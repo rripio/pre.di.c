@@ -1,0 +1,120 @@
+## values cannot be void
+## Numbers: assign "none" to not set
+## Strings: assign "''" to not set
+
+
+
+## speakers
+
+loudspeaker: JBL_LSR305
+
+
+
+## cards
+
+# system card
+# (full ALSA identifier hw:Tarjeta,Device)
+system_card: hw:USB,0
+# cards external to jack (space sepated string if many)
+# (full ALSA identifier hw:Tarjeta,Device)
+external_cards: ''
+# resampler for external cards: alsa | zita
+resampler: zita
+# resampling quality (optional) (0..4 for alsa, 16..96 for zita)
+resamplingQ: 96
+
+
+
+## misc
+
+# delay between commands (seconds)
+command_delay: 1
+# "beep" command options to indicate software load
+beep_options: ''
+# max digital gain (dB)
+gain_max: 6
+# zero some settings on startup (True/False)
+tone_reset_on_startup : False
+balance_reset_on_startup : False
+loudness_reset_on_startup : False
+mono_reset_on_startup: False
+# volume settings on startup. assign null to not set
+level_on_startup: null
+# max Volume on startup. Leave blank to not set
+# precedes level_on_startup
+max_level_on_startup: 0
+# sound monitors (jack ports). Assign '' to not set
+# input selector will connect sources to this ports
+jack_monitors: ''
+
+
+
+## paths & options
+
+# control server
+control_path: ~/bin/server.py
+# screen output: 0 (nothing) - 1 (minimal) - 2 (full)
+control_output: 0
+# screen erasing between commands: True - False
+control_clear: False
+
+# jack
+jack_path: /usr/bin/jackd
+# jack options
+# jack on ALSA: omit cards and fs (managed in initaudio.py)
+jack_options: --silent -R -P 90 -dalsa -p256
+
+# brutefir
+brutefir_path: /usr/bin/brutefir
+# for options see https://www.ludd.ltu.se/~torger/brutefir.html#config
+brutefir_options: ''
+brutefir_ports: brutefir:input-0 brutefir:input-1
+
+# ecasound
+load_ecasound: False # ecasound is optional
+ecasound_path: /usr/bin/ecasound
+# number of parametrics
+# needed PEQxNN_defeat_Fs.ecs template in ~/config
+ecasound_filters: 16
+# ecasound jack ports
+ecasound_ports: ecasound:in_1 ecasound:in_2
+
+
+
+## net
+
+# predic IP address
+ip_address: 192.168.1.3
+# brutefir cli address and port
+bfcli_address: 127.0.0.1
+bfcli_port: 3000
+# control script address and port
+# 0.0.0.0 listen to all net connections
+# 127.0.0.1 listen only to local connections
+control_address: 0.0.0.0
+control_port: 9999
+
+
+
+## equalizer
+
+# filenames of frequencies, loudness curves, tone control curves, 
+frequencies: R20_ext-freq.dat
+loudness_mag_curves: R20_ext-loudness_mag.dat
+loudness_pha_curves: R20_ext-loudness_pha.dat
+treble_mag_curves: R20_ext-treble_mag.dat
+treble_pha_curves: R20_ext-treble_pha.dat
+bass_mag_curves: R20_ext-bass_mag.dat
+bass_pha_curves: R20_ext-bass_pha.dat
+loudness_SPLref: 83
+loudness_SPLmax: 90
+loudness_SPLmin: 70
+# max dB deviation from 0
+tone_variation: 6
+loudness_variation: 7
+balance_variation: 6
+# jump between equalization curves (dB)
+# not yet implemented, given as an indication that must be assumed
+step: 1
+
+
