@@ -68,7 +68,7 @@ jack_options: --silent -R -P 90 -dalsa -p256
 brutefir_path: /usr/bin/brutefir
 # for options see https://www.ludd.ltu.se/~torger/brutefir.html#config
 brutefir_options: ''
-brutefir_ports: brutefir:input-0 brutefir:input-1
+brutefir_ports: brutefir:in.L brutefir:in.R
 
 # ecasound
 load_ecasound: False # ecasound is optional
