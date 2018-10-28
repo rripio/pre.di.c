@@ -67,7 +67,7 @@ def main(run_level):
 
         # jack
         print('(stopaudio) stopping jackd')
-        Popen (['killall', 'jackd'], stdout=fnull, stderr=fnull)
+        Popen (['killall', '-KILL', 'jackd'], stdout=fnull, stderr=fnull)
         time.sleep(1)
 
     if run_level in ['scripts', 'all']:
