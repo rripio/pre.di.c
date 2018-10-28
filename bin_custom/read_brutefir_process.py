@@ -1,8 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-    Módulo interfaz con Brutefir, usado por el módulo presets.py,
-    también funciona en línea de comandos.
+    Módulo interfaz con Brutefir.
 
     Se lee brutefir_config y se conecta con el proceso brutefir.
 
