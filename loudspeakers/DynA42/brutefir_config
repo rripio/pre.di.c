@@ -4,7 +4,7 @@
 
 sampling_rate:     44100;
 
-filter_length:     8192,2;
+filter_length:     32768;
 float_bits:        32;
 
 overflow_warnings: true;
