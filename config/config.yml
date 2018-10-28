@@ -2,19 +2,10 @@
 ## Numbers: assign "none" to not set
 ## Strings: assign "''" to not set
 
+loudspeaker: DynA42
 
-
-## speakers
-
-loudspeaker: JBL_LSR305
-
-
-
-## cards
-
-# system card
 # (full ALSA identifier hw:Tarjeta,Device)
-system_card: hw:USB,0
+system_card: hw:RPiCirrus,0
 # cards external to jack (space sepated string if many)
 # (full ALSA identifier hw:Tarjeta,Device)
 external_cards: ''
@@ -23,31 +14,29 @@ resampler: zita
 # resampling quality (optional) (0..4 for alsa, 16..96 for zita)
 resamplingQ: 96
 
-
-
-## misc
-
 # delay between commands (seconds)
 command_delay: 1
 # "beep" command options to indicate software load
 beep_options: ''
+
 # max digital gain (dB)
 gain_max: 6
+
 # zero some settings on startup (True/False)
 tone_reset_on_startup : False
 balance_reset_on_startup : False
 loudness_reset_on_startup : False
 mono_reset_on_startup: False
+
 # volume settings on startup. assign null to not set
 level_on_startup: null
 # max Volume on startup. Leave blank to not set
 # precedes level_on_startup
 max_level_on_startup: 0
+
 # sound monitors (jack ports). Assign '' to not set
 # input selector will connect sources to this ports
 jack_monitors: ''
-
-
 
 ## paths & options
 
@@ -60,18 +49,17 @@ control_clear: False
 
 # jack
 jack_path: /usr/bin/jackd
-# jack options
 # jack on ALSA: omit cards and fs (managed in initaudio.py)
-jack_options: --silent -R -P 90 -dalsa -p256
+jack_options: --silent -R -dalsa -p2048 -n3
 
 # brutefir
-brutefir_path: /usr/bin/brutefir
 # for options see https://www.ludd.ltu.se/~torger/brutefir.html#config
+brutefir_path: /usr/bin/brutefir
 brutefir_options: ''
 brutefir_ports: brutefir:in.L brutefir:in.R
 
-# ecasound
-load_ecasound: False # ecasound is optional
+# ecasound (optional)
+load_ecasound: False
 ecasound_path: /usr/bin/ecasound
 # number of parametrics
 # needed PEQxNN_defeat_Fs.ecs template in ~/config
@@ -80,11 +68,10 @@ ecasound_filters: 16
 ecasound_ports: ecasound:in_1 ecasound:in_2
 
 
-
 ## net
 
-# predic IP address
-ip_address: 192.168.1.3
+# predic IP address (seems not to be used in PRE.DI.C)
+#ip_address: 192.168.1.203
 # brutefir cli address and port
 bfcli_address: 127.0.0.1
 bfcli_port: 3000
@@ -93,7 +80,6 @@ bfcli_port: 3000
 # 127.0.0.1 listen only to local connections
 control_address: 0.0.0.0
 control_port: 9999
-
 
 
 ## equalizer
