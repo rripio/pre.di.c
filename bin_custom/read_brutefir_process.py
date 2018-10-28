@@ -231,7 +231,7 @@ def main():
               f['cset'].rjust(7) +"   "+ f['cname'].ljust(16) + ca.ljust(11) + f['cpcm']
 
     ################################
-    print "\n--- Jack:"
+    print "\n--- Jack:\n"
     ################################
     for x in jc.jackConexiones("brutefir", "*"):
         print x[0].ljust(30) + x[1].ljust(8) + x[2]
