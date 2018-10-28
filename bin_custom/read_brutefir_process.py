@@ -189,7 +189,7 @@ def read_running():
                 frun['cpcm']   = coeff['pcm']
                 frun['catten'] = coeff['atten']
         # Completamos campos para posibles filtros con coeff: -1;
-        # que no habrán sido detectados en el cruce for coeff in coeffs
+        # que no habrán sido detectados en el cruce de arriba 'for coeff in coeffs'
         if frun['cset'] == '-1':
             frun['cset']    = ''
             frun['cname']   = '-1'
