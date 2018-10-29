@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 '''
-    drc X   --> changes the drc filtering.
-    drc 0   --> sets NO drc filtering.
+    drc X   --> changes the drc filtering to #X
+    drc 0   --> sets NO drc filtering
 '''
 import sys
 import read_brutefir_process as bf
