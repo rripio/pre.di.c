@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# 'nc' on Linux: -N shutdown the network socket after EOF on the input.
-echo "$@" | nc -N localhost 9999
+firtro='localhost'
+
+# 'nc' on Linux: -N shutdown the network socket after EOF on the input.
+echo "$@" | nc -N $firtro 9999
 
 # 'nc' on Mac OS:
-#echo "$@" | nc localhost 9999
+#echo "$@" | nc $firtro 9999
 
 
