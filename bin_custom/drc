@@ -17,7 +17,6 @@ def drc_current():
     bf.read_running()
     cur = []
     for f in [ f for f in bf.filters_running if 'drc' in f['fname'] ]:
-        #cur.append( {'fname':f['fname'],  'cname':f['cname']} )
         cur.append(f)
     return cur
 
@@ -56,14 +55,19 @@ if __name__ == '__main__':
             new_drc = opc
 
     if new_drc:
+        #######################
         drc_change(new_drc)
+        #######################
     else:
+        #######################
         print "\nDRC available:"
+        #######################
         for c in drc_available():
             print '#' + c['name'].split('.')[-2], c['pcm']
 
-    # Print current drc filtering:
+    #######################
     print "\nDRC running:"
+    #######################
     for f in drc_current():
         if f['cname'] <> '-1':
             print f['fname'], '#' + f['cname'].split('.')[-2]
