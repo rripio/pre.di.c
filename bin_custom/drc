@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
     drc X   --> changes the drc filtering to #X
-    drc 0   --> sets NO drc filtering
+    drc 0   --> sets NO drc filtering.
 '''
 import sys
 import read_brutefir_process as bf
@@ -70,6 +70,6 @@ if __name__ == '__main__':
     #######################
     for f in drc_current():
         if f['cname'] <> '-1':
-            print f['fname'], '#' + f['cname'].split('.')[-2]
+            print f['fname'], '#' + f['cname'].split('.')[-2], f['cpcm']
         else:
             print f['fname'], '-1'
