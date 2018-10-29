@@ -1,0 +1,71 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+'''
+    drc X   --> changes the drc filtering.
+    drc 0   --> sets NO drc filtering.
+'''
+import sys
+import read_brutefir_process as bf
+from brutefir_cli import bfcli
+
+# Read Brutefir on the fly:
+bf.read_config()
+bf.read_running()
+
+def drc_current():
+    # read again runnig Brutefir:
+    bf.read_running()
+    cur = []
+    for f in [ f for f in bf.filters_running if 'drc' in f['fname'] ]:
+        #cur.append( {'fname':f['fname'],  'cname':f['cname']} )
+        cur.append(f)
+    return cur
+
+def drc_available():
+    ava = []
+    for c in bf.coeffs:
+        if 'drc' in c['name']:
+            ava.append(c)
+    return ava
+
+def drc_change(x):
+    bfcmds = ''
+    if x == '0':
+        bfcli('cfc "f.drc.L" -1; cfc "f.drc.R" -1; quit;')
+        return
+    for c in [ c for c in bf.coeffs if 'c.drc.'+x  in c['name'] ]:
+            for f in [ f for f in bf.filters_running if 'drc' in f['fname'] ]:
+                cname = c['name']
+                fname = f['fname']
+                if fname[-1] == cname[-1]:
+                    #print "ccc", cname, "fff", fname
+                    bfcmds += 'cfc "' + fname + '" "' + cname + '";'
+    #print bfcmds
+    bfcli(bfcmds + 'quit;')
+
+if __name__ == '__main__':
+
+    new_drc=''
+
+    # Read command line
+    if len(sys.argv) == 1:
+        print __doc__
+
+    for opc in sys.argv:
+        if opc.isdigit():
+            new_drc = opc
+
+    if new_drc:
+        drc_change(new_drc)
+    else:
+        print "\nDRC available:"
+        for c in drc_available():
+            print '#' + c['name'].split('.')[-2], c['pcm']
+
+    # Print current drc filtering:
+    print "\nDRC running:"
+    for f in drc_current():
+        if f['cname'] <> '-1':
+            print f['fname'], '#' + f['cname'].split('.')[-2]
+        else:
+            print f['fname'], '-1'
