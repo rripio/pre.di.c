@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# nc en Linux: -N shutdown the network socket after EOF on the input.
+# 'nc' on Linux: -N shutdown the network socket after EOF on the input.
 echo "$@" | nc -N localhost 9999
 
-# nc en Mac OS:
+# 'nc' on Mac OS:
 #echo "$@" | nc localhost 9999
 
 
