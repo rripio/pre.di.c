@@ -1,0 +1,181 @@
+## folders
+
+music_directory                     "~/music"
+playlist_directory                  "~/playlists"
+db_file                             "~/.mpd/database"
+log_file                            "~/.mpd/log"
+pid_file                            "~/.mpd/pid"
+state_file                          "~/.mpd/mpd_state"
+state_file_interval                 "1"
+sticker_file                        "~/.mpd/sticker.sqlite"
+
+
+## listen to clients
+
+port                    "6600"
+# listen to tcp/ip socket:
+# bind_to_address                     "any"
+bind_to_address                     "0.0.0.0"       # only local network
+# listen to unix socket:
+bind_to_address                     "~/.mpd/socket"
+
+## user when run from root
+
+# user                                "predic"
+# group                               "audio"
+
+
+## database
+
+auto_update                         "yes"
+# auto_update_depth                   "3"
+follow_outside_symlinks             "no"
+follow_inside_symlinks              "no"
+
+
+## input plugins
+
+# open URLs
+input {
+    plugin "curl"
+}
+
+# open CD's
+input {
+    plugin "cdio_paranoia"
+}
+
+
+## Decoders (see active ones with 'mpd --version')
+
+#decoder {
+#    plugin "mad"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "mpg123"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "vorbis"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "oggflac"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "flac"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "opus"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "sndfile"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "audiofile"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "faad"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "mpcdec"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "wavpack"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "modplug"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "sidplay"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "wildmidi"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "fluidsynth"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "adplug"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "gme"
+#    enabled "no"
+#    }
+#decoder {
+#    plugin "pcm"
+#    enabled "no"
+#    }
+
+
+## outputs
+
+# jack audio output
+audio_output {
+    type            "jack"
+    name            "mpd_jack"
+    client_name     "mpd_jack"
+    source_ports    "left,right"
+#    format          "*:*:6"
+    destination_ports "mpd_loop:input_1,mpd_loop:input_2"
+#    destination_ports "brutefir:input-0,brutefir:input-1"
+    mixer_type      "null"
+    enabled         "yes"
+    always_on       "yes"
+}
+
+
+## resampling
+
+samplerate_converter                "soxr high"
+# samplerate_converter                "soxr very high"
+# samplerate_converter                "Medium Sinc Interpolator"
+# samplerate_converter                "Best Sinc Interpolator"
+
+
+## replay gain
+
+replaygain                          "album"
+# replaygain_preamp                   "0"
+# volume_normalization                "no"
+
+
+## misc
+
+filesystem_charset "UTF-8"
+# log_level                           "default"
+# audio_buffer_size                   "4096"
+# buffer_before_play                  "20%"
+metadata_to_use "artist, albumartist, album, title, track, name, genre, date, composer, performer, comment, disc"
+# gapless_mp3_playback                "yes"
+# restore_paused                      "no"
+# save_absolute_paths_in_playlists    "no"
+
+
+## advanced
+
+# connection_timeout                  "60"        # default
+# max_connections                     "5"         # default
+# max_playlist_length                 "16384"     # default)
+# max_command_list_size               "2048"      # default)
+# max_output_buffer_size              "8192"      # default)
+
+
+## zeroconf
+
+# zeroconf_enabled                    "yes"
+# zeroconf_name                       "predic mpd :-)"
