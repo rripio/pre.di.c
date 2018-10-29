@@ -33,7 +33,7 @@
 import sys
 import os
 import time
-from subprocess import Popen
+from subprocess import Popen, check_output
 
 import stopaudio
 import predic as pd
