@@ -74,7 +74,8 @@ def main(run_level):
 
         # stop external scripts, sources and clients
         print('(stopaudio) stopping scripts')
-        for line in open(bp.script_list_path):
+        for line in [ x for x in open(bp.script_list_path)
+                    if not '#' in x ]:
             # dispise options if incorrectly set
             script = line.strip().split()[0]
             script_path = f'{bp.scripts_folder}{script}'

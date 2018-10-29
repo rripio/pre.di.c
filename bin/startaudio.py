@@ -204,7 +204,8 @@ def main(run_level):
         if run_level in ['scripts', 'all']:
             # launch external scripts, sources and clients
             print('\n(startaudio): starting scripts...')
-            for line in open(bp.script_list_path):
+            for line in [ x for x in open(bp.script_list_path)
+                        if not '#' in x ]:
                 # dispise options if incorrectly set
                 script = line.strip().split()[0]
                 path = f'{bp.scripts_folder}{script}'
