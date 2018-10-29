@@ -69,7 +69,10 @@ def init_jack():
     elif not 'dummy' in gc.config['jack_options']:
         print('\n(startaudio) error starting jack: unknown backend')
         sys.exit(-1)
-    jack = Popen(jack_cmd_list)
+    if 'pulseaudio' in check_output("pgrep -fl pulseaudio", shell=True).decode():
+        jack = Popen(['pasuspender', '--'] + jack_cmd_list)
+    else:
+        jack = Popen(jack_cmd_list)
     # waiting for jackd:
     if pd.wait4result('jack_lsp', 'system', tmax=10):
         print('\n(startaudio) jack started :-)')
