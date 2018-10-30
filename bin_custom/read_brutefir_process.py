@@ -25,48 +25,48 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-    Módulo interfaz con Brutefir.
+    A module intended to read the Brutefir convolver running on pre.di.c
 
-    Se lee brutefir_config y se conecta con el proceso brutefir.
+    Four lists are provided:
 
-    Se proporcionan CUATRO listas:
+    .outputsMap:         outputs and its corresponding port in JACK.
+    .coeffs:             available coefficients.
+    .filters_at_start:   filters and coefficients defined into the brutefir_config file.
+    .filters_running:    filters and coefficients in progress.
 
-    outputsMap: lista de salidas y su correspondiente puerto en JACK.
-    coeffs: lista de coeficientes disponibles.
-    filters_at_start: lista de filtros con los coeficientes definidos en la carga de Brutefir.
-    filters_running: lista de filtros con los coeficientes en curso.
-
-    Cada uno de los coeff y de los filtros son diccionarios
+    Each of the provided coeffs and filters are dictionaries.
 """
 
-# v1: se printa
-# - la colección de coeficientes disponibles en brutefir
-# - la configuracion de filtros/coeff definida en brutefir_config
-# - la configuración de filtros/coeff actual que corre en el proceso brutefir
+# v1: prints out
+# - the collection of coefficients available in brutefir
+# - the filter / coeff configuration defined in brutefir_config
+# - the current filter / coeff configuration that runs in the brutefir process
 # v2:
-# - printa el mapeo de salidas de brutefir
-# - printa las conexiones de brutefir en jack
+# - prints the brutefir output mapping
+# - prints brutefir connections on jack
 # v2.1
-# - contempla la existencia de coeff "dirac pulse" para vias full range sin filtrar
+# - admits coeff "dirac pulse" for unfiltered filter stages.
 # v2.1a
-# - Se deja de usar nc localhost en favor de brutefir_cli.py
+# - Stop using nc localhost in favor of brutefir_cli.py
 # v2.1b
-# - Se quitan las comillas en el mapeo de salidas, y se renombra la lista 'outputsMap' para mejor claridad.
+# - The quotes are removed in the output mapping, and the 'outputsMap' list is renamed for better clarity.
 # v2.2
-# - Se simplifica el código
-# - Se usan diccionarios para los coeff y los filtros
-# - Se incluyen las attenuation de los coeff, y en los filters la atten y la polaridad en to_output:
+# - The code is simplified
+# - Dictionaries are used for coeffs and filters
+# - The attenuation of the coeff is included
+# - filters includes 'to_output' field attenuation and polarity
 # v3.0
-# - Adaptación a PRE.DI.C
+# - Adaptation to PRE.DI.C
+# TODO: python3
+
 
 import sys, os
 import subprocess
-import jack_conexiones as jc
+import jack_view_connections as jc
 import brutefir_cli
 
 HOME = os.path.expanduser("~")
 
-# algunos modulos del FIRtro
 sys.path.append(HOME + "/bin")
 
 ############### PRE.DI.C #################
@@ -78,13 +78,13 @@ import getconfigs
 loudspeaker_config, _, _ = getconfigs.get_speaker()
 fs = loudspeaker_config['fs']
 loudspeaker = getconfigs.get_yaml(HOME+'/config/config.yml')['loudspeaker']
-# OjO brutefir_config ya no está en .../44100
+# brutefir_config not anymore under fs folder
 #audio_folder = loudspeakers_folder + loudspeaker + "/" +fs
 audio_folder = loudspeakers_folder + loudspeaker
 brutefir_config = audio_folder + "/brutefir_config"
 
 def read_config():
-    """ se ocupa de leer outputsMap, coeffs, filters_at_start
+    """ reads outputsMap, coeffs, filters_at_start
     """
     global outputsMap, coeffs, filters_at_start
 
@@ -106,11 +106,11 @@ def read_config():
     filterIniciado = False
     filters_at_start = []
 
-    # Bucle de lectura de brutefir.config (linea a linea)
+    # Loops reading lines in brutefir.config
     for linea in lineas:
 
         #######################
-        # Leemos las OUTPUTs
+        # OUTPUTs
         #######################
         if linea.startswith("output"):
             outputIniciado = True
@@ -124,7 +124,7 @@ def read_config():
                 outputsMap = outputsTmp.split(",")
 
         #######################
-        # Recopilamos COEFFs
+        # COEFFs
         #######################
         if linea.startswith("coeff"):
             coeffIniciado = True
@@ -145,7 +145,7 @@ def read_config():
 
 
         #######################################
-        # Recopilamos las etapas de FILTRADO
+        # FILTERs
         #######################################
         if linea.startswith("filter "):
             filterIniciado = True
@@ -164,14 +164,14 @@ def read_config():
 
 
 def read_running():
-    """ lee los filtros que hay corriendo en Brutefir
+    """ Running filters in Brutefir process
     """
     global filters_running
     filters_running = []
     findex = -1
 
     ###########################################################
-    # Obtenemos los filters_running (comando 'lf' en Brutefir)
+    # Get filters running (query 'lf' to Brutefir)
     ###########################################################
     printado = brutefir_cli.bfcli("lf; quit")
 
@@ -202,7 +202,7 @@ def read_running():
             filters_running.append( {'index':str(findex), 'fname':fname, 'cset':cset, 'atten':atten, 'pol':pol} )
 
     #####################################
-    # Cruzamos los filters con los coeff
+    # cross relate filter and  coeffs
     #####################################
     # Tenemos los nombres de los filtros con el número de coeficiente cargado en cada filtro,
     # ahora añadiremos el nombre , el pcm y la atenn del coeficiente.
@@ -221,7 +221,7 @@ def read_running():
             frun['catten']  = '0.0'
 
 def main():
-    """ printa coeffs, filters_running, mapeo de salidas y salidas conectadas
+    """ prints coeffs, filters_running, outputs map and outputs connected in JACK
     """
 
     read_config()
@@ -257,9 +257,12 @@ def main():
     ################################
     print "\n--- Jack:\n"
     ################################
-    for x in jc.jackConexiones("brutefir", "*"):
-        print x[0].ljust(30) + x[1].ljust(8) + x[2]
-
+    for x in jc.jackConns('brutefir'):
+        if x[1] == '-c':
+            tmp = '-->--'
+        if x[1] == '-p':
+            tmp = '--<--'
+        print x[0].ljust(30) + tmp.ljust(8) + x[2]
     print
 
 
