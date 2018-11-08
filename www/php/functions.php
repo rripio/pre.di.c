@@ -8,15 +8,15 @@
     // mediante el 'echo' final.
 
 
-	// Definimos 'command' como el argumento que va a recibir este script PHP server side
+    // Definimos 'command' como el argumento que va a recibir este script PHP server side
     // mediaente las HttpRequest originadas por el código javascript cliente, que es 
     // cargado en el navegador (forma parte del http de la peich)
     $command = $_REQUEST["command"];
 
-	// Aquí almacenamos lo que recibiremos de PRE.DI.C
+    // Aquí almacenamos lo que recibiremos de PRE.DI.C
     $received = null;
 
-	// Función que dialoga con el server TCP/IP de PRE.DI.C
+    // Función que dialoga con el server TCP/IP de PRE.DI.C
     function predic_socket ($cosa) {
         $service_port = 9999;
         $address = "127.0.0.1";
@@ -37,10 +37,9 @@
         return $out;
     }
 
-	$received = predic_socket($command);
-	
-	// PHP devuelve resultados mediante 'echo xxxxx'
-	echo $received;
+    $received = predic_socket($command);
+    
+    // PHP devuelve resultados mediante 'echo xxxxx'
+    echo $received;
     
 ?>
-
