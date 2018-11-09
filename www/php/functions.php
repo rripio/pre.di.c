@@ -7,14 +7,13 @@
     // entonces el server atenderá HTTP_REQUEST, y se devolverán resultados
     // mediante el 'echo' final.
 
-
     // Definimos 'command' como el argumento que va a recibir este script PHP server side
     // mediaente las HttpRequest originadas por el código javascript cliente, que es 
     // cargado en el navegador (forma parte del http de la peich)
     $command = $_REQUEST["command"];
 
-    // Aquí almacenamos lo que recibiremos de PRE.DI.C
-    $received = null;
+    // Inicializamos la variable para devolver resultados ante una request
+    $result = null;
 
     // Función que dialoga con el server TCP/IP de PRE.DI.C
     function predic_socket ($cosa) {
@@ -37,9 +36,21 @@
         return $out;
     }
 
-    $received = predic_socket($command);
-    
+    // Lee el archivo inputs.yml tal cual
+    $inputs_file = "/home/predic/config/inputs.yml";
+    function predic_inputs() {
+        return readfile("/home/predic/config/inputs.yml"); // no funciona readfile($inputs_file); ¿!?
+    }
+
+    if ( $command == "read_inputs_file" ) {
+        $result = predic_inputs();
+    }
+    else {
+        $result = predic_socket($command);
+    }
+        
     // PHP devuelve resultados mediante 'echo xxxxx'
-    echo $received;
+    echo $result;
     
 ?>
+
