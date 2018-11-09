@@ -4,19 +4,22 @@
 
     // Este código PHP reside localmente en el server y no es visible desde el navegador.
     // Este PHP será cargado por Apache (si tiene enabled el php_mod),
-    // entonces el server atenderá HTTP_REQUEST, y se devolverán resultados
-    // mediante el 'echo' final.
+    // entonces se ESCUCHARÁN HTTP_REQUEST como por ejemplo:
+    //     "GET", "php/functions.php?command=level -15"
+    // que son generadas por el js del cliente.
+    // Las RESPUESTAS a dichas request se devolverán mediante el 'echo' al final de este código.
 
     // Definimos 'command' como el argumento que va a recibir este script PHP server side
     // mediaente las HttpRequest originadas por el código javascript cliente, que es 
     // cargado en el navegador (forma parte del http de la peich)
+    // Es
     $command = $_REQUEST["command"];
 
     // Inicializamos la variable para devolver resultados ante una request
     $result = null;
 
     // Función que dialoga con el server TCP/IP de PRE.DI.C
-    function predic_socket ($cosa) {
+    function predic_socket ($cmd) {
         $service_port = 9999;
         $address = "127.0.0.1";
         /* Crear un socket TCP/IP. */
@@ -28,10 +31,8 @@
         if ($result === false) {
             echo "socket_connect() falló.\nRazón: ($result) " . socket_strerror(socket_last_error($socket)) . "\n";
         }
-        socket_write($socket, $cosa, strlen($cosa));
+        socket_write($socket, $cmd, strlen($cmd));
         $out = socket_read($socket, 4096);
-        socket_write($socket, "close", strlen("close"));
-        socket_read($socket, 4096);
         socket_close($socket);
         return $out;
     }
