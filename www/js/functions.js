@@ -62,10 +62,10 @@ function page_update(status) {
 
     document.getElementById("status_DRC").innerHTML = 'DRC: '   + status_decode(status, 'DRC_set');
 
-    document.getElementById("status_BAS").innerHTML = 'BASS: '  + status_decode(status, 'bass');
-    document.getElementById("status_TRE").innerHTML = 'TREB: '  + status_decode(status, 'treble');
+    document.getElementById("bassInfo").innerText   = 'BASS: '  + status_decode(status, 'bass');
+    document.getElementById("trebleInfo").innerText = 'TREB: '  + status_decode(status, 'treble');
 
-    document.getElementById("inputsSelector").value = status_decode(status, 'input');
+    document.getElementById("inputsSelector").value =             status_decode(status, 'input');
 
     document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
     document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
