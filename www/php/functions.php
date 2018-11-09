@@ -12,7 +12,6 @@
     // Definimos 'command' como el argumento que va a recibir este script PHP server side
     // mediaente las HttpRequest originadas por el código javascript cliente, que es 
     // cargado en el navegador (forma parte del http de la peich)
-    // Es
     $command = $_REQUEST["command"];
 
     // Inicializamos la variable para devolver resultados ante una request
