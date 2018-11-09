@@ -16,21 +16,26 @@
     <!-- OjO no meter comentarios dentro de style -->
     <style>
 
-        body    { background-color: rgb(183, 183, 183);
-                  font-family: Verdana, Arial, Helvetica; }
+        body    { color:white;
+                  background-color: rgb(38, 38, 38);
+                  font-family: Verdana, Helvetica, Arial;
+                  font-weight:bold; }
+                  
+        input   { background-color: rgb(185, 185, 185); }
 
-        input   { background-color: rgb(183, 183, 183); }
-
-        button  { background-color: rgb(190, 190, 190); 
+        button  { background-color: rgb(185, 185, 185); 
                   font-size:1.0em;
-                  border-radius: 15%;}
+                  border-radius: 15%; }
 
         th, td  { padding: 5px;
                   text-align: center;
-                  border: 1px solid black;
+                  border: 1px solid gray;
                   font-size:1.0em; }
 
-        select  { font-size:1.0em; }
+        select  { font-size:1.0em;
+                  font-weight:bold;
+                  color:white;
+                  background-color: rgb(25, 25, 25);}
         
     </style>
 
@@ -56,6 +61,7 @@
 
         -->
 
+        <!--Tabla -->
         <div style="overflow-x:auto;"> <!--esto hace que la table sea responsive-->
         <table style="width:100%;">
             <tr>
@@ -71,6 +77,7 @@
 
         <hr>
 
+        <!--Botonera de tonos-->
         <div align="center" style="font-size:0.75em;">
             <button type="button"                 onclick="predic_cmd('bass   -1 add')"  >-</button>
             <span id="bassInfo">bass</span>
@@ -83,6 +90,7 @@
 
         <hr>
 
+        <!--Botonera de mute, mono, loudness-->
         <div align="center">
             <button type="button" id="buttonMute" onclick="predic_cmd('mute toggle')"           ></button>
             <button type="button" id="buttonMono" onclick="predic_cmd('mono toggle')"           ></button>
@@ -91,6 +99,7 @@
 
         <hr>
 
+        <!--Botonera de volumen-->
         <div align="center">
             <button type="button"                 onclick="predic_cmd('level -3 add')" >- 3 dB</button>
             <button type="button"                 onclick="predic_cmd('level -1 add')" >- 1 dB</button>
