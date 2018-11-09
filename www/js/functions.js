@@ -5,8 +5,8 @@
 */
 
 // Función llamada por los eventos de la peich que ordenan algún cambio
-function predic_cmd(cmd) {
-    // console.log(cmd)
+function predic_cmd(cmd, update=true) {
+    //console.log(cmd)
 
     // Envia el comando 'cmd' a PRE.DI.C a través del código PHP del server:
     // https://www.w3schools.com/js/js_ajax_http.asp
@@ -15,14 +15,22 @@ function predic_cmd(cmd) {
     myREQ.send();
 
     // Y actualizamos el nuevo estado en la página
-    get_predic_status();
+    if (update) {
+        get_predic_status();
+    }
 }
 
 // Auto update que se activará al cargar la peich en el navegador
 function page_auto_update() {
-    // OjO aquí con parentesis y en el setInterval SIN paréntesis:
+    
+    // Antes de nada leemos las inputs disponibles en PRE.DI.C
+    fills_inputs_selector()
+    
+    // Inicializamos la peich con el estado de PRE.DI.C
     get_predic_status();
-    setTimeout( setInterval( get_predic_status, 3000 ), 500);
+    // Esperamos 1 s y  programamos el auto-update como tal, cada 3 s:
+    // (OjO la llamada a la función en el setInterval va SIN paréntesis)
+    setTimeout( setInterval( get_predic_status, 3000 ), 1000);
 }
 
 // Obtiene el estado de PRE.DIC.C hablando con el PHP del server
@@ -57,7 +65,7 @@ function page_update(status) {
     document.getElementById("status_BAS").innerHTML = 'BASS: '  + status_decode(status, 'bass');
     document.getElementById("status_TRE").innerHTML = 'TREB: '  + status_decode(status, 'treble');
 
-    document.getElementById("status_INP").innerHTML = 'INPUT: ' + status_decode(status, 'input');
+    document.getElementById("inputsSelector").value = status_decode(status, 'input');
 
     document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
     document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
@@ -85,3 +93,35 @@ function OnOff(prop, truefalse) {
     if ( truefalse == 'true' ) { label = prop.toUpperCase() + ' ON'; }
     return label;
 }
+
+// Prepara el selector de entradas
+function fills_inputs_selector() {
+    
+    // Leemos el contenido de "config/inputs.yml" ...
+    response = "todavia_sin_respuesta";
+    var myREQ = new XMLHttpRequest();
+    myREQ.open(method="GET", url="php/functions.php?command=read_inputs_file", async=false);
+    myREQ.send();
+    response = myREQ.responseText;
+
+    inputs = [];
+
+    // ...y a falta de un decodificador YML, lo analizamos a pedales
+    // para encontrar los nombres de las inputs de PRE.DI.C
+    arr = response.split('\n')
+    for ( i in arr) {
+        if ( (arr[i].substr(-1)==":") && (arr[i].substr(0,1)!=" ") ) {
+            inputs.push( arr[i].slice(0,-1) );
+        }
+    }
+    
+    // Ahora rellenamos el selector de entradas de la peich con las encontradas
+    // https://www.w3schools.com/jsref/met_select_add.asp
+    var x = document.getElementById("inputsSelector");
+    for ( i in inputs) {
+        var option = document.createElement("option");
+        option.text = inputs[i];
+        x.add(option);
+    }
+}
+
