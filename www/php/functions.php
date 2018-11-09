@@ -30,10 +30,13 @@
         if ($result === false) {
             echo "socket_connect() falló.\nRazón: ($result) " . socket_strerror(socket_last_error($socket)) . "\n";
         }
+        // Envia el comando y recibe la respuesta
         socket_write($socket, $cmd, strlen($cmd));
         $out = socket_read($socket, 4096);
+        // Le dice al server que cierre la conexión en su lado
         socket_write($socket, "quit", strlen("quit"));
         socket_read($socket, 4096);
+        /* Finaliza este socket TCP/IP */
         socket_close($socket);
         return $out;
     }
