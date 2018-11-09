@@ -32,6 +32,8 @@
         }
         socket_write($socket, $cmd, strlen($cmd));
         $out = socket_read($socket, 4096);
+        socket_write($socket, "quit", strlen("quit"));
+        socket_read($socket, 4096);
         socket_close($socket);
         return $out;
     }
