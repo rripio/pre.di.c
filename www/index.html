@@ -29,6 +29,9 @@
                   text-align: center;
                   border: 1px solid black;
                   font-size:1.0em; }
+
+        select  { font-size:1.0em; }
+        
     </style>
 
 </head>
@@ -41,14 +44,16 @@
         <!--    Esquema maomeno del display:
 
             level: -23.0    balance: 0.0    XO: mp
-            DRC: a                          bass: 0
-            input: analog                   treble: 0
+            DRC: a          bass: 0         treble: 0
             
                    [-]bass[+]   [-]treble[+]
 
                      [mono][mute][loud]
 
                       [-3][-1][+1][+3]
+                      
+            [[ input ]]
+
         -->
 
         <div style="overflow-x:auto;"> <!--esto hace que la table sea responsive-->
@@ -60,12 +65,7 @@
             </tr>
             <tr>
                 <td id="status_DRC" ></td>
-                <td id="status_PEQ" ></td>
                 <td id="status_BAS" ></td>
-            </tr>
-            <tr>
-                <td id="status_INP" ></td>
-                <td id="void1"      ></td>
                 <td id="status_TRE" ></td>
             </tr>
         </table> 
@@ -95,6 +95,9 @@
             <button type="button"                 onclick="predic_cmd('level +3 add')" >+ 3 dB</button>
         </div>
         <hr>
+
+        <!--Selector de entradas automágico-->
+        <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
 
     </div><!--main-->
 
