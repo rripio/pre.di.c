@@ -1,16 +1,22 @@
 <?php
 
-    // Para depurar https://www.ibm.com/developerworks/library/os-debug/index.html
-    // En nuestro caso también podemos hacer aquí echo $miVariable, que será recibida por
-    // la función JS que haya hecho la http request en el cliente y printarlo allí en 
-    // la consola del navegador con console.log(respuesta).
+    /*
+     * Para depurar https://www.ibm.com/developerworks/library/os-debug/index.html
+     * En nuestro caso también podemos hacer aquí echo $miVariable, que será recibida por
+     * la función JS que haya hecho la http request en el cliente y printarlo allí en 
+     * la consola del navegador con console.log(respuesta).
+     *
+     * Este código PHP reside localmente en el server y no es visible desde el navegador.
+     * Este PHP sera cargado por Apache (si tiene enabled el php_mod),
+     * entonces se ESCUCHARAN HTTP_REQUEST como por ejemplo:
+     *     "GET", "php/functions.php?command=level -15"
+     * que son generadas por el JS del cliente.
+     * 
+     * Las RESPUESTAS se devolverán mediante la salida estandar de este código,
+     * bien mediante 'echo xxxx' o bien mediante algunas funciones que vuelcan su resultado
+     * directamente a la salida estandar, como por ejemplo 'readfile()' -ver abajo-
+     */
 
-    // Este código PHP reside localmente en el server y no es visible desde el navegador.
-    // Este PHP sera cargado por Apache (si tiene enabled el php_mod),
-    // entonces se ESCUCHARAN HTTP_REQUEST como por ejemplo:
-    //     "GET", "php/functions.php?command=level -15"
-    // que son generadas por el JS del cliente.
-    // Las RESPUESTAS se devolverán mediante el 'echo' al final de este código.
 
     // Este script debe conocer el nombre del altavoz running para acceder al path
     // adecuado a la hora de proporcionar un archivo speaker.yml al cliente
@@ -61,13 +67,14 @@
     // y devuelve resultados mediante 'echo xxxxx'
     ///////////////////////////////////////////////////
     
-    // http://php.net/manual/en/reserved.variables.request.php
-    // PHP server side recibe arrays asociativas, o sea diccionarios, mediante los métodos
-    // GET o PUT de las HTTPREQUEST originadas por un código del cliente, en nuestro caso
-    // es el JS cargado en el navegador que forma parte de la peich.
-    // La array es lo que el cliente pone detrás del interrogante, por ejemplo:
-    //          "GET", "php/functions.php?command=level -15"
-    // Como es un array, debemos seleccionar la clave que nos interesa:
+    /* http://php.net/manual/en/reserved.variables.request.php
+    * PHP server side recibe arrays asociativas, o sea diccionarios, mediante los métodos
+    * GET o PUT de las HTTPREQUEST originadas por un código del cliente, en nuestro caso
+    * es el JS cargado en el navegador que forma parte de la peich.
+    * La array es lo que el cliente pone detrás del interrogante, por ejemplo:
+    *          "GET", "php/functions.php?command=level -15"
+    * Como es un array, debemos seleccionar la clave que nos interesa:
+    */
     $command = $_REQUEST["command"];
 
     // Comandos especiales:
