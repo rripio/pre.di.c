@@ -13,28 +13,27 @@ XO:
         - f.fr.L
         - f.fr.R
     sets:
-        mp:
+        fullrange_mp:
             - c.mp.fr.L
             - c.mp.fr.R
-        '2':
+        fullrange_mp_repetido:
             - c.mp.fr.L
             - c.mp.fr.R
     comments:
-        mp: Full range, minimum phase equalizer
-        '2': Same equalizer, for switching testing
+        fullrange_mp: Full range, minimum phase equalizer
+        fullrange_mp_repetido: Same equalizer, for switching testing
 
 DRC:
     filters:
         - f.drc.L
         - f.drc.R
     sets:
-        a:
+        multip_avg_7_points_mp:
             - c.drc.1.L
             - c.drc.1.R
-        b:
-            - c.drc.1.L
-            - c.drc.1.R
+        multip_avg_7_points_lp:
+            - c.drc.2.L
+            - c.drc.2.R
     comments:
-        a: Full range, minimum phase equalizer
-        b: Same equalizer, for switching testing
-            
+        multip_avg_7_points_mp: multipoint averaged 7 points DRC minimum phase FIR
+        multip_avg_7_points_lp: multipoint averaged 7 points DRC linear phase FIR
