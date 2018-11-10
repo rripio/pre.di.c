@@ -23,14 +23,15 @@
                   
         input   { background-color: rgb(185, 185, 185); }
 
-        button  { background-color: rgb(185, 185, 185); 
+        button  { background-color: rgb(185, 185, 185);
                   font-size:1.0em;
                   border-radius: 15%; }
 
         th, td  { padding: 5px;
                   text-align: center;
                   border: 1px solid gray;
-                  font-size:1.0em; }
+                  font-size:1.0em;
+                  width: 50% }
 
         select  { font-size:1.0em;
                   font-weight:bold;
@@ -48,8 +49,7 @@
         
         <!--    Esquema maomeno del display:
 
-            level: -23.0    balance: 0.0    XO: mp
-            DRC: a          
+            level: -23.0        balance: 0.0
             
              [-] bass: 0 [+]   [-] treble: 0 [+]
 
@@ -57,7 +57,10 @@
 
                       [-3][-1][+1][+3]
                       
+                    [[ XO ]]   [[ DRC ]]
+
             [[ input ]]
+
 
         -->
 
@@ -70,10 +73,6 @@
             <tr>
                 <td id="status_LEV" ></td>
                 <td id="status_BAL" ></td>
-                <td id="status_XO"  ></td>
-            </tr>
-            <tr>
-                <td id="status_DRC" colspan="3"></td>
             </tr>
         </table> 
         </div>
@@ -112,13 +111,34 @@
 
         <hr>
 
-        <!--Selector de entradas automágico-->
-        <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
+        <div align="center">
 
-        <!--Botón para probar funciones JS con onclick-->
-        <div align="right">
-            <button type="button"                 onclick="get_speaker()" >PBA</button>
+            <!--Selector de XO automágico-->
+            <span>&nbsp;&nbsp;XO:&nbsp;
+            <select id="xoSelector"     onchange="predic_cmd('xo ' + this.value, update=false)" ></select>
+            </span>
+
+            <!--Selector de DRC automágico-->
+            <span>&nbsp;&nbsp;DRC:&nbsp;
+            <select id="drcSelector"     onchange="predic_cmd('drc ' + this.value, update=false)" ></select>
+            </span>
+
         </div>
+
+        <hr>
+
+        <!--Selector de entradas automágico-->
+        <span>INPUT:&nbsp;
+        <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
+        </span>
+
+        <hr>
+
+        <!--Botón para probar funciones JS con onclick
+        <div align="right">
+            <button type="button"                 onclick="fills_xo_selector()" >PBA</button>
+        </div>
+        -->
         
     </div><!--main-->
 
