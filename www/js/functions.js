@@ -135,7 +135,7 @@ function status_decode(status, prop) {
 
 // Auxiliar para rotular propiedades como por ejemplo muted:true/false ==> 'MUTE ON' / 'mute off'
 function OnOff(prop, truefalse) {
-    var label;
+    var label = '';
     label = prop + ' off'
     if ( truefalse == 'true' ) { label = prop.toUpperCase() + ' ON'; }
     return label;
@@ -146,7 +146,7 @@ function fills_inputs_selector() {
     var inputs = [];
 
     // Leemos el contenido de "config/inputs.yml"
-    // y a falta de un decodificador YML, lo analizamos a pedales
+    // y a falta de un decodificador YAML, lo analizamos a pedales
     var arr = get_file('inputs').split('\n')
     for ( i in arr) {
         if ( (arr[i].substr(-1)==":") && (arr[i].substr(0,1)!=" ") ) {
@@ -201,7 +201,7 @@ function get_loudspeaker() {
     return result;
 }
 
-// Obtiene la lista de sets de una propiedad del altavoz
+// Obtiene la lista con los 'sets:' declarados en una propiedad del altavoz, por ej 'XO:' o 'DRC:'
 function get_speaker_prop_sets(prop) {
     var prop_sets = [];
     var yaml = get_file('speaker');
@@ -244,8 +244,3 @@ function indentLevel(linea) {
     }
     return (level);
 }
-
-
-
-
-
