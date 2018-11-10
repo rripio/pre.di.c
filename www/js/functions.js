@@ -20,11 +20,14 @@ function predic_cmd(cmd, update=true) {
     }
 }
 
-// Auto update que se activará al cargar la peich en el navegador
-function page_auto_update() {
-    
+// Inicializa le peich incluyendo su auto-update
+function page_initiate() {
+            
     // Antes de nada leemos las inputs disponibles en PRE.DI.C
     fills_inputs_selector()
+    
+    // Cabecera de la peich
+    document.getElementById("cabecera").innerText = ':: PRE.DI.C :: ' + get_loudspeaker() + ' ::';
     
     // Inicializamos la peich con el estado de PRE.DI.C
     get_predic_status();
@@ -96,19 +99,12 @@ function OnOff(prop, truefalse) {
 
 // Prepara el selector de entradas
 function fills_inputs_selector() {
-    
-    // Leemos el contenido de "config/inputs.yml" ...
-    response = "todavia_sin_respuesta";
-    var myREQ = new XMLHttpRequest();
-    myREQ.open(method="GET", url="php/functions.php?command=read_inputs_file", async=false);
-    myREQ.send();
-    response = myREQ.responseText;
-
     inputs = [];
 
-    // ...y a falta de un decodificador YML, lo analizamos a pedales
+    // Leemos el contenido de "config/inputs.yml"
+    // y a falta de un decodificador YML, lo analizamos a pedales
     // para encontrar los nombres de las inputs de PRE.DI.C
-    arr = response.split('\n')
+    arr = get_file('inputs').split('\n')
     for ( i in arr) {
         if ( (arr[i].substr(-1)==":") && (arr[i].substr(0,1)!=" ") ) {
             inputs.push( arr[i].slice(0,-1) );
@@ -125,3 +121,46 @@ function fills_inputs_selector() {
     }
 }
 
+// Obtiene el nombre del altavoz
+// (nota: ahora php ya lo conoce se lo podríamos preguntar pero esto lo hice antes)
+function get_loudspeaker() {
+    result = null
+    config = get_file('config');
+    lines = config.split('\n')
+    for ( i in lines ) {
+        line = lines[i];
+        if ( line.trim().split(':')[0] == 'loudspeaker' ){
+            result = line.trim().split(':')[1];
+        }
+    }
+    return result;
+}
+
+// Obtiene el archivo 'loudspeakers/RUNNINGALTAVOZ/speaker.yml' con la configuracion del altavoz
+function get_speaker() {
+    speaker_config = get_file('speaker');
+    //console.log(speaker_config);
+}
+
+// Auxiliar ortopédico para pedir ciertos archivos al servidor PHP
+function get_file(fid) {
+    if      ( fid == 'inputs' ) {
+        phpCmd = 'read_inputs_file';
+    }
+    else if ( fid == 'config' ) {
+        phpCmd = 'read_config_file';
+    }
+    else if ( fid == 'speaker' ) {
+        phpCmd = 'read_speaker_file';
+    }
+    else {
+        return null;
+    }
+    response = "todavia_sin_respuesta";
+    var myREQ = new XMLHttpRequest();
+    // async=false NO es recomendable, pero esto sólo se ejecuta al inicio
+    // y de esta forma llega lo que tiene que llegar ;-)
+    myREQ.open(method="GET", url="php/functions.php?command=" + phpCmd, async=false);
+    myREQ.send();
+    return (myREQ.responseText);
+}
