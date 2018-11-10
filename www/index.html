@@ -41,8 +41,8 @@
 
 </head>
 
-<!-- Actualización periódica de la peich-->
-<body onload="page_auto_update()" >
+<!-- Inicializa la peich, incluyendo su actualización periódica -->
+<body onload="page_initiate()" >
     
     <div id="main">
         
@@ -60,6 +60,9 @@
             [[ input ]]
 
         -->
+
+        <div id="cabecera" align="center"></div>
+        <hr>
 
         <!--Tabla -->
         <div style="overflow-x:auto;"> <!--esto hace que la table sea responsive-->
@@ -112,8 +115,12 @@
         <!--Selector de entradas automágico-->
         <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
 
+        <!--Botón para probar funciones JS con onclick-->
+        <div align="right">
+            <button type="button"                 onclick="get_speaker()" >PBA</button>
+        </div>
+        
     </div><!--main-->
-
 
 </body>
 </html>
