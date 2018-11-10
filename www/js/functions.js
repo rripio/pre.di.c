@@ -61,19 +61,25 @@ function get_predic_status() {
 // Vuelca el estado de PRE.DI.C en la peich
 function page_update(status) {
     
-    document.getElementById("status_LEV").innerHTML = 'LEVEL: ' + status_decode(status, 'level');
-    document.getElementById("status_BAL").innerHTML = 'BAL: '   + status_decode(status, 'balance');
+    // Tabla de LEVEL y BALANCE
+    document.getElementById("status_LEV").innerHTML = 'LEVEL: '   + status_decode(status, 'level');
+    document.getElementById("status_BAL").innerHTML = 'balance: ' + status_decode(status, 'balance');
 
-    document.getElementById("bassInfo").innerText   = 'BASS: '  + status_decode(status, 'bass');
-    document.getElementById("trebleInfo").innerText = 'TREB: '  + status_decode(status, 'treble');
+    // Texto que acompaña a los botones de Tonos
+    document.getElementById("bassInfo").innerText   = 'BASS: '    + status_decode(status, 'bass');
+    document.getElementById("trebleInfo").innerText = 'TREB: '    + status_decode(status, 'treble');
 
-    document.getElementById("inputsSelector").value =             status_decode(status, 'input');
+    // Elemento seleccionado en los selectores de INPUTS, XO y DRC
+    document.getElementById("inputsSelector").value =               status_decode(status, 'input');
+    document.getElementById("xoSelector").value     =               status_decode(status, 'XO_set');
+    document.getElementById("drcSelector").value    =               status_decode(status, 'DRC_set');
 
+    // Rótulo de los botones MUTE, MONO, LOUDNESS
     document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
     document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
     document.getElementById("buttonLoud").innerHTML = OnOff( 'loud', status_decode(status, 'loudness_track') );
     
-    // destacamos los botones que están activados
+    // Destacamos los botones que están activados
     if ( status_decode(status, 'muted') == 'true' ) {
         document.getElementById("buttonMute").style.background = "rgb(185, 185, 185)";
     } else {
@@ -141,7 +147,6 @@ function fills_inputs_selector() {
 
     // Leemos el contenido de "config/inputs.yml"
     // y a falta de un decodificador YML, lo analizamos a pedales
-    // para encontrar los nombres de las inputs de PRE.DI.C
     var arr = get_file('inputs').split('\n')
     for ( i in arr) {
         if ( (arr[i].substr(-1)==":") && (arr[i].substr(0,1)!=" ") ) {
@@ -184,7 +189,7 @@ function fills_drc_selector() {
 // Obtiene el nombre del altavoz
 // (nota: ahora php ya lo conoce se lo podríamos preguntar pero esto lo hice antes)
 function get_loudspeaker() {
-    var result = null;
+    var result = '';
     var config = get_file('config');
     var lines = config.split('\n');
     for ( i in lines ) {
@@ -196,15 +201,10 @@ function get_loudspeaker() {
     return result;
 }
 
-// Obtiene el archivo 'loudspeakers/RUNNINGALTAVOZ/speaker.yml' con la configuracion del altavoz
-function get_speaker() {
-    return get_file('speaker');
-}
-
 // Obtiene la lista de sets de una propiedad del altavoz
 function get_speaker_prop_sets(prop) {
     var prop_sets = [];
-    var yaml = get_speaker();
+    var yaml = get_file('speaker');
 
     // yaml es un YAML, lo suyo sería usar un parser pero vamos a hacerlo a manubrio:
     var arr = yaml.split("\n");
@@ -244,4 +244,8 @@ function indentLevel(linea) {
     }
     return (level);
 }
+
+
+
+
 
