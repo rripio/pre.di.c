@@ -23,8 +23,10 @@ function predic_cmd(cmd, update=true) {
 // Inicializa le peich incluyendo su auto-update
 function page_initiate() {
             
-    // Antes de nada leemos las inputs disponibles en PRE.DI.C
+    // Completamos los selectore de inputs, XO y DRC
     fills_inputs_selector()
+    fills_xo_selector()
+    fills_drc_selector()
     
     // Cabecera de la peich
     document.getElementById("cabecera").innerText = ':: PRE.DI.C :: ' + get_loudspeaker() + ' ::';
@@ -61,28 +63,63 @@ function page_update(status) {
     
     document.getElementById("status_LEV").innerHTML = 'LEVEL: ' + status_decode(status, 'level');
     document.getElementById("status_BAL").innerHTML = 'BAL: '   + status_decode(status, 'balance');
-    document.getElementById("status_XO" ).innerHTML = 'XO: '    + status_decode(status, 'XO_set');
-
-    document.getElementById("status_DRC").innerHTML = 'DRC: '   + status_decode(status, 'DRC_set');
 
     document.getElementById("bassInfo").innerText   = 'BASS: '  + status_decode(status, 'bass');
     document.getElementById("trebleInfo").innerText = 'TREB: '  + status_decode(status, 'treble');
 
     document.getElementById("inputsSelector").value =             status_decode(status, 'input');
 
-    document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
     document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
+    document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
     document.getElementById("buttonLoud").innerHTML = OnOff( 'loud', status_decode(status, 'loudness_track') );
+    
+    // destacamos los botones que están activados
+    if ( status_decode(status, 'muted') == 'true' ) {
+        document.getElementById("buttonMute").style.background = "rgb(185, 185, 185)";
+    } else {
+        document.getElementById("buttonMute").style.background = "rgb(100, 100, 100)";
+    }
+    if ( status_decode(status, 'mono') == 'true' ) {
+        document.getElementById("buttonMono").style.background = "rgb(185, 185, 185)";
+    } else {
+        document.getElementById("buttonMono").style.background = "rgb(100, 100, 100)";
+    }
+    if ( status_decode(status, 'loudness_track') == 'true' ) {
+        document.getElementById("buttonLoud").style.background = "rgb(185, 185, 185)";
+    } else {
+        document.getElementById("buttonLoud").style.background = "rgb(100, 100, 100)";
+    }
+}
+
+// Auxiliar ortopédico para pedir ciertos archivos al servidor PHP
+function get_file(fid) {
+    var phpCmd   = "";
+    var response = "todavia_sin_respuesta";
+    if      ( fid == 'inputs' ) {
+        phpCmd = 'read_inputs_file';
+    }
+    else if ( fid == 'config' ) {
+        phpCmd = 'read_config_file';
+    }
+    else if ( fid == 'speaker' ) {
+        phpCmd = 'read_speaker_file';
+    }
+    else {
+        return null;
+    }
+    var myREQ = new XMLHttpRequest();
+    // async=false NO es recomendable, pero esto sólo se ejecuta al inicio
+    // y de esta forma llega lo que tiene que llegar ;-)
+    myREQ.open(method="GET", url="php/functions.php?command=" + phpCmd, async=false);
+    myREQ.send();
+    return (myREQ.responseText);
 }
 
 // Averigua el valor de una de las propiedades del chorizo status de PRE.DI.C
 function status_decode(status, prop) {
-    //console.log(status)
-    result = null
-    arr = status.split("\n"); // Casa propiedad:valor vienen separados por saltos de línea
-    //console.log(arr)
+    var result = "";
+    arr = status.split("\n"); // Las parejas 'propiedad:valor' vienen separadas por saltos de línea
     for ( i in arr ) {
-        //console.log(arr[i])
         if ( prop == arr[i].split(":")[0] ) {
             result = arr[i].split(":")[1]
         }
@@ -92,6 +129,7 @@ function status_decode(status, prop) {
 
 // Auxiliar para rotular propiedades como por ejemplo muted:true/false ==> 'MUTE ON' / 'mute off'
 function OnOff(prop, truefalse) {
+    var label;
     label = prop + ' off'
     if ( truefalse == 'true' ) { label = prop.toUpperCase() + ' ON'; }
     return label;
@@ -99,12 +137,12 @@ function OnOff(prop, truefalse) {
 
 // Prepara el selector de entradas
 function fills_inputs_selector() {
-    inputs = [];
+    var inputs = [];
 
     // Leemos el contenido de "config/inputs.yml"
     // y a falta de un decodificador YML, lo analizamos a pedales
     // para encontrar los nombres de las inputs de PRE.DI.C
-    arr = get_file('inputs').split('\n')
+    var arr = get_file('inputs').split('\n')
     for ( i in arr) {
         if ( (arr[i].substr(-1)==":") && (arr[i].substr(0,1)!=" ") ) {
             inputs.push( arr[i].slice(0,-1) );
@@ -121,12 +159,34 @@ function fills_inputs_selector() {
     }
 }
 
+// Prepara el selector de XO
+function fills_xo_selector() {
+    var xo_sets = get_speaker_prop_sets('XO');
+    var x = document.getElementById("xoSelector");
+    for ( i in xo_sets ) {
+        var option = document.createElement("option");
+        option.text = xo_sets[i];
+        x.add(option);
+    }
+}
+
+// Prepara el selector de DRC
+function fills_drc_selector() {
+    var drc_sets = get_speaker_prop_sets('DRC');
+    var x = document.getElementById("drcSelector");
+    for ( i in drc_sets ) {
+        var option = document.createElement("option");
+        option.text = drc_sets[i];
+        x.add(option);
+    }
+}
+
 // Obtiene el nombre del altavoz
 // (nota: ahora php ya lo conoce se lo podríamos preguntar pero esto lo hice antes)
 function get_loudspeaker() {
-    result = null
-    config = get_file('config');
-    lines = config.split('\n')
+    var result = null;
+    var config = get_file('config');
+    var lines = config.split('\n');
     for ( i in lines ) {
         line = lines[i];
         if ( line.trim().split(':')[0] == 'loudspeaker' ){
@@ -138,29 +198,50 @@ function get_loudspeaker() {
 
 // Obtiene el archivo 'loudspeakers/RUNNINGALTAVOZ/speaker.yml' con la configuracion del altavoz
 function get_speaker() {
-    speaker_config = get_file('speaker');
-    //console.log(speaker_config);
+    return get_file('speaker');
 }
 
-// Auxiliar ortopédico para pedir ciertos archivos al servidor PHP
-function get_file(fid) {
-    if      ( fid == 'inputs' ) {
-        phpCmd = 'read_inputs_file';
+// Obtiene la lista de sets de una propiedad del altavoz
+function get_speaker_prop_sets(prop) {
+    var prop_sets = [];
+    var yaml = get_speaker();
+
+    // yaml es un YAML, lo suyo sería usar un parser pero vamos a hacerlo a manubrio:
+    var arr = yaml.split("\n");
+    var dentroDeProp = false, dentroDeSets = false, indentOfSets = 0;
+    for (i in arr) {
+        linea = arr[i];
+        if ( linea.trim().replace(' ','') == prop+':') { dentroDeProp = true; };
+        if ( dentroDeProp ) {
+            
+            if ( linea.indexOf('sets:') != -1 ) {
+                dentroDeSets = true;
+                indentOfSets = indentLevel(linea);
+                continue;
+            }
+
+            if ( dentroDeSets && indentLevel(linea) <= indentOfSets ){
+                     break;
+            }            
+            
+            if ( dentroDeSets ) {
+                if ( linea.trim().substr(-1) == ':' ) {
+                    prop_sets.push(linea.trim().replace(':','') );
+                };
+            }
+        }
     }
-    else if ( fid == 'config' ) {
-        phpCmd = 'read_config_file';
-    }
-    else if ( fid == 'speaker' ) {
-        phpCmd = 'read_speaker_file';
-    }
-    else {
-        return null;
-    }
-    response = "todavia_sin_respuesta";
-    var myREQ = new XMLHttpRequest();
-    // async=false NO es recomendable, pero esto sólo se ejecuta al inicio
-    // y de esta forma llega lo que tiene que llegar ;-)
-    myREQ.open(method="GET", url="php/functions.php?command=" + phpCmd, async=false);
-    myREQ.send();
-    return (myREQ.responseText);
+    return (prop_sets);
 }
+
+// Auxiliar para averiguar el nivel de indentación de una linea de código,
+// por ejemplo de una linea de un archivo YAML.
+function indentLevel(linea) {
+    var level = 0;
+    for ( i in linea ) {
+        if ( linea[i] != ' ' ) { break;}
+        level += 1;
+    }
+    return (level);
+}
+
