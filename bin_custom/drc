@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 '''
-    Cambia al vuelo los coeff de DRC disponibles en Brutefir
-    (i) NO está coordinado con el server de PRE.DI.C
+    Shows and changes Brutefir's DRC coeffs
+    (i) NOT coordinated with the PRE.DI.C server
 
     drc X   --> changes the drc filtering to #X
     drc 0   --> sets NO drc filtering.
