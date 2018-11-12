@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    
     <title>PRE.DI.C</title>
-
+    
     <!-- responsive -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     <meta charset="utf-8">
 
@@ -79,22 +78,22 @@
 
         <!--Botonera de tonos-->
         <div align="center" style="font-size:0.75em;">
-            <button type="button"                 onclick="predic_cmd('bass   -1 add')"  >-</button>
+            <button type="button"                 onmousedown="predic_cmd('bass   -1 add')"  >-</button>
             <span id="bassInfo">bass</span>
-            <button type="button"                 onclick="predic_cmd('bass   +1 add')"  >+</button>
+            <button type="button"                 onmousedown="predic_cmd('bass   +1 add')"  >+</button>
             &nbsp;&nbsp;&nbsp;
-            <button type="button"                 onclick="predic_cmd('treble -1 add')"  >-</button>
+            <button type="button"                 onmousedown="predic_cmd('treble -1 add')"  >-</button>
             <span id="trebleInfo">treble</span>
-            <button type="button"                 onclick="predic_cmd('treble +1 add')"  >+</button>
+            <button type="button"                 onmousedown="predic_cmd('treble +1 add')"  >+</button>
         </div>
 
         <hr>
 
         <!--Botonera de mute, mono, loudness-->
         <div align="center">
-            <button type="button" id="buttonMute" onclick="predic_cmd('mute toggle')"           ></button>
-            <button type="button" id="buttonMono" onclick="predic_cmd('mono toggle')"           ></button>
-            <button type="button" id="buttonLoud" onclick="predic_cmd('loudness_track toggle')" ></button>
+            <button type="button" id="buttonMute" onmousedown="predic_cmd('mute toggle')"           ></button>
+            <button type="button" id="buttonMono" onmousedown="predic_cmd('mono toggle')"           ></button>
+            <button type="button" id="buttonLoud" onmousedown="predic_cmd('loudness_track toggle')" ></button>
         </div>
 
         <hr>
@@ -126,10 +125,10 @@
 
         <!--Botonera de volumen-->
         <div align="center">
-            <button type="button"                 onclick="predic_cmd('level -3 add')" >- 3</button>
-            <button type="button"                 onclick="predic_cmd('level -1 add')" >- 1</button>
-            <button type="button"                 onclick="predic_cmd('level +1 add')" >+ 1</button>
-            <button type="button"                 onclick="predic_cmd('level +3 add')" >+ 3</button>
+            <button type="button"                 onmousedown="predic_cmd('level -3 add')" >- 3</button>
+            <button type="button"                 onmousedown="predic_cmd('level -1 add')" >- 1</button>
+            <button type="button"                 onmousedown="predic_cmd('level +1 add')" >+ 1</button>
+            <button type="button"                 onmousedown="predic_cmd('level +3 add')" >+ 3</button>
         </div>
 
         <hr>
