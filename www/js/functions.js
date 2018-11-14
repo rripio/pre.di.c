@@ -4,10 +4,8 @@
  * ***  y la respuesta de las botoneras se verá afectada.
 */
 
-// Función llamada por los eventos de la peich que ordenan algún cambio
+// Función llamada por los eventos de la peich que ordenan algún cambio a PRE.DI.C
 function predic_cmd(cmd, update=true) {
-    //console.log(cmd)
-
     // Envia el comando 'cmd' a PRE.DI.C a través del código PHP del server:
     // https://www.w3schools.com/js/js_ajax_http.asp
     var myREQ = new XMLHttpRequest();
@@ -18,6 +16,13 @@ function predic_cmd(cmd, update=true) {
     if (update) {
         get_predic_status();
     }
+}
+
+// Función para hacer cosas allí (solo las cosas habilitadas en el código php que hay en el server)
+function remoterun(cmd) {
+    var myREQ = new XMLHttpRequest();
+    myREQ.open("GET", "php/functions.php?command=" +  cmd, true);
+    myREQ.send();
 }
 
 // Inicializa le peich incluyendo su auto-update
