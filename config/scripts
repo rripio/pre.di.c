@@ -1,3 +1,4 @@
 mpd.py
-DVB.py
-netjack.py
+#DVB.py
+#netjack.py
+server_local.py
