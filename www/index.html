@@ -48,20 +48,38 @@
         
         <!--    Esquema maomeno del display:
 
+            power << ON/OFF >>  INPUT: << selector >>
             level: -23.0        balance: 0.0
             
              [-] bass: 0 [+]   [-] treble: 0 [+]
 
                      [mute][mono][loud]
 
-                   XO: [[ selector ]]
-                  DRC: [[ selector ]]
-                INPUT: [[ selector ]]
+                   XO: << selector >>
+                  DRC: << selector >>
 
                       [-3][-1][+1][+3]
         -->
+        <div id="cabecera" align="center">
+        </div>
+        
+        <hr>
 
-        <div id="cabecera" align="center"></div>
+        <div align="center">
+            <!--Enciende y apaga el ampli-->
+            <span>power
+            <select id="onoff"          onchange="remoterun('ampli' + this.value)">
+              <option value="on" >ON </option>
+              <option value="off">OFF</option>
+            </span>
+            </select>            
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <!--Selector de entradas automágico-->
+            <span>INPUT:
+            <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
+            </span>
+        </div>
+
         <hr>
 
         <!--Tabla -->
@@ -109,15 +127,6 @@
             <!--Selector de DRC automágico-->
             <span>DRC:
             <select id="drcSelector"     onchange="predic_cmd('drc ' + this.value, update=false)" ></select>
-            </span>
-        </div>
-
-        <hr>
-
-        <div align="center">
-            <!--Selector de entradas automágico-->
-            <span>INPUT:
-            <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
             </span>
         </div>
 
