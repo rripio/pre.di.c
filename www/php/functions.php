@@ -41,7 +41,31 @@
     // Dialoga con el server TCP/IP de PRE.DI.C
     function predic_socket ($cmd) {
         $service_port = 9999;
-        $address = "127.0.0.1";
+        $address = "localhost";
+        /* Crear un socket TCP/IP */
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        if ($socket === false) {
+            echo "socket_create() fallo: razon: " . socket_strerror(socket_last_error()) . "\n";
+        }
+        $result = socket_connect($socket, $address, $service_port);
+        if ($result === false) {
+            echo "socket_connect() fallo.\nRazon: ($result) " . socket_strerror(socket_last_error($socket)) . "\n";
+        }
+        // Envía el comando y recibe la respuesta
+        socket_write($socket, $cmd, strlen($cmd));
+        $out = socket_read($socket, 4096);
+        // Le dice al server que cierre la conexión en su lado
+        socket_write($socket, "quit", strlen("quit"));
+        socket_read($socket, 4096);
+        /* Finaliza este socket TCP/IP */
+        socket_close($socket);
+        return $out;
+    }
+
+    // Dialoga con el server TCP/IP 'server_local.py' que hace lo que se le pida =|:0
+    function local_socket ($cmd) {
+        $service_port = 9988;
+        $address = "localhost";
         /* Crear un socket TCP/IP */
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if ($socket === false) {
@@ -79,7 +103,8 @@
 
     // Comandos especiales:
     if ( $command == "read_inputs_file" ) {
-        // OjO readfile hace el solito un echo del contenido del archivo, a saco.
+        // OjO readfile proporciona un 'echo' del contenido del archivo, a saco.
+        // Es decir: vuelca el contenido del archivo a la salida estandar de php.
         readfile("/home/predic/config/inputs.yml");
     }
     elseif ( $command == "read_config_file" ) {
@@ -89,11 +114,16 @@
         $fpath = "/home/predic/loudspeakers/".get_loudspeaker()."/speaker.yml";
         readfile($fpath);
     }
+    elseif ( $command == "amplion" ) {
+        local_socket('/home/predic/bin_custom/ampli.sh on');
+    }
+    elseif ( $command == "amplioff" ) {
+        local_socket('/home/predic/bin_custom/ampli.sh off');
+    }
 
-    // Comandos estandar para PRE.DI.C:
+    // Comandos estandar para PRE.DI.C (devolvemos el resultado con el echo)
     else {
         echo predic_socket($command);
     }
-        
-?>
 
+?>
