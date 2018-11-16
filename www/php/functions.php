@@ -3,7 +3,7 @@
     /*
      * Para depurar https://www.ibm.com/developerworks/library/os-debug/index.html
      * En nuestro caso también podemos hacer aquí echo $miVariable, que será recibida por
-     * la función JS que haya hecho la http request en el cliente y printarlo allí en 
+     * la función JS que haya hecho la http request en el cliente y printarlo allí en
      * la consola del navegador con console.log(respuesta).
      */
 
@@ -12,7 +12,7 @@
      * entonces se ESCUCHARAN HTTP_REQUEST como por ejemplo:
      *     "GET", "php/functions.php?command=level -15"
      * que son generadas por el JS del cliente.
-     * 
+     *
      * Las RESPUESTAS se devolverán mediante la salida estandar de este código,
      * bien mediante 'echo xxxx' o bien mediante algunas funciones que vuelcan su resultado
      * directamente a la salida estandar, como por ejemplo 'readfile()' -ver abajo-
@@ -23,7 +23,7 @@
     // (he preferido que el código js del cliente no muestre paths del servidor)
     function get_loudspeaker() {
         $tmp = "";
-        $cfile = fopen("/home/predic/config/config.yml", "r") 
+        $cfile = fopen("/home/predic/config/config.yml", "r")
                   or die("Unable to open file!");
         while( !feof($cfile) ) {
             $linea = fgets($cfile);
@@ -38,7 +38,7 @@
         return $tmp;
     }
 
-    // Dialoga con el server TCP/IP de PRE.DI.C
+    // Dialoga con el server TCP/IP de pre.di.c
     function predic_socket ($cmd) {
         $service_port = 9999;
         $address = "localhost";
@@ -90,7 +90,7 @@
     // Procesa el COMMAND recibido en la HTTPREQUEST
     // y devuelve resultados mediante 'echo xxxxx'
     ///////////////////////////////////////////////////
-    
+
     /* http://php.net/manual/en/reserved.variables.request.php
     * PHP server side recibe arrays asociativas, o sea diccionarios, mediante los métodos
     * GET o PUT de las HTTPREQUEST originadas por un código del cliente, en nuestro caso
@@ -115,13 +115,13 @@
         readfile($fpath);
     }
     elseif ( $command == "amplion" ) {
-        local_socket('/home/predic/bin_custom/ampli.sh on');
+        local_socket('ampli on');
     }
     elseif ( $command == "amplioff" ) {
-        local_socket('/home/predic/bin_custom/ampli.sh off');
+        local_socket('ampli off');
     }
 
-    // Comandos estandar para PRE.DI.C (devolvemos el resultado con el echo)
+    // Comandos estandar para pre.di.c (devolvemos el resultado con el echo)
     else {
         echo predic_socket($command);
     }
