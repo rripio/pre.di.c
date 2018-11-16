@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>pre.di.c</title>
-    
+
     <!-- responsive -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
@@ -19,7 +19,7 @@
                   background-color: rgb(38, 38, 38);
                   font-family: Verdana, Helvetica, Arial;
                   font-weight:bold; }
-                  
+
         input   { background-color: rgb(185, 185, 185); }
 
         button  { background-color: rgb(185, 185, 185);
@@ -36,21 +36,21 @@
                   font-weight:bold;
                   color:white;
                   background-color: rgb(25, 25, 25);}
-        
+
     </style>
 
 </head>
 
 <!-- Inicializa la peich, incluyendo su actualización periódica -->
 <body onload="page_initiate()" >
-    
+
     <div id="main">
-        
+
         <!--    Esquema maomeno del display:
 
             power << ON/OFF >>  INPUT: << selector >>
             level: -23.0        balance: 0.0
-            
+
              [-] bass: 0 [+]   [-] treble: 0 [+]
 
                      [mute][mono][loud]
@@ -62,7 +62,7 @@
         -->
         <div id="cabecera" align="center">
         </div>
-        
+
         <hr>
 
         <div align="center">
@@ -72,7 +72,7 @@
               <option value="on" >ON </option>
               <option value="off">OFF</option>
             </span>
-            </select>            
+            </select>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <!--Selector de entradas automágico-->
             <span>INPUT:
@@ -89,7 +89,7 @@
                 <td id="status_LEV" ></td>
                 <td id="status_BAL" ></td>
             </tr>
-        </table> 
+        </table>
         </div>
 
         <hr>
@@ -122,7 +122,7 @@
             <select id="xoSelector"     onchange="predic_cmd('xo ' + this.value, update=false)" ></select>
             </span>
         </div>
-        
+
         <div align="center">
             <!--Selector de DRC automágico-->
             <span>DRC:
@@ -147,7 +147,7 @@
             <button type="button"                 onclick="fills_xo_selector()" >PBA</button>
         </div>
         -->
-        
+
     </div><!--main-->
 
 </body>
