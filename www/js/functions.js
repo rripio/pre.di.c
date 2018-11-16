@@ -34,7 +34,7 @@ function page_initiate() {
     fills_drc_selector()
     
     // Cabecera de la peich
-    document.getElementById("cabecera").innerText = ':: PRE.DI.C :: ' + get_loudspeaker() + ' ::';
+    document.getElementById("cabecera").innerText = ':: pre.di.c        :: ' + get_loudspeaker() + ' ::';
     
     // Inicializamos la peich con el estado de PRE.DI.C
     get_predic_status();
