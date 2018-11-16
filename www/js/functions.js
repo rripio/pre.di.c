@@ -1,12 +1,12 @@
 /*
- * Para debug podemos printar en la consola del navegador: console.log(miVariable); 
+ * Para debug podemos printar en la consola del navegador: console.log(miVariable);
  * ***  OJO CONVIENE NO DEJAR NINGUN console.log activo porque gasta recursos
  * ***  y la respuesta de las botoneras se verá afectada.
 */
 
-// Función llamada por los eventos de la peich que ordenan algún cambio a PRE.DI.C
+// Función llamada por los eventos de la peich que ordenan algún cambio a pre.di.c
 function predic_cmd(cmd, update=true) {
-    // Envia el comando 'cmd' a PRE.DI.C a través del código PHP del server:
+    // Envia el comando 'cmd' a pre.di.c a través del código PHP del server:
     // https://www.w3schools.com/js/js_ajax_http.asp
     var myREQ = new XMLHttpRequest();
     myREQ.open("GET", "php/functions.php?command=" +  cmd, true);
@@ -27,29 +27,29 @@ function remoterun(cmd) {
 
 // Inicializa le peich incluyendo su auto-update
 function page_initiate() {
-            
+
     // Completamos los selectore de inputs, XO y DRC
     fills_inputs_selector()
     fills_xo_selector()
     fills_drc_selector()
-    
+
     // Cabecera de la peich
-    document.getElementById("cabecera").innerText = ':: pre.di.c        :: ' + get_loudspeaker() + ' ::';
-    
-    // Inicializamos la peich con el estado de PRE.DI.C
+    document.getElementById("cabecera").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
+
+    // Inicializamos la peich con el estado de pre.di.c
     get_predic_status();
     // Esperamos 1 s y  programamos el auto-update como tal, cada 3 s:
     // (OjO la llamada a la función en el setInterval va SIN paréntesis)
     setTimeout( setInterval( get_predic_status, 3000 ), 1000);
 }
 
-// Obtiene el estado de PRE.DIC.C hablando con el PHP del server
-function get_predic_status() { 
+// Obtiene el estado de pre.di.c hablando con el PHP del server
+function get_predic_status() {
     // https://www.w3schools.com/js/js_ajax_http.asp
-       
+
     // Prepara una instancia HttpRequest
     var myREQ = new XMLHttpRequest();
-    
+
     // Dispara una acción cuando se haya completado el HttpRequest,
     // nosotros actualizaremos la peich con la respuesta del server.
     myREQ.onreadystatechange = function() {
@@ -57,15 +57,15 @@ function get_predic_status() {
             page_update(this.responseText);
         }
     };
-    
+
     // Ejecuta la transacción HttpRequest
     myREQ.open(method="GET", url="php/functions.php?command=status", async=true);
     myREQ.send();
 }
 
-// Vuelca el estado de PRE.DI.C en la peich
+// Vuelca el estado de pre.dic.c en la peich
 function page_update(status) {
-    
+
     // Tabla de LEVEL y BALANCE
     document.getElementById("status_LEV").innerHTML = 'LEVEL: '   + status_decode(status, 'level');
     document.getElementById("status_BAL").innerHTML = 'balance: ' + status_decode(status, 'balance');
@@ -83,7 +83,7 @@ function page_update(status) {
     document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
     document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
     document.getElementById("buttonLoud").innerHTML = OnOff( 'loud', status_decode(status, 'loudness_track') );
-    
+
     // Destacamos los botones que están activados
     if ( status_decode(status, 'muted') == 'true' ) {
         document.getElementById("buttonMute").style.background = "rgb(185, 185, 185)";
@@ -126,7 +126,7 @@ function get_file(fid) {
     return (myREQ.responseText);
 }
 
-// Averigua el valor de una de las propiedades del chorizo status de PRE.DI.C
+// Averigua el valor de una de las propiedades del chorizo status de pre.di.c
 function status_decode(status, prop) {
     var result = "";
     arr = status.split("\n"); // Las parejas 'propiedad:valor' vienen separadas por saltos de línea
@@ -158,7 +158,7 @@ function fills_inputs_selector() {
             inputs.push( arr[i].slice(0,-1) );
         }
     }
-    
+
     // Ahora rellenamos el selector de entradas de la peich con las encontradas
     // https://www.w3schools.com/jsref/met_select_add.asp
     var x = document.getElementById("inputsSelector");
@@ -218,7 +218,7 @@ function get_speaker_prop_sets(prop) {
         linea = arr[i];
         if ( linea.trim().replace(' ','') == prop+':') { dentroDeProp = true; };
         if ( dentroDeProp ) {
-            
+
             if ( linea.indexOf('sets:') != -1 ) {
                 dentroDeSets = true;
                 indentOfSets = indentLevel(linea);
@@ -227,8 +227,8 @@ function get_speaker_prop_sets(prop) {
 
             if ( dentroDeSets && indentLevel(linea) <= indentOfSets ){
                      break;
-            }            
-            
+            }
+
             if ( dentroDeSets ) {
                 if ( linea.trim().substr(-1) == ':' ) {
                     prop_sets.push(linea.trim().replace(':','') );
