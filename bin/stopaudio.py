@@ -33,7 +33,7 @@
 import time
 import sys
 import os
-from subprocess import Popen
+from subprocess import Popen, run
 
 import basepaths as bp
 import getconfigs as gc
@@ -52,29 +52,28 @@ def main(run_level):
             pd.client_socket('shutdown')
             time.sleep(1)
         except:
-            Popen (['pkill', '-9', '-f', gc.config['control_path']]
-                                        , stdout=fnull, stderr=fnull)
+            run ( ['pkill', '-9', '-f', gc.config['control_path']]
+                                        , stdout=fnull, stderr=fnull )
             time.sleep(.5)
 
         # ecasound
         if gc.config['load_ecasound']:
             print('(stopaudio) stopping ecasound')
-            Popen (['killall', '-KILL', 'ecasound'], stdout=fnull, stderr=fnull)
+            run (['killall', '-KILL', 'ecasound'], stdout=fnull, stderr=fnull )
 
         # brutefir
         print('(stopaudio) stopping brutefir')
-        Popen (['killall', gc.config['brutefir_path']], stdout=fnull, stderr=fnull)
+        run ( ['killall', '-KILL', gc.config['brutefir_path'] ], stdout=fnull, stderr=fnull )
 
         # jack
         print('(stopaudio) stopping jackd')
-        Popen (['killall', '-KILL', 'jackd'], stdout=fnull, stderr=fnull)
-        time.sleep(1)
+        run ( 'killall -KILL jackd'.split(), stdout=fnull, stderr=fnull )
 
     if run_level in ['scripts', 'all']:
 
         # stop external scripts, sources and clients
         print('(stopaudio) stopping scripts')
-        for line in [ x for x in open(bp.script_list_path) 
+        for line in [ x for x in open(bp.script_list_path)
                               if not '#' in x.strip()[0] ]:
             # dispise options if incorrectly set
             script = line.strip().split()[0]
