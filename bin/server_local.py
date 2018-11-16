@@ -1,15 +1,27 @@
 #!/usr/bin/env python3
 
-""" Listen for commands to be executed on local
+""" Listen for certain commands to be executed on local
 """
-# TODO: secure this server by allowing only certain orders 
-#       to be translated to actual local commands
+# This server is secured by allowing only certain commands
+# to be translated to actual local commands.
 
 import socket
 import sys
 import time
 import subprocess as sp
 import yaml
+
+def preprocess(cmd):
+    """
+        Available commans will be translated to executables,
+        others will return False, so doing nothing.
+    """
+    if cmd == 'ampli on':
+        return '/home/predic/bin_custom/ampli.sh on'
+    if cmd == 'ampli off':
+        return '/home/predic/bin_custom/ampli.sh off'
+
+    return False
 
 def server_socket(host, port):
     """Makes a socket for listening clients"""
@@ -36,10 +48,9 @@ def server_socket(host, port):
     # return socket state
     return s
 
-
 if __name__ == '__main__':
 
-    verbose = True
+    verbose = False
     fsocket = server_socket('localhost', 9988)
 
     # main loop to proccess conections
@@ -85,17 +96,25 @@ if __name__ == '__main__':
                 sys.exit(1)
             else:
                 # a command to run has been received in 'data':
-                print ('>>> ' + data)
-                try:
-                    result = sp.run( data.split() )
-                    result = result.returncode
-                except:
-                    result = -1
-                if not result:
-                    sc.send(b'OK\n')
+                if verbose:
+                    print ('>>> ' + data)
+                cmd = preprocess(data)
+                if cmd:
+                    try:
+                        result = sp.run( cmd.split() )
+                        result = result.returncode
+                    except:
+                        result = -1
+                    if not result:
+                        sc.send(b'OK\n')
+                    else:
+                        sc.send(b'ACK\n')
                 else:
                     sc.send(b'ACK\n')
+                    
                 if verbose:
                     print(f'(server_local) connected to client {addr[0]}')
             # wait a bit, loop again
             time.sleep(0.01)
+
+
