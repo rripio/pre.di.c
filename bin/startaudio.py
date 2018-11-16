@@ -134,6 +134,7 @@ def init_server():
     total_time = rem_time = 10
     while rem_time:
         print(f'(startaudio) waiting for server ({(total_time-rem_time)}s)')
+        time.sleep(1)
         try:
             # we must use close() to stop connection
             # and watch till no exception
@@ -142,13 +143,11 @@ def init_server():
         except:
             pass
         rem_time -= 1
-        time.sleep(1.0)
     if rem_time:
         print('\n(startaudio) server started :-)')
     else:
         print('\n(startaudio) server not accesible Bye :-/')
         sys.exit() # initaudio stopped
-
 
 def init_state_settings():
     """restore audio settings as stored in state.yaml
@@ -190,9 +189,8 @@ def init_inputs():
     """restore selected input as stored in state.ini"""
 
     print('\n(startaudio) restoring input: ' + gc.state['input'])
-    time.sleep(gc.config['command_delay'])
+    # maybe not needed time.sleep(gc.config['command_delay'])
     pd.client_socket('input ' + gc.state['input'], quiet=True)
-
 
 def main(run_level):
 
@@ -240,7 +238,7 @@ if __name__ == '__main__':
         # stop proccesses
         print('\n(startaudio) stopping proccesses\n')
         stopaudio.main(run_level)
-        time.sleep(gc.config['command_delay'])
+        # maybe not needed time.sleep(gc.config['command_delay'])
         print('\n(startaudio) starting runlevel ' + run_level)
         main(run_level)
     else:
