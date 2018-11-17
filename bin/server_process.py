@@ -219,14 +219,15 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             if XO_set in gc.speaker['XO']['sets']:
                 coeffs = gc.speaker['XO']['sets'][XO_set]
                 filters = gc.speaker['XO']['filters']
-                # allows no filtering e.g for fullrange loudspeakers
-                for index, item in enumerate(coeffs):
+                # Allows no filtering e.g for fullrange loudspeakers:
+                coeffsTmp = coeffs.copy() # (a copy does not modify the original)
+                for index, item in enumerate(coeffsTmp):
                     if item == 'none':
-                        coeffs[index] = '-1'
+                        coeffsTmp[index] = '-1'
                     else:
-                        coeffs[index] = '"' + item + '"'
+                        coeffsTmp[index] = '"' + item + '"'
                 for i in range(len(filters)):
-                    bf_cli( 'cfc "' + filters[i] + '" ' + coeffs[i] )
+                    bf_cli( 'cfc "' + filters[i] + '" ' + coeffsTmp[i] )
             else:
                 state['XO_set'] = state_old['XO_set']
                 print('bad XO name')
