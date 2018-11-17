@@ -219,11 +219,11 @@ def show( state=gc.state ):
         - and /tmp/predic for others to get this info
     """
 
-    gain = calc_gain(gc.state['level'] , gc.state['input'])
-    headroom = calc_headroom(gain, gc.state['balance'], get_target()[0])
-    input_gain = calc_input_gain(gc.state['input'])
-    muted = ('(muted)' if gc.state['muted'] else ' ')
-    tracking_loud = (' ' if gc.state['loudness_track'] else '(tracking off)')
+    gain            = calc_gain(gc.state['level'] , gc.state['input'])
+    headroom        = calc_headroom(gain, gc.state['balance'], get_target()[0])
+    input_gain      = calc_input_gain(gc.state['input'])
+    muted           = ('(muted)' if gc.state['muted'] else ' ')
+    tracking_loud   = (' ' if gc.state['loudness_track'] else '(tracking off)')
 
     tmp  = "\n"
     tmp += ( f"Loudspeaker is {gc.config['loudspeaker']}\n" )
