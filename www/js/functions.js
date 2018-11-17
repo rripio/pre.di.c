@@ -230,9 +230,8 @@ function get_speaker_prop_sets(prop) {
             }
 
             if ( dentroDeSets ) {
-                if ( linea.trim().substr(-1) == ':' ) {
-                    prop_sets.push(linea.trim().replace(':','') );
-                };
+                setName = linea.split(':')[0].trim()
+                prop_sets.push( setName );
             }
         }
     }
