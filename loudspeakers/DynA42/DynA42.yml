@@ -6,20 +6,16 @@ house_gain:     -2.0
 peq_sets:       ~
 
 drc_sets:
-    nodrc:              nofilter                    nofilter
+    none:               none                        none
     nearfield:          drc.L_lp_DynA42.pcm         drc.R_lp_DynA42.pcm
 
 xo_sets:
-    nofilter:
+    none:
         fr: &way_fr
-            fir:        nofilter                    nofilter
+            fir:        none                        none
             gain:       0.0                         0.0                     
             delay_ms:   0.0                         0.0                   
             polarity:   +1                          +1
-    outofphase:
-        fr:
-            <<:         *way_fr
-            polarity:   +1                          -1
     normal:
         fr:
             <<:         *way_fr

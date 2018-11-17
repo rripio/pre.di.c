@@ -2,13 +2,12 @@ DRC:
   filters: [f.drc.L, f.drc.R]
   sets:
     nearfield: [L_lp_DynA42, R_lp_DynA42]
-    nodrc: ['-1', '-1']
+    none: [none, none]
 XO:
   filters: [f.fr.L, f.fr.R]
   sets:
-    nofilter: ['-1', '-1']
+    none: [none, none]
     normal: [mp_DynA42_left, mp_DynA42_right]
-    outofphase: ['-1', '-1']
 fs: 44100
 ref_level_gain: 0.0
 target_mag_curve: R20_ext-target_mag.dat
