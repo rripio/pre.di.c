@@ -8,8 +8,7 @@
 
  This generates the low level files needed for pre.di.c to work, i.e.:
 
-   - 'speaker.yml'
-   - 'brutefir_config'
+   'brutefir_config', 'speaker.yml'
 
  The following files are needed under the folder 'myLoudspeaker':
 
