@@ -6,7 +6,7 @@
             -w   Overwrites the existing 'speaker.yml' and 'brutefir_config',
                  otherwise '____.candidate' files will be provided.
 
- This generates low level files needed for pre.di.c to work, i.e.:
+ This generates the low level files needed for pre.di.c to work, i.e.:
 
    - 'speaker.yml'
    - 'brutefir_config'
