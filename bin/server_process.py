@@ -1,596 +1,603 @@
-# This file is part of pre.di.c
-# pre.di.c, a preamp and digital crossover
-# Copyright (C) 2018 Roberto Ripio
-#
-# pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
-# Copyright (c) 2006-2011 Roberto Ripio
-# Copyright (c) 2011-2016 Alberto Miguélez
-# Copyright (c) 2016-2018 Rafael Sánchez
-#
-# pre.di.c is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# pre.di.c is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
+"""
+ Usage:     do_config_files.py   loudspeakers/myLoudspeaker/  [ -w ] [ |less ]
 
-import time
-import socket
-import sys
-import jack
-import math as m
-import numpy as np
+            -w   Overwrites the existing 'speaker.yml' and 'brutefir_config',
+                 otherwise '____.candidate' files will be provided.
 
-import peq_control
-import basepaths as bp
-import getconfigs as gc
-import predic as pd
+ This generates the low level files needed for pre.di.c to work, i.e.:
 
-## initialize
+   'brutefir_config', 'speaker.yml'
 
-# EQ curves
-cf = bp.config_folder
-try:
-    curves = {
-        'freq'                : np.loadtxt(cf
-                                + gc.config['frequencies']),
-        'loudness_mag_curves' : np.loadtxt(cf
-                                + gc.config['loudness_mag_curves']),
-        'loudness_pha_curves' : np.loadtxt(cf
-                                + gc.config['loudness_pha_curves']),
-        'treble_mag'          : np.loadtxt(cf
-                                + gc.config['treble_mag_curves']),
-        'treble_pha'          : np.loadtxt(cf
-                                + gc.config['treble_pha_curves']),
-        'bass_mag'            : np.loadtxt(cf
-                                + gc.config['bass_mag_curves']),
-        'bass_pha'            : np.loadtxt(cf
-                                + gc.config['bass_pha_curves']),
-        'target_mag'          : np.loadtxt(gc.target_mag_path),
-        'target_pha'          : np.loadtxt(gc.target_pha_path)
-        }
-except:
-    print('Failed to load EQ files')
-    sys.exit(-1)
-# audio ports
-if gc.config['load_ecasound']:
-    audio_ports = gc.config['ecasound_ports']
-else:
-    audio_ports = gc.config['brutefir_ports']
-# warnings
-warnings = []
+ The following files are needed under the folder 'myLoudspeaker':
 
+   - 'myLoudspeaker.yml':
+     The complete full range, multiway, subwoofer loudspeaker definitions including
+     pcm names, gain, delay and polarity, as well as target values for SLP and room EQ.
 
-def unplug_sources_of(jack_client, out_ports):
-    """ Disconnect clients from predic inputs and monitor inputs """
+   - 'brutefir_settings.yml':
+     General runtime options for Brutefir.
 
-    try:
-        # sources_L = jack.get_connections(out_ports[0])
-        sources_L = jack_client.get_all_connections(out_ports[0])
-        sources_R = jack_client.get_all_connections(out_ports[1])
-        for source in sources_L:
-            jack_client.disconnect(source.name, out_ports[0])
-        for source in sources_R:
-            jack_client.disconnect(source.name, out_ports[1])
-    except:
-        print('error disconnecting outputs')
+   -  and some '*.pcm' FIR files to be used for XO and DRC.
 
+      (i) CONVENTIONS FOR NAMING *.pcm FIR FILES:
 
-def do_change_input(input_name, in_ports, out_ports, resampled=False):
-    """ 'in_ports':   list [L,R] of jack capture ports of chosen source
-    'out_ports':  list of ports in 'audio_ports' variable
-                  depends on use of brutefir/ecasound """
+        XO:
+          xo.someDescription.pcm
 
-    monitor_ports = gc.config['jack_monitors'].split()
-    # switch
-    try:
-        # jack.attach('tmp')
-        tmp = jack.Client('tmp')
-        unplug_sources_of(tmp, out_ports)
-        for i in range(len(in_ports)):
-            # audio inputs
-            try:
-                tmp.connect(in_ports[i], out_ports[i])
-            except:
-                print(f'error connecting {in_ports[i]} <--> {out_ports[i]}')
-           # monitor inputs
-            try:
-                if monitor_ports:
-                    tmp.connect(in_ports[i], monitor_ports[i])
-            except:
-                print('error connecting monitors')
-        tmp.close()
-    except:
-        # on exception returns False
-        print(f'error changing to input "{input_name}"')
-        tmp.close()
-        return False
-    return True
+        DRC:
+          drc.X_someDescription.pcm     Where X is the channel 'L' or 'R'
+"""
+# v1.0
+#   generates 'brutefir_config'
+# v1.1
+#   also generates 'speaker.yml'
 
+import sys, os
+HOME = os.path.expanduser("~")
+sys.path.append(HOME + "/bin")
 
-def bf_cli(command):
-    """send commands to brutefir"""
+import yaml
 
-    global warnings
-    with socket.socket() as s:
-        try:
-            s.connect((gc.config['bfcli_address'], gc.config['bfcli_port']))
-            command = command + '; quit\n'
-            s.send(command.encode())
-            if gc.config['control_output'] > 1:
-                print('command sent to brutefir')
-        except:
-            warnings.append ('Brutefir error')
+# Inside 'myLoudspeaker.yml' the channels are implicit as per the column used into
+# the 'fir:' field. For readability reasons it is not needed to use square brackets
+# as per the yaml syntax standard.
+# So, it is needed to 'patch' the yaml to convert to a convenient iterable list:
+def patch_lspk(lspk):
 
+    lspk['target_spl'] = float( lspk['target_spl'] )
+    lspk['room_gain']  = float( lspk['room_gain'] )
+    lspk['house_gain'] = float( lspk['house_gain'] )
 
-# main function for command proccessing
-def proccess_commands(full_command, state=gc.state, curves=curves):
-    """proccesses commands for predic control"""
+    for set in lspk['drc_sets']:
+        oldValue = lspk['drc_sets'][set]
+        if type( oldValue ) != list:
+            newValue = [ x.strip() for x in str(oldValue).split() ]
+            lspk['drc_sets'][set] = newValue
 
-    # normally write state, but there are exceptions
-    state_write = True
-    change_peq = False
-    # control variable for switching to relative commands
-    add = False
-    # erase warnings
-    warnings = []
-    # backup state to restore values in case of not enough headroom
-    # or error of any kind
-    state_old = state.copy()
-    # strips command final characters and split command from arguments
-    full_command = full_command.rstrip('\r\n').split()
+    for set in lspk['xo_sets']:
+        for way in lspk['xo_sets'][set]:
+            for param in lspk['xo_sets'][set][way]:
+                oldValue = lspk['xo_sets'][set][way][param]
+                if type( oldValue ) != list:
+                    newValue = [ x.strip() for x in str(oldValue).split() ]
+                    lspk['xo_sets'][set][way][param] = newValue
 
-    if len(full_command) > 0:
-        command = full_command[0]
-    else:
-        command = ''
-    if len(full_command) > 1:
-        arg = full_command[1]
-    else:
-        arg = None
-    if len(full_command) > 2:
-        add = (True if full_command[2] == 'add' else False)
-    # initializes gain since it is calculated from level
-    gain = pd.calc_gain(state['level'], state['input'])
+    return lspk
 
+def scan_xo(baseDir):
+    """ .pcm for XO must be named 'xo.xxxxxx.pcm' """
+    XOs = []
+    for root, dirs, files in os.walk(baseDir, topdown=False):
+        for name in [ x for x in files if     x[-4:] == '.pcm'
+                                          and x[:3]  == 'xo.' ]:
+            XOs.append( HOME + '/' + os.path.join(root, name) )
+    return sorted(XOs)
 
-    ## internal functions for actions
+def scan_drc(baseDir):
+    """ .pcm for DRC must be named 'drc.xxxxxx.pcm' """
+    DRCs = []
+    for root, dirs, files in os.walk(baseDir, topdown=False):
+        for name in [ x for x in files if     x[-4:] == '.pcm'
+                                          and x[:4]  == 'drc.' ]:
+            DRCs.append( HOME + '/' + os.path.join(root, name) )
+    return sorted(DRCs)
 
-    def change_target(throw_it):
+def do_header():
+    h1 =  '# --------------------------------------------\n'
+    h1 += '# generated by do_brutefir_config.py as per:  \n'
+    h1 += '#     ' + lspk_fname + '\n'
+    h1 += '#     ' + bfSettings_fname + '\n'
+    h1 += '# --------------------------------------------\n'
 
-        try:
-            (curves['target_mag'], curves['target_pha']) = pd.get_target()
-            state = change_gain(gain, True)
-        except:
-            warnings.append('Something went wrong when changing target state')
+    h2 = ('''
+    # modulo "cli" para puerto tct/ip para consultas y cambios al vuelo
+    # y modulo "eq" para el EQ del preamplificador de predic
 
+    logic:
 
-    def change_input(input, state=state):
+    "cli" { port: 3000; },
 
-        state['input'] = input
-        # if none disconnects all inputs
-        if input == 'none':
-            disconnect_inputs()
-        elif input in gc.inputs:
-            state['XO_set'] = gc.inputs[input]['xo']
-        else:
-            state['input'] = state_old['input']
-            warnings.append('Input name "%s" incorrect' % input)
-            return state
-        try:
-            if do_change_input (input
-                    , gc.inputs[state['input']]['in_ports']
-                    , audio_ports.split()
-                    , gc.inputs[input]['resampled']):
-                    # input change went OK
-                state = change_xovers(state['XO_set'])
-                state = change_gain(gain, True)
+    "eq"  {
+        #debug_dump_filter: "~/brutefir-rendered-%d";
+        {
+         coeff: "c.eq";
+         bands: 18.0, 20.0, 22.4, 25.0, 28.0, 32.0, 36.0, 40.0, 44.8, 50.0, 56.0, 63.0, 71.0, 80.0, 90.0, 100.0, 112.0, 126.0, 142.0, 160.0, 180.0, 200.0, 224.0, 250.0, 280.0, 320.0, 360.0, 400.0, 448.0, 500.0, 560.0, 630.0, 710.0, 800.0, 900.0, 1000.0, 1120.0, 1260.0, 1420.0, 1600.0, 1800.0, 2000.0, 2240.0, 2500.0, 2800.0, 3200.0, 3600.0, 4000.0, 4480.0, 5000.0, 5600.0, 6300.0, 7100.0, 8000.0, 9000.0, 10000.0, 11200.0, 12600.0, 14200.0, 16000.0, 18000.0, 20000.0, 22040.0;
+        };
+    };
+    ''').replace('    ','')
+
+    return (h1+h2)
+
+def do_general():
+
+    header =    ('''
+                # -----------------------------------
+                # --------- GENERAL SETTINGS --------
+                # -----------------------------------
+                ''').replace('    ','')
+
+    tmp = ''
+    for prop in bfir_cfg:
+        value = bfir_cfg[prop]
+        tmp += (prop + ':').ljust(20) + str(value).lower() + ' ;\n'
+
+    return (header + tmp)
+
+def do_io(xo_set):
+    header = ('''
+    # ---------------------------------
+    # -------------  I/O: -------------
+    # mandatory:  input "in.L", "in.R"
+    # ---------------------------------
+    ''').replace('    ','')
+
+    # INPUT
+    tmp =  '\ninput "in.L", "in.R" {\n'
+    tmp += '    # does not connect inputs in jack:\n'
+    # will be better if reading brutefir_ports from config.yml...:
+    tmp += '    device:   "jack" { ports: ""/"in.L", ""/"in.R"; };\n'
+    tmp += '    sample:   "AUTO";\n'
+    tmp += '    channels: 2/0,1;\n'
+    tmp += '};\n'
+
+    # OUTPUT
+    fs = lspk['fs']
+    outputs = outputsMap( xo_set )
+    totalOuts    = str( len(outputs) )
+    seqOuts      = ','.join( [str(x) for x in range( len(outputs) ) ] )
+
+    msecList     = [ x['delay'] for x in outputs ]
+    msecChain    = ', '.join( msecList )
+    samplesList  = [ int(round(float(x) / 1000.0 * fs)) for x in msecList ]
+    samplesChain  = ', '.join( [ str(x) for x in samplesList ] )
+
+    outChain = [ out['outName'] for out in outputs ]
+    outChain = ', '.join( [ '"'+x+'"' for x in outChain ] )
+
+    tmp += '\noutput ' + outChain + ' {\n'
+    tmp += '    # output mapping to the sound card jack ports:\n'
+    tmp += do_mapChain(outputs) + '\n'
+    tmp += '    sample:   "AUTO";\n'
+    tmp += '    channels: ' + totalOuts + '/' + seqOuts + ';\n'
+    tmp += '    maxdelay: 1000;\n'
+    tmp += '    dither:   true;\n'
+    tmp += '    delay:    ' + samplesChain + '; # (samples)\n'
+    tmp += '    #   ~:    ' + msecChain + ' (ms)\n'
+    tmp += '};\n'
+
+    return header + tmp
+
+def outputsMap(xo_set):
+    ''' outsMap will be an orderd list wich index will correspond
+        to the physical order of jack sound card ports
+    '''
+    outsMap = []
+
+    for way in xo_set:
+
+        # Below will be (0,1) for regular ways, or (0) for a single subwoofer:
+        listOfChannels = tuple(range(len( xo_set[way]['delay_ms'] )))
+
+        for cha in listOfChannels:
+            delay = xo_set[way]['delay_ms'][cha]
+            if way != 'sw':
+                cha = ('L','R')[cha]
+                outsMap.append( { 'outName': way + '.' + cha, 'delay':delay } )
             else:
-                warnings.append('Error changing to input ' + input)
-                state['input']  = state_old['input']
-                state['XO_set'] = state_old['XO_set']
-        except:
-            state['input']  = state_old['input']
-            state['XO_set'] = state_old['XO_set']
-            warnings.append('Something went wrong when changing input state')
-        return state
+                outsMap.append( { 'outName': way,             'delay':delay } )
 
+    return (outsMap)
 
-    def disconnect_inputs():
+def do_mapChain(outputs):
+    '''
+    input:  A list of outputs and his properties, i.e.:
+            [ {'outName': 'lo.L', 'delay': '0.4'},  etc... ]
 
-        try:
-            tmp = jack.Client('tmp')
-            unplug_sources_of(tmp, audio_ports.split())
-            tmp.close()
-        except:
-            warnings.append('Something went wrong when diconnecting inputs')
+    output: The text chain usable for brutefir's jack ports definition.
+            Example:
+            device: "jack" { ports:
+                "system:playback_1"/"lo_L", "system:playback_2"/"lo_R",
+                 "system:playback_3"/"hi_L", "system:playback_4"/"hi_R";
+                 "system:playback_5"/"sw_AMR";
+            };
+    '''
+    p = 1
+    tmp =  '    device: "jack" { ports:\n        '
 
+    for o in outputs:
+        if p>2 and p%2 != 0:
+            tmp += '\n        '
+        tmp += '"system:playback_' + str(p) + '"/"' + o['outName'] + '", '
+        p += 1
 
-    def change_xovers(XO_set, state=state):
+    tmp = tmp[:-2] + ';\n    };'
 
-        state['XO_set'] = XO_set
-        try:
-            if XO_set in gc.speaker['XO']['sets']:
-                coeffs = gc.speaker['XO']['sets'][XO_set]
-                filters = gc.speaker['XO']['filters']
-                for i in range(len(filters)):
-                    bf_cli('cfc "'
-                            + filters[i] + '" "' + coeffs[i] + '"')
-            else:
-                state['XO_set'] = state_old['XO_set']
-                print('bad XO name')
-        except:
-            state['XO_set'] = state_old['XO_set']
-            warnings.append('Something went wrong when changing XO state')
-        return state
+    return tmp
 
-    def change_drc(DRC_set, state=state):
+def do_coeffs():
+    tmp = ''
 
-        state['DRC_set'] = DRC_set
-        # if drc 'none' coefficient -1 is set, so latency and CPU usage
-        # are improved
-        if DRC_set == 'none':
-            filters = gc.speaker['DRC']['filters']
-            for i in range(len(filters)):
-                bf_cli('cfc "'
-                        + filters[i] + '" -1')
+    tmp += ('''
+    # --------------------------------------------
+    # --------- COEFFs for EQ & LOUDNESS ---------
+    # 1 block length is enough to smooth eq curves
+    # --------------------------------------------
+    ''').replace('    ','')
+
+    tmp += ('''
+    coeff "c.eq" {
+        filename: "dirac pulse";
+        shared_mem: true;
+        blocks: 1;
+    };
+    ''').replace('     ', ' ').replace('    #', '#').replace('    coeff', 'coeff').replace('    }', '}')
+    # naive but it works
+
+    tmp += ('''
+    # -----------------------------------------
+    # -------  COEFFs for DRC & XOVER: --------
+    # PCMs found under the loudspeaker folder
+    # -----------------------------------------
+    ''').replace('    ','')
+
+    # coeff "c.drc.1.L" {
+    # 	filename:    "drc1/L_drc_pba1.pcm";
+    # 	format:      "FLOAT_LE";
+    # 	shared_mem:  false;
+    # 	attenuation: 0;
+    # };
+
+    for pcm in ( drc_pcms + xo_pcms ):
+        cname = pcm.split('/')[-1].split('.')[1]
+        tmp += '\ncoeff "' + cname + '" {\n'
+        tmp += '    filename:    "' + pcm + '";\n'
+        tmp += '    format:      "FLOAT_LE";\n'
+        tmp += '    shared_mem:  false;\n'
+        tmp += '    attenuation: 0;\n'
+        tmp += '};\n'
+
+    return tmp
+
+def do_filtering_eq():
+
+    tmp = ('''
+    # ---------------------------------------------------------
+    # ---------------- CONVOLVER:  EQ filters  ----------------
+    # Madatory filters "f.eq.L" "f.eq.R" for VOLUME & EQ curves
+    # STARTUP attenuation: 100 dB  ;-)
+    # ---------------------------------------------------------
+    ''').replace('    ','')
+
+    tmp += ('''
+    filter "f.eq.L" {
+        from_inputs:  "in.L"/100/1;
+        to_filters:   "f.drc.L", "f.drc.R";
+        coeff:        "c.eq";
+    };
+
+    filter "f.eq.R" {
+        from_inputs:  "in.R"/100/1;
+        to_filters:   "f.drc.R", "f.drc.L";
+        coeff:        "c.eq";
+    };
+    ''').replace('    f', 'f').replace('    to', 'to').replace('    co', 'co').replace('    }', '}')
+    # naive replacing, but it works :-)
+
+    return tmp
+
+def do_filtering_drc(drc_set, xo_set):
+
+    tmp = ('''
+    # --------------------------------------------------------------
+    # ------------------- CONVOLVER: DRC filters -------------------
+    # Madatory filters "f.drc.L" "f.drc.R" for DRC & MONO/STEREO
+    # From both filters "eq.L" & "eq.R" in order to operate \'mono\'
+    # --------------------------------------------------------------
+    ''').replace('    ','')
+
+    # filter "f_drc_L" {
+    #     from_filters: "f_eq_L"//1, "f_eq_R"//0 ;
+    #     to_filters:   "f_fr_L", "f_hi_L", "f_lo_L", "f_sw_amr", "f_sw_rel";
+    #     coeff:        -1;
+    # };
+    # filter "f_drc_R" {
+    #     from_filters: "f_eq_L"//0, "f_eq_R"//1 ;
+    #     to_filters:   "f_fr_R", "f_hi_R", "f_lo_R", "f_sw_amr", "f_sw_rel";
+    #     coeff:        -1;
+    # };
+
+    for in_cha in ('L','R'):
+        tmp += '\nfilter "f.drc.'+in_cha+'" {\n'
+        if in_cha == 'L':
+            tmp += '    from_filters: "f.eq.L"//1, "f.eq.R"//0;\n'
         else:
-            try:
-                if DRC_set in gc.speaker['DRC']['sets']:
-                    coeffs = gc.speaker['DRC']['sets'][DRC_set]
-                    filters = gc.speaker['DRC']['filters']
-                    for i in range(len(filters)):
-                        bf_cli('cfc "'
-                                + filters[i] + '" "' + coeffs[i] + '"')
+            tmp += '    from_filters: "f.eq.L"//0, "f.eq.R"//1;\n'
+
+        if in_cha == 'L': i = 0 # the column index
+        else:             i = 1
+
+        # Let's prepare the destination field 'to_filters'
+        ways = list( xo_set.keys() )
+        to_filters_regular = [ '"f.' + x + '.' + in_cha + '"' for x in ways if x[:2] != 'sw' ]
+        to_filters_subwoof = [ '"f.' + x +                '"' for x in ways if x[:2] == 'sw' ]
+        to_filters         = (to_filters_regular + to_filters_subwoof)
+        tmp += '    to_filters:   ' + ', '.join(to_filters) + ';\n'
+
+        # And the coeff to apply:
+        pcm = drc_set[i]
+        if pcm in ('none', 'nofilter', 'no', '0', '-1', ''):
+            cname = '-1'
+        else:
+            cname = '"' + pcm.split('.')[1] + '"'
+        tmp += '    coeff:        ' + cname + ';\n'
+
+        tmp += '};\n'
+
+    return tmp
+
+def do_filtering_xo(xo_set):
+
+    tmp = ('''
+    # ----------------------------------------------------------
+    # ------------ CONVOLVER: XOVER filters --------------------
+    # Free full range, multiway, subwoofer filters to outputs
+    # ----------------------------------------------------------
+    ''').replace('    ','')
+
+    # example:
+    #    filter "f_fr_L" {
+    #        from_filters: "f_drc_L";
+    #        to_outputs:   "fr_L"/0.0/1;
+    #        coeff:        "c_lp-fr_2";
+    #    };
+    #    ...
+    #    ...
+    #
+    #    filter "f_sw_amr" {
+    #        from_filters: "f_drc_L"/3.0, "f_drc_R"/3.0;
+    #        to_outputs:   "sw_amr"/-15.0/1;
+    #        coeff:        "c_lp-sw_0";
+    #    };
+
+    # A regular output (could be fullrange or multiway kind of)
+    for cha in ('L', 'R'):
+        if cha == 'L':  chIndex = 0;
+        else:           chIndex = 1;
+        for way in [ w for w in xo_set if w[:2] != 'sw']:
+
+            fname = '.'.join( ('f', way, cha) )
+            atten = str( xo_set[way]['gain'][chIndex] )
+            polar = str( xo_set[way]['polarity'][chIndex] )
+            pcm   = xo_set[way]['fir'][chIndex]
+            tmp += '\nfilter "' + fname + '" {\n'
+            tmp += '    from_filters: "f.drc.' + cha + '";\n'
+            tmp += '    to_outputs:   "' + way + '.' + cha + '"/' + atten + '/' + polar + ';\n'
+            if pcm in ('none', 'nofilter', 'no', '0', '-1', ''):
+                cname = '-1'
+            else:
+                cname = '"' + pcm.split('.')[1] + '"'
+            tmp += '    coeff:        ' + cname + ';\n'
+            tmp += '};\n'
+
+    # The subwoofer outputs
+    for sub in [ s for s in xo_set if s[:2] == 'sw']:
+
+        fname = '.'.join( ('f', sub) )
+        atten = str( xo_set[sub]['gain'][0] )
+        polar = str( xo_set[sub]['polarity'][0] )
+        pcm   = xo_set[sub]['fir'][0]
+        if pcm in ('none', 'nofilter', 'no', '0', '-1', ''):
+            cname = '-1'
+        else:
+            cname = '"' + pcm.split('.')[1] + '"'
+        tmp += '\nfilter "' + fname + '" {\n'
+        tmp += '    from_filters: "f.drc.L"/3.0, "f.drc.R"/3.0;\n'
+        tmp += '    to_outputs:   "' + sub + '"/' + atten + '/' + polar + ';\n'
+        tmp += '    coeff:        ' + cname + ';\n'
+        tmp += '};\n'
+
+    return tmp
+
+def get_lskpName_from_lspkFolder(path):
+    """ returns the directory name of the given path """
+    return [ x for x in filter(None, path.split('/')) ][-1]
+
+def prepare_speaker_yaml():
+    """ this is te pre.di.c speaker.yml sctructure """
+
+    # note: for no coeff to be applied on a filter stage (i.e. 'coeff: -1;' in brutefir_config)
+    #       it is needed to indicate 'none' into the speaker.yml file
+
+    # THE SKELETON:
+    data = """
+            fs:                 ~
+            ref_level_gain:     ~
+            target_mag_curve:   ~
+            target_pha_curve:   ~
+            XO:
+                filters: {}
+                sets: {}
+            DRC:
+                filters:
+                    - f.drc.L
+                    - f.drc.R
+                sets: {}
+    """
+    speaker = yaml.load(data)
+
+
+    # (!) PENDING TO REVIEW THIS SECTION - WORK IN PROGRESS -
+    speaker['fs']               = lspk['fs']
+    speaker['ref_level_gain']   = 0.0
+    speaker['target_mag_curve'] = 'R20_ext-target_mag.dat'
+    speaker['target_pha_curve'] = 'R20_ext-target_pha.dat'
+
+    # THE XO.filters SECTION
+    # We will complete it as the way fields are defined in the source <lspk> yaml configuration.
+    # There, the ways are repeatedly declared under each set in order to adjust parameters,
+    # so let's take the 'first' one by iterating over the sets:
+    mySetName = next( iter( lspk['xo_sets'].keys() ) )
+    mySet     = lspk['xo_sets'][mySetName]
+    speaker['XO']['filters'] = list()               # initialize as empty list
+    for wayName in mySet:
+        if wayName != 'sw': # a stereo kind off
+            speaker['XO']['filters'].append( 'f.' + wayName + '.L' )
+            speaker['XO']['filters'].append( 'f.' + wayName + '.R' )
+        else:
+            speaker['XO']['filters'].append( 'f.' + wayName )
+
+    # THE XO.sets SECTION, as defined in the source <lspk> yaml configuration.
+    for setName in lspk['xo_sets']:
+        mySet = lspk['xo_sets'][setName]
+        speaker['XO']['sets'][setName] = list()     # initialize as empty list
+        # Under speaker.XO.sets it is expected a list of brutefir coeffs
+        # to be matched to the above 'filters' list.
+        # So let's get it as per defined in the source <lspk> yaml configuration:
+        for wayName in mySet:
+            for pcm in mySet[wayName]['fir']:
+                if pcm in ( 'none', 'nofilter', 'no', '0', '-1' , ''):
+                    coeffName = 'none'
                 else:
-                    state['DRC_set'] = state_old['DRC_set']
-                    print('bad DRC name')
-            except:
-                state['DRC_set'] = state_old['DRC_set']
-                warnings.append('Something went wrong when changing DRC state')
-        return state
+                    coeffName = pcm.split('.')[1]  # e.g:  xo.mp_DynA42_left.pcm
+                speaker['XO']['sets'][setName].append( coeffName )
 
+    # THE DRC.filters SECTION
+    # This sectios is hardwired, done when skeleton.
 
-    def change_polarity(polarity, state=state):
-
-        if polarity in ['+', '-', 'toggle']:
-            if polarity == 'toggle':
-                polarity = {
-                    '+': '-',
-                    '-': '+'
-                    }[state['polarity']]
-            state['polarity'] = polarity
-            try:
-                bf_cli('cfia 0 0 m' + polarity + '1 '
-                     '; cfia 1 1 m' + polarity + '1')
-                state = change_gain(gain)
-            except:
-                state['polarity'] = state_old['polarity']
-                warnings.append('Something went wrong when changing polarity state')
-        else:
-            state['polarity'] = state_old['polarity']
-            warnings.append('bad polarity option: has to be "+", "-"'
-                                'or "toggle"')
-        return state
-
-
-    def change_mono(mono, state=state):
-
-        try:
-            state['mono'] = {
-                'on':       True,
-                'off':      False,
-                'toggle':   not state['mono']
-                }[mono]
-        except KeyError:
-            state['mono'] = state_old['mono']
-            warnings.append('Option ' + arg + ' incorrect')
-            return state
-        try:
-            if state['mono']:
-                bf_cli('cffa 2 0 m0.5 ; cffa 2 1 m0.5 '
-                       '; cffa 3 1 m0.5 ; cffa 3 0 m0.5')
+    # THE DRC.sets SECTION
+    for setName in lspk['drc_sets']:
+        mySet = lspk['drc_sets'][setName]
+        speaker['DRC']['sets'][setName] = list()     # initialize as empty list
+        for pcm in mySet:
+            if pcm in ( 'none', 'nofilter', 'no', '0', '-1' , ''):
+                coeffName = 'none'
             else:
-                bf_cli('cffa 2 0 m1 ; cffa 2 1 m0 ; cffa 3 1 m1 ; cffa 3 0 m0')
-        except:
-            state['mono'] = state_old['mono']
-            warnings.append('Something went wrong when changing mono state')
-        return state
+                coeffName = pcm.split('.')[1]  # e.g:  xo.mp_DynA42_left.pcm
+            speaker['DRC']['sets'][setName].append( coeffName )
 
+    return speaker
 
-    def change_mute(mute, state=state):
+if __name__ == "__main__":
 
-        try:
-            state['muted'] = {
-                'on':       True,
-                'off':      False,
-                'toggle':   not state['muted']
-                }[mute]
-        except KeyError:
-            state['muted'] = state_old['muted']
-            warnings.append('Option ' + arg + ' incorrect')
-            return state
-        try:
-            state = change_gain(gain)
-        except:
-            state['muted'] = state_old['muted']
-            warnings.append('Something went wrong when changing mute state')
-        return state
+    # Defaults to find files at current directory
+    lspkFolder = os.getcwd()
 
-
-    def change_loudness_track(loudness_track, state=state):
-
-        try:
-            state['loudness_track'] = {
-                'on':       True,
-                'off':      False,
-                'toggle':   not state['loudness_track']
-                }[loudness_track]
-        except KeyError:
-            state['loudness_track'] = state_old['loudness_track']
-            warnings.append('Option ' + arg + ' incorrect')
-            return state
-        try:
-            state = change_gain(gain)
-        except:
-            state['loudness_track'] = state_old['loudness_track']
-            warnings.append('Something went wrong when changing loudness_track state')
-        return state
-
-
-    def change_loudness_ref(loudness_ref, state=state, add=add):
-
-        try:
-            state['loudness_ref'] = (float(loudness_ref)
-                                    + state['loudness_ref'] * add)
-            state = change_gain(gain, True)
-        except:
-            state['loudness_ref'] = state_old['loudness_ref']
-            warnings.append('Something went wrong when changing loudness_ref state')
-        return state
-
-
-    def change_treble(treble, state=state, add=add):
-
-        try:
-            state['treble'] = (float(treble)
-                                    + state['treble'] * add)
-            state = change_gain(gain, True)
-        except:
-            state['treble'] = state_old['treble']
-            warnings.append('Something went wrong when changing treble state')
-        return state
-
-
-    def change_bass(bass, state=state, add=add):
-
-        try:
-            state['bass'] = (float(bass)
-                                    + state['bass'] * add)
-            state = change_gain(gain, True)
-        except:
-            state['bass'] = state_old['bass']
-            warnings.append('Something went wrong when changing bass state')
-        return state
-
-
-    def change_balance(balance, state=state, add=add):
-
-        try:
-            state['balance'] = (float(balance)
-                                    + state['balance'] * add)
-            state = change_gain(gain, True)
-        except:
-            state['balance'] = state_old['balance']
-            warnings.append('Something went wrong when changing balance state')
-        return state
-
-
-    def change_level(level, state=state, add=add):
-
-        try:
-            state['level'] = (float(level)
-                                    + state['level'] * add)
-            gain = pd.calc_gain(state['level'], state['input'])
-            state = change_gain(gain, True)
-        except:
-            state['level'] = state_old['level']
-            warnings.append('Something went wrong when changing %s state'
-                                                                % command)
-        return state
-
-
-    def change_gain(gain, do_change_eq=False, state=state):
-        """change_gain, aka 'the volume machine' :-)"""
-
-        # gain command send its str argument directly
-        gain = float(gain)
-
-        def change_eq():
-
-            eq_str = ''
-            l = len(curves['freq'])
-            for i in range(l):
-                eq_str = eq_str + str(curves['freq'][i]) + '/' + str(eq_mag[i])
-                if i != l:
-                    eq_str += ', '
-            bf_cli('lmc eq "c.eq" mag ' + eq_str)
-            eq_str = ''
-            for i in range(l):
-                eq_str = eq_str + str(curves['freq'][i]) + '/' + str(eq_pha[i])
-                if i != l:
-                    eq_str += ', '
-            bf_cli('lmc eq "c.eq" phase ' + eq_str)
-
-
-        def change_loudness():
-
-            loudness_max_i = (gc.config['loudness_SPLmax']
-                                        - gc.config['loudness_SPLmin'])
-            if state['loudness_track']:
-                if (m.fabs(state['loudness_ref'])
-                        > gc.config['loudness_variation']):
-                    state['loudness_ref'] = m.copysign(
-                        gc.config['loudness_variation'], state['loudness_ref'])
-                loudness_i = (gc.config['loudness_SPLmax']
-                    - (state['level'] + gc.config['loudness_SPLref']
-                                            + state['loudness_ref']))
-            else:
-                # index of all zeros curve
-                loudness_i = gc.config['loudness_variation']
-            if loudness_i < 0:
-                loudness_i = 0
-            if loudness_i > loudness_max_i:
-                loudness_i = loudness_max_i
-            # loudness_i must be integer as it will be used as
-            # index of loudness curves array
-            loudness_i = int(round(loudness_i))
-            loudeq_mag = curves['loudness_mag_curves'][:,loudness_i]
-            eq_mag = loudeq_mag
-            eq_pha = curves['loudness_pha_curves'][:,loudness_i]
-            return eq_mag, eq_pha
-
-
-        def change_treble():
-
-            treble_i = gc.config['tone_variation'] - state['treble']
-            if treble_i < 0:
-                treble_i = 0
-            if treble_i > 2 * gc.config['tone_variation']:
-                treble_i = 2 * gc.config['tone_variation']
-            # force integer
-            treble_i = int(round(treble_i))
-            eq_mag = curves['treble_mag'][:,treble_i]
-            eq_pha = curves['treble_pha'][:,treble_i]
-            state['treble'] = gc.config['tone_variation'] - treble_i
-            return eq_mag, eq_pha
-
-
-        def change_bass():
-
-            bass_i = gc.config['tone_variation'] - state['bass']
-            if bass_i < 0:
-                bass_i = 0
-            if bass_i > 2 * gc.config['tone_variation']:
-                bass_i = 2 * gc.config['tone_variation']
-            # force integer
-            bass_i = int(round(bass_i))
-            eq_mag = curves['bass_mag'][:,bass_i]
-            eq_pha = curves['bass_pha'][:,bass_i]
-            state['bass'] = gc.config['tone_variation'] - bass_i
-            return eq_mag, eq_pha
-
-
-        def commit_gain():
-
-            bf_atten_dB_0 = gain
-            bf_atten_dB_1 = gain
-            # add balance dB gains
-            if abs(state['balance']) > gc.config['balance_variation']:
-                state['balance'] = m.copysign(
-                        gc.config['balance_variation'] ,state['balance'])
-            bf_atten_dB_0 = bf_atten_dB_0 - (state['balance'] / 2)
-            bf_atten_dB_1 = bf_atten_dB_1 + (state['balance'] / 2)
-            # from dB to multiplier to implement easily
-            # polarity and mute
-            m_polarity = {'+': 1, '-': -1}[state['polarity']]
-            m_muted = float(not state['muted'])
-            m_gain = lambda x: m.pow(10, x/20) * m_polarity * m_muted
-            m_gain_0 = m_gain(bf_atten_dB_0)
-            m_gain_1 = m_gain(bf_atten_dB_1)
-            # commit final gain change
-            bf_cli('cfia 0 0 m' + str(m_gain_0)
-              + ' ; cfia 1 1 m' + str(m_gain_1))
-
-
-        # backs up actual gain
-        gain_old = gain
-        # EQ curves: loudness + treble + bass
-        l_mag,      l_pha      = change_loudness()
-        t_mag,      t_pha      = change_treble()
-        b_mag,      b_pha      = change_bass()
-        # compose EQ curves with target
-        eq_mag = curves['target_mag'] + l_mag + t_mag + b_mag
-        eq_pha = curves['target_pha'] + l_pha + t_pha + b_pha
-        # calculate headroom
-        headroom = pd.calc_headroom(gain, abs(state['balance']/2), eq_mag)
-        # moves headroom to accomodate input gain. It can lead to clipping
-        # because assumes equal dynamic range between sources
-        headroom += pd.calc_input_gain(state['input'])
-        # if enough headroom commit changes
-        if headroom >= 0:
-            commit_gain()
-            change_eq()
-            state['level'] = pd.calc_level(gain, state['input'])
-        # if not enough headroom tries lowering gain
+    # READ COMMAND LINE OPTIONS
+    if len(sys.argv) == 1:
+        print(__doc__)
+        sys.exit()
+    overwrite = False
+    for opc in sys.argv[1:]:
+        if '-w' in opc:
+            overwrite = True
         else:
-            change_gain(gain + headroom)
-            print('headroom hitted, lowering gain...')
-        return state
-    # end of change_gain()
+            lspkFolder = opc
+            if lspkFolder.endswith('/'):
+                lspkFolder = lspkFolder[:-1]
 
+    if overwrite:
+        confirm = input("Are you sure to overwrite? ")
+        if not confirm in ('Y','y') : overwrite = False
 
-    ## parse  commands and select corresponding actions
+    # Our file paths:
+    lspk_fname         = lspkFolder + '/' + get_lskpName_from_lspkFolder(lspkFolder) + '.yml'
+    bfSettings_fname   = lspkFolder + '/brutefir_settings.yml'
+    bfConfig_fname     = lspkFolder + '/brutefir_config'
+    speaker_fname      = lspkFolder + '/speaker.yml'
+    predicConfig_fname = '/home/predic/config/config.yml'
 
-    if gc.config['control_output'] > 0:
-        print(f'Command: {full_command}')
-#    if True:
+    # SCAN PCMS to load as available coeffs in brutefir_config
+    drc_pcms = scan_drc( lspkFolder )
+    xo_pcms  = scan_xo( lspkFolder )
+
+    # LOADING YAML CONFIG FILES
+    # 1/ pre.di.c configuration
+    f = open(predicConfig_fname, 'r')
+    tmp = f.read()
+    f.close()
     try:
-        state = {
-            'target':           change_target,
-            'show':             pd.show,
-            'input':            change_input,
-            'xo':               change_xovers,
-            'drc':              change_drc,
-            'polarity':         change_polarity,
-            'mono':             change_mono,
-            'mute':             change_mute,
-            'loudness_track':   change_loudness_track,
-            'loudness_ref':     change_loudness_ref,
-            'treble':           change_treble,
-            'bass':             change_bass,
-            'balance':          change_balance,
-            'level':            change_level,
-            'gain':             change_gain
-            }[command](arg)
-    except KeyError:
-        warnings.append(f"Unknown command '{command}'")
+        predic_cfg = yaml.load(tmp)
     except:
-        warnings.append(f"Problems in command '{command}'")
+        print ( 'YAML error into ' + predicConfig_fname )
+        sys.exit()
+    # 2/ Brutefir general parameters  file
+    f = open(bfSettings_fname, 'r')
+    tmp = f.read()
+    f.close()
+    try:
+        bfir_cfg = yaml.load(tmp)
+    except:
+        print ( 'YAML error into ' + bfSettings_fname )
+        sys.exit()
+    # 3/ lskp yaml definition
+    f = open(lspk_fname, 'r')
+    tmp = f.read()
+    f.close()
+    try:
+        lspk = yaml.load(tmp)
+    except:
+        print ( 'YAML error into ' + lspk_file )
+        sys.exit()
+    # NOTICE: Channels are not explicit, neither declared as a list for end user's
+    #         convenience, so channels are implicit as per the columns they are written into.
+    #         It is needed to 'patch' the yaml to convert to a convenient iterable list.
+    lspk = patch_lspk(lspk)
 
-    # command execution
+    # Prints out the lspk definition
+    tmp = lspk_fname + ' (patched):'
+    print( '#' * (1+len(tmp)) )
+    print( tmp )
+    print( '#' * (1+len(tmp)) )
+    print( yaml.dump(lspk) )
 
-    # ecasound parametric filters
-    # cases for change_peq = True
-    #   1) reload of actual peq after editing (command = peq reload
-    #       --> peq do not change)
-    #   2) command = peq defeat
-    #       --> peq changes
-    if change_peq:
-        if load_ecasound:
-            state['peqdefeat'] = False
-            # we will reconnect source to ecasound
-            state = change_input(state['input'])
-            if 'reload' in command:
-                if state['peq'] != 'off':
-                    PEQini = (loudspeakers_folder + loudspeaker +  '/'
-                        + state['peq'] + '.peq')
-                    peq_control.cargaPEQini(PEQini)
-                else:
-                    peq_control.PEQdefeat()
-                    state['peqdefeat'] = True
-            elif 'defeat' in command:
-                peq_control.PEQdefeat()
-                state['peqdefeat'] = True
-        elif not load_ecasound and state['peq'] != 'off':
-            pass
+    # PREPARING THE SPEAKER.YML file for pre.di.c to work
+    speaker = prepare_speaker_yaml()
 
-    # return a dictionary of predic state
-    return (state, warnings)
-# end of proccess_commands()
+    # The Brutefir structure will be done based on the first drc_set and xo_set
+    first_drc_set = list(lspk['drc_sets'].keys())[0] # Find the name of the first set
+    first_drc_set = lspk['drc_sets' ][first_drc_set] # The set itself (the underlying dictionary)
+    first_xo_set  = list(lspk['xo_sets' ].keys())[0] # Find the name of the first set
+    first_xo_set = lspk['xo_sets' ][first_xo_set]    # The set itself (the underlying dictionary)
+
+    # Brutefir IN ports are defined into the pre.di.c config.yml file
+    bfir_in_ports = [ p.split(':')[-1] for p in predic_cfg['brutefir_ports'].split() ]
+
+    # DOING THE BRUTEFIR_CONFIG structure:
+    bfconfig  = do_header() + do_general()
+    bfconfig += do_io(first_xo_set)
+    bfconfig += do_coeffs()
+    bfconfig += do_filtering_eq()
+    bfconfig += do_filtering_drc(first_drc_set, first_xo_set)
+    bfconfig += do_filtering_xo(first_xo_set)
+
+    #  Saving results
+    if not overwrite:
+        speaker_fname   += '.candidate'
+        bfConfig_fname  += '.candidate'
+
+    # 'brutefir_config'
+    f = open( bfConfig_fname, 'w')
+    f.write( bfconfig )
+    f.close()
+    print( '#' * (2 + len(bfConfig_fname)) )
+    print( bfConfig_fname + ':' )
+    print( '#' * (2 + len(bfConfig_fname)) )
+    print( bfconfig )
+
+    # 'speaker.yml'
+    f = open(speaker_fname,'w')
+    yaml.dump(speaker, f)
+    f.close()
+    print( '#' * (2 + len(speaker_fname)) )
+    print( speaker_fname + ':' )
+    print( '#' * (2 + len(speaker_fname)) )
+    print( yaml.dump(speaker) )
+
+    print( '\n--- FILES SAVED:' )
+    print( '    ' + bfConfig_fname )
+    print( '    ' + speaker_fname )
+
+    print("    NOTICE:")
+    print("    Still pending to review 'ref_level_gain' and 'target_xxx_curve parameters'")
