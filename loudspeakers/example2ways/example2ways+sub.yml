@@ -11,9 +11,16 @@
 #           polarity:   +1                        +1
 #
 # Channels are implicit as per the columns they are written into,
-# it is not needed to use brackets as per yaml syntax, this is for readability.
+# it is not needed to use brackets as per yaml syntax, this is for readability here.
 #
-
+# If no filtering is desired for DRC, a set must be declared as follows:
+#
+#   none:           none            none 
+#
+# If no filtering is desired for XO (e.g fullrange loudspeaker), a fir field must indicate:
+#
+#           fir:    none            none
+#
 
 fs: 44100
 target_spl:     82
@@ -23,21 +30,21 @@ house_gain:     -2.0
 peq_sets:       ~
 
 drc_sets:
-    nearfield:          drc.L_nearfield.pcm        drc.R_nearfield.pcm
-    midfield:           drc.L_midfield_multip.pcm  drc.R_midfield_multip.pcm
-
+    nearfield:          drc.L_nearfield.pcm         drc.R_nearfield.pcm
+    midfield:           drc.L_midfield_multip.pcm   drc.R_midfield_multip.pcm
+    none:               none                        none
 xo_sets:
     mp:
         lo: &way_lo
-            fir:        xo.mp_beyma.pcm           xo.mp_beyma.pcm         
-            gain:       1.1                       1.1                    
-            delay_ms:   0.4                       0.4                    
-            polarity:   +1                        +1                      
+            fir:        xo.mp_beyma.pcm             xo.mp_beyma.pcm         
+            gain:       1.1                         1.1                    
+            delay_ms:   0.4                         0.4                    
+            polarity:   +1                          +1                      
         hi: &way_hi
-            fir:        xo.mp_vifa_left.pcm       xo.mp_vifa_right.pcm    
-            gain:       2.2                       2.2                    
-            delay_ms:   0.8                       0.8                     
-            polarity:   -1                        -1
+            fir:        xo.mp_vifa_left.pcm         xo.mp_vifa_right.pcm    
+            gain:       2.2                         2.2                    
+            delay_ms:   0.8                         0.8                     
+            polarity:   -1                          -1
         sw: &way_sw
             fir:        xo.mp_rel.pcm 
             gain:       3.3        
@@ -46,10 +53,10 @@ xo_sets:
     lp:
         lo:
             <<:          *way_lo
-            fir:         xo.lp_beyma.pcm           xo.lp_beyma.pcm         
+            fir:         xo.lp_beyma.pcm            xo.lp_beyma.pcm         
         hi:
             <<:          *way_hi
-            fir:         xo.lp_vifa_left.pcm       xo.lp_vifa_right.pcm    
+            fir:         xo.lp_vifa_left.pcm        xo.lp_vifa_right.pcm    
         sw:
             <<:          *way_sw
             fir:         xo.lp_rel.pcm 
