@@ -219,6 +219,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             if XO_set in gc.speaker['XO']['sets']:
                 coeffs = gc.speaker['XO']['sets'][XO_set]
                 filters = gc.speaker['XO']['filters']
+                # allows no filtering e.g for fullrange loudspeakers
                 for index, item in enumerate(coeffs):
                     if item == 'none':
                         coeffs[index] = '-1'
