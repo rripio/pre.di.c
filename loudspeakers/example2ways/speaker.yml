@@ -1,0 +1,14 @@
+DRC:
+  filters: [f.drc.L, f.drc.R]
+  sets:
+    lp: [c.drc.L_lp, c.drc.R_lp]
+    mp: [c.drc.L_mp, c.drc.R_mp]
+XO:
+  filters: [f.lo.L, f.hi.L, f.lo.R, f.hi.R]
+  sets:
+    lp: [c.xo.lp_beyma, c.xo.lp_vifa_left, c.xo.lp_vifa_right]
+    mp: [c.xo.mp_beyma, c.xo.mp_vifa_left, c.xo.mp_vifa_right]
+fs: 44100
+ref_level_gain: -10.0
+target_mag_curve: R20_ext-target_mag.dat
+target_pha_curve: R20_ext-target_pha.dat

@@ -1,0 +1,57 @@
+# Some help:
+#
+# Under 'xo_sets', it must be defined at leas one 'setName:', 
+# then under the set you need to define each way ('fr', 'lo:', 'mi:', 'hi:' or 'sw:').
+#
+# Under each way, then define the underlaying propierties:
+#
+#           fir:        xo.someDescription.pcm    xo.someDescription.pcm
+#           gain:       0.0                       0.0
+#           delay_ms:   0.0                       0.0
+#           polarity:   +1                        +1
+#
+# Channels are implicit as per the columns they are written into,
+# it is not needed to use brackets as per yaml syntax, this is for readability.
+#
+
+
+fs: 44100
+target_spl:     82
+room_gain:      5.0
+house_gain:     -2.0
+
+peq_sets:       ~
+
+drc_sets:
+    nearfield:          drc.L_nearfield.pcm        drc.R_nearfield.pcm
+    midfield:           drc.L_midfield_multip.pcm  drc.R_midfield_multip.pcm
+
+xo_sets:
+    mp:
+        lo: &way_lo
+            fir:        xo.mp_beyma.pcm           xo.mp_beyma.pcm         
+            gain:       1.1                       1.1                    
+            delay_ms:   0.4                       0.4                    
+            polarity:   +1                        +1                      
+        hi: &way_hi
+            fir:        xo.mp_vifa_left.pcm       xo.mp_vifa_right.pcm    
+            gain:       2.2                       2.2                    
+            delay_ms:   0.8                       0.8                     
+            polarity:   -1                        -1
+        sw: &way_sw
+            fir:        xo.mp_rel.pcm 
+            gain:       3.3        
+            delay_ms:   0.0           
+            polarity:   +1            
+    lp:
+        lo:
+            <<:          *way_lo
+            fir:         xo.lp_beyma.pcm           xo.lp_beyma.pcm         
+        hi:
+            <<:          *way_hi
+            fir:         xo.lp_vifa_left.pcm       xo.lp_vifa_right.pcm    
+        sw:
+            <<:          *way_sw
+            fir:         xo.lp_rel.pcm 
+
+
