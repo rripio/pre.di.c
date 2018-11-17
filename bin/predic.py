@@ -213,50 +213,59 @@ def get_target():
     return target_mag, target_pha
 
 
-def show(throw_it=None, state=gc.state):
-    """ shows a status report """
+def show( state=gc.state ):
+    """ A status report addressed to:
+        - stdout
+        - and /tmp/predic for others to get this info
+    """
 
     gain = calc_gain(gc.state['level'] , gc.state['input'])
     headroom = calc_headroom(gain, gc.state['balance'], get_target()[0])
     input_gain = calc_input_gain(gc.state['input'])
-
-    print()
-    print(f"Loudspeaker is {gc.config['loudspeaker']}")
-    print()
-    print(f"fs             {gc.speaker['fs']:6}")
-    print(f"Ref level gain {gc.speaker['ref_level_gain']: 6.1f}")
-
-    print()
     muted = ('(muted)' if gc.state['muted'] else ' ')
-    print(f"Level          {gc.state['level']: 6.1f}", muted)
-    print(f"Balance        {gc.state['balance']: 6.1f}")
-    print(f"Polarity            {gc.state['polarity']:6}")
+    tracking_loud = (' ' if gc.state['loudness_track'] else '(tracking off)')
+
+    tmp  = "\n"
+    tmp += ( f"Loudspeaker is {gc.config['loudspeaker']}\n" )
+    tmp += "\n"
+    tmp += ( f"fs             {gc.speaker['fs']:6}\n" )
+    tmp += ( f"Ref level gain {gc.speaker['ref_level_gain']: 6.1f}\n" )
+
+    tmp += "\n"
+    tmp += ( f"Level          {gc.state['level']: 6.1f} " + muted + "\n")
+    tmp += ( f"Balance        {gc.state['balance']: 6.1f}\n" )
+    tmp += ( f"Polarity            {gc.state['polarity']:6}\n" )
     if gc.state['mono']:
-        print(f"Mono           {'on':>6s}")
+        tmp += ( f"Mono           {'on':>6s}\n" )
     else:
-        print(f"Mono           {'off':>6s}")
+        tmp += ( f"Mono           {'off':>6s}\n" )
 
-    print()
-    print(f"Bass           {gc.state['bass']: 6.1f}")
-    print(f"Treble         {gc.state['treble']: 6.1f}")
-    tracking = (' ' if gc.state['loudness_track'] else '(tracking off)')
-    print(f"Loudness ref   {gc.state['loudness_ref']: 6.1f}", tracking)
+    tmp += "\n"
+    tmp += ( f"Bass           {gc.state['bass']: 6.1f}\n" )
+    tmp += ( f"Treble         {gc.state['treble']: 6.1f}\n" )
+    tmp += ( f"Loudness ref   {gc.state['loudness_ref']: 6.1f} " + tracking_loud + "\n")
 
-    print()
-    print(f"Crossover set  {gc.state['XO_set']:>6s}")
-    print(f"DRC set        {gc.state['DRC_set']:>6s}")
-    print(f"PEQ            {gc.state['peq']:>6s}"
-            , '(defeated)' * gc.state['peqdefeat'])
+    tmp += "\n"
+    tmp += ( f"Crossover set  {gc.state['XO_set']:>6s}\n" )
+    tmp += ( f"DRC set        {gc.state['DRC_set']:>6s}\n" )
+    tmp += ( f"PEQ            {gc.state['peq']:>6s} " +
+             '( defeated )' * gc.state['peqdefeat'] + "\n" )
 
-    print()
-    print(f"Input          {gc.state['input']:>6s}")
-    print(f'Input gain     {input_gain: 6.1f}')
+    tmp += "\n"
+    tmp += ( f"Input          {gc.state['input']:>6s}\n" )
+    tmp += ( f'Input gain     {input_gain: 6.1f}\n' )
 
-    print()
-    print(f"Gain           {gain: 6.1f}")
-    print(f"Headroom       {headroom: 6.1f}")
+    tmp += "\n"
+    tmp += ( f"Gain           {gain: 6.1f}\n" )
+    tmp += ( f"Headroom       {headroom: 6.1f}\n" )
+    tmp += "\n"
 
-    print('\n')
-
+    # writes the report to stdout
+    print( tmp )
+            
+    # and to /tmp/predic
+    f = open( '/tmp/predic', 'w')
+    f.write(tmp)
+    f.close()
+    
     return state
-
