@@ -327,7 +327,7 @@ def do_filtering_drc(drc_set, xo_set):
 
         # And the coeff to apply:
         pcm = drc_set[i]
-        if pcm in ('nofilter', 'no', '0', '-1'):
+        if pcm in ('none', 'nofilter', 'no', '0', '-1', ''):
             cname = '-1'
         else:
             cname = '"' + pcm.split('.')[1] + '"'
@@ -374,7 +374,7 @@ def do_filtering_xo(xo_set):
             tmp += '\nfilter "' + fname + '" {\n'
             tmp += '    from_filters: "f.drc.' + cha + '";\n'
             tmp += '    to_outputs:   "' + way + '.' + cha + '"/' + atten + '/' + polar + ';\n'
-            if pcm == 'nofilter':
+            if pcm in ('none', 'nofilter', 'no', '0', '-1', ''):
                 cname = '-1'
             else:
                 cname = '"' + pcm.split('.')[1] + '"'
@@ -388,7 +388,7 @@ def do_filtering_xo(xo_set):
         atten = str( xo_set[sub]['gain'][0] )
         polar = str( xo_set[sub]['polarity'][0] )
         pcm   = xo_set[sub]['fir'][0]
-        if pcm == 'nofilter':
+        if pcm in ('none', 'nofilter', 'no', '0', '-1', ''):
             cname = '-1'
         else:
             cname = '"' + pcm.split('.')[1] + '"'
@@ -407,6 +407,9 @@ def get_lskpName_from_lspkFolder(path):
 def prepare_speaker_yaml():
     """ this is te pre.di.c speaker.yml sctructure """
 
+    # note: for no coeff to be applied on a filter stage (i.e. 'coeff: -1;' in brutefir_config)
+    #       it is needed to indicate 'none' into the speaker.yml file
+
     # THE SKELETON:
     data = """
             fs:                 ~
@@ -423,14 +426,14 @@ def prepare_speaker_yaml():
                 sets: {}
     """
     speaker = yaml.load(data)
-    
-    
+
+
     # (!) PENDING TO REVIEW THIS SECTION - WORK IN PROGRESS -
     speaker['fs']               = lspk['fs']
     speaker['ref_level_gain']   = 0.0
     speaker['target_mag_curve'] = 'R20_ext-target_mag.dat'
     speaker['target_pha_curve'] = 'R20_ext-target_pha.dat'
-    
+
     # THE XO.filters SECTION
     # We will complete it as the way fields are defined in the source <lspk> yaml configuration.
     # There, the ways are repeatedly declared under each set in order to adjust parameters,
@@ -444,7 +447,7 @@ def prepare_speaker_yaml():
             speaker['XO']['filters'].append( 'f.' + wayName + '.R' )
         else:
             speaker['XO']['filters'].append( 'f.' + wayName )
-            
+
     # THE XO.sets SECTION, as defined in the source <lspk> yaml configuration.
     for setName in lspk['xo_sets']:
         mySet = lspk['xo_sets'][setName]
@@ -454,22 +457,22 @@ def prepare_speaker_yaml():
         # So let's get it as per defined in the source <lspk> yaml configuration:
         for wayName in mySet:
             for pcm in mySet[wayName]['fir']:
-                if pcm in ( 'nofilter', 'no', '0', '-1' , ''):
-                    coeffName = '-1'
+                if pcm in ( 'none', 'nofilter', 'no', '0', '-1' , ''):
+                    coeffName = 'none'
                 else:
                     coeffName = pcm.split('.')[1]  # e.g:  xo.mp_DynA42_left.pcm
                 speaker['XO']['sets'][setName].append( coeffName )
 
     # THE DRC.filters SECTION
     # This sectios is hardwired, done when skeleton.
-    
+
     # THE DRC.sets SECTION
     for setName in lspk['drc_sets']:
         mySet = lspk['drc_sets'][setName]
         speaker['DRC']['sets'][setName] = list()     # initialize as empty list
         for pcm in mySet:
-            if pcm in ( 'nofilter', 'no', '0', '-1' , ''):
-                coeffName = '-1'
+            if pcm in ( 'none', 'nofilter', 'no', '0', '-1' , ''):
+                coeffName = 'none'
             else:
                 coeffName = pcm.split('.')[1]  # e.g:  xo.mp_DynA42_left.pcm
             speaker['DRC']['sets'][setName].append( coeffName )
@@ -493,7 +496,7 @@ if __name__ == "__main__":
             lspkFolder = opc
             if lspkFolder.endswith('/'):
                 lspkFolder = lspkFolder[:-1]
-                
+
     if overwrite:
         confirm = input("Are you sure to overwrite? ")
         if not confirm in ('Y','y') : overwrite = False
@@ -504,7 +507,7 @@ if __name__ == "__main__":
     bfConfig_fname     = lspkFolder + '/brutefir_config'
     speaker_fname      = lspkFolder + '/speaker.yml'
     predicConfig_fname = '/home/predic/config/config.yml'
-    
+
     # SCAN PCMS to load as available coeffs in brutefir_config
     drc_pcms = scan_drc( lspkFolder )
     xo_pcms  = scan_xo( lspkFolder )
@@ -568,7 +571,7 @@ if __name__ == "__main__":
     bfconfig += do_filtering_eq()
     bfconfig += do_filtering_drc(first_drc_set, first_xo_set)
     bfconfig += do_filtering_xo(first_xo_set)
-    
+
     #  Saving results
     if not overwrite:
         speaker_fname   += '.candidate'
@@ -595,6 +598,6 @@ if __name__ == "__main__":
     print( '\n--- FILES SAVED:' )
     print( '    ' + bfConfig_fname )
     print( '    ' + speaker_fname )
-    
+
     print("    NOTICE:")
     print("    Still pending to review 'ref_level_gain' and 'target_xxx_curve parameters'")
