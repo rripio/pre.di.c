@@ -213,7 +213,7 @@ def get_target():
     return target_mag, target_pha
 
 
-def show( state=gc.state ):
+def show( throw_it=None, state=gc.state ):
     """ A status report addressed to:
         - stdout
         - and /tmp/predic for others to get this info
