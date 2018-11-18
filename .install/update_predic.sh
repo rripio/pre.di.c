@@ -186,7 +186,7 @@ chmod -R 755 www/*
 cd
 
 #########################################################
-# FIN
+# END
 #########################################################
 # Dejamos una marca indicando la branch contenida
 touch ~/bin/README_THIS_IS_"$branch"_BRANCH
@@ -197,7 +197,7 @@ echo ""
 
 
 #########################################################
-# Website 'FIRtro'
+# Website 'pre.di.c'
 #########################################################
 forig=$origen"/.install/pre.di.c.conf"
 fdest="/etc/apache2/sites-available/pre.di.c.conf"
