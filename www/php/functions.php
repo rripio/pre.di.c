@@ -99,9 +99,10 @@
     *          "GET", "php/functions.php?command=level -15"
     * Como es un array, debemos seleccionar la clave que nos interesa:
     */
+
     $command = $_REQUEST["command"];
 
-    // Comandos especiales:
+    // Comandos especiale;s:
     if ( $command == "read_inputs_file" ) {
         // OjO readfile proporciona un 'echo' del contenido del archivo, a saco.
         // Es decir: vuelca el contenido del archivo a la salida estandar de php.
@@ -115,10 +116,15 @@
         readfile($fpath);
     }
     elseif ( $command == "amplion" ) {
+        // local_server.py escribirá el estado del amplificador en ~/.ampliwww
+        // para posterior consulta en los updates de la peich
         local_socket('ampli on');
     }
     elseif ( $command == "amplioff" ) {
         local_socket('ampli off');
+    }
+    elseif ( $command == "amplistatus" ) {
+        readfile("/home/predic/.ampliwww"); // una pena no lee en /tmp :-(
     }
 
     // Comandos estandar para pre.di.c (devolvemos el resultado con el echo)
@@ -127,3 +133,4 @@
     }
 
 ?>
+
