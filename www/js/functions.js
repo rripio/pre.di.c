@@ -186,7 +186,12 @@ function fills_inputs_selector() {
         var option = document.createElement("option");
         option.text = inputs[i];
         x.add(option);
-    }
+    }    
+    // Y añadimos la entrada 'none' prevista en server_process que desconectará todo:
+    var option = document.createElement("option");
+    option.text = 'none';
+    x.add(option);
+    
 }
 
 // Prepara el selector de XO
