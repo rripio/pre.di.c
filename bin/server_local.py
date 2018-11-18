@@ -2,7 +2,7 @@
 
 """ Listen for certain commands to be executed on local
 """
-# This server is secured by allowing only certain commands
+# This server is secured by allowing only certain orders
 # to be translated to actual local commands.
 
 import socket
@@ -10,18 +10,6 @@ import sys
 import time
 import subprocess as sp
 import yaml
-
-def preprocess(cmd):
-    """
-        Available commans will be translated to executables,
-        others will return False, so doing nothing.
-    """
-    if cmd == 'ampli on':
-        return '/home/predic/bin_custom/ampli.sh on'
-    if cmd == 'ampli off':
-        return '/home/predic/bin_custom/ampli.sh off'
-
-    return False
 
 def server_socket(host, port):
     """Makes a socket for listening clients"""
@@ -47,6 +35,25 @@ def server_socket(host, port):
 
     # return socket state
     return s
+
+def preprocess(cmd):
+    """
+        Only certain 'cmd' will be translated to executables,
+        for the main loop to execute them (subprocess.run(somethingToExec)).
+        Others 'cmd' will return False, so doing nothing.
+    """
+
+    if cmd == 'ampli on':
+        # writes the ampli state so that others can read it
+        f = open('/home/predic/.ampliwww', 'w'); f.write('on'); f.close()
+        return '/home/predic/bin_custom/ampli.sh on'
+
+    if cmd == 'ampli off':
+        f = open('/home/predic/.ampliwww', 'w'); f.write('off'); f.close()
+        return '/home/predic/bin_custom/ampli.sh off'
+
+    return False
+    
 
 if __name__ == '__main__':
 
@@ -116,5 +123,3 @@ if __name__ == '__main__':
                     print(f'(server_local) connected to client {addr[0]}')
             # wait a bit, loop again
             time.sleep(0.01)
-
-
