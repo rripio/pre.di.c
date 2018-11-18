@@ -1,10 +1,18 @@
-a:
+analog:
     gain: 0.0
     in_ports:
         - system:capture_1
         - system:capture_2
     resampled: False
-    xo: mp
+    xo: none
+
+analog6dB:
+    gain: 6.0
+    in_ports:
+        - system:capture_1
+        - system:capture_2
+    resampled: False
+    xo: none
 
 mpd:
     gain: 0
@@ -12,7 +20,7 @@ mpd:
         - mpd_loop:output_1
         - mpd_loop:output_2
     resampled: False
-    xo: mp
+    xo: none
 
 net:
     gain: 0
@@ -20,7 +28,7 @@ net:
         - net:from_slave_1
         - net:from_slave_2
     resampled: False
-    xo: mp
+    xo: none
 
 tdt:
     gain: 0
@@ -28,4 +36,4 @@ tdt:
         - dvb_loop:output_1
         - dvb_loop:output_2
     resampled: False
-    xo: mp
+    xo: none
