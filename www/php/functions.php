@@ -124,7 +124,7 @@
         local_socket('ampli off');
     }
     elseif ( $command == "amplistatus" ) {
-        readfile("/home/predic/.ampliwww"); // una pena no lee en /tmp :-(
+        readfile("/home/predic/.ampli"); // php no puede acceder a /tmp por razones de seguridad
     }
 
     // Comandos estandar para pre.di.c (devolvemos el resultado con el echo)
