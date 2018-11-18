@@ -20,9 +20,9 @@
                   font-family: Verdana, Helvetica, Arial;
                   font-weight:bold; }
 
-        input   { background-color: rgb(185, 185, 185); }
-
-        button  { background-color: rgb(185, 185, 185);
+        button  { background-color: rgb(100, 100, 100);
+                  color: white;
+                  font-weight:bold;
                   font-size:1.0em;
                   border-radius: 15%; }
 
@@ -36,8 +36,6 @@
                   font-weight:bold;
                   color:white;
                   background-color: rgb(25, 25, 25);}
-
-        .tojunto div { display: inline-block; }
 
     </style>
 
@@ -67,10 +65,9 @@
 
         <hr>
 
-        <div align="center" class="tojunto">
+        <div align="center">
 
             <!--Enciende y apaga el ampli-->
-            power
             <select id="onoffSelector" onchange="ampli(this.value)">
               <option value="on" >ON </option>
               <option value="off">OFF</option>
@@ -113,9 +110,9 @@
 
         <!--Botonera de mute, mono, loudness-->
         <div align="center">
-            <button type="button" id="buttonMute" onmousedown="predic_cmd('mute toggle')"           ></button>
-            <button type="button" id="buttonMono" onmousedown="predic_cmd('mono toggle')"           ></button>
-            <button type="button" id="buttonLoud" onmousedown="predic_cmd('loudness_track toggle')" ></button>
+            <button type="button" id="buttonMute" onmousedown="predic_cmd('mute toggle')"           >MUTE</button>
+            <button type="button" id="buttonMono" onmousedown="predic_cmd('mono toggle')"           >MONO</button>
+            <button type="button" id="buttonLoud" onmousedown="predic_cmd('loudness_track toggle')" >LOUD</button>
         </div>
 
         <hr>
@@ -137,11 +134,11 @@
         <hr>
 
         <!--Botonera de volumen-->
-        <div align="center">
-            <button type="button"                 onmousedown="predic_cmd('level -3 add')" >- 3</button>
-            <button type="button"                 onmousedown="predic_cmd('level -1 add')" >- 1</button>
-            <button type="button"                 onmousedown="predic_cmd('level +1 add')" >+ 1</button>
-            <button type="button"                 onmousedown="predic_cmd('level +3 add')" >+ 3</button>
+        <div align="center" >
+            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level -3 add')" >- 3</button>
+            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level -1 add')" >- 1</button>
+            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level +1 add')" >+ 1</button>
+            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level +3 add')" >+ 3</button>
         </div>
 
         <hr>
