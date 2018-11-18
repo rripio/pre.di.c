@@ -37,6 +37,8 @@
                   color:white;
                   background-color: rgb(25, 25, 25);}
 
+        .tojunto div { display: inline-block; }
+
     </style>
 
 </head>
@@ -65,19 +67,21 @@
 
         <hr>
 
-        <div align="center">
+        <div align="center" class="tojunto">
+
             <!--Enciende y apaga el ampli-->
-            <span>power
-            <select id="onoff"          onchange="remoterun('ampli' + this.value)">
+            power
+            <select id="onoffSelector" onchange="ampli(this.value)">
               <option value="on" >ON </option>
               <option value="off">OFF</option>
-            </span>
             </select>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            &nbsp;
+
             <!--Selector de entradas automágico-->
-            <span>INPUT:
+            INPUT:
             <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
-            </span>
+
         </div>
 
         <hr>
@@ -142,9 +146,9 @@
 
         <hr>
 
-        <!--Botón para probar funciones JS con onclick
+        <!--Botón para probar funciones JS con onclick 
         <div align="right">
-            <button type="button"                 onclick="fills_xo_selector()" >PBA</button>
+            <button type="button"                 onclick="update_ampli_switch()" >PBA</button>
         </div>
         -->
 
