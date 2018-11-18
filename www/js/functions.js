@@ -89,7 +89,7 @@ function page_update(status) {
     document.getElementById("xoSelector").value     =               status_decode(status, 'XO_set');
     document.getElementById("drcSelector").value    =               status_decode(status, 'DRC_set');
 
-    // Rótulo de los botones MUTE, MONO, LOUDNESS
+    // Rótulo de los botones MUTE, MONO, LOUDNESS en lowercase si están desactivados
     document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
     document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
     document.getElementById("buttonLoud").innerHTML = OnOff( 'loud', status_decode(status, 'loudness_track') );
@@ -97,18 +97,24 @@ function page_update(status) {
     // Destacamos los botones que están activados
     if ( status_decode(status, 'muted') == 'true' ) {
         document.getElementById("buttonMute").style.background = "rgb(185, 185, 185)";
+        document.getElementById("buttonMute").style.color = "white";
     } else {
         document.getElementById("buttonMute").style.background = "rgb(100, 100, 100)";
+        document.getElementById("buttonMute").style.color = "lightgray";
     }
     if ( status_decode(status, 'mono') == 'true' ) {
         document.getElementById("buttonMono").style.background = "rgb(185, 185, 185)";
+        document.getElementById("buttonMono").style.color = "white";
     } else {
         document.getElementById("buttonMono").style.background = "rgb(100, 100, 100)";
+        document.getElementById("buttonMono").style.color = "lightgray";
     }
     if ( status_decode(status, 'loudness_track') == 'true' ) {
         document.getElementById("buttonLoud").style.background = "rgb(185, 185, 185)";
+        document.getElementById("buttonLoud").style.color = "white";
     } else {
         document.getElementById("buttonLoud").style.background = "rgb(100, 100, 100)";
+        document.getElementById("buttonLoud").style.color = "lightgray";
     }
 
     // Actualizamos el switch del ampli
@@ -152,11 +158,11 @@ function status_decode(status, prop) {
     return String(result).trim();
 }
 
-// Auxiliar para rotular propiedades como por ejemplo muted:true/false ==> 'MUTE ON' / 'mute off'
+// Auxiliar para rotular propiedades como por ejemplo muted:true/false ==> 'MUTE' / 'mute'
 function OnOff(prop, truefalse) {
     var label = '';
-    label = prop + ' off'
-    if ( truefalse == 'true' ) { label = prop.toUpperCase() + ' ON'; }
+    label = prop.toLowerCase()
+    if ( truefalse == 'true' ) { label = prop.toUpperCase(); }
     return label;
 }
 
