@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # INFO:
-# - Folders ~/*custom*/ and ~/lspk will be unchanged
+# - Folders ~/*custom*/ and ~/loudspeakers will be unchanged
 # - Config files are provides with '.example' extension,
 #   except if you decide not to keep your config files.
 
@@ -14,13 +14,13 @@ fi
 
 destino=/home/predic
 branch=$1
-origen=$destino/tmp/FIRtro-$branch
+origen=$destino/tmp/pre.di.c-$branch
 
 # Si no se localiza la branch indicada
 if [ ! -d $origen ]; then
     echo
-    echo ERROR: no se localiza $origen
-    echo uso indicando la branch xxx disponible en ~/tmp/pre.di.c-xxx:
+    echo ERROR: not found $origen
+    echo must indicated a branch name available at ~/tmp/pre.di.c-xxx:
     echo "    download_predic.sh master|testing|xxx"
     echo
     exit 0
@@ -40,7 +40,7 @@ if [ "$tmp" = "n" ] || [ "$tmp" = "N" ]; then
     fi
 fi
 
-read -r -p "WARNING: contiue updating? [y/N] " tmp
+read -r -p "WARNING: continue updating? [y/N] " tmp
 if [ "$tmp" != "y" ] && [ "$tmp" != "Y" ]; then
     echo Bye.
     exit 0
