@@ -10,7 +10,7 @@ branch=$1
 
 # Prepare temp directory
 mkdir /home/predic/tmp > /dev/null 2>&1
-cd /home/firtro/tmp
+cd /home/predic/tmp
 
 # Removes any existent master.zip or predic directory for this branch:
 rm $branch.zip
