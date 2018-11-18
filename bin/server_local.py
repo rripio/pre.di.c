@@ -38,18 +38,17 @@ def server_socket(host, port):
 
 def preprocess(cmd):
     """
-        Only certain 'cmd' will be translated to executables,
+        Only certain 'cmd' will be translated to executables then passed
         for the main loop to execute them (subprocess.run(somethingToExec)).
-        Others 'cmd' will return False, so doing nothing.
+        Others 'cmd' will pass False to the main loop, so will do nothing.
     """
+    # clear new line
+    cmd = cmd.replace('\n','')
 
     if cmd == 'ampli on':
-        # writes the ampli state so that others can read it
-        f = open('/home/predic/.ampliwww', 'w'); f.write('on'); f.close()
         return '/home/predic/bin_custom/ampli.sh on'
 
     if cmd == 'ampli off':
-        f = open('/home/predic/.ampliwww', 'w'); f.write('off'); f.close()
         return '/home/predic/bin_custom/ampli.sh off'
 
     return False
