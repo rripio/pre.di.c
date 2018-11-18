@@ -39,7 +39,7 @@ def server_socket(host, port):
 def preprocess(cmd):
     """
         Only certain 'cmd' will be translated to executables then passed
-        for the main loop to execute them (subprocess.run(somethingToExec)).
+        to the main loop to execute them (subprocess.run(somethingToExec)).
         Others 'cmd' will pass False to the main loop, so will do nothing.
     """
     # clear new line
