@@ -18,11 +18,21 @@ function predic_cmd(cmd, update=true) {
     }
 }
 
-// Función para hacer cosas allí (solo las cosas habilitadas en el código php que hay en el server)
-function remoterun(cmd) {
+// Controla el ampli
+function ampli(mode) {
     var myREQ = new XMLHttpRequest();
-    myREQ.open("GET", "php/functions.php?command=" +  cmd, true);
+    myREQ.open("GET", "php/functions.php?command=ampli" + mode, async=true);
     myREQ.send();
+}
+
+// Auxiliar para el autoupdate: actualiza el switch del ampli tras consultarlo al server
+// (!) async=false NO es recomendable, pero si no no obtengo la response :-?
+function update_ampli_switch() {
+    var myREQ = new XMLHttpRequest();
+    myREQ.open("GET", "php/functions.php?command=amplistatus", async=false);
+    myREQ.send();
+    ampliStatus = myREQ.responseText.replace('\n','')
+    document.getElementById("onoffSelector").value = ampliStatus;
 }
 
 // Inicializa le peich incluyendo su auto-update
@@ -100,9 +110,15 @@ function page_update(status) {
     } else {
         document.getElementById("buttonLoud").style.background = "rgb(100, 100, 100)";
     }
+
+    // Actualizamos el switch del ampli
+    update_ampli_switch()
+
 }
 
 // Auxiliar ortopédico para pedir ciertos archivos al servidor PHP
+// (!) async=false NO es recomendable, pero esto sólo se ejecuta al inicio
+//     y de esta forma llega lo que tiene que llegar ;-)
 function get_file(fid) {
     var phpCmd   = "";
     var response = "todavia_sin_respuesta";
@@ -119,8 +135,6 @@ function get_file(fid) {
         return null;
     }
     var myREQ = new XMLHttpRequest();
-    // async=false NO es recomendable, pero esto sólo se ejecuta al inicio
-    // y de esta forma llega lo que tiene que llegar ;-)
     myREQ.open(method="GET", url="php/functions.php?command=" + phpCmd, async=false);
     myREQ.send();
     return (myREQ.responseText);
