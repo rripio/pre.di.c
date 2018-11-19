@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>pre.di.c</title>
+
+    <!-- responsive -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <meta charset="utf-8">
+
+    <!-- Para alcanzar las funciones javascript usadas por los eventos de esta peich-->
+    <script src="js/functions.js"></script>
+
+    <!-- https://www.w3schools.com/colors/colors_picker.asp -->
+    <!-- OjO no meter comentarios dentro de style -->
+    <style>
+
+        body    { color:white;
+                  background-color: rgb(38, 38, 38);
+                  font-family: Verdana, Helvetica, Arial;
+                  font-weight:bold; }
+
+        button  { background-color: rgb(100, 100, 100);
+                  color: white;
+                  font-weight:bold;
+                  font-size:1.0em;
+                  border-radius: 15%; }
+
+        th, td  { padding: 5px;
+                  text-align: center;
+                  border: 1px solid gray;
+                  font-size:1.0em;
+                  width: 50% }
+
+        select  { font-size:1.0em;
+                  font-weight:bold;
+                  color:white;
+                  background-color: rgb(25, 25, 25);}
+
+    </style>
+
+</head>
+
+<!-- Inicializa la peich, incluyendo su actualización periódica -->
+<body onload="page_initiate()" >
+
+    <div id="main">
+
+        <!--    Esquema maomeno del display:
+
+            power << ON/OFF >>  INPUT: << selector >>
+            level: -23.0        balance: 0.0
+
+             [-] bass: 0 [+]   [-] treble: 0 [+]
+
+                     [mute][mono][loud]
+
+                   XO: << selector >>
+                  DRC: << selector >>
+
+                      [-3][-1][+1][+3]
+        -->
+        <div id="cabecera" align="center">
+        </div>
+
+        <hr>
+
+        <div align="center">
+
+            <!--Enciende y apaga el ampli-->
+            <select id="onoffSelector" onchange="ampli(this.value)">
+              <option value="on" >ON </option>
+              <option value="off">OFF</option>
+            </select>
+
+            &nbsp;
+
+            <!--Selector de entradas automágico-->
+            INPUT:
+            <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
+
+        </div>
+
+        <hr>
+
+        <!--Tabla -->
+        <div style="overflow-x:auto;"> <!--esto hace que la table sea responsive-->
+        <table style="width:100%;">
+            <tr>
+                <td id="status_LEV" ></td>
+                <td id="status_BAL" ></td>
+            </tr>
+        </table>
+        </div>
+
+        <hr>
+
+        <!--Botonera de tonos-->
+        <div align="center" style="font-size:0.75em;">
+            <button type="button"                 onmousedown="predic_cmd('bass   -1 add')"  >-</button>
+            <span id="bassInfo">bass</span>
+            <button type="button"                 onmousedown="predic_cmd('bass   +1 add')"  >+</button>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button"                 onmousedown="predic_cmd('treble -1 add')"  >-</button>
+            <span id="trebleInfo">treble</span>
+            <button type="button"                 onmousedown="predic_cmd('treble +1 add')"  >+</button>
+        </div>
+
+        <hr>
+
+        <!--Botonera de mute, mono, loudness-->
+        <div align="center">
+            <button type="button" id="buttonMute" onmousedown="predic_cmd('mute toggle')"           >MUTE</button>
+            <button type="button" id="buttonMono" onmousedown="predic_cmd('mono toggle')"           >MONO</button>
+            <button type="button" id="buttonLoud" onmousedown="predic_cmd('loudness_track toggle')" >LOUD</button>
+        </div>
+
+        <hr>
+
+        <div align="center">
+            <!--Selector de XO automágico-->
+            <span>XO:
+            <select id="xoSelector"     onchange="predic_cmd('xo ' + this.value, update=false)" ></select>
+            </span>
+        </div>
+
+        <div align="center">
+            <!--Selector de DRC automágico-->
+            <span>DRC:
+            <select id="drcSelector"     onchange="predic_cmd('drc ' + this.value, update=false)" ></select>
+            </span>
+        </div>
+
+        <hr>
+
+        <!--Botonera de volumen-->
+        <div align="center" >
+            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level -3 add')" >- 3</button>
+            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level -1 add')" >- 1</button>
+            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level +1 add')" >+ 1</button>
+            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level +3 add')" >+ 3</button>
+        </div>
+
+        <hr>
+
+        <!--Botón para probar funciones JS con onclick 
+        <div align="right">
+            <button type="button"                 onclick="update_ampli_switch()" >PBA</button>
+        </div>
+        -->
+
+    </div><!--main-->
+
+</body>
+</html>
