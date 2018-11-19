@@ -1,11 +1,11 @@
-DRC_set: a
-XO_set: mp
+DRC_set: nearfield
+XO_set: none
 balance: 0.0
 bass: 0
-input: mpd
-level: -16.0
+input: none
+level: -22.0
 loudness_ref: 0.0
-loudness_track: false
+loudness_track: true
 mono: false
 muted: false
 peq: 'off'
