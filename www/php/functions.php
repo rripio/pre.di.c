@@ -86,10 +86,11 @@
         return $out;
     }
 
-    ///////////////////   MAIN: ///////////////////////
-    // Procesa el COMMAND recibido en la HTTPREQUEST
-    // y devuelve resultados mediante 'echo xxxxx'
-    ///////////////////////////////////////////////////
+    ///////////////////   MAIN: //////////////////////////////////////////////////
+    // Procesa el COMMAND recibido en la HTTPREQUEST y devuelve resultados
+    // a través de la salida estandar de php, bien mediante 'echo xxxxx' o
+    // bien mediante funciones que escriben directamente en ella como readfile()
+    //////////////////////////////////////////////////////////////////////////////
 
     /* http://php.net/manual/en/reserved.variables.request.php
     * PHP server side recibe arrays asociativas, o sea diccionarios, mediante los métodos
