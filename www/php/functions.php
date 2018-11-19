@@ -117,7 +117,7 @@
         readfile($fpath);
     }
     elseif ( $command == "amplion" ) {
-        // local_server.py escribirá el estado del amplificador en ~/.ampliwww
+        // El script remoto escribirá el estado del ampli en ~/.ampli
         // para posterior consulta en los updates de la peich
         local_socket('ampli on');
     }
