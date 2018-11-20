@@ -61,22 +61,26 @@ echo "(i) backing up *.LAST for config files"
 ## carpeta HOME:
 cp .mpdconf                 .mpdconf.LAST
 cp .brutefir_defaults       .brutefir_defaults.LAST
+
 ## carpeta MPLAYER
 cp .mplayer/config          .mplayer/config.LAST
 cp .mplayer/channels.conf   .mplayer/channels.conf.LAST
 
 ## carpeta CONFIG:
-
+cp config/state.yml         config/state.yml.LAST
 cp config/config.yml        config/config.yml.LAST
-cp config/DVB-T_state.yml   config/DVB-T_state.yml.LAST
-cp config/DVB-T.yml         config/DVB-T.yml.LAST
 cp config/inputs.yml        config/inputs.yml.LAST
 cp config/scripts           config/scripts.LAST
-cp config/state.yml         config/state.yml.LAST
-
-rm -f audio/PEQx*LAST       # por si hubiera anteriores no los replicamos
-for file in audio/PEQx* ; do
+cp config/DVB-T.yml         config/DVB-T.yml.LAST
+cp config/DVB-T_state.yml   config/DVB-T_state.yml.LAST
+rm -f config/PEQx*LAST       # por si hubiera anteriores no los replicamos
+for file in config/PEQx* ; do
     mv "$file" "$file.LAST"
+done
+
+## carpeta SCRIPTS
+for file in scripts/* ; do
+    cp "$file" "$file.LAST"
 done
 
 ## carpeta WWW:
@@ -98,7 +102,7 @@ rm .brutefir_c*
 #########################################################
 # Copiamos lo nuevo
 #########################################################
-echo "(i) Copyong from $origen to $destino"
+echo "(i) Copying from $origen to $destino"
 cp -r $origen/*             $destino/
 # y los ocultos se deben explicitar para que se copien:
 cp $origen/.mpdconf         $destino/
@@ -106,7 +110,7 @@ cp $origen/.brutefir*       $destino/
 cp -r $origen/.mplayer*     $destino/
 
 ########################################################################
-# Si se ha pedido conservar las configuraciones las restauramos:
+# Si se ha pedido CONSERVAR las configuraciones las restauramos:
 ########################################################################
 if [ "$conservar" ]; then
     echo "(i) Restoring user config files"
@@ -135,25 +139,16 @@ if [ "$conservar" ]; then
     done
 
 ########################################################################
-# Si NO se ha pedido conservar las configuraciones, se sobreescriben:
+# Si se ha pedido NO CONSERVAR las configuraciones, se sobreescriben:
 ########################################################################
 else
-
-cp config/config.yml        config/config.yml.LAST
-cp config/DVB-T_state.yml   config/DVB-T_state.yml.LAST
-cp config/DVB-T.yml         config/DVB-T.yml.LAST
-cp config/inputs.yml        config/inputs.yml.LAST
-cp config/scripts           config/scripts.LAST
-cp config/state.yml         config/state.yml.LAST
-
-
     # Algunos archivos de configuracion se han proporcionado con extension .example:
+    cp config/state.example             config/state
     cp config/config.example            config/config
+    cp config/inputs.example            config/inputs
+    cp config/scripts.example           config/scripts
     cp config/DVB-T_state.example       config/DVB-T_state
     cp config/DVB-T.example             config/DVB-T
-    cp config/scripts.example           config/scripts
-    cp config/state.example             config/state
-
     #cp www/config/config.ini.example    www/config/config.ini
 fi
 
@@ -181,7 +176,7 @@ brutefir
 chmod +x bin/*
 chmod +x bin_custom/*
 chmod +x bin_custom.example/*
-chmod -R 755 www/*
+#chmod -R 644 www/*
 #chmod 666 www/config/config*
 cd
 
