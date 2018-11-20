@@ -12,14 +12,14 @@ if [ -z $1 ] ; then
     exit 0
 fi
 
-destino=/home/predic
+destination=/home/predic
 branch=$1
-origen=$destino/tmp/pre.di.c-$branch
+origin=$destination/tmp/pre.di.c-$branch
 
 # If not found the requested branch
-if [ ! -d $origen ]; then
+if [ ! -d $origin ]; then
     echo
-    echo ERROR: not found $origen
+    echo ERROR: not found $origin
     echo must indicated a branch name available at ~/tmp/pre.di.c-xxx:
     echo "    download_predic.sh master|testing|xxx"
     echo
@@ -51,7 +51,7 @@ fi
 ###                                 MAIN                                     ###
 ################################################################################
 
-cd $destino
+cd $destination
 
 ######################################################################
 # Prevent: backup .LAST for current configurations
@@ -102,12 +102,12 @@ rm .brutefir_c*                                 >/dev/null 2>&1
 #########################################################
 # Copying the new stuff
 #########################################################
-echo "(i) Copying from $origen to $destino"
-cp -r $origen/*             $destino/
+echo "(i) Copying from $origin to $destination"
+cp -r $origin/*             $destination/
 # hidden files must be explicited to copy them
-cp $origen/.mpdconf         $destino/           >/dev/null 2>&1
-cp $origen/.brutefir*       $destino/           >/dev/null 2>&1
-cp -r $origen/.mplayer*     $destino/           >/dev/null 2>&1
+cp $origin/.mpdconf         $destination/           >/dev/null 2>&1
+cp $origin/.brutefir*       $destination/           >/dev/null 2>&1
+cp -r $origin/.mplayer*     $destination/           >/dev/null 2>&1
 
 ########################################################################
 # If KEEP:
@@ -194,7 +194,7 @@ echo ""
 #########################################################
 # Website 'pre.di.c'
 #########################################################
-forig=$origen"/.install/pre.di.c.conf"
+forig=$origin"/.install/pre.di.c.conf"
 fdest="/etc/apache2/sites-available/pre.di.c.conf"
 actualizar=1
 echo ""
@@ -221,4 +221,4 @@ if [ "$actualizar" ]; then
 fi
 
 #### And update the updater
-cp "$origen"/.install/update_predic.sh /home/predic/tmp/
+cp "$origin"/.install/update_predic.sh /home/predic/tmp/
