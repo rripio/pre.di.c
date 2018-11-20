@@ -220,3 +220,5 @@ if [ "$actualizar" ]; then
     sudo service apache2 reload
 fi
 
+#### And update the updater
+cp "$origen"/.install/update_predic.sh /home/predic/tmp/
