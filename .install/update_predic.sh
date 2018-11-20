@@ -16,7 +16,7 @@ destino=/home/predic
 branch=$1
 origen=$destino/tmp/pre.di.c-$branch
 
-# Si no se localiza la branch indicada
+# If not found the requested branch
 if [ ! -d $origen ]; then
     echo
     echo ERROR: not found $origen
@@ -26,7 +26,7 @@ if [ ! -d $origen ]; then
     exit 0
 fi
 
-# Preguntamos si se quieren conservar las configuraciones actuales
+# Wanna keep current configurations?
 conservar="1"
 read -r -p "WARNING: will you keep current config? [Y/n] " tmp
 if [ "$tmp" = "n" ] || [ "$tmp" = "N" ]; then
@@ -48,134 +48,134 @@ fi
 
 
 ################################################################################
-###                                 INICIO                                   ###
+###                                 MAIN                                     ###
 ################################################################################
 
 cd $destino
 
 ######################################################################
-# Preventivo: hacemos respaldos .LAST de lo que hubiera ya configurado
+# Prevent: backup .LAST for current configurations
 ######################################################################
 echo "(i) backing up *.LAST for config files"
 
-## carpeta HOME:
-cp .mpdconf                 .mpdconf.LAST
-cp .brutefir_defaults       .brutefir_defaults.LAST
+## folder HOME:
+cp .mpdconf                 .mpdconf.LAST                 >/dev/null 2>&1
+cp .brutefir_defaults       .brutefir_defaults.LAST       >/dev/null 2>&1
 
-## carpeta MPLAYER
-cp .mplayer/config          .mplayer/config.LAST
-cp .mplayer/channels.conf   .mplayer/channels.conf.LAST
+## folder MPLAYER
+cp .mplayer/config          .mplayer/config.LAST          >/dev/null 2>&1
+cp .mplayer/channels.conf   .mplayer/channels.conf.LAST   >/dev/null 2>&1
 
-## carpeta CONFIG:
+## folder CONFIG:
 cp config/state.yml         config/state.yml.LAST
 cp config/config.yml        config/config.yml.LAST
 cp config/inputs.yml        config/inputs.yml.LAST
 cp config/scripts           config/scripts.LAST
-cp config/DVB-T.yml         config/DVB-T.yml.LAST
-cp config/DVB-T_state.yml   config/DVB-T_state.yml.LAST
-rm -f config/PEQx*LAST       # por si hubiera anteriores no los replicamos
+cp config/DVB-T.yml         config/DVB-T.yml.LAST         >/dev/null 2>&1
+cp config/DVB-T_state.yml   config/DVB-T_state.yml.LAST   >/dev/null 2>&1
+rm -f config/PEQx*LAST       # discarting previous if any
 for file in config/PEQx* ; do
     mv "$file" "$file.LAST"
 done
 
-## carpeta SCRIPTS
+## folder SCRIPTS
 for file in scripts/* ; do
-    cp "$file" "$file.LAST"
+    cp "$file" "$file.LAST" >/dev/null 2>&1
 done
 
-## carpeta WWW:
+## folder WWW - Notice config.ini still not in use in current web control page
 # cp www/config/config.ini    tmp/www_config.ini.LAST # en tmp/ pq www/ desaparecerá
 
 #########################################################
-# Limpieza
+# Cleaning
 #########################################################
 echo "(i) Removing old files"
-rm -f CHANGES*
-rm -f LICENSE*
-rm -f README*
-rm -f WIP*
-rm -rf bin/ # -f porque pueden haber *.pyc protegidos
-rm -r doc/
-rm -r www/
-rm .brutefir_c*
+rm -f CHANGES*                                  >/dev/null 2>&1
+rm -f LICENSE*                                  >/dev/null 2>&1
+rm -f README*                                   >/dev/null 2>&1
+rm -f WIP*                                      >/dev/null 2>&1
+rm -rf bin/ # -f because maybe protected *.pyc 
+rm -r doc/                                      >/dev/null 2>&1
+rm -r www/                                      >/dev/null 2>&1
+rm .brutefir_c*                                 >/dev/null 2>&1
 
 #########################################################
-# Copiamos lo nuevo
+# Copying the new stuff
 #########################################################
 echo "(i) Copying from $origen to $destino"
 cp -r $origen/*             $destino/
-# y los ocultos se deben explicitar para que se copien:
-cp $origen/.mpdconf         $destino/
-cp $origen/.brutefir*       $destino/
-cp -r $origen/.mplayer*     $destino/
+# hidden files must be explicited to copy them
+cp $origen/.mpdconf         $destino/           >/dev/null 2>&1
+cp $origen/.brutefir*       $destino/           >/dev/null 2>&1
+cp -r $origen/.mplayer*     $destino/           >/dev/null 2>&1
 
 ########################################################################
-# Si se ha pedido CONSERVAR las configuraciones las restauramos:
+# If KEEP:
 ########################################################################
 if [ "$conservar" ]; then
     echo "(i) Restoring user config files"
 
-    # carpeta HOME:
+    # folder HOME:
     echo "    ".mpdconf
-    mv .mpdconf.LAST                .mpdconf
+    mv .mpdconf.LAST                .mpdconf                >/dev/null 2>&1
     echo "    .brutefir_defaults"
-    mv .brutefir_defaults.LAST      .brutefir_defaults
+    mv .brutefir_defaults.LAST      .brutefir_defaults      >/dev/null 2>&1
 
-    # carpeta MPLAYER
+    # folder MPLAYER
     echo "    ".mplayer/config
-    mv .mplayer/config.LAST         .mplayer/config
+    mv .mplayer/config.LAST         .mplayer/config         >/dev/null 2>&1
     echo "    ".mplayer/channels.conf
-    mv .mplayer/channels.conf.LAST  .mplayer/channels.conf
+    mv .mplayer/channels.conf.LAST  .mplayer/channels.conf  >/dev/null 2>&1
 
-    # carpeta WWW
+    # folder WWW
     #echo "    "www/config/config.ini
     #cp tmp/www_config.ini.LAST      www/config/config.ini
 
-    # carpeta CONFIG:
+    # folder CONFIG:
     for file in config/*LAST ; do
-        nfile=${file%.LAST}         # elimina .LAST encontrado al final '%'
+        nfile=${file%.LAST}         # removes .LAST at the end '%'
         echo "    "$nfile
         mv $file $nfile
     done
 
 ########################################################################
-# Si se ha pedido NO CONSERVAR las configuraciones, se sobreescriben:
+# If NO KEEP, then overwrite:
 ########################################################################
 else
-    # Algunos archivos de configuracion se han proporcionado con extension .example:
+    # Some config files are provided with '.example' extension
     cp config/state.example             config/state
     cp config/config.example            config/config
     cp config/inputs.example            config/inputs
     cp config/scripts.example           config/scripts
-    cp config/DVB-T_state.example       config/DVB-T_state
-    cp config/DVB-T.example             config/DVB-T
+    cp config/DVB-T_state.example       config/DVB-T_state  >/dev/null 2>&1
+    cp config/DVB-T.example             config/DVB-T        >/dev/null 2>&1
     #cp www/config/config.ini.example    www/config/config.ini
 fi
 
-# Caso especial que se ha tratado en tmp/ lo quitamos de ahí
+# Special case copied to tmp/ so lets' move it
 #mv -f tmp/www_config.ini.LAST    www/config/config.ini.LAST
 
 
 #########################################################
-# restaurando FIFOS
+# restoring FIFOs
 #########################################################
-echo "(i) Creando fifos para mplayer"
+echo "(i) Makinf fifos for mplayer"
 rm -f *fifo
 mkfifo tdt_fifo
 mkfifo cdda_fifo
 
 #########################################################
-# restaurando brutefir_convolver
+# restoring brutefir_convolver
 #########################################################
-echo "(i) Un primer arranque de Brutefir para que genere archivos internos"
+echo "(i) A first dry brutefir run in order to generate some internal."
 brutefir
 
 #########################################################
-# restaurando permisos
+# restoring exec permissions under bin*
 #########################################################
-chmod +x bin/*
-chmod +x bin_custom/*
-chmod +x bin_custom.example/*
+chmod +x bin/*                  >/dev/null 2>&1
+chmod +x bin_custom/*           >/dev/null 2>&1
+chmod +x bin_custom.example/*   >/dev/null 2>&1
 #chmod -R 644 www/*
 #chmod 666 www/config/config*
 cd
