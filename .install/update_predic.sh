@@ -183,9 +183,9 @@ cd
 #########################################################
 # END
 #########################################################
-# Dejamos una marca indicando la branch contenida
-touch ~/bin/README_THIS_IS_"$branch"_BRANCH
-echo "as per update_predic.sh" > ~/bin/README_THIS_IS_"$branch"_BRANCH
+# helping file to identify the current branch under bin/
+touch ~/bin/THIS_IS_"$branch"_BRANCH
+echo "as per update_predic.sh" > ~/bin/THIS_IS_"$branch"_BRANCH
 echo ""
 echo "(i) Done."
 echo ""
