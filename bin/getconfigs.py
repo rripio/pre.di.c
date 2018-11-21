@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) 2018 Roberto Ripio
