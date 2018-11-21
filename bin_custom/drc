@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 '''
     Shows and changes Brutefir's DRC coeffs
-    (i) NOT coordinated with the PRE.DI.C server
+    (i) NOT coordinated with the pre.di.c server, further more
+        it is possible to have drc coeffs available but
+        not declared inside the speaker.yml from pre.di.c
 
-    drc X   --> changes the drc filtering to #X
     drc 0   --> sets NO drc filtering.
+    drc X   --> changes the drc filtering to #X
 '''
 import sys
 import read_brutefir_process as bf
@@ -24,29 +26,35 @@ def drc_current():
     return cur
 
 def drc_available():
-    ava = []
+    availables = []
     for c in bf.coeffs:
-        if 'drc' in c['name']:
-            ava.append(c)
-    return ava
+        if 'drc' in c['pcm']:
+            yaesta = False
+            for ava in availables:
+                if c['name'][2:] == ava[1]:
+                    yaesta = True
+            if not yaesta:
+                availables.append( (len(availables)+1, c['name'][2:]) )
+                # Example:
+                # (1, 'lp_DynA42')
+                # (2, 'mp_DynA42')
+    return availables
 
 def drc_change(x):
     bfcmds = ''
     if x == '0':
         bfcli('cfc "f.drc.L" -1; cfc "f.drc.R" -1; quit;')
         return
-    for c in [ c for c in bf.coeffs if 'c.drc.'+x  in c['name'] ]:
-            for f in [ f for f in bf.filters_running if 'drc' in f['fname'] ]:
-                cname = c['name']
-                fname = f['fname']
-                if fname[-1] == cname[-1]:
-                    #print "ccc", cname, "fff", fname
-                    bfcmds += 'cfc "' + fname + '" "' + cname + '";'
-    #print bfcmds
+    for f in ('f.drc.L', 'f.drc.R'):
+        ch = f[-1]
+        bareCoeffName = drc_availables[ int(x) - 1 ][1]
+        c = ch + '_' + bareCoeffName
+        bfcmds += 'cfc "' + f + '" "' + c + '";'
     bfcli(bfcmds + 'quit;')
 
 if __name__ == '__main__':
-
+    
+    drc_availables = drc_available()
     new_drc=''
 
     # Read command line
@@ -65,14 +73,14 @@ if __name__ == '__main__':
         #######################
         print "\nDRC available:"
         #######################
-        for c in drc_available():
-            print '#' + c['name'].split('.')[-2], c['pcm']
+        for drc in drc_availables:
+            print '#'+str(drc[0]), drc[1]
 
     #######################
     print "\nDRC running:"
     #######################
     for f in drc_current():
         if f['cname'] <> '-1':
-            print f['fname'], '#' + f['cname'].split('.')[-2], f['cpcm']
+            print f['fname'] + ':', f['cname'][2:], '( ' + f['cpcm'] + ' )'
         else:
-            print f['fname'], '-1'
+            print f['fname'] + ':', '-1'
