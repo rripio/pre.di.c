@@ -174,16 +174,19 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
     def change_input(input, state=state):
 
         state['input'] = input
-        # if none disconnects all inputs
-        if input == 'none':
-            disconnect_inputs()
-        elif input in gc.inputs:
-            state['XO_set'] = gc.inputs[input]['xo']
-        else:
-            state['input'] = state_old['input']
-            warnings.append('Input name "%s" incorrect' % input)
-            return state
         try:
+            # if none disconnects all inputs
+            if input == 'none':
+                disconnect_inputs()
+                return state
+            elif input == None:
+                raise
+            elif input in gc.inputs:
+                state['XO_set'] = gc.inputs[input]['xo']
+            else:
+                state['input'] = state_old['input']
+                warnings.append('Input name "%s" incorrect' % input)
+                return state
             if do_change_input (input
                     , gc.inputs[state['input']]['in_ports']
                     , audio_ports.split()
