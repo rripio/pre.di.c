@@ -178,6 +178,8 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
         if input == 'none':
             disconnect_inputs()
             return state
+        elif input == None:
+            raise
         elif input in gc.inputs:
             state['XO_set'] = gc.inputs[input]['xo']
         else:
