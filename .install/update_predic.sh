@@ -159,7 +159,7 @@ fi
 #########################################################
 # restoring FIFOs
 #########################################################
-echo "(i) Makinf fifos for mplayer"
+echo "(i) Making fifos for mplayer"
 rm -f *fifo
 mkfifo tdt_fifo
 mkfifo cdda_fifo
