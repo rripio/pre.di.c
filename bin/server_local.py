@@ -59,6 +59,10 @@ if __name__ == '__main__':
     verbose = False
     fsocket = server_socket('localhost', 9988)
 
+    for opc in sys.argv:
+        if '-v' in opc:
+            verbose = True
+
     # main loop to proccess conections
     backlog = 10
     while True:
