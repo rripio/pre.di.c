@@ -104,7 +104,7 @@ rm .brutefir_c*                                 >/dev/null 2>&1
 #########################################################
 echo "(i) Copying from $origin to $destination"
 cp -r $origin/*             $destination/
-# hidden files must be explicited to copy them
+# hidden files must be explicit each one to copy them
 cp $origin/.mpdconf         $destination/           >/dev/null 2>&1
 cp $origin/.brutefir*       $destination/           >/dev/null 2>&1
 cp -r $origin/.mplayer*     $destination/           >/dev/null 2>&1
