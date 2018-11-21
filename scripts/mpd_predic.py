@@ -31,7 +31,7 @@ import time
 import math as m
 from subprocess import Popen
 
-import mpd
+import mpd # package python-mpd, but for Raspberry Pi with berryconda (python 3.6) then 'pip install python-mpd2'
 
 import predic as pd
 import getconfigs as gc
@@ -42,8 +42,7 @@ import getconfigs as gc
 mpd_path = '/usr/bin/mpd'
 mpd_options = ''
 mpd_alias = 'mpd'
-mpd_volume_linked = True
-#mpd_volume_linked = False
+mpd_volume_linked = False
 # Must be positive integer
 slider_range = 48
 
