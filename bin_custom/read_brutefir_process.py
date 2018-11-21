@@ -69,19 +69,11 @@ HOME = os.path.expanduser("~")
 
 sys.path.append(HOME + "/bin")
 
-############### PRE.DI.C #################
-#from basepaths import loudspeaker_folder
 from basepaths import loudspeakers_folder
-#from getconfigs import loudspeaker
-#from getstatus import fs
 import getconfigs
-loudspeaker_config, _, _ = getconfigs.get_speaker()
-fs = loudspeaker_config['fs']
+
 loudspeaker = getconfigs.get_yaml(HOME+'/config/config.yml')['loudspeaker']
-# brutefir_config not anymore under fs folder
-#audio_folder = loudspeakers_folder + loudspeaker + "/" +fs
-audio_folder = loudspeakers_folder + loudspeaker
-brutefir_config = audio_folder + "/brutefir_config"
+brutefir_config = loudspeakers_folder + loudspeaker + "/brutefir_config"
 
 def read_config():
     """ reads outputsMap, coeffs, filters_at_start
@@ -93,6 +85,7 @@ def read_config():
 
     # Outputs storage
     outputIniciado = False
+    outputJackIniciado = False
     outputsTmp= ''
     outputsMap = []
 
@@ -112,17 +105,24 @@ def read_config():
         #######################
         # OUTPUTs
         #######################
-        if linea.startswith("output"):
+        if linea.strip().startswith('output '):
             outputIniciado = True
 
         if outputIniciado:
-            outputsTmp += linea.strip()
+            if 'device:' in linea and '"jack"' in linea:
+                outputJackIniciado = True
+        
+        if outputJackIniciado:
+            tmp = linea.split('ports:')[-1].strip()
+            if tmp:
+                tmp = [ x.strip() for x in tmp.split(',') if x and not '}' in x]
+                for item in tmp:
+                    item = item.replace('"','').replace(';','')
+                    pmap = ( item.split('/')[::-1] )
+                    outputsMap.append( pmap ); tmp = ''
             if "}" in linea: # fin de la lectura de las outputs
-                outputIniciado = False
-                outputsTmp = outputsTmp.split("ports:")[1].split(";")[0].replace(" ", "")
-                outputsTmp = outputsTmp.replace('"', '')
-                outputsMap = outputsTmp.split(",")
-
+                outputJackIniciado = False
+                
         #######################
         # COEFFs
         #######################
@@ -232,7 +232,7 @@ def main():
     print "\n--- Outputs map:"
     ################################
     for output in outputsMap:
-        print output
+        print output[0].ljust(10), '-->   ', output[1]
 
     ################################
     print "\n--- Coeffs available:\n"
