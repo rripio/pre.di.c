@@ -196,7 +196,7 @@ echo ""
 #########################################################
 forig=$origin"/.install/pre.di.c.conf"
 fdest="/etc/apache2/sites-available/pre.di.c.conf"
-actualizar=1
+updateWeb=1
 echo ""
 echo "(i) Checking the website 'pre.di.c'"
 echo "    /etc/apache2/sites-available/pre.di.c.conf"
@@ -208,10 +208,10 @@ if [ -f $fdest ]; then
         echo "    "$forig"\n"
     else
         echo "(i) No changes on the website\n"
-        actualizar=""
+        updateWeb=""
     fi
 fi
-if [ "$actualizar" ]; then
+if [ "$updateWeb" ]; then
     echo "Notice you need admin privilegies (sudo)"
     echo "( ^C to cancel the website update )\n"
     sudo cp $forig $fdest
