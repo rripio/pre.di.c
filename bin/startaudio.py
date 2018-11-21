@@ -183,8 +183,12 @@ def init_state_settings():
     # optional limited volume on start
     limit_level(gc.config['level_on_startup']
                 , gc.config['max_level_on_startup'])
+                
+    # restore DRC_set
+    pd.client_socket( 'drc ' + str( gc.state['DRC_set'] ) )
 
-
+    # XO_set will be adjusted when restoring inputs
+    
 def init_inputs():
     """restore selected input as stored in state.ini"""
 
