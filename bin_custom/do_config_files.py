@@ -601,3 +601,4 @@ if __name__ == "__main__":
 
     print("    NOTICE:")
     print("    Still pending to review 'ref_level_gain' and 'target_xxx_curve parameters'")
+    print("    REMEMBER to update your inputs.yml regarding the new XO_sets if so")
