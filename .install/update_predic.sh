@@ -27,15 +27,15 @@ if [ ! -d $origin ]; then
 fi
 
 # Wanna keep current configurations?
-conservar="1"
+keepConfig="1"
 read -r -p "WARNING: will you keep current config? [Y/n] " tmp
 if [ "$tmp" = "n" ] || [ "$tmp" = "N" ]; then
     echo All files will be overwritten.
     read -r -p "Are you sure? [y/N] " tmp
     if [ "$tmp" = "y" ] || [ "$tmp" = "Y" ]; then
-        conservar=""
+        keepConfig=""
     else
-        conservar="1"
+        keepConfig="1"
         echo Will keep current config.
     fi
 fi
@@ -110,9 +110,9 @@ cp $origin/.brutefir*       $destination/           >/dev/null 2>&1
 cp -r $origin/.mplayer*     $destination/           >/dev/null 2>&1
 
 ########################################################################
-# If KEEP:
+# If KEEP CONFIG:
 ########################################################################
-if [ "$conservar" ]; then
+if [ "$keepConfig" ]; then
     echo "(i) Restoring user config files"
 
     # folder HOME:
@@ -139,7 +139,7 @@ if [ "$conservar" ]; then
     done
 
 ########################################################################
-# If NO KEEP, then overwrite:
+# If NO KEEP CONFIG, then overwrite:
 ########################################################################
 else
     # Some config files are provided with '.example' extension
