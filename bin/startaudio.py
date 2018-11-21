@@ -189,7 +189,7 @@ def init_inputs():
     """restore selected input as stored in state.ini"""
 
     print('\n(startaudio) restoring input: ' + gc.state['input'])
-    # maybe not needed time.sleep(gc.config['command_delay'])
+    time.sleep(gc.config['command_delay'])
     pd.client_socket('input ' + gc.state['input'], quiet=True)
 
 def main(run_level):
@@ -238,7 +238,7 @@ if __name__ == '__main__':
         # stop proccesses
         print('\n(startaudio) stopping proccesses\n')
         stopaudio.main(run_level)
-        # maybe not needed time.sleep(gc.config['command_delay'])
+        time.sleep(gc.config['command_delay'])
         print('\n(startaudio) starting runlevel ' + run_level)
         main(run_level)
     else:
