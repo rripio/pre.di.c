@@ -79,6 +79,7 @@ for file in config/PEQx* ; do
 done
 
 ## folder SCRIPTS
+rm scripts/*LAST
 for file in scripts/* ; do
     cp "$file" "$file.LAST" >/dev/null 2>&1
 done
@@ -94,7 +95,7 @@ rm -f CHANGES*                                  >/dev/null 2>&1
 rm -f LICENSE*                                  >/dev/null 2>&1
 rm -f README*                                   >/dev/null 2>&1
 rm -f WIP*                                      >/dev/null 2>&1
-rm -rf bin/ # -f because maybe protected *.pyc 
+rm -rf bin/ # -f because maybe protected *.pyc
 rm -r doc/                                      >/dev/null 2>&1
 rm -r www/                                      >/dev/null 2>&1
 rm .brutefir_c*                                 >/dev/null 2>&1
