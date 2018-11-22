@@ -6,7 +6,8 @@
 reposite='https://github.com/rsantct'
 ####################################################
 
-echo "WARNING: will download from "$reposite
+echo
+echo "WARNING: Will download from: [ ""$reposite"" ]"
 read -r -p "         Is this OK? [y/N] " tmp
 if [ "$tmp" != "y" ] && [ "$tmp" != "Y" ]; then
     echo '(i) Remember to edit tmp/download_predic.sh to point to the desired repo.'
