@@ -133,9 +133,9 @@ def start():
 def stop():
     """kills mpd"""
 
-#    pd.kill_pid(mpd_alias)
-    Popen('mpd --kill'.split())
-    time.sleep(gc.config['command_delay']*5)
+    pd.kill_pid(mpd_alias)      # seems to work
+    #Popen('mpd --kill'.split())
+    #time.sleep(gc.config['command_delay']*5)
 
 
 if sys.argv[1:]:
