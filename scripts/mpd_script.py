@@ -25,13 +25,16 @@
 """start and stop mplayer for DVB tasks
 use it with 'start' and 'stop' as options"""
 
+# renamed to mpd_script.py  because 'import mpd' does not fails if python-mpd package were not installed, i.e. the fail is masked.
+
 import os
 import sys
 import time
 import math as m
 from subprocess import Popen
 
-import mpd # package python-mpd, but for Raspberry Pi with berryconda (python 3.6) then 'pip install python-mpd2'
+# Must install the package 'python-mpd', but for Raspberry Pi with berryconda (python 3.6) then 'pip install python-mpd2'
+import mpd
 
 import predic as pd
 import getconfigs as gc
