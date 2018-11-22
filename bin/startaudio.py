@@ -183,17 +183,18 @@ def init_state_settings():
     # optional limited volume on start
     limit_level(gc.config['level_on_startup']
                 , gc.config['max_level_on_startup'])
-                
+
     # restore DRC_set
     pd.client_socket( 'drc ' + str( gc.state['DRC_set'] ) )
 
     # XO_set will be adjusted when restoring inputs
-    
+
 def init_inputs():
     """restore selected input as stored in state.ini"""
 
     print('\n(startaudio) restoring input: ' + gc.state['input'])
-    time.sleep(gc.config['command_delay'])
+    # This sleep is not useful since player_loops are not still ready
+    #time.sleep(gc.config['command_delay'])
     pd.client_socket('input ' + gc.state['input'], quiet=True)
 
 def main(run_level):
@@ -209,7 +210,7 @@ def main(run_level):
         if run_level in ['scripts', 'all']:
             # launch external scripts, sources and clients
             print('\n(startaudio): starting scripts...')
-            for line in [ x for x in open(bp.script_list_path) 
+            for line in [ x for x in open(bp.script_list_path)
                                   if not '#' in x.strip()[0] ]:
                 # dispise options if incorrectly set
                 script = line.strip().split()[0]
@@ -242,7 +243,8 @@ if __name__ == '__main__':
         # stop proccesses
         print('\n(startaudio) stopping proccesses\n')
         stopaudio.main(run_level)
-        time.sleep(gc.config['command_delay'])
+        # After tunning sleeps into stopaudio.py this sleep is not necessary:
+        #time.sleep(gc.config['command_delay'])
         print('\n(startaudio) starting runlevel ' + run_level)
         main(run_level)
     else:
