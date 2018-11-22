@@ -1,5 +1,19 @@
 #!/bin/bash
 
+####################################################
+# CONFIGURE here the REPOSITORY to download from
+#reposite='https://github.com/rripio'
+reposite='https://github.com/rsantct'
+####################################################
+
+echo "WARNING: will download from "$reposite
+read -r -p "         Is this OK? [y/N] " tmp
+if [ "$tmp" != "y" ] && [ "$tmp" != "Y" ]; then
+    echo '(i) Remember to edit tmp/download_predic.sh to point to the desired repo.'
+    echo '    Bye.'
+    exit 0
+fi
+
 if [ -z $1 ] ; then
     echo usage:
     echo "    download_predic.sh  master | another_branch"
