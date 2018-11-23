@@ -216,7 +216,7 @@ def init_inputs():
         pd.client_socket('input ' + gc.state['input'], quiet=True)
     else:
         # input ports are NOT available:
-        print( '\n(startaudio) restoring input: ' + desiredInput + ' ERROR:' )
+        print( '\n(startaudio) restoring input: ' + desiredInput + ' - ERROR -' )
         print(   '             ' + ' '.join(neededPorts) + ' not available.' )
 
 def main(run_level):
