@@ -205,7 +205,7 @@ def init_inputs():
     tries = 20
     while tries:
         n = 0
-        for portName in [p for p in neededPorts if p != 'none' ]:
+        for portName in neededPorts:
             if jc.get_ports(name_pattern=portName):
                 n += 1
         if n == 2:
