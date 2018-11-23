@@ -1,3 +1,3 @@
-mpd.py
+mpd_load.py # Don't name this mpd.py since it coold interfere with mpd module
 DVB.py
 netjack.py
