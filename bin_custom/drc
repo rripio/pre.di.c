@@ -53,17 +53,18 @@ def drc_change(x):
     bfcli(bfcmds + 'quit;')
 
 if __name__ == '__main__':
-    
+
     drc_availables = drc_available()
     new_drc=''
 
     # Read command line
-    if len(sys.argv) == 1:
-        print __doc__
 
     for opc in sys.argv:
         if opc.isdigit():
             new_drc = opc
+        elif '-h' in opc:
+            print __doc__
+            sys.exit()
 
     if new_drc:
         #######################
