@@ -38,7 +38,7 @@
 #   defaults to print capture  -->--  playback
 # TODO: python3
 
-import jack
+import jack     # NOTICE this is the old jack module because we use here python2
 import sys
 
 def jackConns(pattern="", direction='all'):
