@@ -42,8 +42,8 @@ import getconfigs as gc
 mpd_path = '/usr/bin/mpd'
 mpd_options = ''
 mpd_alias = 'mpd'
-mpd_volume_linked = True
-#mpd_volume_linked = False
+#mpd_volume_linked = True
+mpd_volume_linked = False
 # Must be positive integer
 slider_range = 48
 
@@ -113,19 +113,19 @@ def start():
         else:
             print('error detecting mpd, client_mpd'
                                                 ' won\'t start')
-        try:
+#        try:
             c = connect_mpd('localhost', 6600)
             c.timeout = 10
             c.idletimeout = None
             set_predic_vol_loop(c)
             c.close()
             c.disconnect()
-        except:
-            print("mpd socket loop broke")
+#        except:
+#            print("mpd socket loop broke")
     else:
         # wait forever to keep jack loop active
         while True:
-            time.sleep(gc.config['command_delay']*10)
+            time.sleep(10)
 
 
 def stop():
@@ -133,8 +133,7 @@ def stop():
 
 #    pd.kill_pid(mpd_alias)
     Popen('mpd --kill'.split())
-#    time.sleep(gc.config['command_delay']*5)
-    time.sleep(gc.config['command_delay'])
+    time.sleep(gc.config['command_delay']*5)
 
 
 if sys.argv[1:]:
