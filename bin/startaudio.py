@@ -189,7 +189,7 @@ def init_inputs():
     """restore selected input as stored in state.ini"""
 
     print('\n(startaudio) restoring input: ' + gc.state['input'])
-#    time.sleep(gc.config['command_delay'])
+    time.sleep(gc.config['command_delay'])
     pd.client_socket('input ' + gc.state['input'], quiet=True)
 
 
