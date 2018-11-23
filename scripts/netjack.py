@@ -56,7 +56,7 @@ if sys.argv[1:]:
             'stop'  : stop
             }[sys.argv[1]]()
     except KeyError:
-        print('DVB.py: bad option')
+        print('netjack.py: bad option')
 else:
     print(__doc__)
 

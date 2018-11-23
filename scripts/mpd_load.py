@@ -125,7 +125,7 @@ def start():
     else:
         # wait forever to keep jack loop active
         while True:
-            time.sleep(10)
+            time.sleep(gc.config['command_delay']*10)
 
 
 def stop():
@@ -133,7 +133,8 @@ def stop():
 
 #    pd.kill_pid(mpd_alias)
     Popen('mpd --kill'.split())
-    time.sleep(gc.config['command_delay']*5)
+#    time.sleep(gc.config['command_delay']*5)
+    time.sleep(gc.config['command_delay'])
 
 
 if sys.argv[1:]:
@@ -143,7 +144,7 @@ if sys.argv[1:]:
             'stop'  : stop
             }[sys.argv[1]]()
     except KeyError:
-        print('mpd_client.py: bad option')
+        print('mpd_load.py: bad option')
 else:
     print(__doc__)
 
