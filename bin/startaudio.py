@@ -40,6 +40,7 @@ import predic as pd
 import basepaths as bp
 import getconfigs as gc
 
+import jack # needed to check for jack ports when trying restoring the input.
 
 def limit_level(level_on_startup, max_level_on_startup):
     """limit volume as specified in config.ini"""
@@ -192,10 +193,31 @@ def init_state_settings():
 def init_inputs():
     """restore selected input as stored in state.ini"""
 
-    print('\n(startaudio) restoring input: ' + gc.state['input'])
-    # This sleep is not useful since player_loops are not still ready
-    #time.sleep(gc.config['command_delay'])
-    pd.client_socket('input ' + gc.state['input'], quiet=True)
+    desiredInput = gc.state['input']
+    print( '\n(startaudio) restoring input: ' + desiredInput )
+    if desiredInput == 'none':
+        return  # nothing to connect, nothing to do.
+
+    # Needs to wait for our desiredInput['in_ports'] to be available
+    neededPorts = pd.gc.inputs[desiredInput]['in_ports']
+    jc = jack.Client('tmp')
+    # waiting till 20 * .5 = 10 sec
+    tries = 20
+    while tries:
+        n = 0
+        for portName in [p for p in neededPorts if p != 'none' ]:
+            if jc.get_ports(name_pattern=portName):
+                n += 1
+        if n == 2:
+            break
+        time.sleep(.5); tries -= 1;
+    if tries:
+        # input ports are available, let's order to connect that input:
+        pd.client_socket('input ' + gc.state['input'], quiet=True)
+    else:
+        # input ports are NOT available:
+        print( '\n(startaudio) restoring input: ' + desiredInput + ' ERROR:' )
+        print(   '             ' + ' '.join(neededPorts) + ' not available.' )
 
 def main(run_level):
 
@@ -230,7 +252,6 @@ def main(run_level):
         init_inputs()
         # some info
         pd.show()
-
 
 if __name__ == '__main__':
 
