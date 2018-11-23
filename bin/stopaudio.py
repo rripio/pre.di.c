@@ -54,7 +54,7 @@ def main(run_level):
         except:
             Popen (['pkill', '-9', '-f', gc.config['control_path']]
                                         , stdout=fnull, stderr=fnull)
-            time.sleep(.5)
+#            time.sleep(.5)
 
         # ecasound
         if gc.config['load_ecasound']:
@@ -70,7 +70,7 @@ def main(run_level):
         # jack
         print('(stopaudio) stopping jackd')
         Popen (['killall', 'jackd'], stdout=fnull, stderr=fnull)
-        time.sleep(1)
+#        time.sleep(gc.config['command_delay'])
 
     if run_level in ['scripts', 'all']:
 
@@ -86,9 +86,10 @@ def main(run_level):
             try:
                 command = f'{script_path} stop'
                 Popen(command.split())
-                time.sleep(gc.config['command_delay'])
+#                time.sleep(gc.config['command_delay'])
                 pd.kill_pid(script)
-                time.sleep(gc.config['command_delay'])
+#                time.sleep(gc.config['command_delay'])
+                pd.wait4result('pgrep -f ' + script, '', 5, quiet=True)
             except OSError as err:
                 print(f'error launching script:\n\t{err}')
             except:
