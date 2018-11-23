@@ -25,7 +25,7 @@
 """start and stop mplayer for DVB tasks
 use it with 'start' and 'stop' as options"""
 
-# renamed to mpd_script.py  because 'import mpd' does not fails if python-mpd package were not installed, i.e. the fail is masked.
+# renamed to mpd_load.py  because 'import mpd' does not fails if python-mpd package were not installed, i.e. the fail is masked.
 
 import os
 import sys
