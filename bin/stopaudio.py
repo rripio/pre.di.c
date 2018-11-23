@@ -59,11 +59,13 @@ def main(run_level):
         # ecasound
         if gc.config['load_ecasound']:
             print('(stopaudio) stopping ecasound')
-            Popen (['killall', '-KILL', 'ecasound'], stdout=fnull, stderr=fnull)
+            Popen (['killall', '-KILL', 'ecasound']
+                                        , stdout=fnull, stderr=fnull)
 
         # brutefir
         print('(stopaudio) stopping brutefir')
-        Popen (['killall', gc.config['brutefir_path']], stdout=fnull, stderr=fnull)
+        Popen (['killall', gc.config['brutefir_path']]
+                                        , stdout=fnull, stderr=fnull)
 
         # jack
         print('(stopaudio) stopping jackd')
@@ -74,8 +76,9 @@ def main(run_level):
 
         # stop external scripts, sources and clients
         print('(stopaudio) stopping scripts')
+        # allow comments in scripts list
         for line in [ x for x in open(bp.script_list_path)
-                    if not '#' in x ]:
+                            if not '#' in x.strip()[0] ]:
             # dispise options if incorrectly set
             script = line.strip().split()[0]
             script_path = f'{bp.scripts_folder}{script}'
