@@ -266,6 +266,25 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                 warnings.append('Something went wrong when changing DRC state')
         return state
 
+    def change_peq(PEQ_set, state=state):
+        
+        state['PEQ_set'] = PEQ_set
+        try:
+            if PEQ_set in gc.speaker['PEQ']:
+                peqFile = gc.speaker['PEQ'][PEQ_set]
+                if peqFile == 'none':
+                    peq_control.PEQdefeat( gc.speaker['fs'] )
+                else:
+                    peq_control.cargaPEQini( peqFile )
+            else:
+                state['PEQ_set'] = state_old['PEQ_set']
+                print('bad PEQ name')
+        except:
+            state['PEQ_set'] = state_old['PEQ_set']
+            warnings.append('Something went wrong when changing PEQ state')
+
+        return state
+
 
     def change_polarity(polarity, state=state):
 
@@ -558,6 +577,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             'input':            change_input,
             'xo':               change_xovers,
             'drc':              change_drc,
+            'peq':              change_peq,
             'polarity':         change_polarity,
             'mono':             change_mono,
             'mute':             change_mute,
@@ -575,31 +595,6 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
         warnings.append(f"Problems in command '{command}'")
 
     # command execution
-
-    # ecasound parametric filters
-    # cases for change_peq = True
-    #   1) reload of actual peq after editing (command = peq reload
-    #       --> peq do not change)
-    #   2) command = peq defeat
-    #       --> peq changes
-    if change_peq:
-        if load_ecasound:
-            state['peqdefeat'] = False
-            # we will reconnect source to ecasound
-            state = change_input(state['input'])
-            if 'reload' in command:
-                if state['peq'] != 'off':
-                    PEQini = (loudspeakers_folder + loudspeaker +  '/'
-                        + state['peq'] + '.peq')
-                    peq_control.cargaPEQini(PEQini)
-                else:
-                    peq_control.PEQdefeat()
-                    state['peqdefeat'] = True
-            elif 'defeat' in command:
-                peq_control.PEQdefeat()
-                state['peqdefeat'] = True
-        elif not load_ecasound and state['peq'] != 'off':
-            pass
 
     # return a dictionary of predic state
     return (state, warnings)
