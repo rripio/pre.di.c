@@ -264,8 +264,6 @@ if __name__ == '__main__':
         # stop proccesses
         print('\n(startaudio) stopping proccesses\n')
         stopaudio.main(run_level)
-        # After tunning sleeps into stopaudio.py this sleep is not necessary:
-        #time.sleep(gc.config['command_delay'])
         print('\n(startaudio) starting runlevel ' + run_level)
         main(run_level)
     else:
