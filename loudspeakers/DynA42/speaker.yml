@@ -3,6 +3,7 @@ DRC:
   sets:
     nearfield: [L_lp_DynA42, R_lp_DynA42]
     none: [none, none]
+PEQ: {defeat: none, peq1: peq1.peq}
 XO:
   filters: [f.fr.L, f.fr.R]
   sets:
