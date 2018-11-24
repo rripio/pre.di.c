@@ -103,13 +103,12 @@ def init_ecasound():
     """loads ecasound"""
 
     if gc.config['load_ecasound']:
-        import peq_control
         print('\n(startaudio) starting ecasound')
         ecsFile = (f"{bp.config_folder}PEQx{gc.config['ecasound_filters']}"
                     f"_defeat_{gc.speaker['fs']}.ecs")
         if not os.path.exists(ecsFile):
-            print('(startaudio) check ecasound_filters in config.ini')
             print('(startaudio) error: cannot find ' + ecsFile)
+            print('             check ecasound_filters in config.yml')
             sys.exit(-1)
         ecsCmd = '-q --server -s:' + ecsFile
         ecasound = Popen([gc.config['ecasound_path']] + ecsCmd.split())
@@ -118,7 +117,7 @@ def init_ecasound():
             print('(startaudio) ecasound started :-)')
         else:
             print('(startaudio) error starting ecasound')
-            sys.exit()
+            sys.exit(-1)
 
 
 def init_server():
