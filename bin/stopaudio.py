@@ -50,14 +50,11 @@ def main(run_level):
         print('(stopaudio) stopping server')
         try:
             pd.client_socket('shutdown')
-            #time.sleep(1)
-            # replace sleep, wait for process not to be running
             pd.wait4result('pgrep -f server.py', '', 5, quiet=True)
         except:
             print('(stopaudio) forcing to stop server.py')
             run ( ['pkill', '-9', '-f', gc.config['control_path']]
                                         , stdout=fnull, stderr=fnull )
-            #time.sleep(.5)
 
         # ecasound
         if gc.config['load_ecasound']:
@@ -84,10 +81,7 @@ def main(run_level):
             try:
                 command = f'{script_path} stop'
                 Popen( command.split() )
-                #time.sleep( gc.config['command_delay'] )
                 pd.kill_pid( script )
-                #time.sleep( gc.config['command_delay'] )
-                # replace sleep, wait for process not to be running
                 pd.wait4result('pgrep -f ' + script, '', 5, quiet=True)
             except OSError as err:
                 print(f'error launching script:\n\t{err}')
