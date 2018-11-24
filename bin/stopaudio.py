@@ -24,7 +24,7 @@
 
 """Stops predic audio system
     Usage:
-    initaudio.py [ core | scripts | all ]   (default 'all')
+    stopaudio.py [ core | scripts | all ]   (default 'all')
     core: jack, brutefir, ecasound, server
     scripts: everything else (players and clients)
     all: all of the above
