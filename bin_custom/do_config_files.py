@@ -33,6 +33,8 @@
 #   generates 'brutefir_config'
 # v1.1
 #   also generates 'speaker.yml'
+# v1.2
+#   includes PEQ
 
 import sys, os
 HOME = os.path.expanduser("~")
@@ -424,6 +426,7 @@ def prepare_speaker_yaml():
                     - f.drc.L
                     - f.drc.R
                 sets: {}
+            PEQ: {defeat: none}
     """
     speaker = yaml.load(data)
 
@@ -476,6 +479,11 @@ def prepare_speaker_yaml():
             else:
                 coeffName = pcm.split('.')[1]  # e.g:  xo.mp_DynA42_left.pcm
             speaker['DRC']['sets'][setName].append( coeffName )
+
+    # THE PEQ SECTION
+    for setName in lspk['peq_sets']:
+        mySet = lspk['peq_sets'][setName]
+        speaker['PEQ'][setName] = mySet
 
     return speaker
 
