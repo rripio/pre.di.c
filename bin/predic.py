@@ -248,9 +248,7 @@ def show( throw_it=None, state=gc.state ):
     tmp += "\n"
     tmp += ( f"Crossover set  {gc.state['XO_set']:>6s}\n" )
     tmp += ( f"DRC set        {gc.state['DRC_set']:>6s}\n" )
-    tmp += ( f"PEQ            {gc.state['peq']:>6s} " +
-             '( defeated )' * gc.state['peqdefeat'] + "\n" )
-
+    tmp += ( f"PEQ            {gc.state['PEQ_set']:>6s}\n" )
     tmp += "\n"
     tmp += ( f"Input          {gc.state['input']:>6s}\n" )
     tmp += ( f'Input gain     {input_gain: 6.1f}\n' )
