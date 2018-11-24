@@ -29,7 +29,7 @@
 
     jack_view_connections.py [ -c | -p ] [pattern]
 
-    -c view capture  -->-- playback ports
+    -c view capture  -->-- playback ports   (DEFAULT)
     -p view playback --<-- capture  ports
 
     Example:  jack_view_connections.py brutefir
@@ -65,7 +65,7 @@ def jackConns(pattern="", direction='all'):
 
 if __name__ == "__main__" :
     pname   = ""
-    dir     = 'all'
+    dir     = '-c'
     if len(sys.argv) > 1:
         for opc in sys.argv[1:]:
             if opc in ('-c', '-p'):
