@@ -160,7 +160,7 @@ def wait4result(command, answer, tmax=4, quiet=False):
             if answer in sp.check_output(command, shell=True,
                         universal_newlines=True):
                 if not quiet:
-                    print('found {answer} in command {command}')
+                    print(f'found {answer} in command {command}')
                 break
         except:
             pass
