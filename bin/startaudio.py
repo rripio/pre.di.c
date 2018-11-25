@@ -63,7 +63,7 @@ def limit_level(level_on_startup, max_level_on_startup):
 def init_jack():
     """loads jack server"""
 
-    # Maps .asoundrc to our pre.di.c input port in JACK, for ALSA backend players.
+    # Maps .asoundrc to our pre.di.c input ports in JACK, for ALSA backend players.
     def update_asoundrc():
         """ updates the jack plugin in .asoundrc
             to point to brutefir or ecasound
