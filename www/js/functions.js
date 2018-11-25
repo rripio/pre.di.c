@@ -42,6 +42,7 @@ function page_initiate() {
     fills_inputs_selector()
     fills_xo_selector()
     fills_drc_selector()
+    fills_peq_selector()
 
     // Cabecera de la peich
     document.getElementById("cabecera").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
@@ -84,10 +85,11 @@ function page_update(status) {
     document.getElementById("bassInfo").innerText   = 'BASS: '    + status_decode(status, 'bass');
     document.getElementById("trebleInfo").innerText = 'TREB: '    + status_decode(status, 'treble');
 
-    // Elemento seleccionado en los selectores de INPUTS, XO y DRC
+    // Elemento seleccionado en los selectores de INPUTS, XO, DRC y peq
     document.getElementById("inputsSelector").value =               status_decode(status, 'input');
     document.getElementById("xoSelector").value     =               status_decode(status, 'XO_set');
     document.getElementById("drcSelector").value    =               status_decode(status, 'DRC_set');
+    document.getElementById("peqSelector").value    =               status_decode(status, 'PEQ_set');
 
     // Rótulo de los botones MUTE, MONO, LOUDNESS en lowercase si están desactivados
     document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
@@ -216,6 +218,17 @@ function fills_drc_selector() {
     }
 }
 
+// Prepara el selector de PEQ
+function fills_peq_selector() {
+    var peq_sets = get_speaker_prop('PEQ');
+    var x = document.getElementById("peqSelector");
+    for ( i in peq_sets ) {
+        var option = document.createElement("option");
+        option.text = peq_sets[i];
+        x.add(option);
+    }
+}
+
 // Obtiene el nombre del altavoz
 // (nota: ahora php ya lo conoce se lo podríamos preguntar pero esto lo hice antes)
 function get_loudspeaker() {
@@ -261,6 +274,35 @@ function get_speaker_prop_sets(prop) {
         }
     }
     return (prop_sets);
+}
+
+// Como arriba, pero para una propiedad sin sección sets, como por ejemplo PEQ.
+function get_speaker_prop(prop) {
+    var opcs = [];
+    var yaml = get_file('speaker');
+
+    // yaml es un YAML, lo suyo sería usar un parser pero vamos a hacerlo a manubrio:
+    var arr = yaml.split("\n");
+    var dentroDeProp = false;
+    for (i in arr) {
+        linea = arr[i];
+        if ( linea.slice(0, (prop.length)+1 ) == prop+':') { dentroDeProp = true; };
+        if ( dentroDeProp ) {
+
+            tmp = linea.replace( prop + ':', '' );
+            tmp = tmp.replace('{', '').replace('}', '');
+            fields = tmp.split(',');
+            for (i in fields) {
+                f = fields[i];
+                opc = f.split(':')[0].trim()
+                opcs.push( opc );
+            }
+
+            if (indentLevel(linea) <= 1 ){ break; }
+        }
+    }
+    console.log( opcs );
+    return (opcs);
 }
 
 // Auxiliar para averiguar el nivel de indentación de una linea de código,
