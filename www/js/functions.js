@@ -4,6 +4,27 @@
  * ***  y la respuesta de las botoneras se verá afectada.
 */
 
+/////////////   VARIABLES GLOBALES
+ecasound_is_used = check_if_ecasound();        // Boolean que indica si pre.di.c usa Ecasound:
+auto_update_interval = 3000;                // Intervalo de auto update en milisegundos:
+
+// Devuelve true si pre.di.c usa Ecasound, o sea: load_ecasound = True en config/config.yml
+function check_if_ecasound() {
+    var config  = get_file('config');
+    var lines   = config.split('\n');
+    var result  = false
+    var line    = ''
+    for (i in lines) {
+        line = lines[i];
+        if ( line.trim().split(':')[0].trim() == 'load_ecasound' ){
+            if ( line.trim().split(':')[1].trim() == 'True') {
+                result = true;
+            }
+        }
+    }
+    return result
+}
+
 // Función llamada por los eventos de la peich que ordenan algún cambio a pre.di.c
 function predic_cmd(cmd, update=true) {
     // Envia el comando 'cmd' a pre.di.c a través del código PHP del server:
@@ -38,11 +59,14 @@ function update_ampli_switch() {
 // Inicializa le peich incluyendo su auto-update
 function page_initiate() {
 
-    // Completamos los selectore de inputs, XO y DRC
+    // Completamos los selectore de inputs, XO, DRC y PEQ
     fills_inputs_selector()
     fills_xo_selector()
     fills_drc_selector()
-    fills_peq_selector()
+    if ( ecasound_is_used == true){
+        insert_peq_selector();
+        fills_peq_selector();  
+    }
 
     // Cabecera de la peich
     document.getElementById("cabecera").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
@@ -51,7 +75,7 @@ function page_initiate() {
     get_predic_status();
     // Esperamos 1 s y  programamos el auto-update como tal, cada 3 s:
     // (OjO la llamada a la función en el setInterval va SIN paréntesis)
-    setTimeout( setInterval( get_predic_status, 3000 ), 1000);
+    setTimeout( setInterval( get_predic_status, auto_update_interval ), 1000);
 }
 
 // Obtiene el estado de pre.di.c hablando con el PHP del server
@@ -89,8 +113,9 @@ function page_update(status) {
     document.getElementById("inputsSelector").value =               status_decode(status, 'input');
     document.getElementById("xoSelector").value     =               status_decode(status, 'XO_set');
     document.getElementById("drcSelector").value    =               status_decode(status, 'DRC_set');
-    document.getElementById("peqSelector").value    =               status_decode(status, 'PEQ_set');
-
+    if ( ecasound_is_used == true){
+        document.getElementById("peqSelector").value    =           status_decode(status, 'PEQ_set');
+    }
     // Rótulo de los botones MUTE, MONO, LOUDNESS en lowercase si están desactivados
     document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
     document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
@@ -218,6 +243,21 @@ function fills_drc_selector() {
     }
 }
 
+// Inserta el selector de PEQ ( usado si pre.di.c usa Ecasound )
+function insert_peq_selector(){
+
+    // definimos el nuevo selector
+    var nuevoSelector = document.createElement("select");
+    nuevoSelector.setAttribute("id", "peqSelector");
+    nuevoSelector.setAttribute("onchange", "predic_cmd('peq ' + this.value, update=false)" );
+
+    // Y lo añadimos en el sitio previsto
+    var element = document.getElementById("span_peq");
+    // También le añadimos el rótulo 'PEQ:' por delante, como los otros selectores
+    element.innerHTML = 'PEQ:';
+    element.appendChild(nuevoSelector);
+}
+
 // Prepara el selector de PEQ
 function fills_peq_selector() {
     var peq_sets = get_speaker_prop('PEQ');
@@ -298,7 +338,7 @@ function get_speaker_prop(prop) {
                 opcs.push( opc );
             }
 
-            if (indentLevel(linea) <= 1 ){ break; }
+            if ( indentLevel(linea) <= 1 ){ break; }
         }
     }
     return (opcs);
