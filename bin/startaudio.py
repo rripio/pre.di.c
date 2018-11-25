@@ -33,12 +33,15 @@
 import sys
 import os
 import time
-from subprocess import Popen, check_output
+from subprocess import Popen, check_output, run
 
 import stopaudio
 import predic as pd
 import basepaths as bp
 import getconfigs as gc
+
+if gc.config['load_ecasound']:
+    import peq_control
 
 import jack # needed to check for jack ports when trying restoring the input.
 
@@ -57,11 +60,26 @@ def limit_level(level_on_startup, max_level_on_startup):
         level = gc.state['level']
     pd.client_socket('level ' + str(level))
 
-
 def init_jack():
     """loads jack server"""
 
+    # Maps .asoundrc to our pre.di.c input ports in JACK, for ALSA backend players.
+    def update_asoundrc():
+        """ updates the jack plugin in .asoundrc
+            to point to brutefir or ecasound
+        """
+        if gc.config['load_ecasound']:
+            cmd_L = '/:in.L/c\\        0 ecasound:in_1'
+            cmd_R = '/:in.R/c\\        1 ecasound:in_2'
+        else:
+            cmd_L = '/:in_1/c\\        0 brutefir:in.L'
+            cmd_R = '/:in_2/c\\        1 brutefir:in.R'
+        run( ['sed', '-i', '-e', cmd_L, bp.main_folder + '.asoundrc'] )
+        run( ['sed', '-i', '-e', cmd_R, bp.main_folder + '.asoundrc'] )
+
     print('\n(startaudio) starting jack\n')
+
+    # Prepare the jackd command line
     jack_cmd_list = ([gc.config['jack_path']]
                         + gc.config['jack_options'].split()
                         + ['-r'] + [str(gc.speaker['fs'])])
@@ -70,10 +88,13 @@ def init_jack():
     elif not 'dummy' in gc.config['jack_options']:
         print('\n(startaudio) error starting jack: unknown backend')
         sys.exit(-1)
+
+    # Some systems runs Pulseaudio, then it is needed to use pasuspender to lauch jackd
     if 'pulseaudio' in check_output("pgrep -fl pulseaudio", shell=True).decode():
         jack = Popen(['pasuspender', '--'] + jack_cmd_list)
     else:
         jack = Popen(jack_cmd_list)
+
     # waiting for jackd:
     if pd.wait4result('jack_lsp', 'system', tmax=10):
         print('\n(startaudio) jack started :-)')
@@ -81,6 +102,7 @@ def init_jack():
         print('\n(startaudio) error starting jack')
         sys.exit()
 
+    update_asoundrc()
 
 def init_brutefir():
     """loads brutefir"""
@@ -101,7 +123,6 @@ def init_brutefir():
 
 def init_ecasound():
     """loads ecasound"""
-
     if gc.config['load_ecasound']:
         print('\n(startaudio) starting ecasound')
         ecsFile = (f"{bp.config_folder}PEQx{gc.config['ecasound_filters']}"
@@ -115,6 +136,7 @@ def init_ecasound():
         # waiting for ecasound:
         if  pd.wait4result('jack_lsp', 'ecasound', tmax=5, quiet=True):
             print('(startaudio) ecasound started :-)')
+            #notice: ecasound autoconnects to brutefir in ports.
         else:
             print('(startaudio) error starting ecasound')
             sys.exit(-1)
@@ -188,6 +210,14 @@ def init_state_settings():
     pd.client_socket( 'drc ' + str( gc.state['DRC_set'] ) )
 
     # XO_set will be adjusted when restoring inputs
+
+    # restore PEQ_set
+    if gc.config['load_ecasound']:
+        peqSet  = gc.state['PEQ_set']
+        speaker,_,_ = gc.get_speaker()
+        peqFile = speaker['PEQ'][peqSet]
+        if peqFile != 'none':
+            peq_control.cargaPEQini( peqFile )
 
 def init_inputs():
     """restore selected input as stored in state.ini"""
