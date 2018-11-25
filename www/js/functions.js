@@ -301,7 +301,6 @@ function get_speaker_prop(prop) {
             if (indentLevel(linea) <= 1 ){ break; }
         }
     }
-    console.log( opcs );
     return (opcs);
 }
 
