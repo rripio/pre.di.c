@@ -1,0 +1,31 @@
+pcm.rawjack {
+    type jack
+    playback_ports {
+        0 brutefir:in.L
+        1 brutefir:in.R
+    }
+#    capture_ports {
+#        0 system:capture_1
+#        1 system:capture_2
+#    }
+}
+
+pcm.jack {
+    type plug
+    slave { pcm "rawjack" }
+    hint {
+    description "JACK Audio Connection Kit"
+    }
+}
+
+pcm.!default {
+    type plug
+    slave { pcm "rawjack" }
+}
+
+pcm.alsafile {
+    type file
+    slave { pcm "null" }
+    file "alsafile.wav"
+    format "wav"
+}
