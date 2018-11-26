@@ -109,7 +109,7 @@ function page_update(status) {
     document.getElementById("bassInfo").innerText   = 'BASS: '    + status_decode(status, 'bass');
     document.getElementById("trebleInfo").innerText = 'TREB: '    + status_decode(status, 'treble');
 
-    // Elemento seleccionado en los selectores de INPUTS, XO, DRC y peq
+    // Elemento seleccionado en los selectores de INPUTS, XO, DRC y PEQ
     document.getElementById("inputsSelector").value =               status_decode(status, 'input');
     document.getElementById("xoSelector").value     =               status_decode(status, 'XO_set');
     document.getElementById("drcSelector").value    =               status_decode(status, 'DRC_set');
