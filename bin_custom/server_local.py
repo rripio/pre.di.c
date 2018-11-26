@@ -11,13 +11,15 @@ import time
 import subprocess as sp
 import yaml
 
+import players # a module for retrieving info from the current music player
+
 def process(data):
     """
         Only certain received 'data' will be validated and processed,
         then returns back some useful info to the client.
     """
     # NOTICE:   subprocess.check_output(cmd) returns bytes-like,
-    #           but if cmd fails an exception will be raised
+    #           but if cmd fails an exception will be raised.
 
     # First clearing the new line
     data = data.replace('\n','')
@@ -36,23 +38,9 @@ def process(data):
         except:
             return b'error'
 
-    # This returns the current track played by librespot when redirected to ~/tmp/.librespotEvents
-    if data == 'get_current_librespot':
-        try:
-            tmp = sp.check_output( 'tail -n1 /home/predic/tmp/.librespotEvents'.split() )
-            tmp = tmp.decode().split('"')[-2]
-            return tmp.encode()
-        except:
-            return b'error'
-
-    # Checks for librespot to be running
-    if data == 'librespot_running':
-        try:
-            tmp = sp.check_output ( 'pgrep -f /usr/bin/librespot'.split() )
-            return b'true'
-        except:
-            return b'false'
-
+    # Info about current music player
+    if data == 'get_current_playing':
+        return players.get_current_playing().encode()
 
 def server_socket(host, port):
     """Makes a socket for listening clients"""
