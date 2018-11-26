@@ -51,7 +51,7 @@ def process(data):
             tmp = sp.check_output ( 'pgrep -f /usr/bin/librespot'.split() )
             return b'true'
         except:
-            return b'error'
+            return b'false'
 
 
 def server_socket(host, port):
