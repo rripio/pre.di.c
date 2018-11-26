@@ -11,6 +11,49 @@ import time
 import subprocess as sp
 import yaml
 
+def process(data):
+    """
+        Only certain received 'data' will be validated and processed,
+        then returns back some useful info to the client.
+    """
+    # NOTICE:   subprocess.check_output(cmd) returns bytes-like,
+    #           but if cmd fails an exception will be raised
+
+    # First clearing the new line
+    data = data.replace('\n','')
+
+    # A custom script that switches on/off the amplifier
+    if data == 'ampli on':
+        try:
+            sp.check_output( '/home/predic/bin_custom/ampli.sh on'.split() )
+            return b'done'
+        except:
+            return b'error'
+    if data == 'ampli off':
+        try:
+            sp.check_output( '/home/predic/bin_custom/ampli.sh off'.split() )
+            return b'done'
+        except:
+            return b'error'
+
+    # This returns the current track played by librespot when redirected to ~/tmp/.librespotEvents
+    if data == 'get_current_librespot':
+        try:
+            tmp = sp.check_output( 'tail -n1 /home/predic/tmp/.librespotEvents'.split() )
+            tmp = tmp.decode().split('"')[-2]
+            return tmp.encode()
+        except:
+            return b'error'
+
+    # Checks for librespot to be running
+    if data == 'librespot_running':
+        try:
+            tmp = sp.check_output ( 'pgrep -f /usr/bin/librespot'.split() )
+            return b'true'
+        except:
+            return b'error'
+
+
 def server_socket(host, port):
     """Makes a socket for listening clients"""
 
@@ -35,28 +78,6 @@ def server_socket(host, port):
 
     # return socket state
     return s
-
-def process(data):
-    """
-        Only certain 'data' will be translated to executables
-    """
-    # clear new line
-    data = data.replace('\n','')
-
-    # A script that switch on/off the amplifier
-    if data == 'ampli on':
-        return sp.check_output( '/home/predic/bin_custom/ampli.sh on'.split() )
-        # NOTICE: subprocess.check_output() returns bytes-like
-    if data == 'ampli off':
-        return sp.check_output( '/home/predic/bin_custom/ampli.sh off'.split() )
-
-    # This returns the current track played by librespot when redirected to ~/tmp/.librespotEvents
-    if data == 'get_current_librespot:
-        tmp = sp.check_output( 'tail -n1 /home/predic/tmp/.librespotEvents'.split() )
-        tmp = tmp.decode().split('"')[-2]
-        return tmp.encode()
-
-    return False
 
 if __name__ == '__main__':
 
