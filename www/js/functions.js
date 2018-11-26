@@ -4,6 +4,27 @@
  * ***  y la respuesta de las botoneras se verá afectada.
 */
 
+/////////////   VARIABLES GLOBALES
+ecasound_is_used = check_if_ecasound();        // Boolean que indica si pre.di.c usa Ecasound:
+auto_update_interval = 3000;                // Intervalo de auto update en milisegundos:
+
+// Devuelve true si pre.di.c usa Ecasound, o sea: load_ecasound = True en config/config.yml
+function check_if_ecasound() {
+    var config  = get_file('config');
+    var lines   = config.split('\n');
+    var result  = false
+    var line    = ''
+    for (i in lines) {
+        line = lines[i];
+        if ( line.trim().split(':')[0].trim() == 'load_ecasound' ){
+            if ( line.trim().split(':')[1].trim() == 'True') {
+                result = true;
+            }
+        }
+    }
+    return result
+}
+
 // Función llamada por los eventos de la peich que ordenan algún cambio a pre.di.c
 function predic_cmd(cmd, update=true) {
     // Envia el comando 'cmd' a pre.di.c a través del código PHP del server:
@@ -29,19 +50,43 @@ function ampli(mode) {
 // (!) async=false NO es recomendable, pero si no no obtengo la response :-?
 function update_ampli_switch() {
     var myREQ = new XMLHttpRequest();
+    var ampliStatus = '';
     myREQ.open("GET", "php/functions.php?command=amplistatus", async=false);
     myREQ.send();
     ampliStatus = myREQ.responseText.replace('\n','')
     document.getElementById("onoffSelector").value = ampliStatus;
 }
 
+// Auxiliar para rellenar los campos 'player_info'
+// (!) async=false NO es recomendable, pero si no no obtengo la response :-?
+function update_player_info() {
+    var myREQ = new XMLHttpRequest();
+    var tmp = '';
+    myREQ.open("GET", "php/functions.php?command=get_current_playing", async=false);
+    myREQ.send();
+    tmp = myREQ.responseText.replace('\n','');
+    dicci = JSON.parse( tmp );
+    var player = dicci['player'];
+    var artist = dicci['artist'];
+    var album  = dicci['album'];
+    var track  = dicci['track'];
+    document.getElementById("player").innerText = player + ':';
+    document.getElementById("artist").innerText = artist;
+    document.getElementById("album").innerText = album;
+    document.getElementById("track").innerText = track;
+}
+
 // Inicializa le peich incluyendo su auto-update
 function page_initiate() {
 
-    // Completamos los selectore de inputs, XO y DRC
+    // Completamos los selectore de inputs, XO, DRC y PEQ
     fills_inputs_selector()
     fills_xo_selector()
     fills_drc_selector()
+    if ( ecasound_is_used == true){
+        insert_peq_selector();
+        fills_peq_selector();  
+    }
 
     // Cabecera de la peich
     document.getElementById("cabecera").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
@@ -50,7 +95,7 @@ function page_initiate() {
     get_predic_status();
     // Esperamos 1 s y  programamos el auto-update como tal, cada 3 s:
     // (OjO la llamada a la función en el setInterval va SIN paréntesis)
-    setTimeout( setInterval( get_predic_status, 3000 ), 1000);
+    setTimeout( setInterval( get_predic_status, auto_update_interval ), 1000);
 }
 
 // Obtiene el estado de pre.di.c hablando con el PHP del server
@@ -84,11 +129,13 @@ function page_update(status) {
     document.getElementById("bassInfo").innerText   = 'BASS: '    + status_decode(status, 'bass');
     document.getElementById("trebleInfo").innerText = 'TREB: '    + status_decode(status, 'treble');
 
-    // Elemento seleccionado en los selectores de INPUTS, XO y DRC
+    // Elemento seleccionado en los selectores de INPUTS, XO, DRC y peq
     document.getElementById("inputsSelector").value =               status_decode(status, 'input');
     document.getElementById("xoSelector").value     =               status_decode(status, 'XO_set');
     document.getElementById("drcSelector").value    =               status_decode(status, 'DRC_set');
-
+    if ( ecasound_is_used == true){
+        document.getElementById("peqSelector").value    =           status_decode(status, 'PEQ_set');
+    }
     // Rótulo de los botones MUTE, MONO, LOUDNESS en lowercase si están desactivados
     document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
     document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
@@ -119,6 +166,9 @@ function page_update(status) {
 
     // Actualizamos el switch del ampli
     update_ampli_switch()
+    
+    // Actualiza los campos "player_info"
+    update_player_info()
 
 }
 
@@ -216,6 +266,32 @@ function fills_drc_selector() {
     }
 }
 
+// Inserta el selector de PEQ ( usado si pre.di.c usa Ecasound )
+function insert_peq_selector(){
+
+    // definimos el nuevo selector
+    var nuevoSelector = document.createElement("select");
+    nuevoSelector.setAttribute("id", "peqSelector");
+    nuevoSelector.setAttribute("onchange", "predic_cmd('peq ' + this.value, update=false)" );
+
+    // Y lo añadimos en el sitio previsto
+    var element = document.getElementById("span_peq");
+    // También le añadimos el rótulo 'PEQ:' por delante, como los otros selectores
+    element.innerHTML = 'PEQ:';
+    element.appendChild(nuevoSelector);
+}
+
+// Prepara el selector de PEQ
+function fills_peq_selector() {
+    var peq_sets = get_speaker_prop('PEQ');
+    var x = document.getElementById("peqSelector");
+    for ( i in peq_sets ) {
+        var option = document.createElement("option");
+        option.text = peq_sets[i];
+        x.add(option);
+    }
+}
+
 // Obtiene el nombre del altavoz
 // (nota: ahora php ya lo conoce se lo podríamos preguntar pero esto lo hice antes)
 function get_loudspeaker() {
@@ -261,6 +337,34 @@ function get_speaker_prop_sets(prop) {
         }
     }
     return (prop_sets);
+}
+
+// Como arriba, pero para una propiedad sin sección sets, como por ejemplo PEQ.
+function get_speaker_prop(prop) {
+    var opcs = [];
+    var yaml = get_file('speaker');
+
+    // yaml es un YAML, lo suyo sería usar un parser pero vamos a hacerlo a manubrio:
+    var arr = yaml.split("\n");
+    var dentroDeProp = false;
+    for (i in arr) {
+        linea = arr[i];
+        if ( linea.slice(0, (prop.length)+1 ) == prop+':') { dentroDeProp = true; };
+        if ( dentroDeProp ) {
+
+            tmp = linea.replace( prop + ':', '' );
+            tmp = tmp.replace('{', '').replace('}', '');
+            fields = tmp.split(',');
+            for (i in fields) {
+                f = fields[i];
+                opc = f.split(':')[0].trim()
+                opcs.push( opc );
+            }
+
+            if ( indentLevel(linea) <= 1 ){ break; }
+        }
+    }
+    return (opcs);
 }
 
 // Auxiliar para averiguar el nivel de indentación de una linea de código,
