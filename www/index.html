@@ -123,17 +123,23 @@
 
         <hr>
 
+        <!--Selector de XO automágico-->
         <div align="center">
-            <!--Selector de XO automágico-->
             <span>XO:
             <select id="xoSelector"     onchange="predic_cmd('xo ' + this.value, update=false)" ></select>
             </span>
         </div>
 
+        <!--Selector de DRC automágico-->
         <div align="center">
-            <!--Selector de DRC automágico-->
             <span>DRC:
             <select id="drcSelector"     onchange="predic_cmd('drc ' + this.value, update=false)" ></select>
+            </span>
+        </div>
+        
+        <!-- El selector de PEQ se creará aquí debajo automágicamente si load_ecasound=True  -->
+        <div align="center">
+            <span id="span_peq"><!-- el rótulo 'PEQ:' se añadirá automágicamente -->
             </span>
         </div>
 
@@ -148,10 +154,19 @@
         </div>
 
         <hr>
+        
+        <!-- Sección informativa del player en curso (vacía si no se recibe respueta a las consultas) -->
+        <div id="player_info">
+            <p id="player"></p>
+            <hr>
+            <p id="artist"></p>
+            <p id="album"></p>
+            <p id="track"></p>
+        </div>
 
-        <!--Botón para probar funciones JS con onclick 
+        <!--Botón para probar funciones JS con onclick
         <div align="right">
-            <button type="button"                 onclick="update_ampli_switch()" >PBA</button>
+            <button type="button"                 onclick="newCosa()" >PBA</button>
         </div>
         -->
 
