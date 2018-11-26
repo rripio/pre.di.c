@@ -35,6 +35,8 @@ import os
 import time
 from subprocess import Popen
 
+import jack
+
 import stopaudio
 import predic as pd
 import basepaths as bp
@@ -128,7 +130,7 @@ def init_server():
         print('\n(startaudio) server didn\'t load')
         sys.exit() # initaudio stopped
     # waiting for server
-    total_time = rem_time = 10
+    total_time = rem_time = 10 * gc.config['command_delay']
     while rem_time:
         print(f'(startaudio) waiting for server ({(total_time-rem_time)}s)')
         try:
@@ -138,8 +140,8 @@ def init_server():
             break
         except:
             pass
-        rem_time -= 1
-        time.sleep(1.0)
+        rem_time -= 1 * gc.config['command_delay']
+        time.sleep(gc.config['command_delay'])
     if rem_time:
         print('\n(startaudio) server started :-)')
     else:
@@ -188,9 +190,29 @@ def init_state_settings():
 def init_inputs():
     """restore selected input as stored in state.ini"""
 
+    input = gc.state['input']
     print('\n(startaudio) restoring input: ' + gc.state['input'])
-    time.sleep(gc.config['command_delay'])
-    pd.client_socket('input ' + gc.state['input'], quiet=True)
+    # exit if input is 'none'
+    if input == 'none': return
+    # wait for input ports to be up
+    ports = pd.gc.inputs[input]['in_ports']
+    jc = jack.Client('tmp')
+    # lets try 20 times to connect to input ports
+    loops = 20
+    while loops:
+        n = 0
+        for port_name in ports:
+            if jc.get_ports(name_pattern=port_name): n += 1
+        if n == 2: break
+        time.sleep(gc.config['command_delay'] * 0.5)
+        loops -= 1
+    if loops:
+        # input ports up and ready :-)
+        pd.client_socket('input ' + gc.state['input'], quiet=True)
+    else:
+        # input ports are down :-(
+        print(f'\n(startaudio) error restoring input "{input}"'
+                                        ', ports not available')
 
 
 def main(run_level):
@@ -240,7 +262,6 @@ if __name__ == '__main__':
         # stop proccesses
         print('\n(startaudio) stopping proccesses\n')
         stopaudio.main(run_level)
-#        time.sleep(gc.config['command_delay'])
         print('\n(startaudio) starting runlevel ' + run_level)
         main(run_level)
     else:
