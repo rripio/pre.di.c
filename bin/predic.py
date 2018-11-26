@@ -171,7 +171,7 @@ def wait4result(command, answer, tmax=4, quiet=False):
         return True
     else:
         if not quiet:
-            print(f'Time out >{tmax}s waiting for{answer}'
+            print(f'Time out >{tmax}s waiting for {answer}'
                     f' in command {command}')
         return False
 
