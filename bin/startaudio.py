@@ -227,26 +227,27 @@ def init_inputs():
     if desiredInput == 'none':
         return  # nothing to connect, nothing to do.
 
-    # Needs to wait for our desiredInput['in_ports'] to be available
-    neededPorts = pd.gc.inputs[desiredInput]['in_ports']
+    # wait for input ports to be up
+    ports = pd.gc.inputs[input]['in_ports']
     jc = jack.Client('tmp')
-    # waiting till 20 * .5 = 10 sec
-    tries = 20
-    while tries:
+    # lets try 20 times to connect to input ports
+    loops = 20
+    while loops:
         n = 0
-        for portName in neededPorts:
-            if jc.get_ports(name_pattern=portName):
+        for port_name in ports:
+            if jc.get_ports(name_pattern=port_name):
                 n += 1
         if n == 2:
             break
-        time.sleep(.5); tries -= 1;
-    if tries:
-        # input ports are available, let's order to connect that input:
+        time.sleep(gc.config['command_delay'] * 0.5)
+        loops -= 1
+    if loops:
+        # input ports up and ready :-)
         pd.client_socket('input ' + gc.state['input'], quiet=True)
     else:
-        # input ports are NOT available:
-        print( '\n(startaudio) restoring input: ' + desiredInput + ' - ERROR -' )
-        print(   '             ' + ' '.join(neededPorts) + ' not available.' )
+        # input ports are down :-(
+        print(f'\n(startaudio) error restoring input "{input}"'
+                                        ', ports not available')
 
 def main(run_level):
 
