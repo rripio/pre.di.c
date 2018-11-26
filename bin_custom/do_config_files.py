@@ -481,9 +481,11 @@ def prepare_speaker_yaml():
             speaker['DRC']['sets'][setName].append( coeffName )
 
     # THE PEQ SECTION
-    for setName in lspk['peq_sets']:
-        mySet = lspk['peq_sets'][setName]
-        speaker['PEQ'][setName] = mySet
+    # This section can be ommited in loudspeakers/myspeaker/myspeaker.yml
+    if 'peq_sets' in lspk:
+        for setName in lspk['peq_sets']:
+            mySet = lspk['peq_sets'][setName]
+            speaker['PEQ'][setName] = mySet
 
     return speaker
 
