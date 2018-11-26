@@ -43,11 +43,18 @@ def process(data):
     # clear new line
     data = data.replace('\n','')
 
+    # A script that switch on/off the amplifier
     if data == 'ampli on':
         return sp.check_output( '/home/predic/bin_custom/ampli.sh on'.split() )
-
+        # NOTICE: subprocess.check_output() returns bytes-like
     if data == 'ampli off':
         return sp.check_output( '/home/predic/bin_custom/ampli.sh off'.split() )
+
+    # This returns the current track played by librespot when redirected to ~/tmp/.librespotEvents
+    if data == 'get_current_librespot:
+        tmp = sp.check_output( 'tail -n1 /home/predic/tmp/.librespotEvents'.split() )
+        tmp = tmp.decode().split('"')[-2]
+        return tmp.encode()
 
     return False
 
@@ -109,11 +116,11 @@ if __name__ == '__main__':
                 result = process(data)
                 if result:
                     sc.send( result )
-                    sc.send(b'OK\n')
                 else:
                     sc.send( b'ACK\n' )
 
                 if verbose:
                     print(f'(server_local) connected to client {addr[0]}')
+
             # wait a bit, loop again
             time.sleep(0.01)
