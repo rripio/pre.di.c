@@ -127,6 +127,9 @@
     elseif ( $command == "amplistatus" ) {
         readfile("/home/predic/.ampli"); // php no puede acceder a /tmp por razones de seguridad
     }
+    elseif ( $command == "get_current_playing" ) {
+        echo local_socket('get_current_playing');
+    }
 
     // Comandos estandar para pre.di.c (devolvemos el resultado con el echo)
     else {
@@ -134,4 +137,3 @@
     }
 
 ?>
-
