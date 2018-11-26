@@ -50,10 +50,30 @@ function ampli(mode) {
 // (!) async=false NO es recomendable, pero si no no obtengo la response :-?
 function update_ampli_switch() {
     var myREQ = new XMLHttpRequest();
+    var ampliStatus = '';
     myREQ.open("GET", "php/functions.php?command=amplistatus", async=false);
     myREQ.send();
     ampliStatus = myREQ.responseText.replace('\n','')
     document.getElementById("onoffSelector").value = ampliStatus;
+}
+
+// Auxiliar para rellenar los campos 'player_info'
+// (!) async=false NO es recomendable, pero si no no obtengo la response :-?
+function update_player_info() {
+    var myREQ = new XMLHttpRequest();
+    var tmp = '';
+    myREQ.open("GET", "php/functions.php?command=get_current_playing", async=false);
+    myREQ.send();
+    tmp = myREQ.responseText.replace('\n','');
+    dicci = JSON.parse( tmp );
+    var player = dicci['player'];
+    var artist = dicci['artist'];
+    var album  = dicci['album'];
+    var track  = dicci['track'];
+    document.getElementById("player").innerText = player + ':';
+    document.getElementById("artist").innerText = artist;
+    document.getElementById("album").innerText = album;
+    document.getElementById("track").innerText = track;
 }
 
 // Inicializa le peich incluyendo su auto-update
@@ -109,7 +129,7 @@ function page_update(status) {
     document.getElementById("bassInfo").innerText   = 'BASS: '    + status_decode(status, 'bass');
     document.getElementById("trebleInfo").innerText = 'TREB: '    + status_decode(status, 'treble');
 
-    // Elemento seleccionado en los selectores de INPUTS, XO, DRC y PEQ
+    // Elemento seleccionado en los selectores de INPUTS, XO, DRC y peq
     document.getElementById("inputsSelector").value =               status_decode(status, 'input');
     document.getElementById("xoSelector").value     =               status_decode(status, 'XO_set');
     document.getElementById("drcSelector").value    =               status_decode(status, 'DRC_set');
@@ -146,6 +166,9 @@ function page_update(status) {
 
     // Actualizamos el switch del ampli
     update_ampli_switch()
+    
+    // Actualiza los campos "player_info"
+    update_player_info()
 
 }
 
