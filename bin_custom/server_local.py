@@ -36,20 +36,18 @@ def server_socket(host, port):
     # return socket state
     return s
 
-def preprocess(cmd):
+def process(data):
     """
-        Only certain 'cmd' will be translated to executables then passed
-        to the main loop to execute them (subprocess.run(somethingToExec)).
-        Others 'cmd' will pass False to the main loop, so will do nothing.
+        Only certain 'data' will be translated to executables
     """
     # clear new line
-    cmd = cmd.replace('\n','')
+    data = data.replace('\n','')
 
-    if cmd == 'ampli on':
-        return '/home/predic/bin_custom/ampli.sh on'
+    if data == 'ampli on':
+        return sp.check_output( '/home/predic/bin_custom/ampli.sh on'.split() )
 
-    if cmd == 'ampli off':
-        return '/home/predic/bin_custom/ampli.sh off'
+    if data == 'ampli off':
+        return sp.check_output( '/home/predic/bin_custom/ampli.sh off'.split() )
 
     return False
 
@@ -107,19 +105,13 @@ if __name__ == '__main__':
                 # a command to run has been received in 'data':
                 if verbose:
                     print ('>>> ' + data)
-                cmd = preprocess(data)
-                if cmd:
-                    try:
-                        result = sp.run( cmd.split() )
-                        result = result.returncode
-                    except:
-                        result = -1
-                    if not result:
-                        sc.send(b'OK\n')
-                    else:
-                        sc.send(b'ACK\n')
+                # process() will validate the data, and if so then executed
+                result = process(data)
+                if result:
+                    sc.send( result )
+                    sc.send(b'OK\n')
                 else:
-                    sc.send(b'ACK\n')
+                    sc.send( b'ACK\n' )
 
                 if verbose:
                     print(f'(server_local) connected to client {addr[0]}')
