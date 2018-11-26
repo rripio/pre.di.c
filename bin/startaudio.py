@@ -69,11 +69,11 @@ def init_jack():
             to point to brutefir or ecasound
         """
         if gc.config['load_ecasound']:
-            cmd_L = '/:in.L/c\\        0 ecasound:in_1'
-            cmd_R = '/:in.R/c\\        1 ecasound:in_2'
+            cmd_L = '/brutefir:in.L/c\\        0 ecasound:in_1'
+            cmd_R = '/brutefir:in.R/c\\        1 ecasound:in_2'
         else:
-            cmd_L = '/:in_1/c\\        0 brutefir:in.L'
-            cmd_R = '/:in_2/c\\        1 brutefir:in.R'
+            cmd_L = '/ecasound:in_1/c\\        0 brutefir:in.L'
+            cmd_R = '/ecasound:in_2/c\\        1 brutefir:in.R'
         run( ['sed', '-i', '-e', cmd_L, bp.main_folder + '.asoundrc'] )
         run( ['sed', '-i', '-e', cmd_R, bp.main_folder + '.asoundrc'] )
 
