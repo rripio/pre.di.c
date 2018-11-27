@@ -73,7 +73,7 @@ function update_player_info() {
     document.getElementById("player").innerText = player + ':';
     document.getElementById("artist").innerText = artist;
     document.getElementById("album").innerText = album;
-    document.getElementById("track").innerText = title;
+    document.getElementById("title").innerText = title;
 }
 
 // Inicializa le peich incluyendo su auto-update
