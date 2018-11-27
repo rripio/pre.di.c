@@ -3,7 +3,7 @@ import sys
 from subprocess import Popen
 
 def start():
-    Popen( '/home/predic/bin/server_local.py' )
+    Popen( ['server_local.py'] ) # if this fails check your paths
 
 def stop():
     Popen( 'pkill -KILL -f server_local.py'.split() )
