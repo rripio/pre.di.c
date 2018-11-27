@@ -1,4 +1,6 @@
 mpd_load.py
 #DVB.py
 #netjack.py
-server_local.py
+alsa2jack.py        # Sets up alsa_loop ports in jack to be used from ALSA backended players
+server_local.py     # A server to execute local tasks as switching the amplifier
+                    # and getting metadata from players 
