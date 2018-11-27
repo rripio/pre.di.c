@@ -43,7 +43,7 @@ def get_librespot_info():
         album  = ''
         title  = tmp.decode().split('"')[-2]
         # JSON for JavaScript on control web page, NOTICE json requires double quotes:
-        return '{ "player":"MPD", "artist":"' + artist + '", "album":"' + album + '", "title":"' + title + '" }'
+        return '{ "player":"Spotify", "artist":"' + artist + '", "album":"' + album + '", "title":"' + title + '" }'
 
     except:
         return '{}'
