@@ -69,11 +69,11 @@ function update_player_info() {
     var player = dicci['player'];
     var artist = dicci['artist'];
     var album  = dicci['album'];
-    var track  = dicci['track'];
+    var title  = dicci['title'];
     document.getElementById("player").innerText = player + ':';
     document.getElementById("artist").innerText = artist;
     document.getElementById("album").innerText = album;
-    document.getElementById("track").innerText = track;
+    document.getElementById("title").innerText = title;
 }
 
 // Inicializa le peich incluyendo su auto-update
