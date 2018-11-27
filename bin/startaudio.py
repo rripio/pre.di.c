@@ -63,23 +63,6 @@ def limit_level(level_on_startup, max_level_on_startup):
 def init_jack():
     """loads jack server"""
 
-    # Maps .asoundrc to our pre.di.c input ports in JACK, for ALSA backend players.
-    def update_asoundrc():
-        """ updates the jack plugin in .asoundrc
-            to point to brutefir or ecasound
-        """
-        if gc.config['load_ecasound']:
-            cmd_L = '/:in.L/c\\        0 ecasound:in_1'
-            cmd_R = '/:in.R/c\\        1 ecasound:in_2'
-        else:
-            cmd_L = '/:in_1/c\\        0 brutefir:in.L'
-            cmd_R = '/:in_2/c\\        1 brutefir:in.R'
-        run( ['sed', '-i', '-e', cmd_L, bp.main_folder + '.asoundrc'] )
-        run( ['sed', '-i', '-e', cmd_R, bp.main_folder + '.asoundrc'] )
-
-    print('\n(startaudio) starting jack\n')
-
-    # Prepare the jackd command line
     jack_cmd_list = ([gc.config['jack_path']]
                         + gc.config['jack_options'].split()
                         + ['-r'] + [str(gc.speaker['fs'])])
@@ -101,8 +84,6 @@ def init_jack():
     else:
         print('\n(startaudio) error starting jack')
         sys.exit()
-
-    update_asoundrc()
 
 def init_brutefir():
     """loads brutefir"""
@@ -222,10 +203,10 @@ def init_state_settings():
 def init_inputs():
     """restore selected input as stored in state.ini"""
 
-    desiredInput = gc.state['input']
-    print( '\n(startaudio) restoring input: ' + desiredInput )
-    if desiredInput == 'none':
-        return  # nothing to connect, nothing to do.
+    input = gc.state['input']
+    print( '\n(startaudio) restoring input: ' + input )
+    if input == 'none':
+        return  # nothing to connect.
 
     # wait for input ports to be up
     ports = pd.gc.inputs[input]['in_ports']
