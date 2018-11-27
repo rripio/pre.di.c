@@ -6,11 +6,11 @@ analog:
     resampled: False
     xo: none
 
-analog6dB:
-    gain: 6.0
+spotify:
+    gain: 0
     in_ports:
-        - system:capture_1
-        - system:capture_2
+        - alsa_loop:output_1
+        - alsa_loop:output_2
     resampled: False
     xo: none
 
