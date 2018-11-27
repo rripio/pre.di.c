@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-""" Listen for certain commands to be executed on local
+""" A TCP server that listen for certain tasks to be executed on local:
+    - switches on/off an amplifier
+    - gets metadata info from the player we are listen to
 """
 # This server is secured by allowing only certain orders
 # to be translated to actual local commands.
