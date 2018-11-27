@@ -22,8 +22,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-""" 
- Módulo de control del EQ paramétrico Ecasound en predic
+"""
+ Módulo de control del EQ paramétrico Ecasound en pre.di.c
 
  Uso en línea de comandos:
 
@@ -48,25 +48,17 @@
 # v1.1a:
 #  suprimido el sleep(0.1) de cargaPEQini
 #  y cambiado sleep(0.02) antes 0.1 en PEQbypass (estos sleeps habría que depurarlos...)
+# v2.0 python3 for pre.di.c integration
 
-from os import path as os_path, remove as os_remove
-from sys import path as sys_path, argv as sys_argv
-from time import sleep
+import sys, os, time
 from configparser import ConfigParser
 import socket
 
-# esto es para importar los modulos del predic que siguen abajo
-HOME = os_path.expanduser("~")
-sys_path.append(HOME + "/bin")
-from basepaths import config_folder, loudspeakers_folder
-
-import getconfigs as gc
-
-# Usado solamente en PEQdefeat
-status = ConfigParser()
+# pre.di.c.
+import basepaths, getconfigs
 
 # Solo se usa para el archivo temporal de volcado de EQ en curso (peqdump.txt)
-altavoz_folder = loudspeakers_folder + gc.config['loudspeaker']
+altavoz_folder = basepaths.loudspeakers_folder + getconfigs.config['loudspeaker']
 
 # --- AJUSTES DE LOS PARAMETRICOS ---
 # Los valores de los filtros paramétricos los almacenaremos en un objeto ConfigParser (ini)
@@ -74,14 +66,16 @@ PEQs = ConfigParser()
 
 # ---  ECASOUND  ------
 def ecanet(comando):
-    """ para enviar comandos a Ecasound y recibir resultados
+    """ Para enviar comandos a Ecasound y recibir resultados
+        NOTAS:  - Ecasound necesita CRLF.
+                - socket envia y recibe bytes (no cadenas), por tanto .encode() y .decode()
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('localhost', 2868))
-    s.send(comando + "\r\n")
-    data = s.recv(8192)
+    s.connect( ('localhost', 2868) )
+    s.send( (comando + '\r\n').encode() )
+    data = s.recv( 8192 )
     s.close()
-    return data
+    return data.decode()
 
 def leeCanalPEQini(fileName, channel):
     """ Se lee el archivo externo XXXX.peq con la configuracion de PEQs para ambos canales.
@@ -130,16 +124,14 @@ def cargaPEQini(archivoPEQini):
     except:
         pass
 
-def PEQdefeat():
+def PEQdefeat(fs):
     """ carga una ChainSetup externa (PEQ_defeat_FSAMPLING.ecs con los parametricos "a cero"
         (!!!) OjO habrá desconexión de los puertos de jack que entraban a ecasound.
     """
-    status.read(config_folder + "/status")
-    fs = status.get("general", "fs")
-    bandasPEQ = gc.config['ecasound_filters']
+    bandasPEQ = getconfigs.config['ecasound_filters']
+    ecsDefeatFile = basepaths.config_folder + "PEQx" + str(bandasPEQ) + "_defeat_" + str(fs) + ".ecs"
 
-    ecsDefeatFile = config_folder + "PEQx" + bandasPEQ + "_defeat_" + fs + ".ecs"
-    if os_path.isfile(ecsDefeatFile):
+    if os.path.isfile(ecsDefeatFile):
         ecanet("cs-disconnect")
         ecanet("cs-remove")
         ecanet("cs-load " + ecsDefeatFile)
@@ -166,7 +158,7 @@ def PEQbypass(mode):
     for chain in ("left", "right"):
         ecanet("c-select " + chain)
         ecanet("c-bypass " + mode)
-        sleep(.02) # experimental, es necesario
+        time.sleep(.2) # experimental, es necesario
 
     for chain in ecanet("c-status").replace("[selected] ", "").split("\n")[2:4]:
         tmp = ""
@@ -214,7 +206,7 @@ def PEQdump2ecs():
     ecanet("cs-save-as /home/predic/tmp.ecs")
     with open("/home/predic/tmp.ecs", "r") as f:
         print((f.read()))
-    os_remove("/home/predic/tmp.ecs")
+    os.remove("/home/predic/tmp.ecs")
 
 if __name__ == '__main__':
 
@@ -226,8 +218,8 @@ if __name__ == '__main__':
     dumpfile = altavoz_folder + "/peqdump.txt"
 
     # si ejecutamos desde linea de comando podemos pasar uno o más comandos a Ecasoud
-    if len(sys_argv) > 1:
-        comandos = sys_argv[1:]
+    if len(sys.argv) > 1:
+        comandos = sys.argv[1:]
         for comando in comandos: # recorremos la lista de comandos
             if not("PEQ" in comando):
                 print((ecanet(comando)))

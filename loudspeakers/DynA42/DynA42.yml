@@ -4,7 +4,7 @@ room_gain:      5.0
 house_gain:     -2.0
 
 peq_sets:
-    peq1:              peq1.peq
+    peq1:               peq1.peq
 
 drc_sets:
     none:               none                        none

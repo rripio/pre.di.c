@@ -44,7 +44,7 @@ def get_librespot_info():
     """ gets info from librespot """
     # Unfortunately librespot only prints out the title metadata, nor artist neither album.
     # More info can be retrieved from the spotify web, but it is necessary to register
-    # for getting a privative and unique  http request token for authentication.
+    # for getting a privative and unique http request token for authentication.
 
     player = 'Spotify'
 

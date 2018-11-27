@@ -1,4 +1,5 @@
 DRC_set: nearfield
+PEQ_set: peq1
 XO_set: none
 balance: 0.0
 bass: 0
@@ -8,7 +9,5 @@ loudness_ref: 0.0
 loudness_track: true
 mono: false
 muted: false
-peq: 'off'
-peqdefeat: true
 polarity: +
 treble: 0
