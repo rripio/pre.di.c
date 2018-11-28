@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-"""start and stop mplayer for DVB tasks
+"""start and stop MPD
 use it with 'start' and 'stop' as options"""
 
 import os
@@ -30,7 +30,9 @@ import sys
 import time
 import math as m
 from subprocess import Popen
+import threading
 
+# Needs the package 'python-mpd', but for Raspberry Pi with berryconda (python 3.6) then 'pip install python-mpd2'
 import mpd
 
 import predic as pd
@@ -38,12 +40,11 @@ import getconfigs as gc
 
 
 ## user config
-
 mpd_path = '/usr/bin/mpd'
 mpd_options = ''
 mpd_alias = 'mpd'
 #mpd_volume_linked = True
-mpd_volume_linked = False
+mpd_volume_linked = False   # DOES NOT USE THIS. PENDING TO REVIEW THIS STUFF
 # Must be positive integer
 slider_range = 48
 
@@ -93,19 +94,22 @@ def set_mpd_vol_loop(gain):
     except:
         print("problem setting mpd volume")
 
-
 def start():
     """loads mpd"""
 
-    # create jack loop for connections
-    pd.jack_loop('mpd_loop')
-    time.sleep(gc.config['command_delay'])
+    # 1. Request pre.di.c to create a jack loop to connect the MPD outputs
+    #    This will be a daemond like thread to continue to starting MPD
+    loop = threading.Thread( target = pd.jack_loop('mpd_loop') )
+    loop.setDaemon(True)
+    loop.start()
+
+    # 2. Starts MPD
     print('starting mpd')
     command = f'{mpd_path} {mpd_options}'
     pd.start_pid(command, mpd_alias)
-#    p = Popen([mpd_path] + mpd_options.split())
     time.sleep(gc.config['command_delay'])
-    # volume linked to mpd (optional)
+
+    # volume linked to mpd (optional)  # DOES NOT USE THIS. PENDING TO REVIEW THIS STUFF
     if mpd_volume_linked:
         print('waiting for mpd')
         if  pd.wait4result('pgrep -l mpd', 'mpd', tmax=10, quiet=True):
@@ -113,19 +117,15 @@ def start():
         else:
             print('error detecting mpd, client_mpd'
                                                 ' won\'t start')
-#        try:
+        try:
             c = connect_mpd('localhost', 6600)
             c.timeout = 10
             c.idletimeout = None
             set_predic_vol_loop(c)
             c.close()
             c.disconnect()
-#        except:
-#            print("mpd socket loop broke")
-    else:
-        # wait forever to keep jack loop active
-        while True:
-            time.sleep(10)
+        except:
+            print("mpd socket loop broke")
 
 
 def stop():
