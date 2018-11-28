@@ -30,6 +30,7 @@ import os
 import numpy as np
 import subprocess as sp
 import contextlib as cl
+import threading
 
 import jack
 
@@ -66,32 +67,65 @@ def kill_pid(script):
         print(f'problem killing {script}')
 
 def jack_loop(clientname):
-    """creates a jack loop with given 'clientname'"""
+    # will thread this
 
-    client = jack.Client(clientname)
-    if client.status.server_started:
-        print(f"JACK client '{clientname}' started")
-    if client.status.name_not_unique:
-        print(f'unique name {client.name!r} assigned')
+    def jack_loop(clientname):
+        """ creates a jack loop with given 'clientname' """
 
-    @client.set_process_callback
-    def process(frames):
-        assert len(client.inports) == len(client.outports)
-        assert frames == client.blocksize
-        for i, o in zip(client.inports, client.outports):
-            o.get_buffer()[:] = i.get_buffer()
+        # CREDITS:  https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
 
-    @client.set_shutdown_callback
-    def shutdown(status, reason):
-        print('JACK shutdown!')
-        print('status:', status)
-        print('reason:', reason)
+        # The instance for our loop
+        client = jack.Client(name=clientname, no_start_server=True)
 
-    # create two port pairs
-    for number in 1, 2:
-        client.inports.register(f'input_{number}')
-        client.outports.register(f'output_{number}')
-    client.activate()
+        if client.status.name_not_unique:
+            client.close()
+            print( f'(predic.jack_loop) \'{clientname}\' already exists in JACK, nothing done.' )
+            return
+
+        # The threading event to keep this running
+        event = threading.Event()
+
+        # This sets the actual loop that copies frames from our capture to our playback ports
+        @client.set_process_callback
+        def process(frames):
+            assert len(client.inports) == len(client.outports)
+            assert frames == client.blocksize
+            for i, o in zip(client.inports, client.outports):
+                o.get_buffer()[:] = i.get_buffer()
+
+        # This is a helper when jack shutdowns will terminate this script.
+        @client.set_shutdown_callback
+        def shutdown(status, reason):
+            print('(predic.jack_loop) JACK shutdown!')
+            print('(predic.jack_loop) JACK status:', status)
+            print('(predic.jack_loop) JACK reason:', reason)
+            # This triggers an event so that the below 'with client' will terminate
+            event.set()
+
+        # Create the ports
+        for n in 1, 2:
+            client.inports.register(f'input_{n}')
+            client.outports.register(f'output_{n}')
+
+        # This is the keeping trick
+        with client:
+            # client.activate() not needed.
+            # When entering this with-statement, client.activate() is called.
+            # This tells the JACK server that we are ready to roll.
+            # Our process() callback will start running now.
+
+            print( f'(predic.jack_loop) running {clientname}' )
+            try:
+                event.wait()
+            except KeyboardInterrupt:
+                print('\n(predic.jack_loop) Interrupted by user')
+            except:
+                print ('\n(predic.jack_loop)  Terminated')
+
+    # Running the underlaying jack_loop() function above as a daemon
+    d = threading.Thread( target=jack_loop(clientname) )
+    d.setDaemon(True)
+    d.start()
 
 
 def server_socket(host, port):
