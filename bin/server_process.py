@@ -569,8 +569,8 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             }[command](arg)
     except KeyError:
         warnings.append(f"Unknown command '{command}'")
-#    except:
-#        warnings.append(f"Problems in command '{command}'")
+    except:
+        warnings.append(f"Problems in command '{command}'")
 
     # command execution
 
