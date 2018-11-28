@@ -171,6 +171,11 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             warnings.append('Something went wrong when changing target state')
 
 
+    def show(throw_it):
+
+        state = pd.show_file()
+        return(state)
+
     def change_input(input, state=state):
 
         state['input'] = input
@@ -547,7 +552,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
     try:
         state = {
             'target':           change_target,
-            'show':             pd.show,
+            'show':             show,
             'input':            change_input,
             'xo':               change_xovers,
             'drc':              change_drc,
@@ -564,8 +569,8 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             }[command](arg)
     except KeyError:
         warnings.append(f"Unknown command '{command}'")
-    except:
-        warnings.append(f"Problems in command '{command}'")
+#    except:
+#        warnings.append(f"Problems in command '{command}'")
 
     # command execution
 

@@ -29,6 +29,7 @@ import time
 import os
 import numpy as np
 import subprocess as sp
+import contextlib as cl
 
 import jack
 
@@ -219,6 +220,7 @@ def show(throw_it=None, state=gc.state):
     gain = calc_gain(gc.state['level'] , gc.state['input'])
     headroom = calc_headroom(gain, gc.state['balance'], get_target()[0])
     input_gain = calc_input_gain(gc.state['input'])
+    tracking_loud = (' ' if gc.state['loudness_track'] else '(tracking off)')
 
     print()
     print(f"Loudspeaker is {gc.config['loudspeaker']}")
@@ -239,8 +241,7 @@ def show(throw_it=None, state=gc.state):
     print()
     print(f"Bass           {gc.state['bass']: 6.1f}")
     print(f"Treble         {gc.state['treble']: 6.1f}")
-    tracking = (' ' if gc.state['loudness_track'] else '(tracking off)')
-    print(f"Loudness ref   {gc.state['loudness_ref']: 6.1f}", tracking)
+    print(f"Loudness ref   {gc.state['loudness_ref']: 6.1f}", tracking_loud)
 
     print()
     print(f"Crossover set  {gc.state['XO_set']:>6s}")
@@ -260,3 +261,10 @@ def show(throw_it=None, state=gc.state):
 
     return state
 
+def show_file(throw_it=None, state=gc.state):
+    """ writes a status report to temp file """
+
+    with open('/tmp/predic', 'w') as f:
+        with cl.redirect_stdout(f):
+            state = show()
+    return state
