@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+
 """ A module  to retrieve track info from the current player
 """
 import subprocess as sp
 import yaml
 import jack
 import mpd
+import time
 
 def get_state():
     f = open('/home/predic/config/state.yml', 'r')
@@ -63,8 +65,19 @@ def get_current_playing():
 
     player = artist = album = title = ''
 
-    listening = get_state()['input']
-
+    # It is possible to fail while state file is updating :-/
+    times = 4
+    while times:
+        try:
+            listening = get_state()['input']
+            break
+        except:
+            times -= 1
+        time.sleep(.25)
+    if not times:
+        return '{ "player":"' + player + '", "artist":"' + artist + \
+               '", "album":"' + album + '", "title":"' + title + '" }'
+    
     if listening == 'spotify':
         return get_librespot_info()
 
