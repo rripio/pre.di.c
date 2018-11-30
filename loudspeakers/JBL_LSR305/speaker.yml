@@ -23,6 +23,9 @@ XO:
         mp: Full range, minimum phase equalizer
         '2': Same equalizer, for switching testing
 
+PEQ: 
+    defeat: none
+
 DRC:
     filters:
         - f.drc.L

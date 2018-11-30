@@ -42,6 +42,8 @@ import predic as pd
 import basepaths as bp
 import getconfigs as gc
 
+if gc.config['load_ecasound']: import peq_control
+
 
 def limit_level(level_on_startup, max_level_on_startup):
     """limit volume as specified in config.ini"""
@@ -186,6 +188,15 @@ def init_state_settings():
     # restore DRC_set
     pd.client_socket( 'drc ' + str( gc.state['DRC_set'] ) )
     # XO_set will be adjusted when restoring inputs
+
+    # restore PEQ_set
+    if gc.config['load_ecasound']:
+        peqSet  = gc.state['PEQ_set']
+        speaker,_,_ = gc.get_speaker()
+        peqFile = speaker['PEQ'][peqSet]
+        if peqFile != 'none':
+            peq_control.cargaPEQini( peqFile )
+
 
 def init_inputs():
     """restore selected input as stored in state.ini"""
