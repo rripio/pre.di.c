@@ -22,114 +22,112 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Control module of a parametric ecualizer based on ecasound
+
+Usage: peq_control.py "command1 param1" "command2 param2" ...
+
+   commandN can be:
+
+    - native ecasound-iam command (man ecasound-iam)
+
+    - one of this:
+      PEQdump                  prints running parametric filters
+      PEQdump2ecs              prints running .ecs structure
+      PEQbypass on|off|toggle  EQ bypass
+      PEQgain XX               sets EQ gain
 """
- Módulo de control del EQ paramétrico Ecasound en pre.di.c
 
- Uso en línea de comandos:
-
-   peq_control.py "comando1 param1" "comando2 param2" ...
-
-   comandoN puede ser
-
-    - un comando nativo ecasound-iam (consultar la man)
-
-    - un comando especial:
-      PEQdump                  printa los filtros paramétricos en curso
-      PEQdump2ecs              printa la estructura .ecs en curso
-      PEQplot                  grafico del EQ en curso
-      PEQbypass on|off|toggle  bypass del EQ
-      PEQgain XX               ajusta la ganancia del EQ (primer plugin)
-"""
-# v1.0a:
-#  Comprueba que Ecasound esté escuchando
-# v1.1:
-#  Corregido cargaPEQini cuando el INI tiene menos bloques de plugins que ecasound
-#  Permite PEQdump sin ser el dueño del fichero /home/predic/lspk/altavoz/peqdump.txt
-# v1.1a:
-#  suprimido el sleep(0.1) de cargaPEQini
-#  y cambiado sleep(0.02) antes 0.1 en PEQbypass (estos sleeps habría que depurarlos...)
-# v2.0 python3 for pre.di.c integration
-
-import sys, os, time
-from configparser import ConfigParser
+import sys
+import os
+import time
 import socket
+from configparser import ConfigParser
 
-# pre.di.c.
-import basepaths, getconfigs
+import basepaths
+import getconfigs
 
-# Solo se usa para el archivo temporal de volcado de EQ en curso (peqdump.txt)
-altavoz_folder = basepaths.loudspeakers_folder + getconfigs.config['loudspeaker']
 
-# --- AJUSTES DE LOS PARAMETRICOS ---
-# Los valores de los filtros paramétricos los almacenaremos en un objeto ConfigParser (ini)
+# pool of PEQ settings
 PEQs = ConfigParser()
 
-# ---  ECASOUND  ------
-def ecanet(comando):
-    """ Para enviar comandos a Ecasound y recibir resultados
-        NOTAS:  - Ecasound necesita CRLF.
-                - socket envia y recibe bytes (no cadenas), por tanto .encode() y .decode()
-    """
+def ecanet(command):
+    """Sends commands to ecasound and accept results"""
+
+    # note:   - ecasound needs CRLF
+    #         - socket send and receive bytes (not strings),
+    #           hence .encode() and .decode()
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect( ('localhost', 2868) )
-    s.send( (comando + '\r\n').encode() )
+    s.send( (command + '\r\n').encode() )
     data = s.recv( 8192 )
     s.close()
     return data.decode()
 
-def leeCanalPEQini(fileName, channel):
-    """ Se lee el archivo externo XXXX.peq con la configuracion de PEQs para ambos canales.
-        Se devuelven dos cadenas de parámetros para conseguir los 4 + 4 paramétricos por canal.
-    """
+
+def readChannelPEQini(fileName, channel):
+    """Reads external file XXXX.peq"""
+
+    # returns two parameter chains to get 4 + 4 parametrics per channel
+
     PEQs.read(fileName)
 
     cad = ""
-    for filtro in PEQs.options(channel):
-        cad += "," + ",".join(PEQs.get(channel, filtro).split())
+    for filter in PEQs.options(channel):
+        cad += "," + ",".join(PEQs.get(channel, filter).split())
 
-    return cad[1:]  # global...filtros_1-4...filtros_5-8 (quitamos la primera coma del join)
+    # global...filters_1-4...filters_5-8 (remove first comma of 'join')
+    return cad[1:]
 
-def cargaPEQini(archivoPEQini):
-    """ recarga al vuelo los plugins de Ecasound releyendo
-        un archivo XXXXXX.peq indicado (de tipo INI)
-    """
+
+def loadPEQini(archivoPEQini):
+    """Reloads ecasound settings on-the-fly"""
+
     for channel in ["left","right"]:
-        # leemos el canal dentro del archivo XXXXXX.peq
-        listaParamsPlugins = leeCanalPEQini(archivoPEQini, channel).split(",")
+        # read channel from XXXXXX.peq file
+        listParamsPlugins = readChannelPEQini(archivoPEQini,
+                                                    channel).split(",")
 
-        # seleccionamos el canal en Ecasound
+        # select channel in ecasound
         ecanet("c-select " + channel)
 
-        # consultamos la relacion de plugins (cop) encadenados en el canal ecasound
+        # check plugins list (cop) chained in ecasound channel
         plugins = ecanet("cop-list").split("\r\n")[1].split(",")
-        # recorremos los plugins (se seleccionan por su número de orden)
+        # parse plugins (selected by ordinal number)
         for n in range(len(plugins)):
 
-            # seleccionamos el plugin a modificar
-            cop = n + 1 # ecasound numera desde "1"
+            # select plugin to change
+            # ecasound numbers from "1"
+            cop = n + 1
             ecanet("cop-select " + str(cop))
 
-            # sobreescribimos el ajuste de cada paramétrico de ecasound con lo que tenga el INI
-            for pos in range(1,19): # cada plugin tiene 18 parámetros (2 globales y 4x4 de los filtros)
-                # (!) por si el pop* se agota antes que los posibles filtros admitidos en ecasound
-                if listaParamsPlugins:
-                    ecanet("cop-set " + str(cop) + "," + str(pos) + "," + listaParamsPlugins.pop(0)) #(*)
-    #sleep(.1)
-    print(("(peq_control) Se ha cargado en Ecasound el archivo: " + archivoPEQini))
-    print("(peq_control) Recuerda revisar la Ganancia global del primer plugin.")
+            # overwrite each parametric setting with INI settings
+            # each plugin has 18 parameters (2 globals, 4x4 from filters)
+            for pos in range(1,19):
+                # (!) in case pop* exhausts before possible filters
+                # admitted in ecasound
+                if listParamsPlugins:
+                    ecanet("cop-set " + str(cop) + "," + str(pos) + "," + listParamsPlugins.pop(0)) #(*)
+
+    print("(peq_control) file " + archivoPEQini
+                                + "has been loaded in ecasound")
+    print("(peq_control) Remember to check global gain in first plugin")
     try:
-        if len(listaParamsPlugins) > 0:
-            print(("(peq_control) La lista de filtros excede la capacidad de " + str(len(plugins)) \
-                  + " plugins de Ecasound"))
+        if len(listParamsPlugins) > 0:
+            print("(peq_control) filter list of" + str(len(plugins))
+                                + " plugins excedes ecasound capacity")
     except:
         pass
 
+
 def PEQdefeat(fs):
-    """ carga una ChainSetup externa (PEQ_defeat_FSAMPLING.ecs con los parametricos "a cero"
-        (!!!) OjO habrá desconexión de los puertos de jack que entraban a ecasound.
-    """
-    bandasPEQ = getconfigs.config['ecasound_filters']
-    ecsDefeatFile = basepaths.config_folder + "PEQx" + str(bandasPEQ) + "_defeat_" + str(fs) + ".ecs"
+    """Loads external ChainSetup with zeroed filters"""
+
+    # beware that jack ports inputs to ecasound will be disconnected
+
+    PEQbands = getconfigs.config['ecasound_filters']
+    ecsDefeatFile = (basepaths.config_folder + "PEQx" + str(PEQbands)
+                                        + "_defeat_" + str(fs) + ".ecs")
 
     if os.path.isfile(ecsDefeatFile):
         ecanet("cs-disconnect")
@@ -137,28 +135,32 @@ def PEQdefeat(fs):
         ecanet("cs-load " + ecsDefeatFile)
         ecanet("cs-connect")
         ecanet("start")
-        # printamos:
-        print(("(peq_control) Ecasound ha cargado el archivo: " + ecsDefeatFile))
+
+        print(("(peq_control) ecasound has loaded file: "
+                                                        + ecsDefeatFile))
     else:
-        print(("(peq_control) ERROR accediendo al archivo: " + ecsDefeatFile))
+        print(("(peq_control) error accessing file: " + ecsDefeatFile))
         return False
 
+
 def PEQgain(level):
-    """ ajuste de ganacia del ecualizador en la primera etapa de plugin
-    """
+    """ set gain in first plugin stage"""
+
     for chain in ("left", "right"):
-        ecanet("c-select " + chain) # selecc del canal
-        ecanet("cop-select 1")      # selecc segunda etapa de filtros
-        ecanet("copp-select 2")     # seleccion de la Gain global
-        ecanet("copp-set " + level) # ajuste
+        ecanet("c-select " + chain) # select channel
+        ecanet("cop-select 1")      # select second filter stage
+        ecanet("copp-select 2")     # select global gain
+        ecanet("copp-set " + level) # set
+
 
 def PEQbypass(mode):
-    """ mode: on | off | toggle
-    """
+    """mode: on | off | toggle"""
+
     for chain in ("left", "right"):
         ecanet("c-select " + chain)
         ecanet("c-bypass " + mode)
-        time.sleep(.2) # experimental, es necesario
+        # experimental, seems neccessary
+        time.sleep(getconfigs.config['command_delay'] * .2)
 
     for chain in ecanet("c-status").replace("[selected] ", "").split("\n")[2:4]:
         tmp = ""
@@ -166,20 +168,25 @@ def PEQbypass(mode):
             tmp = chain.split()[2]
         print((" ".join(chain.split()[:2]) + " " + tmp))
 
+
 def PEQdump(fname=None):
+
     dump = ""
-    dump += "\n# " + "Active".rjust(8) + "Freq".rjust(9) + "BW".rjust(7) + "Gain".rjust(8) + "\n"
+    dump += ("\n# " + "Active".rjust(8) + "Freq".rjust(9) + "BW".rjust(7)
+                                                    + "Gain".rjust(8) + "\n")
     tmp = ecanet("cs-status").split("\n")
 
-    # el canal L está en el campo 7 de tmp y el R en el campo 8.
+    # channel L in field 7 of tmp, R in field 8
     for pos in (7,8):
         chain = tmp[pos].split(" ")
-        dump += "\n" + chain[3].replace('":',']').replace('"','[') + "\n"  # el nombre de la chain = canal.
+        # chain name= channel
+        dump += "\n" + chain[3].replace('":',']').replace('"','[') + "\n"
         pluginNum = 1
         filterNum = 1
-        for n in range(len(chain)): # recorremos los campos de la chain
-            if "eli:" in chain[n]:  # es un plugin
-                dump += auxPEQdump(chain[n], pluginNum, filterNum)    # lo destripamos
+        for n in range(len(chain)): # parse chain fields
+            if "eli:" in chain[n]:  # it's a plugin
+                # let's see inside
+                dump += auxPEQdump(chain[n], pluginNum, filterNum)
                 pluginNum += 1
                 filterNum += 4
 
@@ -188,60 +195,72 @@ def PEQdump(fname=None):
             with open(fname, "w") as f:
                 f.write(dump)
         except:
-            print(("\n(peq_control) (!) no se ha podido volcar al archivo " + fname + "\n"))
+            print(("\n(peq_control) (!) file " + fname
+                                                + " couldn't be dumped\n"))
 
     return dump
 
+
 def auxPEQdump(plugin, pluginNum, filterNum):
+
     tmp = ""
     p = plugin.split(",")
-    tmp += "global"+str(pluginNum)+" = " + p[ 1][0].rjust(2) + p[ 2].rjust(24) + "\n"
-    tmp += "f"+str(filterNum+0).ljust(2)+" =     " + p[ 3][0].rjust(2) + p[ 4].rjust(9) + p[ 5].rjust(7) + p[ 6].rjust(8) + "\n"
-    tmp += "f"+str(filterNum+1).ljust(2)+" =     " + p[ 7][0].rjust(2) + p[ 8].rjust(9) + p[ 9].rjust(7) + p[10].rjust(8) + "\n"
-    tmp += "f"+str(filterNum+2).ljust(2)+" =     " + p[11][0].rjust(2) + p[12].rjust(9) + p[13].rjust(7) + p[14].rjust(8) + "\n"
-    tmp += "f"+str(filterNum+3).ljust(2)+" =     " + p[15][0].rjust(2) + p[16].rjust(9) + p[17].rjust(7) + p[18].rjust(8) + "\n"
+    tmp += ("global"+str(pluginNum)+" = " + p[ 1][0].rjust(2)
+                                                    + p[ 2].rjust(24) + "\n")
+    tmp += ("f"+str(filterNum+0).ljust(2)+" =     " + p[ 3][0].rjust(2)
+                    + p[ 4].rjust(9) + p[ 5].rjust(7) + p[ 6].rjust(8) + "\n")
+    tmp += ("f"+str(filterNum+1).ljust(2)+" =     " + p[ 7][0].rjust(2)
+                    + p[ 8].rjust(9) + p[ 9].rjust(7) + p[10].rjust(8) + "\n")
+    tmp += ("f"+str(filterNum+2).ljust(2)+" =     " + p[11][0].rjust(2)
+                    + p[12].rjust(9) + p[13].rjust(7) + p[14].rjust(8) + "\n")
+    tmp += ("f"+str(filterNum+3).ljust(2)+" =     " + p[15][0].rjust(2)
+                    + p[16].rjust(9) + p[17].rjust(7) + p[18].rjust(8) + "\n")
+
     return tmp
 
+
 def PEQdump2ecs():
+
     ecanet("cs-save-as /home/predic/tmp.ecs")
     with open("/home/predic/tmp.ecs", "r") as f:
         print((f.read()))
     os.remove("/home/predic/tmp.ecs")
 
+
 if __name__ == '__main__':
 
     try:
-        ecanet("") # comprobamos que Ecasound esté escuchando
+        ecanet("") # is ecasound listening?
     except:
-        print("(!) ECASOUND server not running")
+        print("(!) ecasound server not running")
 
-    dumpfile = altavoz_folder + "/peqdump.txt"
+    dumpfile = getconfigs.config['loudspeakers_folder'] + "/peqdump.txt"
 
-    # si ejecutamos desde linea de comando podemos pasar uno o más comandos a Ecasoud
+    # we can pass more than one command from command line to ecasound
     if len(sys.argv) > 1:
-        comandos = sys.argv[1:]
-        for comando in comandos: # recorremos la lista de comandos
-            if not("PEQ" in comando):
-                print((ecanet(comando)))
+        commands = sys.argv[1:]
+        for command in commands: # parse command list
+            if not("PEQ" in command):
+                print((ecanet(command)))
             else:
-                if comando == "PEQdump":
+                if command == "PEQdump":
                     print((PEQdump(dumpfile)))
-                elif comando == "PEQdump2ecs":
+                elif command == "PEQdump2ecs":
                     PEQdump2ecs()
-                elif "PEQbypass" in comando:
+                elif "PEQbypass" in command:
                     try:
-                        PEQbypass(comando.split()[1])
+                        PEQbypass(command.split()[1])
                     except:
-                        print("falta parámetro on | off | toggle")
-                elif "PEQgain" in comando:
+                        print("lacking on | off | toggle parameter")
+                elif "PEQgain" in command:
                     try:
-                        gain = comando.split()[1]
+                        gain = command.split()[1]
                         PEQgain(gain)
                         # PEQdump()
                     except:
-                        print("falta ganacia en dB")
+                        print("lacking gain in dB")
                 else:
-                    print(("(!) error en comando " + comando))
+                    print(("(!) error en command " + command))
                     print(__doc__)
     else:
         print(__doc__)
