@@ -6,10 +6,6 @@ import yaml
 import jack
 import mpd
 
-# BY DEFAULT WILL RETURN EMPTY VALUES
-player = ''
-artist = album = title = ''
-
 def get_state():
     f = open('/home/predic/config/state.yml', 'r')
     tmp = f.read()
@@ -20,6 +16,7 @@ def get_mpd_info(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
     """ gets info from mpd """
 
     player = 'MPD'
+    artist = album = title = ''
 
     try:
         client = mpd.MPDClient()
@@ -47,6 +44,7 @@ def get_librespot_info():
     # for getting a privative and unique http request token for authentication.
 
     player = 'Spotify'
+    artist = album = title = ''
 
     try:
         # Returns the current track played by librespot when redirected to ~/tmp/.librespotEvents
@@ -62,6 +60,8 @@ def get_librespot_info():
 def get_current_playing():
     # Retrieve a dictionary with the current player info
     # {player: xxxx, artist: xxxx, album:xxxx, title:xxxx }
+
+    player = artist = album = title = ''
 
     listening = get_state()['input']
 
