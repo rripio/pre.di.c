@@ -25,15 +25,18 @@
 """start and stop mplayer for DVB tasks
 use it with 'start' and 'stop' as options"""
 
-# renamed to mpd_load.py  because 'import mpd' does not fails if python-mpd package were not installed, i.e. the fail is masked.
+# Renamed to mpd_load.py  because 'import mpd' does not fails if 
+# python-mpd package were not installed, i.e. the fail is masked.
 
 import os
 import sys
 import time
 import math as m
 from subprocess import Popen
+import threading
 
-# Must install the package 'python-mpd', but for Raspberry Pi with berryconda (python 3.6) then 'pip install python-mpd2'
+# Must install the package 'python-mpd', but for Raspberry Pi
+# with berryconda (python 3.6) then 'pip install python-mpd2'
 import mpd
 
 import predic as pd
@@ -45,7 +48,7 @@ import getconfigs as gc
 mpd_path = '/usr/bin/mpd'
 mpd_options = ''
 mpd_alias = 'mpd'
-mpd_volume_linked = False
+mpd_volume_linked = False   # THIS MUST BE REVIEWED
 # Must be positive integer
 slider_range = 48
 
@@ -97,23 +100,27 @@ def set_mpd_vol_loop(gain):
 
 
 def start():
-    """loads mpd"""
+    """
+        Loads MPD after creating the necessary JACK ports
+    """
 
-    # create jack loop for connections
-    pd.jack_loop('mpd_loop')
-    time.sleep(gc.config['command_delay'])
-    print('starting mpd')
-    command = f'{mpd_path} {mpd_options}'
-    pd.start_pid(command, mpd_alias)
-#    p = Popen([mpd_path] + mpd_options.split())
-    time.sleep(gc.config['command_delay'])
-    # volume linked to mpd (optional)
+    # 1. Prepare a jack loop where MPD outputs can connect.
+    #    The jack_loop module will keep the loop alive, so we need to thread it.
+    jloop = threading.Thread( target = pd.jack_loop, args=('mpd_loop',) )
+    jloop.start()
+
+    # 2. Starts MPD
+    print('(mpd_load.py) starting mpd')
+    mpd_command = f'{mpd_path} {mpd_options}'
+    pd.start_pid(mpd_command, mpd_alias)
+
+    # volume linked to mpd (optional)  # THIS MUST BE REVIEWED
     if mpd_volume_linked:
-        print('waiting for mpd')
+        print('(mpd_load.py) waiting for mpd')
         if  pd.wait4result('pgrep -l mpd', 'mpd', tmax=10, quiet=True):
-            print('mpd started :-)')
+            print('(mpd_load.py) mpd started :-)')
         else:
-            print('error detecting mpd, client_mpd'
+            print('(mpd_load.py) error detecting mpd, client_mpd'
                                                 ' won\'t start')
         try:
             c = connect_mpd('localhost', 6600)
@@ -123,17 +130,13 @@ def start():
             c.close()
             c.disconnect()
         except:
-            print("mpd socket loop broke")
-    else:
-        # wait forever to keep jack loop active
-        while True:
-            time.sleep(10)
-
+            print('(mpd_load.py) mpd socket loop broke')
 
 def stop():
     """kills mpd"""
 
     #pd.kill_pid(mpd_alias)
+    # must kill mpd this way:
     Popen('mpd --kill'.split())
     time.sleep(gc.config['command_delay']*5)
 
