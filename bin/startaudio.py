@@ -211,10 +211,9 @@ def init_inputs():
     # lets try 20 times to connect to input ports
     loops = 20
     while loops:
-        n = 0
         for port_name in ports:
-            if jc.get_ports(name_pattern=port_name): n += 1
-        if n == 2: break
+            while not jc.get_ports(port_name): pass
+        break
         time.sleep(gc.config['command_delay'] * 0.5)
         loops -= 1
     if loops:
