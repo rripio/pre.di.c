@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) 2018 Roberto Ripio
@@ -29,8 +31,8 @@ import time
 import os
 import numpy as np
 import subprocess as sp
-import threading
 import jack
+import threading
 
 import basepaths as bp
 import getconfigs as gc
@@ -41,9 +43,6 @@ def jack_loop(clientname):
                 so if necessary you'll need to thread this when calling here.
     """
     # CREDITS:  https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
-
-    import jack
-    import threading
 
     # The jack module instance for our looping ports
     client = jack.Client(name=clientname, no_start_server=True)
@@ -64,7 +63,7 @@ def jack_loop(clientname):
         for i, o in zip(client.inports, client.outports):
             o.get_buffer()[:] = i.get_buffer()
 
-    # This is a helper when jack shutdowns will trigger over the Envent then will terminate this script.
+    # If jack shutdowns, will trigger on 'event' so that the below 'whith client' will break.
     @client.set_shutdown_callback
     def shutdown(status, reason):
         print('(predic.jack_loop) JACK shutdown!')
@@ -93,6 +92,7 @@ def jack_loop(clientname):
         except:
             print('\n(predic.jack_loop)  Terminated')
 
+
 def start_pid(command, alias):
     """starts a program and writes its pid
     command: full path with options
@@ -120,35 +120,6 @@ def kill_pid(script):
             os.kill(pid, 9)
     except:
         print(f'problem killing {script}')
-
-def jack_loop(clientname):
-    """creates a jack loop with given 'clientname'"""
-
-    client = jack.Client(clientname)
-    if client.status.server_started:
-        print(f"JACK client '{clientname}' started")
-    if client.status.name_not_unique:
-        print(f'unique name {client.name!r} assigned')
-
-    @client.set_process_callback
-    def process(frames):
-        assert len(client.inports) == len(client.outports)
-        assert frames == client.blocksize
-        for i, o in zip(client.inports, client.outports):
-            o.get_buffer()[:] = i.get_buffer()
-
-    @client.set_shutdown_callback
-    def shutdown(status, reason):
-        print('JACK shutdown!')
-        print('status:', status)
-        print('reason:', reason)
-
-    # create two port pairs
-    for number in 1, 2:
-        client.inports.register(f'input_{number}')
-        client.outports.register(f'output_{number}')
-    client.activate()
-
 
 def server_socket(host, port):
     """Makes a socket for listening clients"""
