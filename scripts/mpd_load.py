@@ -48,7 +48,7 @@ import getconfigs as gc
 mpd_path = '/usr/bin/mpd'
 mpd_options = ''
 mpd_alias = 'mpd'
-mpd_volume_linked = False
+mpd_volume_linked = False   # THIS MUST BE REVIEWED
 # Must be positive integer
 slider_range = 48
 
@@ -101,20 +101,20 @@ def set_mpd_vol_loop(gain):
 
 def start():
     """
-        Loads MPD after creating the necessary pre.di.c JACK ports
+        Loads MPD after creating the necessary JACK ports
     """
 
-    # 1. Request pre.di.c to create a jack loop where MPD outputs can connect.
+    # 1. Prepare a jack loop where MPD outputs can connect.
     #    The jack_loop module will keep the loop alive, so we need to thread it.
     jloop = threading.Thread( target = pd.jack_loop, args=('mpd_loop',) )
     jloop.start()
 
     # 2. Starts MPD
     print('(mpd_load.py) starting mpd')
-    mpdCommandLine = f'{mpd_path} {mpd_options}'
-    pd.start_pid(mpdCommandLine, mpd_alias)
+    mpd_command = f'{mpd_path} {mpd_options}'
+    pd.start_pid(mpd_command, mpd_alias)
 
-    # volume linked to mpd (optional)  # DOES NOT USE THIS. PENDING TO REVIEW THIS STUFF
+    # volume linked to mpd (optional)  # THIS MUST BE REVIEWED
     if mpd_volume_linked:
         print('(mpd_load.py) waiting for mpd')
         if  pd.wait4result('pgrep -l mpd', 'mpd', tmax=10, quiet=True):
@@ -136,6 +136,7 @@ def stop():
     """kills mpd"""
 
     #pd.kill_pid(mpd_alias)
+    # must kill mpd this way:
     Popen('mpd --kill'.split())
     time.sleep(gc.config['command_delay']*5)
 
