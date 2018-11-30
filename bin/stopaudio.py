@@ -30,7 +30,7 @@
     all: all of the above
 """
 
-import time
+#import time
 import sys
 import os
 from subprocess import Popen
@@ -50,7 +50,7 @@ def main(run_level):
         print('(stopaudio) stopping server')
         try:
             pd.client_socket('shutdown')
-            time.sleep(1)
+#            time.sleep(1)
         except:
             Popen (['pkill', '-9', '-f', gc.config['control_path']]
                                         , stdout=fnull, stderr=fnull)
