@@ -110,11 +110,11 @@ def loadPEQini(archivoPEQini):
                     ecanet("cop-set " + str(cop) + "," + str(pos) + "," + listParamsPlugins.pop(0)) #(*)
 
     print("(peq_control) file " + archivoPEQini
-                                + "has been loaded in ecasound")
+                                + " has been loaded in ecasound")
     print("(peq_control) Remember to check global gain in first plugin")
     try:
         if len(listParamsPlugins) > 0:
-            print("(peq_control) filter list of" + str(len(plugins))
+            print("(peq_control) filter list of " + str(len(plugins))
                                 + " plugins excedes ecasound capacity")
     except:
         pass
@@ -234,7 +234,8 @@ if __name__ == '__main__':
     except:
         print("(!) ecasound server not running")
 
-    dumpfile = getconfigs.config['loudspeakers_folder'] + "/peqdump.txt"
+    dumpfile =  basepaths.loudspeakers_folder + \
+                getconfigs.config['loudspeaker'] + "/peqdump.txt"
 
     # we can pass more than one command from command line to ecasound
     if len(sys.argv) > 1:
@@ -243,15 +244,19 @@ if __name__ == '__main__':
             if not("PEQ" in command):
                 print((ecanet(command)))
             else:
+
                 if command == "PEQdump":
                     print((PEQdump(dumpfile)))
+
                 elif command == "PEQdump2ecs":
                     PEQdump2ecs()
+
                 elif "PEQbypass" in command:
                     try:
                         PEQbypass(command.split()[1])
                     except:
                         print("lacking on | off | toggle parameter")
+
                 elif "PEQgain" in command:
                     try:
                         gain = command.split()[1]
@@ -259,9 +264,10 @@ if __name__ == '__main__':
                         # PEQdump()
                     except:
                         print("lacking gain in dB")
+
                 else:
                     print(("(!) error en command " + command))
                     print(__doc__)
+
     else:
         print(__doc__)
-
