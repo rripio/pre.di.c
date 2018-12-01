@@ -267,15 +267,18 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
         return state
 
     def change_peq(PEQ_set, state=state):
-        
+
         state['PEQ_set'] = PEQ_set
         try:
             if PEQ_set in gc.speaker['PEQ']:
                 peqFile = gc.speaker['PEQ'][PEQ_set]
                 if peqFile == 'none':
                     peq_control.PEQdefeat( gc.speaker['fs'] )
+                    # restore input connections because peq defeating causes
+                    # ecasaound input jack ports to be disconnected:
+                    change_input( state['input'], state )
                 else:
-                    peq_control.cargaPEQini( peqFile )
+                    peq_control.loadPEQini( peqFile )
             else:
                 state['PEQ_set'] = state_old['PEQ_set']
                 print('bad PEQ name')
