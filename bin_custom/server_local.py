@@ -33,16 +33,28 @@ def process(data):
             return b'done'
         except:
             return b'error'
-    if data == 'ampli off':
+    elif data == 'ampli off':
         try:
             sp.check_output( '/home/predic/bin_custom/ampli.sh off'.split() )
             return b'done'
         except:
             return b'error'
 
-    # Info about current music player
-    if data == 'get_current_playing':
+    # Query the current music player
+    elif data == 'get_current_playing':
         return players.get_current_playing().encode()
+    elif data == 'player_state':
+        return players.control('state')
+    elif data == 'player_stop':
+        return players.control('stop')
+    elif data == 'player_pause':
+        return players.control('pause')
+    elif data == 'player_play':
+        return players.control('play')
+    elif data == 'player_next':
+        return players.control('next')
+    elif data == 'player_previous':
+        return players.control('previous')
 
 def server_socket(host, port):
     """Makes a socket for listening clients"""
