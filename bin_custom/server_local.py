@@ -2,7 +2,7 @@
 
 """ A TCP server that listen for certain tasks to be executed on local:
     - switches on/off an amplifier
-    - gets metadata info from the player we are listen to
+    - controls and gets metadata info from the player we are listen to
 """
 # This server is secured by allowing only certain orders
 # to be translated to actual local commands.
@@ -13,7 +13,7 @@ import time
 import subprocess as sp
 import yaml
 
-import players # a module for retrieving info from the current music player
+import players # comunicates to the current music player
 
 def process(data):
     """
