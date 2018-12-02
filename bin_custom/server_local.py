@@ -1,155 +1,149 @@
 #!/usr/bin/env python3
 
-""" A module that controls and retrieve track info from the current player
+""" A TCP server that listen for certain tasks to be executed on local:
+    - switches on/off an amplifier
+    - controls and gets metadata info from the player we are listen to
 """
+# This server is secured by allowing only certain orders
+# to be translated to actual local commands.
+
+import socket
+import sys
+import time
 import subprocess as sp
 import yaml
-import jack
-import mpd
-import time
 
-mpd_host    = 'localhost'
-mpd_port    = 6600
-mpd_passwd  = None
+import players # comunicates to the current music player
 
-def get_predic_state():
-    f = open('/home/predic/config/state.yml', 'r')
-    tmp = f.read()
-    f.close()
-    return yaml.load(tmp)
+def process(data):
+    """
+        Only certain received 'data' will be validated and processed,
+        then returns back some useful info to the client.
+    """
+    # NOTICE:   subprocess.check_output(cmd) returns bytes-like,
+    #           but if cmd fails an exception will be raised.
 
-def mpd_client(query):
+    # First clearing the new line
+    data = data.replace('\n','')
 
-    def get_meta():
-        """ gets info from mpd """
-
-        player = 'MPD'
-        artist = album = title = ''
-
+    # A custom script that switches on/off the amplifier
+    if data == 'ampli on':
         try:
-            # We try because not all tracks have complete metadata fields:
-            try:    artist = client.currentsong()['artist']
-            except: pass
-            try:    album  = client.currentsong()['album']
-            except: pass
-            try:    title  = client.currentsong()['title']
-            except: pass
-            client.close()
+            sp.check_output( '/home/predic/bin_custom/ampli.sh on'.split() )
+            return b'done'
         except:
-            pass
+            return b'error'
+    elif data == 'ampli off':
+        try:
+            sp.check_output( '/home/predic/bin_custom/ampli.sh off'.split() )
+            return b'done'
+        except:
+            return b'error'
 
-        return '{ "player":"' + player + '", "artist":"' + artist + \
-               '", "album":"' + album + '", "title":"' + title + '" }'
+    # Query the current music player
+    elif data == 'get_current_playing':
+        return players.get_current_playing().encode()
+    elif data == 'player_state':
+        return players.control('state')
+    elif data == 'player_stop':
+        return players.control('stop')
+    elif data == 'player_pause':
+        return players.control('pause')
+    elif data == 'player_play':
+        return players.control('play')
+    elif data == 'player_next':
+        return players.control('next')
+    elif data == 'player_previous':
+        return players.control('previous')
 
-    def stop():
-        if mpd_online:
-            client.stop()
-            return client.status()['state']
-    def pause():
-        if mpd_online:
-            client.pause()
-            return client.status()['state']
-    def play():
-        if mpd_online:
-            client.play()
-            return client.status()['state']
-    def next():
-        if mpd_online:
-            client.next()
-            return client.status()['state']
-    def previous():
-        if mpd_online:
-            client.previous()
-            return client.status()['state']
-    def state():
-        if mpd_online:
-            return client.status()['state']
-
-    client = mpd.MPDClient()
-    try:
-        client.connect(mpd_host, mpd_port)
-        if mpd_passwd:
-            client.password(mpd_passwd)
-        mpd_online = True
-    except:
-        mpd_online = False
-
-    result =    { 'get_meta':   get_meta,
-                  'stop':       stop,
-                  'pause':      pause,
-                  'play':       play,
-                  'next':       next,
-                  'previous':   previous,
-                  'state':      state
-                }[query]()
-
-    return result
-
-def get_librespot_info():
-    """ gets info from librespot """
-    # Unfortunately librespot only prints out the title metadata, nor artist neither album.
-    # More info can be retrieved from the spotify web, but it is necessary to register
-    # for getting a privative and unique http request token for authentication.
-
-    player = 'Spotify'
-    artist = album = title = ''
+def server_socket(host, port):
+    """Makes a socket for listening clients"""
 
     try:
-        # Returns the current track played by librespot when redirected to ~/tmp/.librespotEvents
-        tmp = sp.check_output( 'tail -n1 /home/predic/tmp/.librespotEvents'.split() )
-        title  = tmp.decode().split('"')[-2]
-        # JSON for JavaScript on control web page, NOTICE json requires double quotes:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    except socket.error as e:
+        print(f'(server) Error creating socket: {e}')
+        sys.exit(-1)
+    # we use opción socket.SO_REUSEADDR to avoid this error:
+    # socket.error: [Errno 98] Address already in use
+    # that can happen if we reinit this script.
+    # This is because the previous execution has left the socket in a
+    # TIME_WAIT state, and cannot be immediately reused.
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # tcp socket
+    try:
+        s.bind((host, port))
     except:
-        pass
+        print('(server_local) Error binding port', port)
+        s.close()
+        sys.exit(-1)
 
-    return '{ "player":"' + player + '", "artist":"' + artist + \
-           '", "album":"' + album + '", "title":"' + title + '" }'
+    # return socket state
+    return s
 
-def predic_source():
-    source = None
-    # It is possible to fail while state file is updating :-/
-    times = 4
-    while times:
-        try:
-            source = get_predic_state()['input']
-            break
-        except:
-            times -= 1
-        time.sleep(.25)
-    return source
+if __name__ == '__main__':
 
-def get_current_playing():
-    # Retrieve a dictionary with the current player info
-    # {player: xxxx, artist: xxxx, album:xxxx, title:xxxx }
+    verbose = False
+    fsocket = server_socket('localhost', 9988)
 
-    player = artist = album = title = ''
-    source = predic_source()
+    for opc in sys.argv:
+        if '-v' in opc:
+            verbose = True
 
-    if source == 'spotify':
-        return get_librespot_info()
+    # main loop to proccess conections
+    backlog = 10
+    while True:
+        # listen ports
+        fsocket.listen(10)  # number of connections in queue
+        if verbose:
+            print('(server_local) listening on \'localhost\':9988')
+        # accept client connection
+        sc, addr = fsocket.accept()
+        # somo info
+        if verbose:
+            print(f'(server_local) connected to client {addr[0]}')
+        # buffer loop to proccess received command
+        while True:
+        # reception
+            data = sc.recv(4096).decode()
+            if not data:
+                # nothing in buffer, client has disconnected too soon
+                if verbose:
+                    print('(server_local) client disconnected. '
+                                           'Closing connection...')
+                sc.close()
+                break
+            elif data.rstrip('\r\n') == 'status':
+                # echo state to client as YAML string
+                sc.send(yaml.dump( 'status: running',
+                                   default_flow_style=False).encode() )
+                sc.send(b'OK\n')
+            elif data.rstrip('\r\n') == 'quit':
+                sc.send(b'OK\n')
+                if verbose:
+                    print('(server_local) closing connection...')
+                sc.close()
+                break
+            elif data.rstrip('\r\n') == 'shutdown':
+                sc.send(b'OK\n')
+                if verbose:
+                    print('(server_local) closing connection...')
+                sc.close()
+                fsocket.close()
+                sys.exit(1)
+            else:
+                # a command to run has been received in 'data':
+                if verbose:
+                    print ('>>> ' + data)
+                # process() will validate the data, and if so then executed
+                result = process(data)
+                if result:
+                    sc.send( result )
+                else:
+                    sc.send( b'ACK\n' )
 
-    elif source == 'mpd':
-        return mpd_client('get_meta')
+                if verbose:
+                    print(f'(server_local) connected to client {addr[0]}')
 
-    else:
-        return '{ "player":"' + player + '", "artist":"' + artist + \
-               '", "album":"' + album + '", "title":"' + title + '" }'
-
-def control(action):
-    """ controls the playback: play, pause, stop, ... """
-
-    if predic_source() == 'mpd':
-        result = mpd_client(action)
-    elif predic_source() == 'spotify':
-        # WORK IN PROGRESS
-        pass
-    elif predic_source() == 'tdt':
-        # WORK IN PROGRESS
-        pass
-    else:
-        pass
-
-    if result:
-        return result.encode()
-    else:
-        return ''.encode()
+            # wait a bit, loop again
+            time.sleep(0.01)
