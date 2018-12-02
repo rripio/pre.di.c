@@ -8,36 +8,82 @@ import jack
 import mpd
 import time
 
-def get_state():
+mpd_host    = 'localhost'
+mpd_port    = 6600
+mpd_passwd  = None
+
+def get_predic_state():
     f = open('/home/predic/config/state.yml', 'r')
     tmp = f.read()
     f.close()
     return yaml.load(tmp)
 
-def get_mpd_info(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
-    """ gets info from mpd """
+def mpd_client(query):
 
-    player = 'MPD'
-    artist = album = title = ''
+    def get_meta():
+        """ gets info from mpd """
 
+        player = 'MPD'
+        artist = album = title = ''
+
+        try:
+            # We try because not all tracks have complete metadata fields:
+            try:    artist = client.currentsong()['artist']
+            except: pass
+            try:    album  = client.currentsong()['album']
+            except: pass
+            try:    title  = client.currentsong()['title']
+            except: pass
+            client.close()
+        except:
+            pass
+
+        return '{ "player":"' + player + '", "artist":"' + artist + \
+               '", "album":"' + album + '", "title":"' + title + '" }'
+
+    def stop():
+        if mpd_online:
+            client.stop()
+            return client.status()['state']
+    def pause():
+        if mpd_online:
+            client.pause()
+            return client.status()['state']
+    def play():
+        if mpd_online:
+            client.play()
+            return client.status()['state']
+    def next():
+        if mpd_online:
+            client.next()
+            return client.status()['state']
+    def previous():
+        if mpd_online:
+            client.previous()
+            return client.status()['state']
+    def state():
+        if mpd_online:
+            return client.status()['state']
+
+    client = mpd.MPDClient()
     try:
-        client = mpd.MPDClient()
         client.connect(mpd_host, mpd_port)
         if mpd_passwd:
             client.password(mpd_passwd)
-        # We try because not all tracks have complete metadata fields:
-        try:    artist = client.currentsong()['artist']
-        except: pass
-        try:    album  = client.currentsong()['album']
-        except: pass
-        try:    title  = client.currentsong()['title']
-        except: pass
-        client.close()
+        mpd_online = True
     except:
-        pass
+        mpd_online = False
 
-    return '{ "player":"' + player + '", "artist":"' + artist + \
-           '", "album":"' + album + '", "title":"' + title + '" }'
+    result =    { 'get_meta':   get_meta,
+                  'stop':       stop,
+                  'pause':      pause,
+                  'play':       play,
+                  'next':       next,
+                  'previous':   previous,
+                  'state':      state
+                }[query]()
+
+    return result
 
 def get_librespot_info():
     """ gets info from librespot """
@@ -59,31 +105,37 @@ def get_librespot_info():
     return '{ "player":"' + player + '", "artist":"' + artist + \
            '", "album":"' + album + '", "title":"' + title + '" }'
 
+def predic_source():
+    source = None
+    # It is possible to fail while state file is updating :-/
+    times = 4
+    while times:
+        try:
+            source = get_predic_state()['input']
+            break
+        except:
+            times -= 1
+        time.sleep(.25)
+    return source
+
 def get_current_playing():
     # Retrieve a dictionary with the current player info
     # {player: xxxx, artist: xxxx, album:xxxx, title:xxxx }
 
     player = artist = album = title = ''
+    source = predic_source()
 
-    # It is possible to fail while state file is updating :-/
-    times = 4
-    while times:
-        try:
-            listening = get_state()['input']
-            break
-        except:
-            times -= 1
-        time.sleep(.25)
-    if not times:
-        return '{ "player":"' + player + '", "artist":"' + artist + \
-               '", "album":"' + album + '", "title":"' + title + '" }'
-    
-    if listening == 'spotify':
+    if source == 'spotify':
         return get_librespot_info()
 
-    elif listening == 'mpd':
-        return get_mpd_info()
+    elif source == 'mpd':
+        return mpd_client('get_meta')
 
     else:
         return '{ "player":"' + player + '", "artist":"' + artist + \
                '", "album":"' + album + '", "title":"' + title + '" }'
+
+def control(action):
+    if predic_source() == 'mpd':
+        result = mpd_client(action)
+        return result.encode()
