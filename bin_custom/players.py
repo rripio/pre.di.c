@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-""" A module  to retrieve track info from the current player
+""" A module that controls and retrieve track info from the current player
 """
 import subprocess as sp
 import yaml
@@ -139,3 +139,9 @@ def control(action):
     if predic_source() == 'mpd':
         result = mpd_client(action)
         return result.encode()
+    elif predic_source() == 'spotify':
+        # WORK IN PROGRESS
+        pass
+    elif predic_source() == 'tdt':
+        # WORK IN PROGRESS
+        pass
