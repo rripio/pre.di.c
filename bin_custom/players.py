@@ -136,12 +136,21 @@ def get_current_playing():
                '", "album":"' + album + '", "title":"' + title + '" }'
 
 def control(action):
+    """ controls the playback """
+    result = ''
+
     if predic_source() == 'mpd':
         result = mpd_client(action)
-        return result.encode()
+
     elif predic_source() == 'spotify':
         # WORK IN PROGRESS
         pass
+    
     elif predic_source() == 'tdt':
         # WORK IN PROGRESS
         pass
+
+    if result:
+        return result.encode()
+    else:
+        return ''.encode()
