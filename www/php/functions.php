@@ -130,6 +130,9 @@
     elseif ( $command == "get_current_playing" ) {
         echo local_socket('get_current_playing');
     }
+    elseif ( substr( $command, 0, 7 ) === "player_" ) {
+        echo local_socket($command);
+    }
 
     // Comandos estandar para pre.di.c (devolvemos el resultado con el echo)
     else {
