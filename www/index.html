@@ -38,6 +38,8 @@
                   font-size:1.0em;
                   width: 50% }
 
+        table#player_info { width: 100%; text-align: left; }
+
         select  { font-size:1.0em;
                   font-weight:bold;
                   color:white;
@@ -154,19 +156,28 @@
         </div>
 
         <hr>
-        
+
+        <!-- Botones de control del player de la entrada -->
+        <div id="player_control" align="center" >
+            <button type="button" id="buttonPrevious" onmousedown="playerCtrl('previous')" >&lt;|           </button>
+            <button type="button" id="buttonStop"     onmousedown="playerCtrl('stop')"     >&nbsp;[]&nbsp;  </button>
+            <button type="button" id="buttonPause"    onmousedown="playerCtrl('pause')"    >&nbsp;||&nbsp;  </button>
+            <button type="button" id="buttonPlay"     onmousedown="playerCtrl('play')"     >&nbsp;&gt;&nbsp;</button>
+            <button type="button" id="buttonNext"     onmousedown="playerCtrl('next')"     >|&gt;           </button>
+        </div>
+
         <!-- Sección informativa del player en curso (vacía si no se recibe respueta a las consultas) -->
-        <div id="player_info">
-            <p id="player"></p>
-            <hr>
-            <p id="artist"></p>
-            <p id="album"></p>
-            <p id="title"></p>
+        <div style="overflow-x:auto;">
+            <table id="player_info" >
+                <tr><td id="artist" ></td></tr>
+                <tr><td id="album"  ></td></tr>
+                <tr><td id="title"  ></td></tr>
+            </table>
         </div>
 
         <!--Botón para probar funciones JS con onclick
         <div align="right">
-            <button type="button"                 onclick="newCosa()" >PBA</button>
+            <button type="button"                 onclick="playerCtrl('state')" >PBA</button>
         </div>
         -->
 
