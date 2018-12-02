@@ -57,6 +57,45 @@ function update_ampli_switch() {
     document.getElementById("onoffSelector").value = ampliStatus;
 }
 
+// Controla el player en curso
+function playerCtrl(action) {
+    var myREQ = new XMLHttpRequest();
+    myREQ.open("GET", "php/functions.php?command=player_" + action, async=true);
+    myREQ.send();
+}
+
+// Auxiliar para el autoupdate: actualiza los botones playerCtrl
+// (!) async=false NO es recomendable, pero si no no obtengo la response :-?
+function update_player_controls() {
+    var myREQ = new XMLHttpRequest();
+    var playerState = '';
+    myREQ.open("GET", "php/functions.php?command=player_state", async=false);
+    myREQ.send();
+    playerState = myREQ.responseText.replace('\n','')
+    if        ( playerState == 'stop' ) {
+        document.getElementById("buttonStop").style.background  = "rgb(185, 185, 185)";
+        document.getElementById("buttonStop").style.color       = "white";
+        document.getElementById("buttonPause").style.background = "rgb(100, 100, 100)";
+        document.getElementById("buttonPause").style.color      = "lightgray";
+        document.getElementById("buttonPlay").style.background  = "rgb(100, 100, 100)";
+        document.getElementById("buttonPlay").style.color       = "lightgray";
+    } else if ( playerState == 'pause' ){
+        document.getElementById("buttonStop").style.background  = "rgb(100, 100, 100)";
+        document.getElementById("buttonStop").style.color       = "lightgray";
+        document.getElementById("buttonPause").style.background = "rgb(185, 185, 185)";
+        document.getElementById("buttonPause").style.color      = "white";
+        document.getElementById("buttonPlay").style.background  = "rgb(100, 100, 100)";
+        document.getElementById("buttonPlay").style.color       = "lightgray";
+    } else if ( playerState == 'play' ) {
+        document.getElementById("buttonStop").style.background  = "rgb(100, 100, 100)";
+        document.getElementById("buttonStop").style.color       = "lightgray";
+        document.getElementById("buttonPause").style.background = "rgb(100, 100, 100)";
+        document.getElementById("buttonPause").style.color      = "lightgray";
+        document.getElementById("buttonPlay").style.background  = "rgb(185, 185, 185)";
+        document.getElementById("buttonPlay").style.color       = "white";
+    }
+}
+
 // Auxiliar para rellenar los campos 'player_info'
 // (!) async=false NO es recomendable, pero si no no obtengo la response :-?
 function update_player_info() {
@@ -70,7 +109,8 @@ function update_player_info() {
     var artist = dicci['artist'];
     var album  = dicci['album'];
     var title  = dicci['title'];
-    document.getElementById("player").innerText = player + ':';
+    // El 'player' es redundante, ya lo indica la 'input'
+    // document.getElementById("player").innerText = player + ':';
     document.getElementById("artist").innerText = artist;
     document.getElementById("album").innerText = album;
     document.getElementById("title").innerText = title;
@@ -169,6 +209,9 @@ function page_update(status) {
     
     // Actualiza los campos "player_info"
     update_player_info()
+
+    // Actualiza los campos "player_info"
+    update_player_controls()
 
 }
 
