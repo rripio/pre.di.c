@@ -1,14 +1,17 @@
 /*
- * Para debug podemos printar en la consola del navegador: console.log(miVariable);
- * ***  OJO CONVIENE NO DEJAR NINGUN console.log activo porque gasta recursos
- * ***  y la respuesta de las botoneras se verá afectada.
+ * debug trick: console.log(something);
+ * NOTICE: remember do not leaving any console.log actives
 */
 
-/////////////   VARIABLES GLOBALES
-ecasound_is_used = check_if_ecasound();        // Boolean que indica si pre.di.c usa Ecasound:
-auto_update_interval = 3000;                // Intervalo de auto update en milisegundos:
+// TO REVIEW: At some http request we use sync=false, this is not recommended
+//            but this way we get the answer.
+//            Maybe it is better to use onreadystatechange as per in get_predic_status()
 
-// Devuelve true si pre.di.c usa Ecasound, o sea: load_ecasound = True en config/config.yml
+/////////////   GLOBALS
+ecasound_is_used = check_if_ecasound();     // Boolean indicates if pre.di.c uses Ecasound
+auto_update_interval = 3000;                // Auto-update interval millisec
+
+// true if 'load_ecasound = True' inside 'config/config.yml'
 function check_if_ecasound() {
     var config  = get_file('config');
     var lines   = config.split('\n');
@@ -25,29 +28,28 @@ function check_if_ecasound() {
     return result
 }
 
-// Función llamada por los eventos de la peich que ordenan algún cambio a pre.di.c
+// Used from buttons
 function predic_cmd(cmd, update=true) {
-    // Envia el comando 'cmd' a pre.di.c a través del código PHP del server:
+    // Sends the command to pre.di.c through by the server's PHP:
     // https://www.w3schools.com/js/js_ajax_http.asp
     var myREQ = new XMLHttpRequest();
     myREQ.open("GET", "php/functions.php?command=" +  cmd, true);
     myREQ.send();
 
-    // Y actualizamos el nuevo estado en la página
+    // Then update the web page
     if (update) {
         get_predic_status();
     }
 }
 
-// Controla el ampli
+// Amplifier control
 function ampli(mode) {
     var myREQ = new XMLHttpRequest();
     myREQ.open("GET", "php/functions.php?command=ampli" + mode, async=true);
     myREQ.send();
 }
 
-// Auxiliar para el autoupdate: actualiza el switch del ampli tras consultarlo al server
-// (!) async=false NO es recomendable, pero si no no obtengo la response :-?
+// Queries the amplifier switch remote state
 function update_ampli_switch() {
     var myREQ = new XMLHttpRequest();
     var ampliStatus = '';
@@ -57,15 +59,14 @@ function update_ampli_switch() {
     document.getElementById("onoffSelector").value = ampliStatus;
 }
 
-// Controla el player en curso
+// Controls the current player
 function playerCtrl(action) {
     var myREQ = new XMLHttpRequest();
     myREQ.open("GET", "php/functions.php?command=player_" + action, async=true);
     myREQ.send();
 }
 
-// Auxiliar para el autoupdate: actualiza los botones playerCtrl
-// (!) async=false NO es recomendable, pero si no no obtengo la response :-?
+// Updates the player control buttons
 function update_player_controls() {
     var myREQ = new XMLHttpRequest();
     var playerState = '';
@@ -96,8 +97,7 @@ function update_player_controls() {
     }
 }
 
-// Auxiliar para rellenar los campos 'player_info'
-// (!) async=false NO es recomendable, pero si no no obtengo la response :-?
+// Shows the playing info metadata
 function update_player_info() {
     var myREQ = new XMLHttpRequest();
     var tmp = '';
@@ -116,10 +116,10 @@ function update_player_info() {
     document.getElementById("title").innerText = title;
 }
 
-// Inicializa le peich incluyendo su auto-update
+// Initializes the web page, then starts the auto-update
 function page_initiate() {
 
-    // Completamos los selectore de inputs, XO, DRC y PEQ
+    // Filling the selectors: inputs, XO, DRC and PEQ
     fills_inputs_selector()
     fills_xo_selector()
     fills_drc_selector()
@@ -128,60 +128,59 @@ function page_initiate() {
         fills_peq_selector();  
     }
 
-    // Cabecera de la peich
+    // Web header shows the loudspeaker name
     document.getElementById("cabecera").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
 
-    // Inicializamos la peich con el estado de pre.di.c
+    // The pre.di.c status
     get_predic_status();
-    // Esperamos 1 s y  programamos el auto-update como tal, cada 3 s:
-    // (OjO la llamada a la función en el setInterval va SIN paréntesis)
+
+    // Waits 1 sec, then schedules the auto-update itself:
+    // Notice: the function call inside setInterval uses NO brackets)
     setTimeout( setInterval( get_predic_status, auto_update_interval ), 1000);
 }
 
-// Obtiene el estado de pre.di.c hablando con el PHP del server
+// Gets the pre.di.c status
 function get_predic_status() {
     // https://www.w3schools.com/js/js_ajax_http.asp
 
-    // Prepara una instancia HttpRequest
     var myREQ = new XMLHttpRequest();
 
-    // Dispara una acción cuando se haya completado el HttpRequest,
-    // nosotros actualizaremos la peich con la respuesta del server.
+    // Will trigger an action when HttpRequest has completed: page_update
     myREQ.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             page_update(this.responseText);
         }
     };
 
-    // Ejecuta la transacción HttpRequest
+    // the http request:
     myREQ.open(method="GET", url="php/functions.php?command=status", async=true);
     myREQ.send();
 }
 
-// Vuelca el estado de pre.dic.c en la peich
+// Dumps pre.di.c status into the web page
 function page_update(status) {
 
-    // Tabla de LEVEL y BALANCE
+    // LEVEL y BALANCE
     document.getElementById("status_LEV").innerHTML = 'LEVEL: '   + status_decode(status, 'level');
     document.getElementById("status_BAL").innerHTML = 'balance: ' + status_decode(status, 'balance');
 
-    // Texto que acompaña a los botones de Tonos
+    // Tone buttons
     document.getElementById("bassInfo").innerText   = 'BASS: '    + status_decode(status, 'bass');
     document.getElementById("trebleInfo").innerText = 'TREB: '    + status_decode(status, 'treble');
 
-    // Elemento seleccionado en los selectores de INPUTS, XO, DRC y peq
+    // The selected item on INPUTS, XO, DRC and PEQ
     document.getElementById("inputsSelector").value =               status_decode(status, 'input');
     document.getElementById("xoSelector").value     =               status_decode(status, 'XO_set');
     document.getElementById("drcSelector").value    =               status_decode(status, 'DRC_set');
     if ( ecasound_is_used == true){
         document.getElementById("peqSelector").value    =           status_decode(status, 'PEQ_set');
     }
-    // Rótulo de los botones MUTE, MONO, LOUDNESS en lowercase si están desactivados
+    // MUTE, MONO, LOUDNESS buttons text lower case if deactivated
     document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
     document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
     document.getElementById("buttonLoud").innerHTML = OnOff( 'loud', status_decode(status, 'loudness_track') );
 
-    // Destacamos los botones que están activados
+    // Highlights activated buttons
     if ( status_decode(status, 'muted') == 'true' ) {
         document.getElementById("buttonMute").style.background = "rgb(185, 185, 185)";
         document.getElementById("buttonMute").style.color = "white";
@@ -204,20 +203,18 @@ function page_update(status) {
         document.getElementById("buttonLoud").style.color = "lightgray";
     }
 
-    // Actualizamos el switch del ampli
+    // Updates the amplifier switch
     update_ampli_switch()
     
-    // Actualiza los campos "player_info"
+    // Updates metadata player info
     update_player_info()
 
-    // Actualiza los campos "player_info"
+    // Highlights player controls when activated
     update_player_controls()
 
 }
 
-// Auxiliar ortopédico para pedir ciertos archivos al servidor PHP
-// (!) async=false NO es recomendable, pero esto sólo se ejecuta al inicio
-//     y de esta forma llega lo que tiene que llegar ;-)
+// Geeting files from server
 function get_file(fid) {
     var phpCmd   = "";
     var response = "todavia_sin_respuesta";
@@ -239,10 +236,10 @@ function get_file(fid) {
     return (myREQ.responseText);
 }
 
-// Averigua el valor de una de las propiedades del chorizo status de pre.di.c
+// Decodes the value from some pre.di.c parameter inside the pre.di.c status stream
 function status_decode(status, prop) {
     var result = "";
-    arr = status.split("\n"); // Las parejas 'propiedad:valor' vienen separadas por saltos de línea
+    arr = status.split("\n"); // the tuples 'parameter:value' comes sparated by line breaks
     for ( i in arr ) {
         if ( prop == arr[i].split(":")[0] ) {
             result = arr[i].split(":")[1]
@@ -251,7 +248,7 @@ function status_decode(status, prop) {
     return String(result).trim();
 }
 
-// Auxiliar para rotular propiedades como por ejemplo muted:true/false ==> 'MUTE' / 'mute'
+// Upper cases some button labels, e.g. muted:true/false ==> 'MUTE' / 'mute'
 function OnOff(prop, truefalse) {
     var label = '';
     label = prop.toLowerCase()
@@ -259,12 +256,11 @@ function OnOff(prop, truefalse) {
     return label;
 }
 
-// Prepara el selector de entradas
+// Fills out the inputs selector
 function fills_inputs_selector() {
     var inputs = [];
 
-    // Leemos el contenido de "config/inputs.yml"
-    // y a falta de un decodificador YAML, lo analizamos a pedales
+    // reads "config/inputs.yml" and custom YAML decoding
     var arr = get_file('inputs').split('\n')
     for ( i in arr) {
         if ( (arr[i].substr(-1)==":") && (arr[i].substr(0,1)!=" ") ) {
@@ -272,7 +268,7 @@ function fills_inputs_selector() {
         }
     }
 
-    // Ahora rellenamos el selector de entradas de la peich con las encontradas
+    // Filling the options in the inputs selector
     // https://www.w3schools.com/jsref/met_select_add.asp
     var x = document.getElementById("inputsSelector");
     for ( i in inputs) {
@@ -287,7 +283,7 @@ function fills_inputs_selector() {
     
 }
 
-// Prepara el selector de XO
+// XO selector
 function fills_xo_selector() {
     var xo_sets = get_speaker_prop_sets('XO');
     var x = document.getElementById("xoSelector");
@@ -298,7 +294,7 @@ function fills_xo_selector() {
     }
 }
 
-// Prepara el selector de DRC
+// DRC selector
 function fills_drc_selector() {
     var drc_sets = get_speaker_prop_sets('DRC');
     var x = document.getElementById("drcSelector");
@@ -309,22 +305,22 @@ function fills_drc_selector() {
     }
 }
 
-// Inserta el selector de PEQ ( usado si pre.di.c usa Ecasound )
+// Inserts the PEQ selector if Ecasound is used
 function insert_peq_selector(){
 
-    // definimos el nuevo selector
+    // definines the selector
     var nuevoSelector = document.createElement("select");
     nuevoSelector.setAttribute("id", "peqSelector");
     nuevoSelector.setAttribute("onchange", "predic_cmd('peq ' + this.value, update=false)" );
 
-    // Y lo añadimos en el sitio previsto
+    // Appends it
     var element = document.getElementById("span_peq");
-    // También le añadimos el rótulo 'PEQ:' por delante, como los otros selectores
+    // And label it with 'PEQ:'
     element.innerHTML = 'PEQ:';
     element.appendChild(nuevoSelector);
 }
 
-// Prepara el selector de PEQ
+// PEQ selector
 function fills_peq_selector() {
     var peq_sets = get_speaker_prop('PEQ');
     var x = document.getElementById("peqSelector");
@@ -335,8 +331,8 @@ function fills_peq_selector() {
     }
 }
 
-// Obtiene el nombre del altavoz
-// (nota: ahora php ya lo conoce se lo podríamos preguntar pero esto lo hice antes)
+// Gets the current loudspeaker
+// (recently the php server knows it, but this was done before)
 function get_loudspeaker() {
     var result = '';
     var config = get_file('config');
@@ -350,12 +346,12 @@ function get_loudspeaker() {
     return result;
 }
 
-// Obtiene la lista con los 'sets:' declarados en una propiedad del altavoz, por ej 'XO:' o 'DRC:'
+// Gets the sets defined into XO or DRC (speaker.yml)
 function get_speaker_prop_sets(prop) {
     var prop_sets = [];
     var yaml = get_file('speaker');
 
-    // yaml es un YAML, lo suyo sería usar un parser pero vamos a hacerlo a manubrio:
+    // custom YAML decoder
     var arr = yaml.split("\n");
     var dentroDeProp = false, dentroDeSets = false, indentOfSets = 0;
     for (i in arr) {
@@ -382,12 +378,12 @@ function get_speaker_prop_sets(prop) {
     return (prop_sets);
 }
 
-// Como arriba, pero para una propiedad sin sección sets, como por ejemplo PEQ.
+// Gets the options from some speaker property, e.g. from PEQ.
 function get_speaker_prop(prop) {
     var opcs = [];
     var yaml = get_file('speaker');
 
-    // yaml es un YAML, lo suyo sería usar un parser pero vamos a hacerlo a manubrio:
+    // custom YAML decoder
     var arr = yaml.split("\n");
     var dentroDeProp = false;
     for (i in arr) {
@@ -410,8 +406,7 @@ function get_speaker_prop(prop) {
     return (opcs);
 }
 
-// Auxiliar para averiguar el nivel de indentación de una linea de código,
-// por ejemplo de una linea de un archivo YAML.
+// Aux function that retrieves the indentation level of some code line, i.e. inside an YAML file.
 function indentLevel(linea) {
     var level = 0;
     for ( i in linea ) {
