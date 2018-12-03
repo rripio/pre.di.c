@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 """
     Starts the server_aux.py for some tasks as amplifier switch on/off and players management
     
