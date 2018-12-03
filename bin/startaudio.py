@@ -202,18 +202,23 @@ def init_inputs():
     """restore selected input as stored in state.ini"""
 
     input = gc.state['input']
-    print('\n(startaudio) restoring input: ' + gc.state['input'])
+    print(f'\n(startaudio) restoring input: {input}')
     # exit if input is 'none'
-    if input == 'none': return
+    if input == 'none':
+        return
     # wait for input ports to be up
     ports = pd.gc.inputs[input]['in_ports']
     jc = jack.Client('tmp')
     # lets try 20 times to connect to input ports
     loops = 20
     while loops:
+        channels = ('L','R')
+        n = len(channels)
         for port_name in ports:
-            while not jc.get_ports(port_name): pass
-        break
+            if jc.get_ports(port_name):
+                n -=1
+        if n == 0:
+            break
         time.sleep(gc.config['command_delay'] * 0.5)
         loops -= 1
     if loops:
@@ -221,7 +226,7 @@ def init_inputs():
         pd.client_socket('input ' + gc.state['input'], quiet=True)
     else:
         # input ports are down :-(
-        print(f'\n(startaudio) error restoring input "{input}"'
+        print(f'\n(startaudio) time out restoring input \'{input}\''
                                         ', ports not available')
 
 
