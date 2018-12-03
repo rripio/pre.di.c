@@ -30,6 +30,7 @@ import sys
 import time
 import math as m
 from subprocess import Popen
+import threading
 
 import mpd
 
@@ -95,37 +96,35 @@ def set_mpd_vol_loop(gain):
 
 
 def start():
-    """loads mpd"""
+    """loads mpd and jack loop"""
 
     # create jack loop for connections
-    pd.jack_loop('mpd_loop')
-    time.sleep(gc.config['command_delay'])
-    print('starting mpd')
-    command = f'{mpd_path} {mpd_options}'
-    pd.start_pid(command, mpd_alias)
-#    p = Popen([mpd_path] + mpd_options.split())
-    time.sleep(gc.config['command_delay'])
-    # volume linked to mpd (optional)
+    jloop = threading.Thread( target = pd.jack_loop, args=('mpd_loop',) )
+    jloop.start()
+
+    # starts MPD
+    print('(mpd_load.py) starting mpd')
+    mpd_command = f'{mpd_path} {mpd_options}'
+    pd.start_pid(mpd_command, mpd_alias)
+
+    # volume linked to mpd (optional)  # THIS MUST BE REVIEWED
     if mpd_volume_linked:
-        print('waiting for mpd')
+        print('(mpd_load.py) waiting for mpd')
         if  pd.wait4result('pgrep -l mpd', 'mpd', tmax=10, quiet=True):
-            print('mpd started :-)')
+            print('(mpd_load.py) mpd started :-)')
         else:
-            print('error detecting mpd, client_mpd'
+            print('(mpd_load.py) error detecting mpd, client_mpd'
                                                 ' won\'t start')
-#        try:
+        try:
             c = connect_mpd('localhost', 6600)
             c.timeout = 10
             c.idletimeout = None
             set_predic_vol_loop(c)
             c.close()
             c.disconnect()
-#        except:
-#            print("mpd socket loop broke")
-    else:
-        # wait forever to keep jack loop active
-        while True:
-            time.sleep(10)
+        except:
+            print('(mpd_load.py) mpd socket loop broke')
+
 
 
 def stop():
