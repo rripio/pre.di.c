@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-""" librespot.py   start | stop
+""" Launch 'librespot', a Spotify Connect player client
+    
+    use:    librespot.py   start | stop
 """
 
 import sys
