@@ -7,9 +7,11 @@
 //            but this way we get the answer.
 //            Maybe it is better to use onreadystatechange as per in refresh_predic_status()
 
+
 /////////////   GLOBALS //////////////
 ecasound_is_used = check_if_ecasound();     // Boolean indicates if pre.di.c uses Ecasound
 auto_update_interval = 3000;                // Auto-update interval millisec
+
 
 // Returns boolen as per 'load_ecasound = True|False' inside 'config/config.yml'
 function check_if_ecasound() {
