@@ -41,8 +41,8 @@ def process(data):
             return b'error'
 
     # Query the current music player
-    elif data == 'get_current_playing':
-        return players.get_current_playing().encode()
+    elif data == 'player_get_meta':
+        return players.get_meta().encode()
     elif data == 'player_state':
         return players.control('state')
     elif data == 'player_stop':
