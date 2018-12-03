@@ -8,7 +8,7 @@
 # This server is secured by allowing only certain orders
 # to be translated to actual local commands.
 #####################
-LISTENING_PORT = 9998
+LISTENING_PORT = 9988
 #####################
 
 import socket
