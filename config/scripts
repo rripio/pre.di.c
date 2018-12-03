@@ -2,5 +2,5 @@ mpd_load.py
 #DVB.py
 #netjack.py
 alsa_loop_load.py   # Sets up alsa_loop ports in jack to be used from ALSA backended players
-server_local.py     # A server to execute local tasks as switching the amplifier
-                    # and getting metadata from players
+server_aux.py       # A server for tasks as switching the amplifier and getting metadata from players
+librespot.py        # A Spotify Connect player client
