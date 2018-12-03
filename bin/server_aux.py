@@ -74,7 +74,7 @@ def server_socket(host, port):
     try:
         s.bind((host, port))
     except:
-        print('(server_local) Error binding port', port)
+        print('(server_aux) Error binding port', port)
         s.close()
         sys.exit(-1)
 
@@ -96,12 +96,12 @@ if __name__ == '__main__':
         # listen ports
         fsocket.listen(10)  # number of connections in queue
         if verbose:
-            print('(server_local) listening on \'localhost\':9988')
+            print('(server_aux) listening on \'localhost\':9988')
         # accept client connection
         sc, addr = fsocket.accept()
         # somo info
         if verbose:
-            print(f'(server_local) connected to client {addr[0]}')
+            print(f'(server_aux) connected to client {addr[0]}')
         # buffer loop to proccess received command
         while True:
         # reception
@@ -109,7 +109,7 @@ if __name__ == '__main__':
             if not data:
                 # nothing in buffer, client has disconnected too soon
                 if verbose:
-                    print('(server_local) client disconnected. '
+                    print('(server_aux) client disconnected. '
                                            'Closing connection...')
                 sc.close()
                 break
@@ -121,13 +121,13 @@ if __name__ == '__main__':
             elif data.rstrip('\r\n') == 'quit':
                 sc.send(b'OK\n')
                 if verbose:
-                    print('(server_local) closing connection...')
+                    print('(server_aux) closing connection...')
                 sc.close()
                 break
             elif data.rstrip('\r\n') == 'shutdown':
                 sc.send(b'OK\n')
                 if verbose:
-                    print('(server_local) closing connection...')
+                    print('(server_aux) closing connection...')
                 sc.close()
                 fsocket.close()
                 sys.exit(1)
@@ -143,7 +143,7 @@ if __name__ == '__main__':
                     sc.send( b'ACK\n' )
 
                 if verbose:
-                    print(f'(server_local) connected to client {addr[0]}')
+                    print(f'(server_aux) connected to client {addr[0]}')
 
             # wait a bit, loop again
             time.sleep(0.01)
