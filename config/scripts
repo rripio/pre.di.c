@@ -1,4 +1,4 @@
-mpd_load.py # Don't name this mpd.py since it coold interfere with mpd module
+mpd_load.py # Don't name this mpd.py since it could interfere with mpd module
 DVB.py
 netjack.py
 alsa_loop_load.py # Sets up alsa_loop ports in jack to be used from ALSA players
