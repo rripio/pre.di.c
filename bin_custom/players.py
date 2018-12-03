@@ -95,7 +95,8 @@ def get_librespot_info():
     artist = album = title = ''
 
     try:
-        # Returns the current track played by librespot when redirected to ~/tmp/.librespotEvents
+        # Returns the current track title played by librespot.
+        # <scripts/librespot.py> handles the libresport print outs to be redirected to <~/tmp/.librespotEvents>
         tmp = sp.check_output( 'tail -n1 /home/predic/tmp/.librespotEvents'.split() )
         title  = tmp.decode().split('"')[-2]
         # JSON for JavaScript on control web page, NOTICE json requires double quotes:
