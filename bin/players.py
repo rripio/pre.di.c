@@ -13,12 +13,15 @@ mpd_port    = 6600
 mpd_passwd  = None
 
 def get_predic_state():
+    """ returns the YAML pre.di.c's status info """
+
     f = open('/home/predic/config/state.yml', 'r')
     tmp = f.read()
     f.close()
     return yaml.load(tmp)
 
 def mpd_client(query):
+    """ comuticates to MPD music player daemon """
 
     def get_meta():
         """ gets info from mpd """
@@ -85,8 +88,8 @@ def mpd_client(query):
 
     return result
 
-def get_librespot_info():
-    """ gets info from librespot """
+def get_librespot_meta():
+    """ gets metadata info from librespot """
     # Unfortunately librespot only prints out the title metadata, nor artist neither album.
     # More info can be retrieved from the spotify web, but it is necessary to register
     # for getting a privative and unique http request token for authentication.
@@ -107,6 +110,7 @@ def get_librespot_info():
            '", "album":"' + album + '", "title":"' + title + '" }'
 
 def predic_source():
+    """ retrieves the current input source """
     source = None
     # It is possible to fail while state file is updating :-/
     times = 4
@@ -119,15 +123,15 @@ def predic_source():
         time.sleep(.25)
     return source
 
-def get_current_playing():
-    # Retrieve a dictionary with the current player info
-    # {player: xxxx, artist: xxxx, album:xxxx, title:xxxx }
-
+def get_meta():
+    """ Retrieves a dictionary with the current track metadata
+        {player: xxxx, artist: xxxx, album:xxxx, title:xxxx }
+    """
     player = artist = album = title = ''
     source = predic_source()
 
     if source == 'spotify':
-        return get_librespot_info()
+        return get_librespot_meta()
 
     elif source == 'mpd':
         return mpd_client('get_meta')
@@ -146,7 +150,7 @@ def control(action):
     elif predic_source() == 'spotify':
         # WORK IN PROGRESS
         pass
-    
+
     elif predic_source() == 'tdt':
         # WORK IN PROGRESS
         pass
