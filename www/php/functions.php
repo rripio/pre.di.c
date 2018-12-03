@@ -62,8 +62,8 @@
         return $out;
     }
 
-    // Dialoga con el server TCP/IP 'server_local.py' que hace lo que se le pida =|:0
-    function local_socket ($cmd) {
+    // Dialoga con el server TCP/IP 'server_aux.py' que se ocupa de ciertas tareas auxiliares
+    function aux_socket ($cmd) {
         $service_port = 9988;
         $address = "localhost";
         /* Crear un socket TCP/IP */
@@ -103,7 +103,7 @@
 
     $command = $_REQUEST["command"];
 
-    // Comandos especiale;s:
+    // Comandos especiales:
     if ( $command == "read_inputs_file" ) {
         // OjO readfile proporciona un 'echo' del contenido del archivo, a saco.
         // Es decir: vuelca el contenido del archivo a la salida estandar de php.
@@ -119,19 +119,19 @@
     elseif ( $command == "amplion" ) {
         // El script remoto escribirá el estado del ampli en ~/.ampli
         // para posterior consulta en los updates de la peich
-        local_socket('ampli on');
+        aux_socket('ampli on');
     }
     elseif ( $command == "amplioff" ) {
-        local_socket('ampli off');
+        aux_socket('ampli off');
     }
     elseif ( $command == "amplistatus" ) {
         readfile("/home/predic/.ampli"); // php no puede acceder a /tmp por razones de seguridad
     }
     elseif ( $command == "get_current_playing" ) {
-        echo local_socket('get_current_playing');
+        echo aux_socket('get_current_playing');
     }
     elseif ( substr( $command, 0, 7 ) === "player_" ) {
-        echo local_socket($command);
+        echo aux_socket($command);
     }
 
     // Comandos estandar para pre.di.c (devolvemos el resultado con el echo)
