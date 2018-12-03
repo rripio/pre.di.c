@@ -5,13 +5,13 @@
 
 // TO REVIEW: At some http request we use sync=false, this is not recommended
 //            but this way we get the answer.
-//            Maybe it is better to use onreadystatechange as per in get_predic_status()
+//            Maybe it is better to use onreadystatechange as per in refresh_predic_status()
 
-/////////////   GLOBALS
+/////////////   GLOBALS //////////////
 ecasound_is_used = check_if_ecasound();     // Boolean indicates if pre.di.c uses Ecasound
 auto_update_interval = 3000;                // Auto-update interval millisec
 
-// true if 'load_ecasound = True' inside 'config/config.yml'
+// Returns boolen as per 'load_ecasound = True|False' inside 'config/config.yml'
 function check_if_ecasound() {
     var config  = get_file('config');
     var lines   = config.split('\n');
@@ -28,7 +28,7 @@ function check_if_ecasound() {
     return result
 }
 
-// Used from buttons
+// Used from buttons to send commands to pre.di.c
 function predic_cmd(cmd, update=true) {
     // Sends the command to pre.di.c through by the server's PHP:
     // https://www.w3schools.com/js/js_ajax_http.asp
@@ -38,7 +38,7 @@ function predic_cmd(cmd, update=true) {
 
     // Then update the web page
     if (update) {
-        get_predic_status();
+        refresh_predic_status();
     }
 }
 
@@ -66,7 +66,7 @@ function playerCtrl(action) {
     myREQ.send();
 }
 
-// Updates the player control buttons
+// Updates the player control buttons, hightlights the corresponding button to the playback state
 function update_player_controls() {
     var myREQ = new XMLHttpRequest();
     var playerState = '';
@@ -109,7 +109,7 @@ function update_player_info() {
     var artist = dicci['artist'];
     var album  = dicci['album'];
     var title  = dicci['title'];
-    // El 'player' es redundante, ya lo indica la 'input'
+    // 'player' info not anymore needed because equals to 'input' value
     // document.getElementById("player").innerText = player + ':';
     document.getElementById("artist").innerText = artist;
     document.getElementById("album").innerText = album;
@@ -131,16 +131,16 @@ function page_initiate() {
     // Web header shows the loudspeaker name
     document.getElementById("cabecera").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
 
-    // The pre.di.c status
-    get_predic_status();
+    // Queries the pre.di.c status and updates the page
+    refresh_predic_status();
 
     // Waits 1 sec, then schedules the auto-update itself:
     // Notice: the function call inside setInterval uses NO brackets)
-    setTimeout( setInterval( get_predic_status, auto_update_interval ), 1000);
+    setTimeout( setInterval( refresh_predic_status, auto_update_interval ), 1000);
 }
 
-// Gets the pre.di.c status
-function get_predic_status() {
+// Gets the pre.di.c status and updates the page
+function refresh_predic_status() {
     // https://www.w3schools.com/js/js_ajax_http.asp
 
     var myREQ = new XMLHttpRequest();
@@ -214,10 +214,10 @@ function page_update(status) {
 
 }
 
-// Geeting files from server
+// Getting files from server
 function get_file(fid) {
     var phpCmd   = "";
-    var response = "todavia_sin_respuesta";
+    var response = "still_no_answer";
     if      ( fid == 'inputs' ) {
         phpCmd = 'read_inputs_file';
     }
@@ -236,10 +236,10 @@ function get_file(fid) {
     return (myREQ.responseText);
 }
 
-// Decodes the value from some pre.di.c parameter inside the pre.di.c status stream
+// Decodes the value from a pre.di.c parameter inside the pre.di.c status stream
 function status_decode(status, prop) {
     var result = "";
-    arr = status.split("\n"); // the tuples 'parameter:value' comes sparated by line breaks
+    arr = status.split("\n"); // the tuples 'parameter:value' comes separated by line breaks
     for ( i in arr ) {
         if ( prop == arr[i].split(":")[0] ) {
             result = arr[i].split(":")[1]
@@ -248,7 +248,7 @@ function status_decode(status, prop) {
     return String(result).trim();
 }
 
-// Upper cases some button labels, e.g. muted:true/false ==> 'MUTE' / 'mute'
+// To upper-lower case button labels, e.g. muted:true/false ==> 'MUTE' / 'mute'
 function OnOff(prop, truefalse) {
     var label = '';
     label = prop.toLowerCase()
@@ -260,7 +260,7 @@ function OnOff(prop, truefalse) {
 function fills_inputs_selector() {
     var inputs = [];
 
-    // reads "config/inputs.yml" and custom YAML decoding
+    // Reads "config/inputs.yml" and custom YAML decoding
     var arr = get_file('inputs').split('\n')
     for ( i in arr) {
         if ( (arr[i].substr(-1)==":") && (arr[i].substr(0,1)!=" ") ) {
@@ -276,7 +276,8 @@ function fills_inputs_selector() {
         option.text = inputs[i];
         x.add(option);
     }    
-    // Y añadimos la entrada 'none' prevista en server_process que desconectará todo:
+
+    // And adds the input 'none' as intended into server_process that will disconnet all inputs
     var option = document.createElement("option");
     option.text = 'none';
     x.add(option);
@@ -308,7 +309,7 @@ function fills_drc_selector() {
 // Inserts the PEQ selector if Ecasound is used
 function insert_peq_selector(){
 
-    // definines the selector
+    // defines the selector
     var nuevoSelector = document.createElement("select");
     nuevoSelector.setAttribute("id", "peqSelector");
     nuevoSelector.setAttribute("onchange", "predic_cmd('peq ' + this.value, update=false)" );
@@ -346,7 +347,7 @@ function get_loudspeaker() {
     return result;
 }
 
-// Gets the sets defined into XO or DRC (speaker.yml)
+// Gets the sets defined into XO or DRC inside speaker.yml
 function get_speaker_prop_sets(prop) {
     var prop_sets = [];
     var yaml = get_file('speaker');
@@ -406,7 +407,7 @@ function get_speaker_prop(prop) {
     return (opcs);
 }
 
-// Aux function that retrieves the indentation level of some code line, i.e. inside an YAML file.
+// Aux function that retrieves the indentation level of some code line, useful for YAML decoding.
 function indentLevel(linea) {
     var level = 0;
     for ( i in linea ) {
