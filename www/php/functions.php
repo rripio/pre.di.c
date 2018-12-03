@@ -115,7 +115,7 @@
         echo aux_socket($command);
     }
 
-    // Standard pre.di.c commands
+    // Standard pre.di.c commands are forwarded to the server 
     else {
         echo predic_socket($command);
     }
