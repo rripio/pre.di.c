@@ -195,7 +195,7 @@ def init_state_settings():
         speaker,_,_ = gc.get_speaker()
         peqFile = speaker['PEQ'][peqSet]
         if peqFile != 'none':
-            peq_control.cargaPEQini( peqFile )
+            peq_control.loadPEQini( peqFile )
 
 
 def init_inputs():
