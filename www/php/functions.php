@@ -1,26 +1,10 @@
 <?php
 
-    /*
-     * Para depurar https://www.ibm.com/developerworks/library/os-debug/index.html
-     * En nuestro caso también podemos hacer aquí echo $miVariable, que será recibida por
-     * la función JS que haya hecho la http request en el cliente y printarlo allí en
-     * la consola del navegador con console.log(respuesta).
+    /*  Hidden server side php code.
+     *  PHP will response to the client via the standard php output (echo xxx, readfile(xx), etcetera)
      */
 
-    /* Este código PHP reside localmente en el server y no es visible desde el navegador.
-     * Este PHP sera cargado por Apache (si tiene enabled el php_mod),
-     * entonces se ESCUCHARAN HTTP_REQUEST como por ejemplo:
-     *     "GET", "php/functions.php?command=level -15"
-     * que son generadas por el JS del cliente.
-     *
-     * Las RESPUESTAS se devolverán mediante la salida estandar de este código,
-     * bien mediante 'echo xxxx' o bien mediante algunas funciones que vuelcan su resultado
-     * directamente a la salida estandar, como por ejemplo 'readfile()' -ver abajo-
-     */
-
-    // Este script debe conocer el nombre del altavoz running para acceder al path
-    // adecuado a la hora de proporcionar un archivo speaker.yml al cliente
-    // (he preferido que el código js del cliente no muestre paths del servidor)
+    // Retrieves the running loudspeaker on pre.di.c
     function get_loudspeaker() {
         $tmp = "";
         $cfile = fopen("/home/predic/config/config.yml", "r")
@@ -38,7 +22,7 @@
         return $tmp;
     }
 
-    // Dialoga con el server TCP/IP de pre.di.c
+    // Communicates to the pre.di.c TCP/IP server
     function predic_socket ($cmd) {
         $service_port = 9999;
         $address = "localhost";
@@ -62,8 +46,8 @@
         return $out;
     }
 
-    // Dialoga con el server TCP/IP 'server_local.py' que hace lo que se le pida =|:0
-    function local_socket ($cmd) {
+    // Communicates to the auxiliary tasks pre.di.c's TCP/IP server
+    function aux_socket ($cmd) {
         $service_port = 9988;
         $address = "localhost";
         /* Crear un socket TCP/IP */
@@ -86,26 +70,26 @@
         return $out;
     }
 
-    ///////////////////   MAIN: ///////////////////////
-    // Procesa el COMMAND recibido en la HTTPREQUEST
-    // y devuelve resultados mediante 'echo xxxxx'
-    ///////////////////////////////////////////////////
+    ///////////////////////////   MAIN: ///////////////////////////////
+    // listen to http request then returns results via standard output
+    ///////////////////////////////////////////////////////////////////
 
     /* http://php.net/manual/en/reserved.variables.request.php
-    * PHP server side recibe arrays asociativas, o sea diccionarios, mediante los métodos
-    * GET o PUT de las HTTPREQUEST originadas por un código del cliente, en nuestro caso
-    * es el JS cargado en el navegador que forma parte de la peich.
-    * La array es lo que el cliente pone detrás del interrogante, por ejemplo:
+    * PHP server side receives associative arrays, i.e. dictionaries, through by the 
+    * GET o PUT methods from the client side HTTPREQUEST (usually javascript).
+    * The array is what appears after 'php/functions.php?.......', example:
     *          "GET", "php/functions.php?command=level -15"
-    * Como es un array, debemos seleccionar la clave que nos interesa:
+    * Here the key 'command' has the value 'level -15'
     */
 
+    // lets read the key 'command'
     $command = $_REQUEST["command"];
 
-    // Comandos especiale;s:
+    //// SPECIAL commands:
+
+    // Reading config files
     if ( $command == "read_inputs_file" ) {
-        // OjO readfile proporciona un 'echo' del contenido del archivo, a saco.
-        // Es decir: vuelca el contenido del archivo a la salida estandar de php.
+        // notice: readfile() does an 'echo', i.e. it returns the contents to the standard php output
         readfile("/home/predic/config/inputs.yml");
     }
     elseif ( $command == "read_config_file" ) {
@@ -115,22 +99,28 @@
         $fpath = "/home/predic/loudspeakers/".get_loudspeaker()."/speaker.yml";
         readfile($fpath);
     }
+
+    // Amplifier switching
     elseif ( $command == "amplion" ) {
-        // local_server.py escribirá el estado del amplificador en ~/.ampliwww
-        // para posterior consulta en los updates de la peich
-        local_socket('ampli on');
+        // The remote script will store the amplifier state into
+        // ~/.ampli so that the web can update it.
+        aux_socket('ampli on');
     }
     elseif ( $command == "amplioff" ) {
-        local_socket('ampli off');
+        aux_socket('ampli off');
     }
     elseif ( $command == "amplistatus" ) {
-        readfile("/home/predic/.ampli"); // php no puede acceder a /tmp por razones de seguridad
+        readfile("/home/predic/.ampli"); // php cannot acces inside /tmp for securety reasons.
     }
 
-    // Comandos estandar para pre.di.c (devolvemos el resultado con el echo)
+    // Player related commands
+    elseif ( substr( $command, 0, 7 ) === "player_" ) {
+        echo aux_socket($command);
+    }
+
+    //// Any else will be an STANDARD pre.di.c command, then forwarded to pre.di.c's server
     else {
         echo predic_socket($command);
     }
 
 ?>
-
