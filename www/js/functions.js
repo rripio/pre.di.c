@@ -101,7 +101,7 @@ function update_player_controls() {
 function update_player_info() {
     var myREQ = new XMLHttpRequest();
     var tmp = '';
-    myREQ.open("GET", "php/functions.php?command=get_current_playing", async=false);
+    myREQ.open("GET", "php/functions.php?command=player_get_meta", async=false);
     myREQ.send();
     tmp = myREQ.responseText.replace('\n','');
     dicci = JSON.parse( tmp );
