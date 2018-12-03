@@ -30,7 +30,6 @@
     all: all of the above
 """
 
-#import time
 import sys
 import os
 from subprocess import Popen
