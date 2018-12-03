@@ -85,7 +85,9 @@
     // lets read the key 'command'
     $command = $_REQUEST["command"];
 
-    // Special commands:
+    //// SPECIAL commands:
+
+    // Reading config files
     if ( $command == "read_inputs_file" ) {
         // notice: readfile() does an 'echo', i.e. it returns the contents to the standard php output
         readfile("/home/predic/config/inputs.yml");
@@ -97,6 +99,8 @@
         $fpath = "/home/predic/loudspeakers/".get_loudspeaker()."/speaker.yml";
         readfile($fpath);
     }
+
+    // Amplifier switching
     elseif ( $command == "amplion" ) {
         // The remote script will store the amplifier state into
         // ~/.ampli so that the web can update it.
@@ -108,14 +112,13 @@
     elseif ( $command == "amplistatus" ) {
         readfile("/home/predic/.ampli"); // php cannot acces inside /tmp for securety reasons.
     }
-    elseif ( $command == "get_current_playing" ) {
-        echo aux_socket('get_current_playing');
-    }
+
+    // Player related commands
     elseif ( substr( $command, 0, 7 ) === "player_" ) {
         echo aux_socket($command);
     }
 
-    // Standard pre.di.c commands are forwarded to the server 
+    //// Any else will be an STANDARD pre.di.c command, then forwarded to pre.di.c's server
     else {
         echo predic_socket($command);
     }
