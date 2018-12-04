@@ -160,9 +160,9 @@ fi
 #########################################################
 # restoring FIFOs
 #########################################################
-echo "(i) Making fifos for mplayer"
+echo "(i) Making fifos for mplayer services: dvb and cdda"
 rm -f *fifo
-mkfifo tdt_fifo
+mkfifo dvb_fifo
 mkfifo cdda_fifo
 
 #########################################################
