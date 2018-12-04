@@ -112,7 +112,7 @@ def change_radio(new_radiopreset, state=state):
 
 def start():
 
-    # 1. Prepare a jack loop where MPD outputs can connect.
+    # 1. Prepare a jack loop where DVB outputs can connect.
     #    The jack_loop module will keep the loop alive, so we need to thread it.
     jloop = threading.Thread( target = pd.jack_loop, args=('dvb_loop',) )
     jloop.start()
