@@ -1,12 +1,33 @@
 /*
- * debug trick: console.log(something);
- * NOTICE: remember do not leaving any console.log actives
+Copyright (c) 2018 Rafael Sánchez
+This file is part of pre.di.c
+pre.di.c, a preamp and digital crossover
+Copyright (C) 2018 Roberto Ripio
+pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
+Copyright (c) 2006-2011 Roberto Ripio
+Copyright (c) 2011-2016 Alberto Miguélez
+Copyright (c) 2016-2018 Rafael Sánchez
+pre.di.c is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+pre.di.c is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 */
 
-// TO REVIEW: At some http request we use sync=false, this is not recommended
-//            but this way we get the answer.
-//            Maybe it is better to use onreadystatechange as per in refresh_predic_status()
+/*
+   debug trick: console.log(something);
+   NOTICE: remember do not leaving any console.log actives
+*/
 
+/* TO REVIEW: At some http request we use sync=false, this is not recommended
+              but this way we get the answer.
+              Maybe it is better to use onreadystatechange as per in refresh_predic_status()
+*/
 
 /////////////   GLOBALS //////////////
 ecasound_is_used = check_if_ecasound();     // Boolean indicates if pre.di.c uses Ecasound
