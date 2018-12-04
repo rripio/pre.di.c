@@ -121,10 +121,6 @@ def start():
     opts = f'{options} -idle -slave -profile dvb -input file={dvb_fifo}'
     command = f'{mplayer_path} {opts}'
     pd.start_pid(command, program_alias)
-    # wait forever to keep jack loop active
-    while True:
-        time.sleep(10)
-
 
 def stop():
 
