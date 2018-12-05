@@ -32,7 +32,7 @@ rm $branch.zip
 rm -r pre.di.c-$branch
 
 # Downloads the zip
-wget https://github.com/rsantct/pre.di.c/archive/$branch.zip
+wget https://github.com/"$reposite"/pre.di.c/archive/"$branch".zip
 
 # Unzip
 unzip $branch.zip
