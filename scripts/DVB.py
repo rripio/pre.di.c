@@ -29,6 +29,7 @@ import sys
 import os
 import time
 from subprocess import Popen
+import threading
 
 import basepaths as bp
 import getconfigs as gc
@@ -111,15 +112,15 @@ def change_radio(new_radiopreset, state=state):
 
 def start():
 
-    pd.jack_loop('dvb_loop')
-    # Mplayer DVB:
+    # 1. Prepare a jack loop where DVB outputs can connect.
+    #    The jack_loop module will keep the loop alive, so we need to thread it.
+    jloop = threading.Thread( target = pd.jack_loop, args=('dvb_loop',) )
+    jloop.start()
+    
+    # 2. Mplayer DVB:
     opts = f'{options} -idle -slave -profile dvb -input file={dvb_fifo}'
     command = f'{mplayer_path} {opts}'
     pd.start_pid(command, program_alias)
-    # wait forever to keep jack loop active
-    while True:
-        time.sleep(10)
-
 
 def stop():
 
