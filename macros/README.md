@@ -6,11 +6,13 @@ N determines the position into the web macros key pad.
 
 For example
 
+```
 $ ls -1 macros/
 1_Radio 1
 2_R. Clasica
 6_flat sound
-README
+README.md
+```
 
 Will be show the following key pad layout:
 
