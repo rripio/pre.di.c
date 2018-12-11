@@ -1,31 +1,27 @@
 <!DOCTYPE html>
 <html>
-
+    
 <!--
 Copyright (c) 2018 Rafael Sánchez
 This file is part of pre.di.c
 pre.di.c, a preamp and digital crossover
 Copyright (C) 2018 Roberto Ripio
-
 pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
 Copyright (c) 2006-2011 Roberto Ripio
 Copyright (c) 2011-2016 Alberto Miguélez
 Copyright (c) 2016-2018 Rafael Sánchez
-
 pre.di.c is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
 pre.di.c is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
 You should have received a copy of the GNU General Public License
 along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 -->
-
+    
 <head>
     <title>pre.di.c</title>
 
@@ -49,26 +45,43 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
         body    { color:white;
                   background-color: rgb(38, 38, 38);
                   font-family: Verdana, Helvetica, Arial;
-                  font-weight:bold; }
+                  font-weight:bold;
+                }
 
         button  { background-color: rgb(100, 100, 100);
                   color: white;
                   font-weight:bold;
                   font-size:1.0em;
-                  border-radius: 15%; }
+                  border-radius: 5px/5px;
+                  border:2px solid rgb(120,120,120);
+                }
 
         th, td  { padding: 5px;
                   text-align: center;
                   border: 1px solid gray;
                   font-size:1.0em;
-                  width: 50% }
+                  width: 50%
+                }
 
-        table#player_info { width: 100%; text-align: left; }
+        table#player_info   { width: 100%; text-align: left;
+                            }
 
         select  { font-size:1.0em;
                   font-weight:bold;
                   color:white;
-                  background-color: rgb(25, 25, 25);}
+                  background-color: rgb(25, 25, 25);
+                }
+
+        .buttons_table  {   width: 100%; border-style: none;
+                        }
+        .button_cell    {   width: 33%; border-style: none;
+                        }        
+        .custom_buttons {   width: 100%;
+                            font-size:1.2em;
+                            box-shadow: 0 5px 10px 0 rgba(200,200,200,0.3), 0 3px 10px 0 rgba(0,0,0,0.1);
+                            border:2px solid rgb(120,120,120);
+                            border-radius: 10px/10px;
+                        }
 
     </style>
 
@@ -92,11 +105,15 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
                   DRC: << selector >>
 
                      [-3][-1][+1][+3]
-              [ <| ] [ [] ] [ || ] [ > ] [ |> ]
+
+            [ <| ] [ [] ] [ || ] [ > ] [ |> ]
+
             Artists
             Album
             Title
+
         -->
+        
         <div id="cabecera" align="center">
         </div>
 
@@ -204,13 +221,52 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
             </table>
         </div>
 
-        <!-- uncomment to test javascript functions with this button
+        <!-- uncomment to test javascript functions with this button 
         <div align="right">
-            <button type="button"                 onclick="playerCtrl('state')" >PBA</button>
+            <button type="button"                 onclick="filling_macro_buttons()" >PBA</button>
         </div>
         -->
 
     </div><!--main-->
+
+    <!-- 9 buttons keypad for customizable user macros -->
+    <div id="custom_buttons" style="display:none">
+        <table class="buttons_table">
+          <tr>
+            <td class="button_cell">
+            <button class="button custom_buttons" type="button" id="macro_button_1" onmousedown="user_macro('1', this.innerText)" >-</button>
+            </td>                                                                            
+            <td class="button_cell">                                                         
+            <button class="button custom_buttons" type="button" id="macro_button_2" onmousedown="user_macro('2', this.innerText)" >-</button>
+            </td>                                                                            
+            <td class="button_cell">                                                         
+            <button class="button custom_buttons" type="button" id="macro_button_3" onmousedown="user_macro('3', this.innerText)" >-</button>
+            </td>                                                                            
+          </tr>                                                                              
+          <tr>                                                                               
+            <td class="button_cell">                                                         
+            <button class="button custom_buttons" type="button" id="macro_button_4" onmousedown="user_macro('4', this.innerText)" >-</button>
+            </td>                                                                            
+            <td class="button_cell">                                                         
+            <button class="button custom_buttons" type="button" id="macro_button_5" onmousedown="user_macro('5', this.innerText)" >-</button>
+            </td>                                                                            
+            <td class="button_cell">                                                         
+            <button class="button custom_buttons" type="button" id="macro_button_6" onmousedown="user_macro('6', this.innerText)" >-</button>
+            </td>                                                                            
+          </tr>                                                                              
+          <tr>                                                                               
+            <td class="button_cell">                                                         
+            <button class="button custom_buttons" type="button" id="macro_button_7" onmousedown="user_macro('7', this.innerText)" >-</button>
+            </td>                                                                            
+            <td class="button_cell">                                                         
+            <button class="button custom_buttons" type="button" id="macro_button_8" onmousedown="user_macro('8', this.innerText)" >-</button>
+            </td>                                                                            
+            <td class="button_cell">                                                         
+            <button class="button custom_buttons" type="button" id="macro_button_9" onmousedown="user_macro('9', this.innerText)" >-</button>
+            </td>
+          </tr>
+        </table>
+    </div>
 
 </body>
 </html>
