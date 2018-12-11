@@ -14,7 +14,7 @@ $ ls -1 macros/
 README.md
 ```
 
-Will be show the following key pad layout:
+Will show the following key pad layout:
 
 ```
     [   Radio 1   ]  [ R. Clasica  ]  [    --      ]
