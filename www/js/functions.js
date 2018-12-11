@@ -3,22 +3,18 @@ Copyright (c) 2018 Rafael Sánchez
 This file is part of pre.di.c
 pre.di.c, a preamp and digital crossover
 Copyright (C) 2018 Roberto Ripio
-
 pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
 Copyright (c) 2006-2011 Roberto Ripio
 Copyright (c) 2011-2016 Alberto Miguélez
 Copyright (c) 2016-2018 Rafael Sánchez
-
 pre.di.c is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
 pre.di.c is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
 You should have received a copy of the GNU General Public License
 along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 */
@@ -69,7 +65,8 @@ function predic_cmd(cmd, update=true) {
     }
 }
 
-// Amplifier control
+//////// AMPLIFIER CONTROL ////////
+// Switch the amplifier
 function ampli(mode) {
     var myREQ = new XMLHttpRequest();
     myREQ.open("GET", "php/functions.php?command=ampli" + mode, async=true);
@@ -86,7 +83,49 @@ function update_ampli_switch() {
     document.getElementById("onoffSelector").value = ampliStatus;
 }
 
-// Controls the current player
+//////// USER MACROS ////////
+// Get a list of user macros availables under /home/predic/macros/
+function list_macros() {
+    var list = [];
+    var myREQ = new XMLHttpRequest();
+    myREQ.open("GET", "php/functions.php?command=list_macros", async=false);
+    myREQ.send();
+    list = JSON.parse( myREQ.responseText );
+    // remove '.' and '..' from the list
+    if ( list.length > 2 ) {
+        list = list.slice(2, );
+        return list;
+    }
+    // if no elements, but '.' and '..', then returns an empty list
+    else { return [];}
+}
+
+// Filling the user's macros buttons
+function filling_macro_buttons() {
+    var macros = list_macros();
+    // If no macros on the list, do nothing, so leaving "display:none" on the buttons keypad div
+    if ( macros.length < 1 ) { return; }
+    // If any macro found, lets show the macros keypad
+    document.getElementById( "custom_buttons").style.display = "block";
+    var macro = ''
+    for (i in macros) {
+        macro = macros[i];
+        // Macro files are named this way: 'N_macro_name', so N will serve as button position
+        macro_name = macro.slice(2, );
+        macro_pos = macro.split('_')[0];
+        document.getElementById( "macro_button_" + macro_pos ).innerText = macro_name;
+    }
+}
+
+// Executes user defined macros
+function user_macro(prefix, name) {
+    var myREQ = new XMLHttpRequest();
+    myREQ.open("GET", "php/functions.php?command=macro_" + prefix + "_" + name, async=true);
+    myREQ.send();
+}
+
+//////// PLAYER CONTROL ////////
+// Controls the player
 function playerCtrl(action) {
     var myREQ = new XMLHttpRequest();
     myREQ.open("GET", "php/functions.php?command=player_" + action, async=true);
@@ -143,13 +182,17 @@ function update_player_info() {
     document.getElementById("title").innerText = title;
 }
 
-// Initializes the web page, then starts the auto-update
+//////// PAGE MANAGEMENT ////////
+// Initializaes the page, then starts the auto-update
 function page_initiate() {
+    
+    // Showing and filling the macro buttons
+    filling_macro_buttons();
 
     // Filling the selectors: inputs, XO, DRC and PEQ
-    fills_inputs_selector()
-    fills_xo_selector()
-    fills_drc_selector()
+    fills_inputs_selector();
+    fills_xo_selector();
+    fills_drc_selector();
     if ( ecasound_is_used == true){
         insert_peq_selector();
         fills_peq_selector();  
