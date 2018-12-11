@@ -23,34 +23,38 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-
 """ A TCP server that listen for certain tasks to be executed on local:
-    - switches on/off an amplifier
-    - controls and gets metadata info from the player we are listen to
+    - Switches on/off an amplifier
+    - Controls and gets metadata info from the player we are listen to
+    - Other tasks are still not implemented
 """
+
 # This server is secured by allowing only certain orders
 # to be translated to actual local commands.
+
+#####################
+LISTENING_PORT = 9988
+#####################
 
 import socket
 import sys
 import time
 import subprocess as sp
 import yaml
-
-import players # comunicates to the current music player
+import players # to comunicate to the current music player
 
 def process(data):
     """
         Only certain received 'data' will be validated and processed,
-        then returns back some useful info to the client.
+        then returns back some useful info to the asking client.
     """
-    # NOTICE:   subprocess.check_output(cmd) returns bytes-like,
-    #           but if cmd fails an exception will be raised.
 
     # First clearing the new line
     data = data.replace('\n','')
 
     # A custom script that switches on/off the amplifier
+    # notice: subprocess.check_output(cmd) returns bytes-like,
+    #         but if cmd fails an exception will be raised, so used with 'try'
     if data == 'ampli on':
         try:
             sp.check_output( '/home/predic/bin_custom/ampli.sh on'.split() )
@@ -64,7 +68,7 @@ def process(data):
         except:
             return b'error'
 
-    # Query the current music player
+    # Queries the current music player
     elif data == 'player_get_meta':
         return players.get_meta().encode()
     elif data == 'player_state':
@@ -79,9 +83,20 @@ def process(data):
         return players.control('next')
     elif data == 'player_previous':
         return players.control('previous')
+        
+    # User macros: macro files are named this way: '~/macros/N_macro_name',
+    #              so N will serve as button keypad position from web control page
+    elif data[:6] == 'macro_':
+        try:
+            cmd = 'sh /home/predic/macros/' + data[6:]
+            sp.run( cmd.split() )
+            return b'done'
+        except:
+            return b'error'
+
 
 def server_socket(host, port):
-    """Makes a socket for listening clients"""
+    """ Makes a socket for listening clients """
 
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -108,7 +123,7 @@ def server_socket(host, port):
 if __name__ == '__main__':
 
     verbose = False
-    fsocket = server_socket('localhost', 9988)
+    fsocket = server_socket('localhost', LISTENING_PORT)
 
     for opc in sys.argv:
         if '-v' in opc:
@@ -120,7 +135,7 @@ if __name__ == '__main__':
         # listen ports
         fsocket.listen(10)  # number of connections in queue
         if verbose:
-            print('(server_aux) listening on \'localhost\':9988')
+            print(f'(server_aux) listening on \'localhost\':{LISTENING_PORT}')
         # accept client connection
         sc, addr = fsocket.accept()
         # somo info
