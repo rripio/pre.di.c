@@ -30,6 +30,7 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 */
 
 /////////////   GLOBALS //////////////
+
 ecasound_is_used = check_if_ecasound();     // Boolean indicates if pre.di.c uses Ecasound
 auto_update_interval = 3000;                // Auto-update interval millisec
 
@@ -66,6 +67,7 @@ function predic_cmd(cmd, update=true) {
 }
 
 //////// AMPLIFIER CONTROL ////////
+
 // Switch the amplifier
 function ampli(mode) {
     var myREQ = new XMLHttpRequest();
@@ -84,17 +86,25 @@ function update_ampli_switch() {
 }
 
 //////// USER MACROS ////////
-// Get a list of user macros availables under /home/predic/macros/
+
+// Gets a list of user macros availables under /home/predic/macros/
 function list_macros() {
-    var list = [];
+    var list  = [];
+    var list2 = []; // a clean list version
     var myREQ = new XMLHttpRequest();
     myREQ.open("GET", "php/functions.php?command=list_macros", async=false);
     myREQ.send();
     list = JSON.parse( myREQ.responseText );
-    // remove '.' and '..' from the list
+    // Remove '.' and '..' from the list ...
     if ( list.length > 2 ) {
         list = list.slice(2, );
-        return list;
+        // ... and discard any disabled item, i.e. not named as 'N_xxxxx'
+        for (i in list) {
+            if ( isNumeric( list[i].split('_')[0] ) ) {
+                list2.push( list[i] );
+            }
+        }
+        return list2;
     }
     // if no elements, but '.' and '..', then returns an empty list
     else { return [];}
@@ -125,6 +135,7 @@ function user_macro(prefix, name) {
 }
 
 //////// PLAYER CONTROL ////////
+
 // Controls the player
 function playerCtrl(action) {
     var myREQ = new XMLHttpRequest();
@@ -183,6 +194,7 @@ function update_player_info() {
 }
 
 //////// PAGE MANAGEMENT ////////
+
 // Initializaes the page, then starts the auto-update
 function page_initiate() {
     
@@ -485,4 +497,9 @@ function indentLevel(linea) {
         level += 1;
     }
     return (level);
+}
+
+// Auxiliary to check for "numeric" strings
+function isNumeric(num){
+  return !isNaN(num)
 }
