@@ -1,5 +1,5 @@
 
-Any file here named like 'N_some_nice_name' will be consider as an user macro
+Any file here named like **`N_some_nice_name`** will be consider as an user macro
 by the control web page, then a button will be used to trigger the macro.
 
 N determines the position into the web macros key pad.
