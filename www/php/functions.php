@@ -5,22 +5,18 @@
     This file is part of pre.di.c
     pre.di.c, a preamp and digital crossover
     Copyright (C) 2018 Roberto Ripio
-
     pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
     Copyright (c) 2006-2011 Roberto Ripio
     Copyright (c) 2011-2016 Alberto Miguélez
     Copyright (c) 2016-2018 Rafael Sánchez
-
     pre.di.c is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     pre.di.c is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
     */
@@ -112,7 +108,7 @@
 
     //// SPECIAL commands:
 
-    // Reading config files
+    // Reading config FILES
     if ( $command == "read_inputs_file" ) {
         // notice: readfile() does an 'echo', i.e. it returns the contents to the standard php output
         readfile("/home/predic/config/inputs.yml");
@@ -125,7 +121,7 @@
         readfile($fpath);
     }
 
-    // Amplifier switching
+    // AMPLIFIER switching
     elseif ( $command == "amplion" ) {
         // The remote script will store the amplifier state into
         // ~/.ampli so that the web can update it.
@@ -138,9 +134,18 @@
         readfile("/home/predic/.ampli"); // php cannot acces inside /tmp for securety reasons.
     }
 
-    // Player related commands
+    // PLAYER related commands
     elseif ( substr( $command, 0, 7 ) === "player_" ) {
         echo aux_socket($command);
+    }
+
+    // User MACROS commands
+    elseif ( $command === "list_macros" ) {
+        $macros_array = scandir("/home/predic/macros/");
+        echo json_encode( $macros_array );
+    }
+    elseif ( substr( $command, 0, 6 ) === "macro_" ) {
+        echo aux_socket( $command );
     }
 
     //// Any else will be an STANDARD pre.di.c command, then forwarded to pre.di.c's server
