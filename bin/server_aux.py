@@ -83,13 +83,13 @@ def process(data):
         return players.control('next')
     elif data == 'player_previous':
         return players.control('previous')
-        
+
     # User macros: macro files are named this way: '~/macros/N_macro_name',
     #              so N will serve as button keypad position from web control page
     elif data[:6] == 'macro_':
         try:
-            cmd = 'sh /home/predic/macros/' + data[6:]
-            sp.run( cmd.split() )
+            cmd = '/home/predic/macros/' + data[6:]
+            sp.run( "'" + cmd + "'", shell=True ) # needs shell to user bash scripts to work
             return b'done'
         except:
             return b'error'
