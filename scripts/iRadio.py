@@ -23,8 +23,18 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-"""start and stop mplayer for iRadio tasks, and change iRadio stations
-use it with 'start' and 'stop' as options"""
+"""
+    Start and stop mplayer for iRadio tasks, and change iRadio stations
+
+    Use:    iradio.py   start  [ <num> | <station_name> ] &
+                        stop
+                        preset <num*>
+                        name   <station_name*>
+                        url    <some_url_stream>
+
+    * from file:  ~/config/iradio_stations.yml
+
+"""
 
 import sys
 import os
@@ -146,7 +156,8 @@ if __name__ == '__main__':
         elif opc == 'url':
             load_url( sys.argv[2] )
 
+        elif '-h' in opc:
+            print(__doc__)
+
         else:
             print('(iRadio.py) Bad option')
-    else:
-        print(__doc__)
