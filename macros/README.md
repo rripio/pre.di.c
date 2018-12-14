@@ -9,7 +9,7 @@ For example
 ```
 $ ls -1 macros/
 1_RNE
-2_R. Clasica
+2_R.Clasica
 6_flat sound
 README.md
 ```
@@ -17,7 +17,7 @@ README.md
 Will show the following key pad layout:
 
 ```
-    [     RNE     ]  [ R. Clasica  ]  [    --      ]
+    [     RNE     ]  [  R.Clasica  ]  [    --      ]
     [     --      ]  [     --      ]  [ flat sound ]
     [     --      ]  [     --      ]  [    --      ]
 ```
