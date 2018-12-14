@@ -26,6 +26,7 @@
 """ A TCP server that listen for certain tasks to be executed on local:
     - Switches on/off an amplifier
     - Controls and gets metadata info from the player we are listen to
+    - User macros under ~/macros
     - Other tasks are still not implemented
 """
 
