@@ -26,10 +26,13 @@
 """ A TCP server that listen for certain tasks to be executed on local:
     - Switches on/off an amplifier
     - Controls and gets metadata info from the player we are listen to
+    - User macros under ~/macros
     - Other tasks are still not implemented
 """
+
 # This server is secured by allowing only certain orders
 # to be translated to actual local commands.
+
 #####################
 LISTENING_PORT = 9988
 #####################
@@ -81,6 +84,17 @@ def process(data):
         return players.control('next')
     elif data == 'player_previous':
         return players.control('previous')
+
+    # User macros: macro files are named this way: '~/macros/N_macro_name',
+    #              so N will serve as button keypad position from web control page
+    elif data[:6] == 'macro_':
+        try:
+            cmd = '/home/predic/macros/' + data[6:]
+            sp.run( "'" + cmd + "'", shell=True ) # needs shell to user bash scripts to work
+            return b'done'
+        except:
+            return b'error'
+
 
 def server_socket(host, port):
     """ Makes a socket for listening clients """
