@@ -1,0 +1,4 @@
+control bass 0
+control treble 0
+control loudness_track off
+control drc off
