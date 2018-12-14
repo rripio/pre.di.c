@@ -8,7 +8,7 @@ For example
 
 ```
 $ ls -1 macros/
-1_Radio 1
+1_RNE
 2_R. Clasica
 6_flat sound
 README.md
@@ -17,7 +17,10 @@ README.md
 Will show the following key pad layout:
 
 ```
-    [   Radio 1   ]  [ R. Clasica  ]  [    --      ]
+    [     RNE     ]  [ R. Clasica  ]  [    --      ]
     [     --      ]  [     --      ]  [ flat sound ]
     [     --      ]  [     --      ]  [    --      ]
 ```
+
+**NOTICE:** if no macro files `N_xxxx` were defined under `~/macros/` then **NO keypad** will be showed on the control web page.
+
