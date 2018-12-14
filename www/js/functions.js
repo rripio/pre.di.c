@@ -30,6 +30,7 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 */
 
 /////////////   GLOBALS //////////////
+
 ecasound_is_used = check_if_ecasound();     // Boolean indicates if pre.di.c uses Ecasound
 auto_update_interval = 3000;                // Auto-update interval millisec
 
@@ -65,7 +66,9 @@ function predic_cmd(cmd, update=true) {
     }
 }
 
-// Amplifier control
+//////// AMPLIFIER CONTROL ////////
+
+// Switch the amplifier
 function ampli(mode) {
     var myREQ = new XMLHttpRequest();
     myREQ.open("GET", "php/functions.php?command=ampli" + mode, async=true);
@@ -82,7 +85,58 @@ function update_ampli_switch() {
     document.getElementById("onoffSelector").value = ampliStatus;
 }
 
-// Controls the current player
+//////// USER MACROS ////////
+
+// Gets a list of user macros availables under /home/predic/macros/
+function list_macros() {
+    var list  = [];
+    var list2 = []; // a clean list version
+    var myREQ = new XMLHttpRequest();
+    myREQ.open("GET", "php/functions.php?command=list_macros", async=false);
+    myREQ.send();
+    list = JSON.parse( myREQ.responseText );
+    // Remove '.' and '..' from the list ...
+    if ( list.length > 2 ) {
+        list = list.slice(2, );
+        // ... and discard any disabled item, i.e. not named as 'N_xxxxx'
+        for (i in list) {
+            if ( isNumeric( list[i].split('_')[0] ) ) {
+                list2.push( list[i] );
+            }
+        }
+        return list2;
+    }
+    // if no elements, but '.' and '..', then returns an empty list
+    else { return [];}
+}
+
+// Filling the user's macros buttons
+function filling_macro_buttons() {
+    var macros = list_macros();
+    // If no macros on the list, do nothing, so leaving "display:none" on the buttons keypad div
+    if ( macros.length < 1 ) { return; }
+    // If any macro found, lets show the macros keypad
+    document.getElementById( "custom_buttons").style.display = "block";
+    var macro = ''
+    for (i in macros) {
+        macro = macros[i];
+        // Macro files are named this way: 'N_macro_name', so N will serve as button position
+        macro_name = macro.slice(2, );
+        macro_pos = macro.split('_')[0];
+        document.getElementById( "macro_button_" + macro_pos ).innerText = macro_name;
+    }
+}
+
+// Executes user defined macros
+function user_macro(prefix, name) {
+    var myREQ = new XMLHttpRequest();
+    myREQ.open("GET", "php/functions.php?command=macro_" + prefix + "_" + name, async=true);
+    myREQ.send();
+}
+
+//////// PLAYER CONTROL ////////
+
+// Controls the player
 function playerCtrl(action) {
     var myREQ = new XMLHttpRequest();
     myREQ.open("GET", "php/functions.php?command=player_" + action, async=true);
@@ -139,13 +193,18 @@ function update_player_info() {
     document.getElementById("title").innerText = title;
 }
 
-// Initializes the web page, then starts the auto-update
+//////// PAGE MANAGEMENT ////////
+
+// Initializaes the page, then starts the auto-update
 function page_initiate() {
+    
+    // Showing and filling the macro buttons
+    filling_macro_buttons();
 
     // Filling the selectors: inputs, XO, DRC and PEQ
-    fills_inputs_selector()
-    fills_xo_selector()
-    fills_drc_selector()
+    fills_inputs_selector();
+    fills_xo_selector();
+    fills_drc_selector();
     if ( ecasound_is_used == true){
         insert_peq_selector();
         fills_peq_selector();  
@@ -438,4 +497,9 @@ function indentLevel(linea) {
         level += 1;
     }
     return (level);
+}
+
+// Auxiliary to check for "numeric" strings
+function isNumeric(num){
+  return !isNaN(num)
 }
