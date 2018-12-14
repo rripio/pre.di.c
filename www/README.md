@@ -1,1 +1,1 @@
-![](https://github.com/Rsantct/pre.di.c/blob/master/www/images/control%20web%20v0.4.jpg)
+![](https://github.com/Rsantct/pre.di.c/blob/master/www/images/control%20web%20v0.5.png)
