@@ -108,7 +108,7 @@
 
     //// SPECIAL commands:
 
-    // Reading config files
+    // Reading config FILES
     if ( $command == "read_inputs_file" ) {
         // notice: readfile() does an 'echo', i.e. it returns the contents to the standard php output
         readfile("/home/predic/config/inputs.yml");
@@ -121,7 +121,7 @@
         readfile($fpath);
     }
 
-    // Amplifier switching
+    // AMPLIFIER switching
     elseif ( $command == "amplion" ) {
         // The remote script will store the amplifier state into
         // ~/.ampli so that the web can update it.
@@ -134,9 +134,18 @@
         readfile("/home/predic/.ampli"); // php cannot acces inside /tmp for securety reasons.
     }
 
-    // Player related commands
+    // PLAYER related commands
     elseif ( substr( $command, 0, 7 ) === "player_" ) {
         echo aux_socket($command);
+    }
+
+    // User MACROS commands
+    elseif ( $command === "list_macros" ) {
+        $macros_array = scandir("/home/predic/macros/");
+        echo json_encode( $macros_array );
+    }
+    elseif ( substr( $command, 0, 6 ) === "macro_" ) {
+        echo aux_socket( $command );
     }
 
     //// Any else will be an STANDARD pre.di.c command, then forwarded to pre.di.c's server
