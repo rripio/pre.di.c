@@ -1,4 +1,5 @@
 mpd_load.py
+iRadio.py           # Mplayer plays internet radio stations
 #DVB.py
 #netjack.py
 alsa_loop_load.py   # Sets up alsa_loop ports in jack to be used from ALSA backended players
