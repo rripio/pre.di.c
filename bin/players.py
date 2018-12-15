@@ -132,6 +132,41 @@ def get_librespot_meta():
     return '{ "player":"' + player + '", "artist":"' + artist + \
            '", "album":"' + album + '", "title":"' + title + '" }'
 
+def get_mplayer_iradio_info():
+    """ gets metadata from Mplayer as per
+        http://www.mplayerhq.hu/DOCS/tech/slave.txt """
+
+    player = 'Mplayer'
+    artist = album = title = '--'
+
+    # This is the file were Mplayer standard output has been redirected to,
+    # so we can read there any answer when required to Mplayer slave daemon:
+    mplayer_redirection_path = '/home/predic/tmp/.iradio'
+
+    # Communicates to Mplayer trough by its input fifo to get the current media filename and bitrate:
+    sp.Popen( 'echo "get_file_name"     > /home/predic/iradio_fifo', shell=True)
+    sp.Popen( 'echo "get_audio_bitrate" > /home/predic/iradio_fifo', shell=True)
+
+    # Trying to read the ANS_xxxx from the Mplayer output file
+    try:
+        with open(mplayer_redirection_path, 'r') as file:
+            tmp = file.read().split('\n')[-3:] # get last two lines plus the empty one when splitting
+            #print('DEBUG\n', tmp)
+        # Flushing the Mplayer output file to avoid continue growing:
+        with open(mplayer_redirection_path, 'w') as file:
+            file.write('')
+        # Reading the intended metadata chunks
+        if len(tmp) >= 2: # to avoid indexes issues while no relevant metadata is available
+            if 'ANS_FILENAME=' in tmp[0]:
+                album = tmp[0].split('ANS_FILENAME=')[1].split('?')[0].replace("'","")
+            if 'ANS_AUDIO_BITRATE=' in tmp[1]:
+                title = tmp[1].split('ANS_AUDIO_BITRATE=')[1].split('\n')[0].replace("'","")
+    except:
+        pass
+
+    return '{ "player":"' + player + '", "artist":"' + artist + \
+           '", "album":"' + album + '", "title":"' + title + '" }'
+
 def predic_source():
     """ retrieves the current input source """
     source = None
@@ -150,14 +185,17 @@ def get_meta():
     """ Retrieves a dictionary with the current track metadata
         {player: xxxx, artist: xxxx, album:xxxx, title:xxxx }
     """
-    player = artist = album = title = ''
+    player = artist = album = title = '--'
     source = predic_source()
 
-    if source == 'spotify':
+    if   source == 'spotify':
         return get_librespot_meta()
 
     elif source == 'mpd':
         return mpd_client('get_meta')
+
+    elif source == 'iradio':
+        return get_mplayer_iradio_info()
 
     else:
         return '{ "player":"' + player + '", "artist":"' + artist + \
@@ -167,7 +205,7 @@ def control(action):
     """ controls the playback """
     result = ''
 
-    if predic_source() == 'mpd':
+    if   predic_source() == 'mpd':
         result = mpd_client(action)
 
     elif predic_source() == 'spotify':
@@ -175,6 +213,10 @@ def control(action):
         pass
 
     elif predic_source() == 'tdt':
+        # WORK IN PROGRESS
+        pass
+
+    elif predic_source() == 'iradio':
         # WORK IN PROGRESS
         pass
 
