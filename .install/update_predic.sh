@@ -67,12 +67,13 @@ cp .mplayer/config          .mplayer/config.LAST          >/dev/null 2>&1
 cp .mplayer/channels.conf   .mplayer/channels.conf.LAST   >/dev/null 2>&1
 
 ## folder CONFIG:
-cp config/state.yml         config/state.yml.LAST
-cp config/config.yml        config/config.yml.LAST
-cp config/inputs.yml        config/inputs.yml.LAST
-cp config/scripts           config/scripts.LAST
-cp config/DVB-T.yml         config/DVB-T.yml.LAST         >/dev/null 2>&1
-cp config/DVB-T_state.yml   config/DVB-T_state.yml.LAST   >/dev/null 2>&1
+cp config/state.yml             config/state.yml.LAST
+cp config/config.yml            config/config.yml.LAST
+cp config/inputs.yml            config/inputs.yml.LAST
+cp config/scripts               config/scripts.LAST
+cp config/DVB-T.yml             config/DVB-T.yml.LAST           >/dev/null 2>&1
+cp config/DVB-T_state.yml       config/DVB-T_state.yml.LAST     >/dev/null 2>&1
+cp config/iradio_stations.yml   config/iradio_stations.yml.LAST >/dev/null 2>&1
 rm -f config/PEQx*LAST       # discarting previous if any
 for file in config/PEQx* ; do
     mv "$file" "$file.LAST"
