@@ -93,13 +93,17 @@ def jack_loop(clientname):
             print('\n(predic.jack_loop)  Terminated')
 
 
-def start_pid(command, alias):
+def start_pid(command, alias, redir_file=None):
     """starts a program and writes its pid
-    command: full path with options
-    alias  : name given for pid retrieving and error output"""
+    command:    full executable path with options
+    alias  :    name given for pid retrieving and error output
+    redir_file: a file object to redirect the executable output """
 
     try:
-        p = sp.Popen(command.split())
+        if redir_file:
+            p = sp.Popen( command.split(), shell=False, stdout=redir_file, stderr=redir_file )
+        else:
+            p = sp.Popen( command.split() )
         print(f'\tpid {p.pid:4}: {alias}')
         with open(f'{bp.pids_folder}{alias}.pid', 'w') as pidfile:
             pidfile.write(f'{p.pid}')
