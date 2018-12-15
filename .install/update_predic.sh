@@ -164,6 +164,7 @@ echo "(i) Making fifos for mplayer services: dvb and cdda"
 rm -f *fifo
 mkfifo dvb_fifo
 mkfifo cdda_fifo
+mkfifo iradio_fifo
 
 #########################################################
 # restoring brutefir_convolver
