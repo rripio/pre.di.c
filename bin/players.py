@@ -132,6 +132,12 @@ def get_librespot_meta():
     return '{ "player":"' + player + '", "artist":"' + artist + \
            '", "album":"' + album + '", "title":"' + title + '" }'
 
+def mplayer_cmd(cmd, service):
+    """ Sends a command to Mplayer trough by its input fifo """
+    # Notice: Mplayer sends its responses to the terminal where Mplayer was launched,
+    #         or to a redirected file.
+    sp.Popen( f'echo "{cmd}" > /home/predic/{service}_fifo', shell=True)
+
 def get_mplayer_iradio_info():
     """ gets metadata from Mplayer as per
         http://www.mplayerhq.hu/DOCS/tech/slave.txt """
@@ -144,8 +150,8 @@ def get_mplayer_iradio_info():
     mplayer_redirection_path = '/home/predic/tmp/.iradio'
 
     # Communicates to Mplayer trough by its input fifo to get the current media filename and bitrate:
-    sp.Popen( 'echo "get_file_name"     > /home/predic/iradio_fifo', shell=True)
-    sp.Popen( 'echo "get_audio_bitrate" > /home/predic/iradio_fifo', shell=True)
+    mplayer_cmd(cmd='get_file_name',     service='iradio')
+    mplayer_cmd(cmd='get_audio_bitrate', service='iradio')
 
     # Trying to read the ANS_xxxx from the Mplayer output file
     try:
@@ -218,6 +224,9 @@ def control(action):
 
     elif predic_source() == 'iradio':
         # WORK IN PROGRESS
+        pass
+
+    else:
         pass
 
     if result:
