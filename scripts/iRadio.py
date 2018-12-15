@@ -67,6 +67,8 @@ stations_fname = bp.config_folder + 'iradio_stations.yml'
 iradio_fifo = bp.main_folder + 'iradio_fifo'
 # Mplayer path:
 mplayer_path = '/usr/bin/mplayer'
+# Mplayer outputs redirected to:
+mplayer_redirection_path = '/home/predic/tmp/.iradio'
 # name used for info and pid saving
 program_alias = 'mplayer-iradio'
 
@@ -102,7 +104,8 @@ def start():
     # 2. Mplayer_url:
     opts = f'{options} -idle -slave -profile iradio -input file={iradio_fifo}'
     command = f'{mplayer_path} {opts}'
-    pd.start_pid(command, program_alias)
+    with open(mplayer_redirection_path, 'w') as redir:
+        pd.start_pid(command, program_alias, redir)
 
 def stop():
 
