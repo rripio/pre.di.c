@@ -23,144 +23,215 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
+""" A module that controls and retrieve track info from the current player
 """
-    Start and stop mplayer for iRadio tasks, and change iRadio stations
-
-    Use:    iradio.py   start  [ <num> | <station_name> ] &
-                        stop
-                        preset <num*>
-                        name   <station_name*>
-                        url    <some_url_stream>
-
-    * from file:  ~/config/iradio_stations.yml
-
-"""
-
-import sys
-import os
-import time
-from subprocess import Popen
-import threading
+import subprocess as sp
 import yaml
+import jack
+import mpd
+import time
 
-import basepaths as bp
-import getconfigs as gc
-import predic as pd
+mpd_host    = 'localhost'
+mpd_port    = 6600
+mpd_passwd  = None
 
-### Mplayer aditional options:
-# -quiet: see channels change
-# -really-quiet: silent
-options = '-quiet -nolirc'
-# Aditional option to avoid Mplayer default "Playlist parsing disabled for security reasons."
-# This applies to RTVE, which iradio urls are given in .m3u playlist format.
-# - one can download the .m3u then lauch the inside url with mplayer
-# - or, easy way, we can allow playlit parsing on Mplayer.
-#        if "rtve" in emisoraUrl:
-options += " -allow-dangerous-playlist-parsing"
+def get_predic_state():
+    """ returns the YAML pre.di.c's status info """
 
-### Script config:
-# DEFAULT iRadio station preset number:
-default_station = '2'
-# iRadio stations file:
-stations_fname = bp.config_folder + 'iradio_stations.yml'
-# command fifo filename
-iradio_fifo = bp.main_folder + 'iradio_fifo'
-# Mplayer path:
-mplayer_path = '/usr/bin/mplayer'
-# Mplayer outputs redirected to:
-mplayer_redirection_path = '/home/predic/tmp/.iradio'
-# name used for info and pid saving
-program_alias = 'mplayer-iradio'
-
-
-def load_url(url):
-    try:
-        command = ('loadfile ' + url + '\n' )
-        with open( iradio_fifo, 'w') as f:
-            f.write(command)
-        return True
-    except:
-        return False
-
-def select_by_name(preset_name):
-    """ sets channel in mplayer """
-    for preset,dict in stations.items():
-        if dict['name'] == preset_name:
-            load_url( dict['url'] )
-            return
-    print( f'(iRadio.py) station \'{preset_name}\' not found' )
-
-def select_by_preset(preset_num):
-    """ selects preset from DVB-t.ini """
-    load_url( stations[ int(preset_num) ]['url'] )
-
-def start():
-
-    # 1. Prepare a jack loop where MPLAYER outputs can connect.
-    #    The jack_loop module will keep the loop alive, so we need to thread it.
-    jloop = threading.Thread( target = pd.jack_loop, args=('iradio_loop',) )
-    jloop.start()
-
-    # 2. Mplayer_url:
-    opts = f'{options} -idle -slave -profile iradio -input file={iradio_fifo}'
-    command = f'{mplayer_path} {opts}'
-    with open(mplayer_redirection_path, 'w') as redir:
-        pd.start_pid(command, program_alias, redir)
-
-def stop():
-
-    pd.kill_pid(program_alias)
-    # kill bill
-    Popen( 'pkill -KILL -f iradio'.split() )
-    Popen( 'pkill -KILL -f iRadio.py'.split() )
-
-if __name__ == '__main__':
-
-    ### Reading the iradio stations file
-    stations = {}
-    f = open(stations_fname, 'r')
+    f = open('/home/predic/config/state.yml', 'r')
     tmp = f.read()
     f.close()
+    return yaml.load(tmp)
+
+def mpd_client(query):
+    """ comuticates to MPD music player daemon """
+
+    def get_meta():
+        """ gets info from mpd """
+
+        player = 'MPD'
+        artist = album = title = ''
+
+        try:
+            # We try because not all tracks have complete metadata fields:
+            try:    artist = client.currentsong()['artist']
+            except: pass
+            try:    album  = client.currentsong()['album']
+            except: pass
+            try:    title  = client.currentsong()['title']
+            except: pass
+            client.close()
+        except:
+            pass
+
+        return '{ "player":"' + player + '", "artist":"' + artist + \
+               '", "album":"' + album + '", "title":"' + title + '" }'
+
+    def stop():
+        if mpd_online:
+            client.stop()
+            return client.status()['state']
+    def pause():
+        if mpd_online:
+            client.pause()
+            return client.status()['state']
+    def play():
+        if mpd_online:
+            client.play()
+            return client.status()['state']
+    def next():
+        if mpd_online:
+            client.next()
+            return client.status()['state']
+    def previous():
+        if mpd_online:
+            client.previous()
+            return client.status()['state']
+    def state():
+        if mpd_online:
+            return client.status()['state']
+
+    client = mpd.MPDClient()
     try:
-        stations = yaml.load(tmp)
+        client.connect(mpd_host, mpd_port)
+        if mpd_passwd:
+            client.password(mpd_passwd)
+        mpd_online = True
     except:
-        print ( '(iRadio.py) YAML error into ' + stations_fname )
+        mpd_online = False
 
-    ### reading the command line
-    if sys.argv[1:]:
+    result =    { 'get_meta':   get_meta,
+                  'stop':       stop,
+                  'pause':      pause,
+                  'play':       play,
+                  'next':       next,
+                  'previous':   previous,
+                  'state':      state
+                }[query]()
 
-        opc = sys.argv[1]
+    return result
 
-        # Start the script and optionally load a preset/name
-        if opc == 'start':
-            start()
-            if sys.argv[2:]:
-                opc2 = sys.argv[2]
-                if opc2.isdigit():
-                    select_by_preset(opc2)
-                elif opc2.isalpha():
-                    select_by_name(opc2)
-            else:
-                select_by_preset(default_station)
+def get_librespot_meta():
+    """ gets metadata info from librespot """
+    # Unfortunately librespot only prints out the title metadata, nor artist neither album.
+    # More info can be retrieved from the spotify web, but it is necessary to register
+    # for getting a privative and unique http request token for authentication.
 
-        # Stops all this stuff
-        elif opc == 'stop':
-            stop()
+    player = 'Spotify'
+    artist = album = title = ''
 
-        # Selects an iRadio preset on the fly
-        elif opc == 'preset':
-            select_by_preset( sys.argv[2] )
+    try:
+        # Returns the current track title played by librespot.
+        # <scripts/librespot.py> handles the libresport print outs to be redirected to <~/tmp/.librespotEvents>
+        tmp = sp.check_output( 'tail -n1 /home/predic/tmp/.librespotEvents'.split() )
+        title  = tmp.decode().split('"')[-2]
+        # JSON for JavaScript on control web page, NOTICE json requires double quotes:
+    except:
+        pass
 
-        # Selects an iRadio station name on the fly
-        elif opc == 'name':
-            select_by_name( sys.argv[2] )
+    return '{ "player":"' + player + '", "artist":"' + artist + \
+           '", "album":"' + album + '", "title":"' + title + '" }'
 
-        # Loads an url stream on the fly
-        elif opc == 'url':
-            load_url( sys.argv[2] )
+def mplayer_cmd(cmd, service):
+    """ Sends a command to Mplayer trough by its input fifo """
+    # Notice: Mplayer sends its responses to the terminal where Mplayer was launched,
+    #         or to a redirected file.
+    sp.Popen( f'echo "{cmd}" > /home/predic/{service}_fifo', shell=True)
 
-        elif '-h' in opc:
-            print(__doc__)
+def get_mplayer_iradio_info():
+    """ gets metadata from Mplayer as per
+        http://www.mplayerhq.hu/DOCS/tech/slave.txt """
 
-        else:
-            print('(iRadio.py) Bad option')
+    player = 'Mplayer'
+    artist = album = title = '--'
+
+    # This is the file were Mplayer standard output has been redirected to,
+    # so we can read there any answer when required to Mplayer slave daemon:
+    mplayer_redirection_path = '/home/predic/tmp/.iradio'
+
+    # Communicates to Mplayer trough by its input fifo to get the current media filename and bitrate:
+    mplayer_cmd(cmd='get_file_name',     service='iradio')
+    mplayer_cmd(cmd='get_audio_bitrate', service='iradio')
+
+    # Trying to read the ANS_xxxx from the Mplayer output file
+    with open(mplayer_redirection_path, 'r') as file:
+        try:
+            tmp = file.read().split('\n')[-3:] # get last two lines plus the empty one when splitting
+        except:
+            tmp = []
+
+    #print('DEBUG\n', tmp)
+
+    # Flushing the Mplayer output file to avoid continue growing:
+    with open(mplayer_redirection_path, 'w') as file:
+        file.write('')
+
+    # Reading the intended metadata chunks
+    if len(tmp) >= 2: # to avoid indexes issues while no relevant metadata is available
+        if 'ANS_FILENAME=' in tmp[0]:
+            album = tmp[0].split('ANS_FILENAME=')[1].split('?')[0].replace("'","")
+        if 'ANS_AUDIO_BITRATE=' in tmp[1]:
+            title = tmp[1].split('ANS_AUDIO_BITRATE=')[1].split('\n')[0].replace("'","")
+
+    return '{ "player":"' + player + '", "artist":"' + artist + \
+           '", "album":"' + album + '", "title":"' + title + '" }'
+
+def predic_source():
+    """ retrieves the current input source """
+    source = None
+    # It is possible to fail while state file is updating :-/
+    times = 4
+    while times:
+        try:
+            source = get_predic_state()['input']
+            break
+        except:
+            times -= 1
+        time.sleep(.25)
+    return source
+
+def get_meta():
+    """ Retrieves a dictionary with the current track metadata
+        {player: xxxx, artist: xxxx, album:xxxx, title:xxxx }
+    """
+    player = artist = album = title = '--'
+    source = predic_source()
+
+    if   source == 'spotify':
+        return get_librespot_meta()
+
+    elif source == 'mpd':
+        return mpd_client('get_meta')
+
+    elif source == 'iradio':
+        return get_mplayer_iradio_info()
+
+    else:
+        return '{ "player":"' + player + '", "artist":"' + artist + \
+               '", "album":"' + album + '", "title":"' + title + '" }'
+
+def control(action):
+    """ controls the playback """
+    result = ''
+
+    if   predic_source() == 'mpd':
+        result = mpd_client(action)
+
+    elif predic_source() == 'spotify':
+        # WORK IN PROGRESS
+        pass
+
+    elif predic_source() == 'tdt':
+        # WORK IN PROGRESS
+        pass
+
+    elif predic_source() == 'iradio':
+        mplayer_cmd(action, 'iradio')
+
+    else:
+        pass
+
+    if result:
+        return result.encode()
+    else:
+        return ''.encode()
