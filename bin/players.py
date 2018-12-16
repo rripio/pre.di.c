@@ -154,21 +154,24 @@ def get_mplayer_iradio_info():
     mplayer_cmd(cmd='get_audio_bitrate', service='iradio')
 
     # Trying to read the ANS_xxxx from the Mplayer output file
-    try:
-        with open(mplayer_redirection_path, 'r') as file:
+    with open(mplayer_redirection_path, 'r') as file:
+        try:
             tmp = file.read().split('\n')[-3:] # get last two lines plus the empty one when splitting
-            #print('DEBUG\n', tmp)
-        # Flushing the Mplayer output file to avoid continue growing:
-        with open(mplayer_redirection_path, 'w') as file:
-            file.write('')
-        # Reading the intended metadata chunks
-        if len(tmp) >= 2: # to avoid indexes issues while no relevant metadata is available
-            if 'ANS_FILENAME=' in tmp[0]:
-                album = tmp[0].split('ANS_FILENAME=')[1].split('?')[0].replace("'","")
-            if 'ANS_AUDIO_BITRATE=' in tmp[1]:
-                title = tmp[1].split('ANS_AUDIO_BITRATE=')[1].split('\n')[0].replace("'","")
-    except:
-        pass
+        except:
+            tmp = []
+
+    #print('DEBUG\n', tmp)
+
+    # Flushing the Mplayer output file to avoid continue growing:
+    with open(mplayer_redirection_path, 'w') as file:
+        file.write('')
+
+    # Reading the intended metadata chunks
+    if len(tmp) >= 2: # to avoid indexes issues while no relevant metadata is available
+        if 'ANS_FILENAME=' in tmp[0]:
+            album = tmp[0].split('ANS_FILENAME=')[1].split('?')[0].replace("'","")
+        if 'ANS_AUDIO_BITRATE=' in tmp[1]:
+            title = tmp[1].split('ANS_AUDIO_BITRATE=')[1].split('\n')[0].replace("'","")
 
     return '{ "player":"' + player + '", "artist":"' + artist + \
            '", "album":"' + album + '", "title":"' + title + '" }'
@@ -223,8 +226,7 @@ def control(action):
         pass
 
     elif predic_source() == 'iradio':
-        # WORK IN PROGRESS
-        pass
+        mplayer_cmd(action, 'iradio')
 
     else:
         pass
