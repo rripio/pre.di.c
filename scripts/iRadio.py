@@ -109,10 +109,10 @@ def start():
 
 def stop():
 
-    # kill bill
     pd.kill_pid(program_alias)
-    Popen( 'pkill -f iradio'.split() )
-    Popen( 'pkill -f iRadio.py'.split() )
+    # kill bill
+    Popen( 'pkill -KILL -f iradio'.split() )
+    Popen( 'pkill -KILL -f iRadio.py'.split() )
 
 if __name__ == '__main__':
 
