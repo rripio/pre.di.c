@@ -1,4 +1,4 @@
-![](https://github.com/Rsantct/pre.di.c/blob/master/www/images/control%20web%20v1.0a.jpg)
-![](https://github.com/Rsantct/pre.di.c/blob/master/www/images/control%20web%20v1.0b.jpg)
-![](https://github.com/Rsantct/pre.di.c/blob/master/www/images/control%20web%20v1.0c.jpg)
-![](https://github.com/Rsantct/pre.di.c/blob/master/www/images/control%20web%20v1.0d.jpg)
+![](https://github.com/Rsantct/pre.di.c/blob/master/www/images/control%20web%20v1.1a.jpg)
+![](https://github.com/Rsantct/pre.di.c/blob/master/www/images/control%20web%20v1.1b.jpg)
+![](https://github.com/Rsantct/pre.di.c/blob/master/www/images/control%20web%20v1.1c.jpg)
+![](https://github.com/Rsantct/pre.di.c/blob/master/www/images/control%20web%20v1.1d.jpg)
