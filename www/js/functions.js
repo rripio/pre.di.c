@@ -32,8 +32,8 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 /////////////   GLOBALS //////////////
 
 ecasound_is_used = check_if_ecasound();     // Boolean indicates if pre.di.c uses Ecasound
-auto_update_interval = 3000;                // Auto-update interval millisec
-
+auto_update_interval = 1500;                // Auto-update interval millisec
+advanced_controls = false;                  // Default for showing advanced controls
 
 // Returns boolen as per 'load_ecasound = True|False' inside 'config/config.yml'
 function check_if_ecasound() {
@@ -64,6 +64,17 @@ function predic_cmd(cmd, update=true) {
     if (update) {
         refresh_predic_status();
     }
+}
+
+//////// TOGGLES ADVANCED CONTROLS ////////
+function advanced_toggle() {
+    if ( advanced_controls !== true ) {
+        advanced_controls = true;
+    }
+    else {
+        advanced_controls = false;
+    }
+    page_update(status);
 }
 
 //////// AMPLIFIER CONTROL ////////
@@ -211,7 +222,7 @@ function page_initiate() {
     }
 
     // Web header shows the loudspeaker name
-    document.getElementById("cabecera").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
+    document.getElementById("main_lside").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
 
     // Queries the pre.di.c status and updates the page
     refresh_predic_status();
@@ -242,33 +253,32 @@ function refresh_predic_status() {
 // Dumps pre.di.c status into the web page
 function page_update(status) {
 
-    // LEVEL y BALANCE
-    document.getElementById("status_LEV").innerHTML = 'LEVEL: '   + status_decode(status, 'level');
-    document.getElementById("status_BAL").innerHTML = 'balance: ' + status_decode(status, 'balance');
-
-    // Tone buttons
-    document.getElementById("bassInfo").innerText   = 'BASS: '    + status_decode(status, 'bass');
-    document.getElementById("trebleInfo").innerText = 'TREB: '    + status_decode(status, 'treble');
+    // Level, balance, tone info
+    document.getElementById("levelInfo").innerHTML  =            status_decode(status, 'level');
+    document.getElementById("balInfo").innerHTML    = 'BAL: '  + status_decode(status, 'balance');
+    document.getElementById("bassInfo").innerText   = 'BASS: ' + status_decode(status, 'bass');
+    document.getElementById("trebleInfo").innerText = 'TREB: ' + status_decode(status, 'treble');
 
     // The selected item on INPUTS, XO, DRC and PEQ
-    document.getElementById("inputsSelector").value =               status_decode(status, 'input');
-    document.getElementById("xoSelector").value     =               status_decode(status, 'XO_set');
-    document.getElementById("drcSelector").value    =               status_decode(status, 'DRC_set');
+    document.getElementById("inputsSelector").value =            status_decode(status, 'input');
+    document.getElementById("xoSelector").value     =            status_decode(status, 'XO_set');
+    document.getElementById("drcSelector").value    =            status_decode(status, 'DRC_set');
     if ( ecasound_is_used == true){
         document.getElementById("peqSelector").value    =           status_decode(status, 'PEQ_set');
     }
-    // MUTE, MONO, LOUDNESS buttons text lower case if deactivated
-    document.getElementById("buttonMute").innerHTML = OnOff( 'mute', status_decode(status, 'muted') );
-    document.getElementById("buttonMono").innerHTML = OnOff( 'mono', status_decode(status, 'mono') );
-    document.getElementById("buttonLoud").innerHTML = OnOff( 'loud', status_decode(status, 'loudness_track') );
+    // MONO, LOUDNESS buttons text lower case if deactivated
+    document.getElementById("buttonMono").innerHTML = UpLow( 'mono', status_decode(status, 'mono') );
+    document.getElementById("buttonLoud").innerHTML = UpLow( 'loud', status_decode(status, 'loudness_track') );
 
     // Highlights activated buttons
     if ( status_decode(status, 'muted') == 'true' ) {
         document.getElementById("buttonMute").style.background = "rgb(185, 185, 185)";
         document.getElementById("buttonMute").style.color = "white";
+        document.getElementById("buttonMute").style.fontWeight = "bolder";
     } else {
         document.getElementById("buttonMute").style.background = "rgb(100, 100, 100)";
         document.getElementById("buttonMute").style.color = "lightgray";
+        document.getElementById("buttonMute").style.fontWeight = "normal";
     }
     if ( status_decode(status, 'mono') == 'true' ) {
         document.getElementById("buttonMono").style.background = "rgb(185, 185, 185)";
@@ -293,7 +303,22 @@ function page_update(status) {
 
     // Highlights player controls when activated
     update_player_controls()
+    
+    // Displays the [url] button if input == 'iradio'
+    if (status_decode(status, 'input') == "iradio") {
+        document.getElementById( "url_button").style.display = "inline";
+    }
+    else {
+        document.getElementById( "url_button").style.display = "none";
+    }
 
+    // Displays or hides the advanced controls section
+    if ( advanced_controls == true ) {
+        document.getElementById( "advanced_controls").style.display = "block";
+    }
+    else {
+        document.getElementById( "advanced_controls").style.display = "none";
+    }
 }
 
 // Getting files from server
@@ -330,8 +355,8 @@ function status_decode(status, prop) {
     return String(result).trim();
 }
 
-// To upper-lower case button labels, e.g. muted:true/false ==> 'MUTE' / 'mute'
-function OnOff(prop, truefalse) {
+// To upper-lower case button labels, e.g. mono:true/false ==> 'MONO' / 'mono'
+function UpLow(prop, truefalse) {
     var label = '';
     label = prop.toLowerCase()
     if ( truefalse == 'true' ) { label = prop.toUpperCase(); }
@@ -392,15 +417,16 @@ function fills_drc_selector() {
 function insert_peq_selector(){
 
     // defines the selector
-    var nuevoSelector = document.createElement("select");
-    nuevoSelector.setAttribute("id", "peqSelector");
-    nuevoSelector.setAttribute("onchange", "predic_cmd('peq ' + this.value, update=false)" );
+    var newSelector = document.createElement("select");
+    newSelector.setAttribute("id", "peqSelector");
+    newSelector.setAttribute("onchange", "predic_cmd('peq ' + this.value, update=false)" );
 
     // Appends it
     var element = document.getElementById("span_peq");
-    // And label it with 'PEQ:'
+    // label it with 'PEQ:' and restore font color from grey to white
     element.innerHTML = 'PEQ:';
-    element.appendChild(nuevoSelector);
+    element.appendChild(newSelector);
+    document.getElementById("peq").style.color = "white";
 }
 
 // PEQ selector
@@ -502,4 +528,14 @@ function indentLevel(linea) {
 // Auxiliary to check for "numeric" strings
 function isNumeric(num){
   return !isNaN(num)
+}
+
+// Sends an url to the server, to be played back
+function play_url() {
+    var url = prompt('Enter url to play:');
+    if ( url.slice(0,5) == 'http:' || url.slice(0,6) == 'https:' ) {
+        var myREQ = new XMLHttpRequest();
+        myREQ.open("GET", "php/functions.php?command=" + url, async=true);
+        myREQ.send();
+    }
 }
