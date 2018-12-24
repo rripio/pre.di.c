@@ -73,27 +73,29 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 
         td#input            { width:  85%; text-align: right;  border: none;}
         
-        td#treble           { border: 1px solid grey; border-radius: 10px/10px;}
-        td#balance          { border: 1px solid grey; border-radius: 10px/10px;}
-        td#bass             { border: 1px solid grey; border-radius: 10px/10px;}
-        td#mono_loud        { border: 1px solid grey; border-radius: 10px/10px;}
+        td#treble           { border: 1px solid grey; border-radius: 10px/10px; }
+        td#balance          { border: 1px solid grey; border-radius: 10px/10px; }
+        td#bass             { border: 1px solid grey; border-radius: 10px/10px; }
+        td#mono_loud        { border: 1px solid grey; border-radius: 10px/10px; }
         
-        table#eq_table      { border: 1px solid grey; border-radius: 10px/10px;}
+        table#eq_table      { border: 1px solid grey; border-radius: 10px/10px; }
         td#xo               { border: none; width: 33%; }
         td#drc              { border: none; width: 33%; }
-        td#peq              { border: none; width: 33%; color:grey;}
+        td#peq              { border: none; width: 33%; color:grey; }
         
         table#player_info   { text-align: left; }
-        td#artist           { border: 1px solid grey; border-radius: 10px/10px;}
-        td#album            { border: 1px solid grey; border-radius: 10px/10px;}
-        td#title            { border: 1px solid grey; border-radius: 10px/10px;}
+        td#time             { border: 1px solid grey; border-radius: 10px/10px; width: 7%; font-size:0.6em;}
+        td#bitrate          { border: 1px solid grey; border-radius: 10px/10px; width: 5%; font-size:0.6em;}
+        td#artist           { border: 1px solid grey; border-radius: 10px/10px; }
+        td#album            { border: 1px solid grey; border-radius: 10px/10px; }
+        td#title            { border: 1px solid grey; border-radius: 10px/10px; }
 
         select  { font-size:1.0em;
                   font-weight:bold;
                   color:white;
                   background-color: rgb(25, 25, 25); }
 
-        .buttons_table      { width: 100%; border-style: none;}
+        .buttons_table      { width: 100%; border-style: none; }
         
         .button_cell        { width: 33%; border-style: none; }
                 
@@ -214,9 +216,9 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
         <!-- Playing info -->
         <div style="overflow-x:auto;">
             <table id="player_info" >
-                <tr><td id="artist" ></td></tr>
-                <tr><td id="album"  ></td></tr>
-                <tr><td id="title"  ></td></tr>
+                <tr> <td id="bitrate"></td> <td id="artist"></td> <td id="time"> </td></tr>
+                <tr> <td id="album" colspan="3">                              </td></tr>
+                <tr> <td id="title" colspan="3">                               </td></tr>
             </table>
         </div>
 
