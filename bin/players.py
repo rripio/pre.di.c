@@ -118,7 +118,7 @@ def get_librespot_meta():
     # for getting a privative and unique http request token for authentication.
 
     player = 'Spotify'
-    artist = album = title = ''
+    artist = album = title = '-'
 
     try:
         # Returns the current track title played by librespot.
@@ -136,6 +136,13 @@ def mplayer_cmd(cmd, service):
     """ Sends a command to Mplayer trough by its input fifo """
     # Notice: Mplayer sends its responses to the terminal where Mplayer was launched,
     #         or to a redirected file.
+
+    # We prefer to translate previuos/next commands to seeking -/+ 60 seconds:
+    if cmd == 'previous':
+        cmd = 'seek -60 0' # 0 means relative seeking (http://www.mplayerhq.hu/DOCS/tech/slave.txt)
+    if cmd == 'next':
+        cmd = 'seek +60 0'
+
     sp.Popen( f'echo "{cmd}" > /home/predic/{service}_fifo', shell=True)
 
 def get_mplayer_iradio_info():
@@ -150,13 +157,17 @@ def get_mplayer_iradio_info():
     mplayer_redirection_path = '/home/predic/tmp/.iradio'
 
     # Communicates to Mplayer trough by its input fifo to get the current media filename and bitrate:
-    mplayer_cmd(cmd='get_file_name',     service='iradio')
     mplayer_cmd(cmd='get_audio_bitrate', service='iradio')
+    mplayer_cmd(cmd='get_file_name',     service='iradio')
+    mplayer_cmd(cmd='get_time_pos',      service='iradio')
+
+    # Waiting Mplayer ANS_xxxx to be writen to output file
+    time.sleep(.25)
 
     # Trying to read the ANS_xxxx from the Mplayer output file
     with open(mplayer_redirection_path, 'r') as file:
         try:
-            tmp = file.read().split('\n')[-3:] # get last two lines plus the empty one when splitting
+            tmp = file.read().split('\n')[-4:] # get last 3 lines plus the empty one when splitting
         except:
             tmp = []
 
@@ -167,11 +178,20 @@ def get_mplayer_iradio_info():
         file.write('')
 
     # Reading the intended metadata chunks
-    if len(tmp) >= 2: # to avoid indexes issues while no relevant metadata is available
-        if 'ANS_FILENAME=' in tmp[0]:
-            album = tmp[0].split('ANS_FILENAME=')[1].split('?')[0].replace("'","")
-        if 'ANS_AUDIO_BITRATE=' in tmp[1]:
-            title = tmp[1].split('ANS_AUDIO_BITRATE=')[1].split('\n')[0].replace("'","")
+    if len(tmp) >= 3: # to avoid indexes issues while no relevant metadata are available
+
+        if 'ANS_AUDIO_BITRATE=' in tmp[0]:
+            artist = tmp[0].split('ANS_AUDIO_BITRATE=')[1].split('\n')[0].replace("'","")
+
+        if 'ANS_FILENAME=' in tmp[1]:
+            album = tmp[1].split('ANS_FILENAME=')[1].split('?')[0].replace("'","")
+
+        if 'ANS_TIME_POSITION=' in tmp[2]:
+            time_pos = tmp[2].split('ANS_TIME_POSITION=')[1].split('\n')[0]
+            time_pos = float(time_pos)
+            minutes = int(time_pos / 60)
+            seconds = int(round(time_pos % 60))
+            title  = f'{minutes:0>2}:{seconds:0>2}'
 
     return '{ "player":"' + player + '", "artist":"' + artist + \
            '", "album":"' + album + '", "title":"' + title + '" }'
@@ -226,7 +246,7 @@ def control(action):
         pass
 
     elif predic_source() == 'iradio':
-        mplayer_cmd(action, 'iradio')
+        mplayer_cmd(cmd=action, service='iradio')
 
     else:
         pass
