@@ -23,6 +23,7 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 -->
     
 <head>
+
     <title>pre.di.c</title>
 
     <!-- responsive -->
@@ -45,43 +46,62 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
         body    { color:white;
                   background-color: rgb(38, 38, 38);
                   font-family: Verdana, Helvetica, Arial;
-                  font-weight:bold;
-                }
+                  font-weight:bold; }
 
         button  { background-color: rgb(100, 100, 100);
                   color: white;
                   font-weight:bold;
-                  font-size:1.0em;
+                  font-size:0.95em;
                   border-radius: 5px/5px;
-                  border:2px solid rgb(120,120,120);
-                }
+                  border:2px solid rgb(120,120,120); }
 
+        table   { width: 100%; }
+                  
         th, td  { padding: 5px;
                   text-align: center;
                   border: 1px solid gray;
                   font-size:1.0em;
-                  width: 50%
-                }
+                  width: 50% }
 
-        table#player_info   { width: 100%; text-align: left;
-                            }
+        td#main_lside       { width:  95%; text-align: center; border: 1px solid white; border-radius: 10px/10px; }
+
+        td#main_rside       { width:   5%; text-align: center; border: none; }
+
+        td#OnOff            { width:   5%; text-align: center; border: none; }
+
+        td#levelInfo        { width:   5%; text-align: center; border: 1px solid white; border-radius: 10px/10px; }
+
+        td#input            { width:  85%; text-align: right;  border: none;}
+        
+        td#treble           { border: 1px solid grey; border-radius: 10px/10px;}
+        td#balance          { border: 1px solid grey; border-radius: 10px/10px;}
+        td#bass             { border: 1px solid grey; border-radius: 10px/10px;}
+        td#mono_loud        { border: 1px solid grey; border-radius: 10px/10px;}
+        
+        table#eq_table      { border: 1px solid grey; border-radius: 10px/10px;}
+        td#xo               { border: none; width: 33%; }
+        td#drc              { border: none; width: 33%; }
+        td#peq              { border: none; width: 33%; color:grey;}
+        
+        table#player_info   { text-align: left; }
+        td#artist           { border: 1px solid grey; border-radius: 10px/10px;}
+        td#album            { border: 1px solid grey; border-radius: 10px/10px;}
+        td#title            { border: 1px solid grey; border-radius: 10px/10px;}
 
         select  { font-size:1.0em;
                   font-weight:bold;
                   color:white;
-                  background-color: rgb(25, 25, 25);
-                }
+                  background-color: rgb(25, 25, 25); }
 
-        .buttons_table  {   width: 100%; border-style: none;
-                        }
-        .button_cell    {   width: 33%; border-style: none;
-                        }        
-        .custom_buttons {   width: 100%;
-                            font-size:1.0em;
+        .buttons_table      { width: 100%; border-style: none;}
+        
+        .button_cell        { width: 33%; border-style: none; }
+                
+        .custom_buttons     { width: 100%;
+                            font-size:0.90em;
                             box-shadow: 0 5px 10px 0 rgba(200,200,200,0.3), 0 3px 10px 0 rgba(0,0,0,0.1);
                             border:2px solid rgb(120,120,120);
-                            border-radius: 10px/10px;
-                        }
+                            border-radius: 10px/10px; }
 
     </style>
 
@@ -91,120 +111,99 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 <body onload="page_initiate()" >
 
     <div id="main">
-
-        <!--    page scheme:
-
-            power << ON/OFF >>  INPUT: << selector >>
-            level: -23.0        balance: 0.0
-
-             [-] bass: 0 [+]   [-] treble: 0 [+]
-
-                     [mute][mono][loud]
-
-                   XO: << selector >>
-                  DRC: << selector >>
-
-                     [-3][-1][+1][+3]
-
-            [ <| ] [ [] ] [ || ] [ > ] [ |> ]
-
-            Artists
-            Album
-            Title
-
-        -->
         
-        <div id="cabecera" align="center">
-        </div>
-
-        <hr>
-
-        <div align="center">
-
-            <!-- Amplifier swith -->
-            <select id="onoffSelector" onchange="ampli(this.value)">
-              <option value="on" >ON </option>
-              <option value="off">OFF</option>
-            </select>
-
-            &nbsp;
-
-            <!-- Inputs selector, will be filled by javascript -->
-            INPUT:
-            <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
-
-        </div>
-
-        <hr>
-
-        <!-- Level , Balance (table display) -->
-        <div style="overflow-x:auto;"> <!-- responsive -->
-        <table style="width:100%;">
+        <!-- :: pre.di.c :: Loudspeaker | advanced_controls_switch -->
+        <div style="overflow-x:auto;">
+        <table id="main_title" >
             <tr>
-                <td id="status_LEV" ></td>
-                <td id="status_BAL" ></td>
+                <td id="main_lside"></td>
+                <td id="main_rside">
+                    <button id="advanced_switch" style="font-size:0.7em" onclick="advanced_toggle()">&#9881;</button>
+                </td>
             </tr>
         </table>
         </div>
 
-        <hr>
 
-        <!-- Tone buttons -->
-        <div align="center" style="font-size:0.75em;">
-            <button type="button"                 onmousedown="predic_cmd('bass   -1 add')"  >-</button>
-            <span id="bassInfo">bass</span>
-            <button type="button"                 onmousedown="predic_cmd('bass   +1 add')"  >+</button>
-            &nbsp;&nbsp;&nbsp;
-            <button type="button"                 onmousedown="predic_cmd('treble -1 add')"  >-</button>
-            <span id="trebleInfo">treble</span>
-            <button type="button"                 onmousedown="predic_cmd('treble +1 add')"  >+</button>
+        <div>
+            <table id="level_ampli_input"><tr>
+
+            <!-- Amplifier swith -->
+            <td id="OnOff">
+                <select id="onoffSelector" onchange="ampli(this.value)">
+                  <option value="on" >ON </option>
+                  <option value="off">OFF</option>
+                </select>
+            </td>
+
+            <!-- Level display -->
+            <td id="levelInfo"></td>
+            
+            <!-- Inputs selector, will be filled by javascript -->
+            <td id="input">
+                <button id="url_button"     style="text-align:center;font-size:0.7em;display:none" onclick="play_url()">&#9901</button>
+                <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
+            </td>
+
+            </tr></table>
+
         </div>
 
-        <hr>
+        <!-- ADVANCED CONTROLS CAN BE DISABLED-->
 
-        <!-- mute, mono, loudness -->
-        <div align="center">
-            <button type="button" id="buttonMute" onmousedown="predic_cmd('mute toggle')"           >MUTE</button>
-            <button type="button" id="buttonMono" onmousedown="predic_cmd('mono toggle')"           >MONO</button>
-            <button type="button" id="buttonLoud" onmousedown="predic_cmd('loudness_track toggle')" >LOUD</button>
-        </div>
-
-        <hr>
-
-        <!--  XO selector -->
-        <div align="center">
-            <span>XO:
-            <select id="xoSelector"     onchange="predic_cmd('xo ' + this.value, update=false)" ></select>
-            </span>
-        </div>
-
-        <!-- DRC selector -->
-        <div align="center">
-            <span>DRC:
-            <select id="drcSelector"     onchange="predic_cmd('drc ' + this.value, update=false)" ></select>
-            </span>
-        </div>
-        
-        <!-- a PEQ selector will be created if ecasound is used -->
-        <div align="center">
-            <span id="span_peq">
-            </span>
-        </div>
-
-        <hr>
-
-        <!-- Volume butttons -->
-        <div align="center" >
-            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level -3 add')" >- 3</button>
-            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level -1 add')" >- 1</button>
-            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level +1 add')" >+ 1</button>
-            <button type="button" style="font-size:1.2em;" onmousedown="predic_cmd('level +3 add')" >+ 3</button>
-        </div>
-
-        <hr>
+        <!-- bass     balance   -->
+        <!-- treble   mono loud -->
+        <!--  XO      DRC       -->
+        <!--          PEQ       -->
+        <div id="advanced_controls" align="center" style="display:none; font-size:0.75em;">
+        <table>
+            <tr>
+                <td id="treble">
+                    <button type="button"                 onmousedown="predic_cmd('treble -1 add')"  >-</button>
+                    <span id="trebleInfo">treble</span>
+                    <button type="button"                 onmousedown="predic_cmd('treble +1 add')"  >+</button>
+                </td>
+                <td id="balance">
+                    <button type="button"                 onmousedown="predic_cmd('balance -1 add')"  >-</button>
+                    <span id="balInfo">BAL</span>
+                    <button type="button"                 onmousedown="predic_cmd('balance +1 add')"  >+</button>
+                </td>
+            </tr>
+            <tr>
+                <td id="bass">
+                    <button type="button"                 onmousedown="predic_cmd('bass   -1 add')"  >-</button>
+                    <span id="bassInfo">bass</span>
+                    <button type="button"                 onmousedown="predic_cmd('bass   +1 add')"  >+</button>
+                </td>
+                <td id="mono_loud">
+                    <button type="button" id="buttonMono" onmousedown="predic_cmd('mono toggle')"           >MONO</button>
+                    <button type="button" id="buttonLoud" onmousedown="predic_cmd('loudness_track toggle')" >LOUD</button>
+                </td>
+            </tr>
+        </table>
+        <table id="eq_table">
+            <tr>
+                <td id="xo">
+                    <span>XO:
+                    <select id="xoSelector"     onchange="predic_cmd('xo ' + this.value, update=false)" ></select>
+                    </span>
+                </td>
+                <td id="drc">
+                    <span >DRC:
+                    <select id="drcSelector"     onchange="predic_cmd('drc ' + this.value, update=false)" ></select>
+                    </span>
+                </td>
+                <td id="peq">
+                    <!-- a PEQ selector will be created if ecasound is used -->
+                    <span id="span_peq" style="display:inline-block;">[peq]
+                    </span>
+                </td>
+            </tr>
+        </table>
+        </div><!-- EOF ADVANCED CONTROLS -->
 
         <!-- Playing control -->
-        <div id="player_control" align="center" >
+        <div id="player_control_buttons" align="center" display="inline">
             <button type="button" id="buttonPrevious" onmousedown="playerCtrl('previous')" >&lt;|           </button>
             <button type="button" id="buttonStop"     onmousedown="playerCtrl('stop')"     >&nbsp;[]&nbsp;  </button>
             <button type="button" id="buttonPause"    onmousedown="playerCtrl('pause')"    >&nbsp;||&nbsp;  </button>
@@ -221,6 +220,15 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
             </table>
         </div>
 
+        <!-- Level butttons -->
+        <div id="level_buttons" align="center" >
+            <button type="button" onmousedown="predic_cmd('level -3 add')"                >- 3</button>
+            <button type="button" onmousedown="predic_cmd('level -1 add')"                >- 1</button>
+            <button type="button" onmousedown="predic_cmd('mute toggle')" id="buttonMute" >  0</button>            
+            <button type="button" onmousedown="predic_cmd('level +1 add')"                >+ 1</button>
+            <button type="button" onmousedown="predic_cmd('level +3 add')"                >+ 3</button>
+        </div>
+
         <!-- uncomment to test javascript functions with this button 
         <div align="right">
             <button type="button"                 onclick="filling_macro_buttons()" >PBA</button>
@@ -229,7 +237,7 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 
     </div><!--main-->
 
-    <!-- 9 buttons keypad for customizable user macros -->
+    <!-- 9 buttons keypad for customizable user macros (if any found) -->
     <div id="custom_buttons" style="display:none">
         <table class="buttons_table">
           <tr>
