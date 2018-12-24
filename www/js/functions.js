@@ -193,15 +193,20 @@ function update_player_info() {
     myREQ.send();
     tmp = myREQ.responseText.replace('\n','');
     dicci = JSON.parse( tmp );
-    var player = dicci['player'];
-    var artist = dicci['artist'];
-    var album  = dicci['album'];
-    var title  = dicci['title'];
+    var player      = dicci['player'];
+    var bitrate     = dicci['bitrate'];
+    var time_pos    = dicci['time_pos'];
+    var time_tot    = dicci['time_tot'];
+    var artist      = dicci['artist'];
+    var album       = dicci['album'];
+    var title       = dicci['title'];
     // 'player' info not anymore needed because equals to 'input' value
     // document.getElementById("player").innerText = player + ':';
-    document.getElementById("artist").innerText = artist;
-    document.getElementById("album").innerText = album;
-    document.getElementById("title").innerText = title;
+    document.getElementById("time").innerText       = time_pos + "\n" + time_tot;
+    document.getElementById("bitrate").innerText    = bitrate + "\nkbps";
+    document.getElementById("artist").innerText     = artist;
+    document.getElementById("album").innerText      = album;
+    document.getElementById("title").innerText      = title;
 }
 
 //////// PAGE MANAGEMENT ////////
