@@ -136,6 +136,11 @@
 
     // PLAYER related commands
     elseif ( substr( $command, 0, 7 ) === "player_" ) {
+        // A regular playback control (player_play, player_pause, etc)
+        echo aux_socket($command);
+    }
+    elseif ( substr( $command, 0, 4 ) === "http" ) {
+        // A stream url to be played back
         echo aux_socket($command);
     }
 
