@@ -84,7 +84,11 @@ def process(data):
         return players.control('next')
     elif data == 'player_previous':
         return players.control('previous')
-
+        
+    # An url to be played back is received:
+    elif data[:7] == 'http://':
+        sp.run( f'/home/predic/scripts/iRadio.py url {data}'.split() )
+        
     # User macros: macro files are named this way: '~/macros/N_macro_name',
     #              so N will serve as button keypad position from web control page
     elif data[:6] == 'macro_':
