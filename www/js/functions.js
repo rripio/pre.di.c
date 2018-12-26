@@ -309,8 +309,9 @@ function page_update(status) {
     // Highlights player controls when activated
     update_player_controls()
     
-    // Displays the [url] button if input == 'iradio'
-    if (status_decode(status, 'input') == "iradio") {
+    // Displays the [url] button if input == 'iradio' or 'istreams'
+    if (status_decode(status, 'input') == "iradio" ||
+        status_decode(status, 'input') == "istreams") {
         document.getElementById( "url_button").style.display = "inline";
     }
     else {
