@@ -1,0 +1,19 @@
+# Write your default config options here!
+
+# NOTICE: mplayer will resample to the Fs of JACK
+# af=resample=44100:0:2 # not necessary
+
+# USE:
+#   ao=jack:name=<mplayer_jack_name>:noconnect
+# OR
+#   ao=jack:name=<mplayer_port_name>:port=<destination_port_name>
+
+[dvb]
+ao=jack:name=mplayer_dvb:noconnect
+
+[cdda]
+ao=jack:name=mplayer_cdda:noconnect
+
+[istreams]
+ao=jack:name=mplayer_istreams:port=istreams_loop
+
