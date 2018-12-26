@@ -25,6 +25,9 @@
 
 """ A module that controls and retrieve track info from the current player
 """
+
+# TODO: a command line interface could be useful
+
 import subprocess as sp
 import yaml
 import jack
@@ -284,3 +287,32 @@ def control(action):
         return result.encode()
     else:
         return ''.encode()
+
+def process(data):
+    """
+        Only certain received 'data' will be validated and processed,
+        then returns back some useful info to the asking client.
+    """
+
+    # First clearing the new line
+    data = data.replace('\n','')
+
+    # Queries the current music player
+    if data == 'player_get_meta':
+        return get_meta()
+    elif data == 'player_state':
+        return control('state')
+    elif data == 'player_stop':
+        return control('stop')
+    elif data == 'player_pause':
+        return control('pause')
+    elif data == 'player_play':
+        return control('play')
+    elif data == 'player_next':
+        return control('next')
+    elif data == 'player_previous':
+        return control('previous')
+
+    # An url to be played back is received:
+    elif data[:7] == 'http://':
+        sp.run( f'/home/predic/scripts/istreams.py url {data}'.split() )
