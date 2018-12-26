@@ -1,1 +1,4 @@
-/home/predic/scripts/istreams.py name radioclasica
+#!/bin/bash
+
+/home/predic/scripts/istreams.py preset 2
+control input istreams
