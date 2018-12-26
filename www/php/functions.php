@@ -43,50 +43,32 @@
         return $tmp;
     }
 
-    // Communicates to the pre.di.c TCP/IP server
-    function predic_socket ($cmd) {
-        $service_port = 9999;
+    //////////////////////////////////////////////////////
+    // Communicates to the pre.di.c TCP/IP servers.
+    //////////////////////////////////////////////////////
+    // Available server ports are:
+    //      9999    pre.di.c audio server
+    //      9990    aux server (amplifier, user macros)
+    //      9991    players interface server
+    //////////////////////////////////////////////////////
+    function predic_socket ($service_port, $cmd) {
         $address = "localhost";
-        /* Crear un socket TCP/IP */
+        /* Creates a TCP socket*/
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if ($socket === false) {
-            echo "socket_create() fallo: razon: " . socket_strerror(socket_last_error()) . "\n";
+            echo "socket_create() failed: " . socket_strerror(socket_last_error()) . "\n";
         }
         $result = socket_connect($socket, $address, $service_port);
         if ($result === false) {
-            echo "socket_connect() fallo.\nRazon: ($result) " . socket_strerror(socket_last_error($socket)) . "\n";
+            echo "socket_connect() failed: ($result) " . socket_strerror(socket_last_error($socket)) . "\n";
         }
-        // Envía el comando y recibe la respuesta
+        // Sends and receive
         socket_write($socket, $cmd, strlen($cmd));
         $out = socket_read($socket, 4096);
-        // Le dice al server que cierre la conexión en su lado
+        // Tells the server to close the connection from its end:
         socket_write($socket, "quit", strlen("quit"));
         socket_read($socket, 4096);
-        /* Finaliza este socket TCP/IP */
-        socket_close($socket);
-        return $out;
-    }
-
-    // Communicates to the auxiliary tasks pre.di.c's TCP/IP server
-    function aux_socket ($cmd) {
-        $service_port = 9988;
-        $address = "localhost";
-        /* Crear un socket TCP/IP */
-        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if ($socket === false) {
-            echo "socket_create() fallo: razon: " . socket_strerror(socket_last_error()) . "\n";
-        }
-        $result = socket_connect($socket, $address, $service_port);
-        if ($result === false) {
-            echo "socket_connect() fallo.\nRazon: ($result) " . socket_strerror(socket_last_error($socket)) . "\n";
-        }
-        // Envía el comando y recibe la respuesta
-        socket_write($socket, $cmd, strlen($cmd));
-        $out = socket_read($socket, 4096);
-        // Le dice al server que cierre la conexión en su lado
-        socket_write($socket, "quit", strlen("quit"));
-        socket_read($socket, 4096);
-        /* Finaliza este socket TCP/IP */
+        // Ends this end socket
         socket_close($socket);
         return $out;
     }
@@ -125,10 +107,10 @@
     elseif ( $command == "amplion" ) {
         // The remote script will store the amplifier state into
         // ~/.ampli so that the web can update it.
-        aux_socket('ampli on');
+        predic_socket( 9990, 'ampli on');
     }
     elseif ( $command == "amplioff" ) {
-        aux_socket('ampli off');
+        predic_socket( 9990, 'ampli off');
     }
     elseif ( $command == "amplistatus" ) {
         readfile("/home/predic/.ampli"); // php cannot acces inside /tmp for securety reasons.
@@ -137,11 +119,11 @@
     // PLAYER related commands
     elseif ( substr( $command, 0, 7 ) === "player_" ) {
         // A regular playback control (player_play, player_pause, etc)
-        echo aux_socket($command);
+        echo predic_socket( 9991, $command );
     }
     elseif ( substr( $command, 0, 4 ) === "http" ) {
         // A stream url to be played back
-        echo aux_socket($command);
+        echo predic_socket( 9991, $command );
     }
 
     // User MACROS commands
@@ -150,12 +132,12 @@
         echo json_encode( $macros_array );
     }
     elseif ( substr( $command, 0, 6 ) === "macro_" ) {
-        echo aux_socket( $command );
+        echo predic_socket( 9990, $command );
     }
 
     //// Any else will be an STANDARD pre.di.c command, then forwarded to pre.di.c's server
     else {
-        echo predic_socket($command);
+        echo predic_socket( 9999, $command );
     }
 
 ?>
