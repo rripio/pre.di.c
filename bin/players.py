@@ -31,6 +31,7 @@ import jack
 import mpd
 import time
 
+# MPD settings:
 mpd_host    = 'localhost'
 mpd_port    = 6600
 mpd_passwd  = None
@@ -52,22 +53,24 @@ def mpd_client(query):
         player = 'MPD'
         time_pos = time_tot = '-:-'
         bitrate = artist = album = title = '-'
+        
+        if mpd_online:
 
-        # We try because not all tracks have complete metadata fields:
-        try:    artist   = client.currentsong()['artist']
-        except: pass
-        try:    album    = client.currentsong()['album']
-        except: pass
-        try:    title    = client.currentsong()['title']
-        except: pass
-        try:    bitrate  = client.status()['bitrate']   # given in kbps
-        except: pass
-        try:    time_pos = timeFmt( float( client.status()['elapsed'] ) )
-        except: pass
-        try:    time_tot = timeFmt( float( client.currentsong()['time'] ) )
-        except: pass
+            # We try because not all tracks have complete metadata fields:
+            try:    artist   = client.currentsong()['artist']
+            except: pass
+            try:    album    = client.currentsong()['album']
+            except: pass
+            try:    title    = client.currentsong()['title']
+            except: pass
+            try:    bitrate  = client.status()['bitrate']   # given in kbps
+            except: pass
+            try:    time_pos = timeFmt( float( client.status()['elapsed'] ) )
+            except: pass
+            try:    time_tot = timeFmt( float( client.currentsong()['time'] ) )
+            except: pass
 
-        client.close()
+            client.close()
 
         return '{ "player":"' + player + '", "bitrate":"' + bitrate + \
                '", "time_pos":"' + time_pos + '", "time_tot":"' + time_tot + \
@@ -106,14 +109,14 @@ def mpd_client(query):
     except:
         mpd_online = False
 
-    result =    { 'get_meta':   get_meta,
-                  'stop':       stop,
-                  'pause':      pause,
-                  'play':       play,
-                  'next':       next,
-                  'previous':   previous,
-                  'state':      state
-                }[query]()
+    result = {  'get_meta':   get_meta,
+                'stop':       stop,
+                'pause':      pause,
+                'play':       play,
+                'next':       next,
+                'previous':   previous,
+                'state':      state
+             }[query]()
 
     return result
 
@@ -129,8 +132,8 @@ def get_librespot_meta():
 
     try:
         # Returns the current track title played by librespot.
-        # <scripts/librespot.py> handles the libresport print outs to be 
-        #                        redirected to <~/tmp/.librespotEvents>
+        # 'scripts/librespot.py' handles the libresport print outs to be 
+        #                        redirected to 'tmp/.librespotEvents'
         tmp = sp.check_output( 'tail -n1 /home/predic/tmp/.librespotEvents'.split() )
         title  = tmp.decode().split('"')[-2]
         # JSON for JavaScript on control web page, NOTICE json requires double quotes:
@@ -154,7 +157,7 @@ def mplayer_cmd(cmd, service):
 
     sp.Popen( f'echo "{cmd}" > /home/predic/{service}_fifo', shell=True)
 
-def get_mplayer_iradio_info():
+def get_mplayer_istreams_info():
     """ gets metadata from Mplayer as per
         http://www.mplayerhq.hu/DOCS/tech/slave.txt """
 
@@ -164,13 +167,13 @@ def get_mplayer_iradio_info():
 
     # This is the file were Mplayer standard output has been redirected to,
     # so we can read there any answer when required to Mplayer slave daemon:
-    mplayer_redirection_path = '/home/predic/tmp/.iradio'
+    mplayer_redirection_path = '/home/predic/tmp/.istreams'
 
     # Communicates to Mplayer trough by its input fifo to get the current media filename and bitrate:
-    mplayer_cmd(cmd='get_audio_bitrate', service='iradio')
-    mplayer_cmd(cmd='get_file_name',     service='iradio')
-    mplayer_cmd(cmd='get_time_pos',      service='iradio')
-    mplayer_cmd(cmd='get_time_length',   service='iradio')
+    mplayer_cmd(cmd='get_audio_bitrate', service='istreams')
+    mplayer_cmd(cmd='get_file_name',     service='istreams')
+    mplayer_cmd(cmd='get_time_pos',      service='istreams')
+    mplayer_cmd(cmd='get_time_length',   service='istreams')
 
     # Waiting Mplayer ANS_xxxx to be writen to output file
     time.sleep(.25)
@@ -210,7 +213,6 @@ def get_mplayer_iradio_info():
            '", "time_pos":"' + time_pos + '", "time_tot":"' + time_tot + \
            '", "artist":"' + artist + '", "album":"' + album + '", "title":"' + title + '" }'
 
-
 def timeFmt(x):
     min = int(x / 60)
     sec = int(round(x % 60))
@@ -231,27 +233,30 @@ def predic_source():
     return source
 
 def get_meta():
-    """ Retrieves a dictionary like structured string with the current track metadata
+    """ Constructs a dictionary-like string with the current track metadata
         '{player: xxxx, artist: xxxx, album:xxxx, title:xxxx, etc... }'
+        Then will return a bytes-like object from the referred string.
     """
     player   = '-'
     time_pos = time_tot = '-:-'
     bitrate = artist = album = title = '-'
     source = predic_source()
-
-    if   source == 'spotify':
-        return get_librespot_meta()
-
-    elif source == 'mpd':
-        return mpd_client('get_meta')
-
-    elif source == 'iradio':
-        return get_mplayer_iradio_info()
-
-    else:
-        return '{ "player":"' + player + '", "bitrate":"' + bitrate + \
+    
+    result  = '{ "player":"' + player + '", "bitrate":"' + bitrate + \
                '", "time_pos":"' + time_pos + '", "time_tot":"' + time_tot + \
                '", "artist":"' + artist + '", "album":"' + album + '", "title":"' + title + '" }'
+
+    if   source == 'spotify':
+        result = get_librespot_meta()
+
+    elif source == 'mpd':
+        result = mpd_client('get_meta')
+
+    elif source == 'istreams':
+        result = get_mplayer_istreams_info()
+
+    # As this is used by a server, we will return a bytes-like object:
+    return result.encode()
 
 def control(action):
     """ controls the playback """
@@ -268,12 +273,13 @@ def control(action):
         # WORK IN PROGRESS
         pass
 
-    elif predic_source() == 'iradio':
-        mplayer_cmd(cmd=action, service='iradio')
+    elif predic_source() in ['istreams', 'iradio']:
+        mplayer_cmd(cmd=action, service='istreams')
 
     else:
         pass
 
+    # As this is used by a server, we will return a bytes-like object:
     if result:
         return result.encode()
     else:
