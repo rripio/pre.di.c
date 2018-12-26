@@ -1,0 +1,4 @@
+#!/bin/bash
+
+/home/predic/scripts/istreams.py preset 3
+control input istreams
