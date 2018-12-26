@@ -37,3 +37,12 @@ tdt:
         - dvb_loop:output_2
     resampled: False
     xo: none
+
+istreams:
+    gain: 0
+    in_ports:
+        - istreams_loop:output_1
+        - istreams_loop:output_2
+    resampled: False
+    xo: none
+
