@@ -24,15 +24,17 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-    Start and stop mplayer for iRadio tasks, and change iRadio stations
+    Starts and stops mplayer for internet streams playback.
+    e.g.: podcasts or internet radio stations.
 
-    Use:    iradio.py   start  [ <num> | <station_name> ] &
+    Use:   istreams.py  start  [ preset_num* | preset_name* ] &
                         stop
-                        preset <num*>
-                        name   <station_name*>
+                        preset <preset_num>
+                        name   <preset_name>
                         url    <some_url_stream>
 
-    * from file:  ~/config/iradio_stations.yml
+    Internet streams presets can be configured into:
+        config/istreams.yml
 
 """
 
@@ -59,50 +61,53 @@ options = '-quiet -nolirc'
 options += " -allow-dangerous-playlist-parsing"
 
 ### Script config:
-# DEFAULT iRadio station preset number:
-default_station = '2'
-# iRadio stations file:
-stations_fname = bp.config_folder + 'iradio_stations.yml'
+# DEFAULT preset number:
+default_preset = '2'
+# internet streams / stations file:
+presets_fname = bp.config_folder + 'istreams.yml'
 # command fifo filename
-iradio_fifo = bp.main_folder + 'iradio_fifo'
+istreams_fifo = bp.main_folder + 'istreams_fifo'
 # Mplayer path:
 mplayer_path = '/usr/bin/mplayer'
 # Mplayer outputs redirected to:
-mplayer_redirection_path = '/home/predic/tmp/.iradio'
+mplayer_redirection_path = '/home/predic/tmp/.istreams'
 # name used for info and pid saving
-program_alias = 'mplayer-iradio'
+program_alias = 'mplayer-istreams'
 
 
 def load_url(url):
     try:
         command = ('loadfile ' + url + '\n' )
-        with open( iradio_fifo, 'w') as f:
+        with open( istreams_fifo, 'w') as f:
             f.write(command)
         return True
     except:
         return False
 
 def select_by_name(preset_name):
-    """ sets channel in mplayer """
-    for preset,dict in stations.items():
+    """ loads a stream by its preset name """
+    for preset,dict in presets.items():
         if dict['name'] == preset_name:
             load_url( dict['url'] )
             return
-    print( f'(iRadio.py) station \'{preset_name}\' not found' )
+    print( f'(istreams.py) preset \'{preset_name}\' not found' )
 
 def select_by_preset(preset_num):
-    """ selects preset from DVB-t.ini """
-    load_url( stations[ int(preset_num) ]['url'] )
+    """ loads a stream by its preset number """
+    try:
+        load_url( presets[ int(preset_num) ]['url'] )
+    except:
+        print( f'(istreams.py) error in preset # {preset_num}' )
 
 def start():
 
     # 1. Prepare a jack loop where MPLAYER outputs can connect.
     #    The jack_loop module will keep the loop alive, so we need to thread it.
-    jloop = threading.Thread( target = pd.jack_loop, args=('iradio_loop',) )
+    jloop = threading.Thread( target = pd.jack_loop, args=('istreams_loop',) )
     jloop.start()
 
     # 2. Mplayer_url:
-    opts = f'{options} -idle -slave -profile iradio -input file={iradio_fifo}'
+    opts = f'{options} -idle -slave -profile istreams -input file={istreams_fifo}'
     command = f'{mplayer_path} {opts}'
     with open(mplayer_redirection_path, 'w') as redir:
         pd.start_pid(command, program_alias, redir)
@@ -111,20 +116,20 @@ def stop():
 
     pd.kill_pid(program_alias)
     # kill bill
-    Popen( 'pkill -KILL -f iradio'.split() )
-    Popen( 'pkill -KILL -f iRadio.py'.split() )
+    Popen( 'pkill -KILL -f istreams'.split() )
+    Popen( 'pkill -KILL -f istreams.py'.split() )
 
 if __name__ == '__main__':
 
     ### Reading the iradio stations file
-    stations = {}
-    f = open(stations_fname, 'r')
+    presets = {}
+    f = open(presets_fname, 'r')
     tmp = f.read()
     f.close()
     try:
-        stations = yaml.load(tmp)
+        presets = yaml.load(tmp)
     except:
-        print ( '(iRadio.py) YAML error into ' + stations_fname )
+        print ( '(istreams.py) YAML error into ' + presets_fname )
 
     ### reading the command line
     if sys.argv[1:]:
@@ -141,17 +146,17 @@ if __name__ == '__main__':
                 elif opc2.isalpha():
                     select_by_name(opc2)
             else:
-                select_by_preset(default_station)
+                select_by_preset(default_preset)
 
         # Stops all this stuff
         elif opc == 'stop':
             stop()
 
-        # Selects an iRadio preset on the fly
+        # Selects a preset number on the fly
         elif opc == 'preset':
             select_by_preset( sys.argv[2] )
 
-        # Selects an iRadio station name on the fly
+        # Selects a preset name on the fly
         elif opc == 'name':
             select_by_name( sys.argv[2] )
 
@@ -163,4 +168,4 @@ if __name__ == '__main__':
             print(__doc__)
 
         else:
-            print('(iRadio.py) Bad option')
+            print('(istreams.py) Bad option')
