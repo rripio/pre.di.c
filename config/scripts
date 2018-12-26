@@ -1,7 +1,7 @@
-mpd_load.py
-iRadio.py           # Mplayer plays internet radio stations
-#DVB.py
+mpd_load.py         # Loads MPD
+istreams.py         # Mplayer based internet streams player script
+#DVB.py             # Mplayer based DVB-T player script
 #netjack.py
 alsa_loop_load.py   # Sets up alsa_loop ports in jack to be used from ALSA backended players
-server_aux.py       # A server for tasks as switching the amplifier and getting metadata from players
-librespot.py        # A Spotify Connect player client
+server_aux.py       # A server for tasks as switching the amplifier and interfacing to players
+librespot.py        # Loads a Spotify Connect player client
