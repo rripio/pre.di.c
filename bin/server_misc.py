@@ -24,24 +24,24 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-    A general purpose TCP server for pre.di.c to process auxiliary jobs
+    A general purpose TCP server for pre.di.c to process jobs
 
     Use:     server_misc.py <processing_module>
 
     e.g:     server_misc.py players
              server_misc.py aux
 """
-# TODO: avoid time.sleep under run_server() maybe 'threading' or 'with' ¿?
 
-# LISTENING ADDRESS & PORT are configured into 'config/config.yml'
+####################################################################
+# The LISTENING ADDRESS & PORT will be read from 'config/config.yml'
 from getconfigs import config
+####################################################################
 
 # The 'verbose' option can be useful to debug:
 verbose = False
 
 import socket
 import sys
-import time
 import subprocess as sp
 
 def server_socket(host, port):
@@ -70,33 +70,36 @@ def server_socket(host, port):
     return s
 
 def run_server(host, port, verbose=False):
+    """ This is the server itself.
+        Here the desired processing module is called
+        to perform actions and giving results.
+    """
 
-    # create the socket
+    # Creates the socket
     mysocket = server_socket(host, port)
 
-    # main loop to proccess connections
+    # Main loop to proccess connections
     maxconns = 10
     while True:
-        # listen ports
-        mysocket.listen(maxconns)  # number of connections in queue
+        # Listen for a queue of connections
+        mysocket.listen(maxconns)
         if verbose:
             print( f'(server_misc [{service}]) listening on \'localhost\':{port}' )
-        # accept client connection
+        # Accepts a client connection when happens:
         sc, remote = mysocket.accept()
-        # somo info
         if verbose:
             print( f'(server_misc [{service}]) connected to client {remote[0]}' )
 
-        # buffer loop to proccess received command
+        # A buffer loop to proccess received orders
         while True:
-            # reception
+            # Reception
             data = sc.recv(4096).decode()
 
             if not data:
-                # nothing in buffer, client has disconnected too soon
+                # Nothing in buffer, closing because the client has disconnected too soon.
                 if verbose:
-                    print (f'(server_misc [{service}]) Client disconnected. '
-                          '              Closing connection...' )
+                    print (f'(server_misc [{service}]) Client disconnected. \
+                             Closing connection...' )
                 sc.close()
                 break
 
@@ -111,7 +114,7 @@ def run_server(host, port, verbose=False):
             elif data.rstrip('\r\n') == 'shutdown':
                 sc.send(b'OK\n')
                 if verbose:
-                    print( f'(server_misc [{service}]) closing connection...' )
+                    print( f'(server_misc [{service}]) Shutting down the server...' )
                 sc.close()
                 mysocket.close()
                 sys.exit(1)
@@ -122,12 +125,13 @@ def run_server(host, port, verbose=False):
                     print  ('>>> ' + data )
                 
                 ############################################################
-                # THE PROCESSING MODULE IMPORTED AT STARTING UP THIS SERVER,
-                # must use the the do() function from the  module.
+                # PROCESSING MODULE IMPORTED AT STARTING UP THIS SERVER,
+                # always must use the the do() function from the  module.
                 result = processing.do(data)
                 ############################################################
 
                 # And send back the result
+                # NOTICE: it is expected to receive a result as a bytes-like object
                 if result:
                     sc.send( result )
                 else:
@@ -136,13 +140,12 @@ def run_server(host, port, verbose=False):
                 if verbose:
                     print( f'(server_misc [{service}]) connected to client {remote[0]}' )
 
-            # wait a bit, loop again
-            time.sleep(0.01)
 
 if __name__ == "__main__":
     
     service = sys.argv[1]
 
+    # Setting the address and port for this server
     address = config[ service + '_address' ]
     port    = config[ service + '_port' ]
 
