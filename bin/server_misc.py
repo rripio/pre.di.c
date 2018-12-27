@@ -31,12 +31,12 @@
              server_misc.py aux
 """
 
-###################################################
-# PORT MAPPING BY SERVICE:
+##############################################################
+# THE LISTENING PORT IS MAPPED AS PER THE SERVICE MODULE NAME:
 SERVICE_PORTS = {   'players':  9991,
                     'aux':      9990
                 }
-###################################################
+##############################################################
 
 import socket
 import sys
