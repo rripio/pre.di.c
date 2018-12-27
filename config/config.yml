@@ -1,95 +1,94 @@
-## values cannot be void
+## Values cannot be void
 ## Numbers: assign "none" to not set
 ## Strings: assign "''" to not set
 
 loudspeaker: DynA42
 
-# (full ALSA identifier hw:Tarjeta,Device)
+# Full ALSA identifier 'hw:Card,Device'
 system_card: hw:RPiCirrus,0
-# cards external to jack (space sepated string if many)
-# (full ALSA identifier hw:Tarjeta,Device)
+# Cards external to jack (space sepated string if many)
+# Full ALSA identifier 'hw:Card,Device'
 external_cards: ''
-# resampler for external cards: alsa | zita
+# Resampler for external cards: alsa | zita
 resampler: zita
-# resampling quality (optional) (0..4 for alsa, 16..96 for zita)
+# Resampling quality (optional) (0..4 for alsa, 16..96 for zita)
 resamplingQ: 96
 
-# delay between commands (seconds)
+# Delay between commands (seconds)
 command_delay: 1
-# "beep" command options to indicate software load
+# "Beep" command options to indicate software load
 beep_options: ''
 
-# max digital gain (dB)
+# Max digital gain (dB)
 gain_max: 6
 
-# zero some settings on startup (True/False)
+# Zeroes some settings on startup (True/False)
 tone_reset_on_startup : False
 balance_reset_on_startup : False
 loudness_reset_on_startup : False
 mono_reset_on_startup: False
 
-# volume settings on startup. assign null to not set
+# Volume settings on startup. assign null to not set
 level_on_startup: null
-# max Volume on startup. Leave blank to not set
-# precedes level_on_startup
+# Max volume on startup. Leave blank to not set
+# Precedes level_on_startup
 max_level_on_startup: 0
 
-# sound monitors (jack ports). Assign '' to not set
-# input selector will connect sources to this ports
+# Sound monitors (jack ports). Assign '' to not set.
+# Input selector will connect sources to this ports
 jack_monitors: ''
 
-## paths & options
+## Paths & options
 
-# control server
+# Control server
 control_path: ~/bin/server.py
-# screen output: 0 (nothing) - 1 (minimal) - 2 (full)
+# Screen output: 0 (nothing) - 1 (minimal) - 2 (full)
 control_output: 0
-# screen erasing between commands: True - False
+# Screen erasing between commands: True - False
 control_clear: False
 
-# jack
+# Jack
 jack_path: /usr/bin/jackd
 # jack on ALSA: omit cards and fs (managed in initaudio.py)
 jack_options: --silent -R -dalsa -p2048 -n3
 
-# brutefir
+# Brutefir,
 # for options see https://www.ludd.ltu.se/~torger/brutefir.html#config
 brutefir_path: /usr/bin/brutefir
 brutefir_options: ''
 brutefir_ports: brutefir:in.L brutefir:in.R
 
-# ecasound (optional)
+# Ecasound (optional)
 load_ecasound: True
 ecasound_path: /usr/bin/ecasound
-# number of parametrics
-# needed PEQxNN_defeat_Fs.ecs template in ~/config
+# Number of parametrics
+# Needed PEQxNN_defeat_Fs.ecs template in ~/config
 ecasound_filters: 8
-# ecasound jack ports
+# Ecasound jack ports
 ecasound_ports: ecasound:in_1 ecasound:in_2
 
 
-## net
+## Net
 
-# predic IP address (seems not to be used in pre.di.c)
-#ip_address: 192.168.1.203
-# brutefir cli address and port
+# Brutefir cli address and port
 bfcli_address: 127.0.0.1
 bfcli_port: 3000
-# control script address and port
+
+# Control server address and port
 # 0.0.0.0 listen to all net connections
 # 127.0.0.1 listen only to local connections
 control_address: 0.0.0.0
 control_port: 9999
 
-# Auxiliary services (optional)
+# Auxiliary service servers (optional)
 aux_address: localhost
 aux_port: 9990
 players_address: localhost
 players_port: 9991
 
-## equalizer
+## Equalizer stage in Brutefir
 
-# filenames of frequencies, loudness curves, tone control curves, 
+# Filenames of frequencies, loudness curves, tone control curves, 
 frequencies: R20_ext-freq.dat
 loudness_mag_curves: R20_ext-loudness_mag.dat
 loudness_pha_curves: R20_ext-loudness_pha.dat
@@ -100,12 +99,13 @@ bass_pha_curves: R20_ext-bass_pha.dat
 loudness_SPLref: 83
 loudness_SPLmax: 90
 loudness_SPLmin: 70
-# max dB deviation from 0
+
+# Max dB deviation from 0
 tone_variation: 6
 loudness_variation: 7
 balance_variation: 6
-# jump between equalization curves (dB)
+
+# Jump between equalization curves (dB)
 # not yet implemented, given as an indication that must be assumed
 step: 1
-
 
