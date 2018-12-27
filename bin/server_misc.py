@@ -31,6 +31,13 @@
              server_misc.py aux
 """
 
+###################################################
+# PORT MAPPING BY SERVICE:
+SERVICE_PORTS = {   'players':  9991,
+                    'aux':      9990
+                }
+###################################################
+
 import socket
 import sys
 import time
@@ -42,7 +49,7 @@ def server_socket(host, port):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error as e:
-        print(f'(server) Error creating socket: {e}')
+        print( f'(server) Error creating socket: {e}' )
         sys.exit(-1)
     # we use socket.SO_REUSEADDR to avoid this error:
     # socket.error: [Errno 98] Address already in use
@@ -54,7 +61,7 @@ def server_socket(host, port):
     try:
         s.bind((host, port))
     except:
-        print(f'(server_misc [{opc}]) Error binding port', port)
+        print( f'(server_misc [{opc}]) Error binding port', port )
         s.close()
         sys.exit(-1)
 
@@ -72,12 +79,12 @@ def run_server(host, port, verbose=False):
         # listen ports
         fsocket.listen(10)  # number of connections in queue
         if verbose:
-            print(f'(server_misc [{opc}]) listening on \'localhost\':{port}')
+            print( f'(server_misc [{opc}]) listening on \'localhost\':{port}' )
         # accept client connection
         sc, addr = fsocket.accept()
         # somo info
         if verbose:
-            print(f'(server_misc [{opc}]) connected to client {addr[0]}')
+            print( f'(server_misc [{opc}]) connected to client {addr[0]}' )
 
         # buffer loop to proccess received command
         while True:
@@ -87,8 +94,8 @@ def run_server(host, port, verbose=False):
             if not data:
                 # nothing in buffer, client has disconnected too soon
                 if verbose:
-                    print(f'(server_misc [{opc}]) Client disconnected. '
-                          '              Closing connection...')
+                    print (f'(server_misc [{opc}]) Client disconnected. '
+                          '              Closing connection...' )
                 sc.close()
                 break
 
@@ -96,14 +103,14 @@ def run_server(host, port, verbose=False):
             elif data.rstrip('\r\n') == 'quit':
                 sc.send(b'OK\n')
                 if verbose:
-                    print(f'(server_misc [{opc}]) closing connection...')
+                    print( f'(server_misc [{opc}]) closing connection...' )
                 sc.close()
                 break
 
             elif data.rstrip('\r\n') == 'shutdown':
                 sc.send(b'OK\n')
                 if verbose:
-                    print(f'(server_misc [{opc}]) closing connection...')
+                    print( f'(server_misc [{opc}]) closing connection...' )
                 sc.close()
                 fsocket.close()
                 sys.exit(1)
@@ -111,12 +118,13 @@ def run_server(host, port, verbose=False):
             # If not a reserved word, then process the received thing:
             else:
                 if verbose:
-                    print ('>>> ' + data)
+                    print  ('>>> ' + data )
                 
-                #########################################################
-                # THE PROCESSING MODULE LOADED AT STARTING UP THE SERVER:
-                result = process.do(data)
-                #########################################################
+                ############################################################
+                # THE PROCESSING MODULE IMPORTED AT STARTING UP THIS SERVER,
+                # must use the the do() function from the  module.
+                result = processing.do(data)
+                ############################################################
 
                 # And send back the result
                 if result:
@@ -125,18 +133,18 @@ def run_server(host, port, verbose=False):
                     sc.send( b'ACK\n' )
 
                 if verbose:
-                    print(f'(server_misc [{opc}]) connected to client {addr[0]}')
+                    print( f'(server_misc [{opc}]) connected to client {addr[0]}' )
 
             # wait a bit, loop again
             time.sleep(0.01)
 
 if __name__ == "__main__":
     
-    opc = sys.argv[1]
+    service = sys.argv[1]
 
     try:
-        process = __import__(opc)
-        ports = { 'players': 9991, 'aux': 9990 }
-        run_server('localhost', ports[opc] )
+        processing = __import__(service)
+        run_server( host='localhost', port=SERVICE_PORTS[service] )
+
     except:
-        print( f'(server_misc) error trying processing module \'{opc}\'. Bye.')
+        print( f'(server_misc) error trying processing module \'{service}\'. Bye.' )
