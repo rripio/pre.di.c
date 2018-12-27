@@ -70,7 +70,7 @@ ecasound_ports: ecasound:in_1 ecasound:in_2
 
 ## net
 
-# predic IP address (seems not to be used in PRE.DI.C)
+# predic IP address (seems not to be used in pre.di.c)
 #ip_address: 192.168.1.203
 # brutefir cli address and port
 bfcli_address: 127.0.0.1
@@ -81,6 +81,11 @@ bfcli_port: 3000
 control_address: 0.0.0.0
 control_port: 9999
 
+# Auxiliary services (optional)
+aux_address: localhost
+aux_port: 9990
+players_address: localhost
+players_port: 9991
 
 ## equalizer
 
