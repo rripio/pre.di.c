@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+# Copyright (c) 2018 Roberto Ripio, Rafael Sánchez
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) 2018 Roberto Ripio
@@ -22,96 +23,135 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
+"""
+    A general purpose TCP server for pre.di.c to run processing modules
+
+    Use:     server.py <processing_module>
+
+    e.g:     server.py control
+             server.py aux
+"""
+
+####################################################################
+# The LISTENING ADDRESS & PORT will be read from 'config/config.yml'
+from getconfigs import config
+####################################################################
+
+# The 'verbose' option can be useful when debugging:
+verbose = False
+
 import socket
 import sys
-import time
-import os
-import yaml
+import subprocess as sp
 
-import basepaths as bp
-import server_process as sp
-import getconfigs as gc
-import predic as pd
+def server_socket(host, port):
+    """ Makes a socket that listen to clients """
 
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    except socket.error as e:
+        print( f'(server) Error creating socket: {e}' )
+        sys.exit(-1)
+    # We use socket.SO_REUSEADDR to avoid this error:
+    # socket.error: [Errno 98] Address already in use
+    # that can happen if we reinit this script.
+    # This is because the previous execution has left the socket in a
+    # TIME_WAIT state, and cannot be immediately reused.
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # the tcp socket
+    try:
+        s.bind((host, port))
+    except:
+        print( f'(server.py [{service}]) Error binding port', port )
+        s.close()
+        sys.exit(-1)
 
-if __name__ == '__main__':
+    # returns the socket object
+    return s
 
-    state = gc.state
-    fsocket = pd.server_socket(gc.config['control_address']
-                            , gc.config['control_port'])
-    # main loop to proccess conections
-    # number of connections in queue
-    backlog = 10
+def run_server(host, port, verbose=False):
+    """ This is the server itself.
+        Inside the desired processing module is called
+        to perform actions and giving results.
+    """
+
+    # Creates the socket
+    mysocket = server_socket(host, port)
+
+    # Main loop to proccess connections
+    maxconns = 10
     while True:
-        # listen ports
-        fsocket.listen(backlog)
-        if gc.config['control_output'] > 1:
-            print('(server) listening on address '
-                    f"{gc.config['control_address']}"
-                    f", port{gc.config['control_port']}...")
-        # accept client connection
-        sc, addr = fsocket.accept()
-        # somo info
-        if gc.config['control_output'] > 1:
-            if gc.config['control_clear']:
-                # optional terminal clearing
-                os.system('clear')
-            else:
-                # separator
-                 print('=' * 70)
-            print(f'(server) connected to client {addr[0]}')
-        # buffer loop to proccess received command
+        # Listen for a queue of connections
+        mysocket.listen(maxconns)
+        if verbose:
+            print( f'(server.py [{service}]) listening on \'localhost\':{port}' )
+        # Accepts a client connection when happens:
+        sc, remote = mysocket.accept()
+        if verbose:
+            print( f'(server.py [{service}]) connected to client {remote[0]}' )
+
+        # A buffer loop to proccess received orders
         while True:
-        # reception
+            # Reception
             data = sc.recv(4096).decode()
+
             if not data:
-                # nothing in buffer, client has disconnected too soon
-                if gc.config['control_output'] > 1:
-                    print('(server) client disconnected. '
-                                           'Closing connection...')
+                # Nothing in buffer, closing because the client has disconnected too soon.
+                if verbose:
+                    print (f'(server.py [{service}]) Client disconnected. \
+                             Closing connection...' )
                 sc.close()
                 break
-            elif data.rstrip('\r\n') == 'status':
-                # echo state to client as YAML string
-                sc.send(yaml.dump(state,
-                                    default_flow_style=False).encode())
-                sc.send(b'OK\n')
+
+            # Some reserved words for controling the communication:
             elif data.rstrip('\r\n') == 'quit':
                 sc.send(b'OK\n')
-                if gc.config['control_output'] > 1:
-                    print('(server) closing connection...')
+                if verbose:
+                    print( f'(server.py [{service}]) closing connection...' )
                 sc.close()
                 break
+
             elif data.rstrip('\r\n') == 'shutdown':
                 sc.send(b'OK\n')
-                if gc.config['control_output'] > 1:
-                    print('(server) closing connection...')
+                if verbose:
+                    print( f'(server.py [{service}]) Shutting down the server...' )
                 sc.close()
-                fsocket.close()
+                mysocket.close()
                 sys.exit(1)
+
+            # If not a reserved word, then process the received thing:
             else:
-                # command received in 'data',
-                # then send command to server_process.py,
-                # that answers with state dict
-                (state, warnings) = (sp.proccess_commands
-                                                (data, state))
-                # writes state file
-                try:
-                    with open(bp.state_path, 'w') as f:
-                        yaml.dump(state, f, default_flow_style=False)
-                # print warnings
-                    if len(warnings) > 0:
-                        print("Warnings:")
-                        for warning in warnings:
-                            print("\t", warning)
-                        sc.send(b'ACK\n')
-                    else:
-                        sc.send(b'OK\n')
-                except:
-                    sc.send(b'ACK\n')
-                if gc.config['control_output'] > 1:
-                    print(f'(server) connected to client {addr[0]}')
-            # wait a bit, loop again
-            time.sleep(0.01 * gc.config['command_delay'])
+                if verbose:
+                    print  ('>>> ' + data )
+                
+                ############################################################
+                # PROCESSING MODULE IMPORTED AT STARTING UP THIS SERVER,
+                # always must use the the do() function from the  module.
+                result = processing.do(data)
+                ############################################################
+
+                # And send back the result
+                # NOTICE: it is expected to receive a result as a bytes-like object
+                if result:
+                    sc.send( result )
+                else:
+                    sc.send( b'ACK\n' )
+
+                if verbose:
+                    print( f'(server.py [{service}]) connected to client {remote[0]}' )
 
 
+if __name__ == "__main__":
+    
+    service = sys.argv[1]
+
+    # Setting the address and port for this server
+    address = config[ service + '_address' ]
+    port    = config[ service + '_port' ]
+
+    try:
+        processing = __import__(service)
+        run_server( host=address, port=port, verbose=verbose )
+
+    except:
+        print( f'(server.py) error trying processing module \'{service}\'. Bye.' )
