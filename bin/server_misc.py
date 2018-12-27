@@ -74,7 +74,7 @@ def run_server(host, port, verbose=False):
     # create the socket
     mysocket = server_socket(host, port)
 
-    # main loop to proccess conections
+    # main loop to proccess connections
     maxconns = 10
     while True:
         # listen ports
