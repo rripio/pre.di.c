@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-    Starts a server to manage players
+    Starts / stops a server which listen for some player related tasks
+    supported into the 'players' module
     
     use:   scripts/players.py    start | stop
 """
@@ -23,6 +24,6 @@ if sys.argv[1:]:
             'stop'  : stop
             }[ sys.argv[1] ]()
     except:
-        print('(server_aux) bad option')
+        print( '(scripts/players.py) bad option' )
 else:
     print(__doc__)
