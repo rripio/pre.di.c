@@ -130,7 +130,7 @@ def run_server(host, port, verbose=False):
                 result = processing.do(data)
                 #######################################################################
 
-                # And send back the result
+                # And sending back the result
                 # NOTICE: it is expected to receive a result as a bytes-like object
                 if result:
                     sc.send( result )
