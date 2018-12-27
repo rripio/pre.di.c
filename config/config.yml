@@ -30,8 +30,8 @@ mono_reset_on_startup: False
 
 # Volume settings on startup. assign null to not set
 level_on_startup: null
-# Max volume on startup. Leave blank to not set
-# Precedes level_on_startup
+# Max volume on startup. Leave blank to not set,
+# precedes level_on_startup.
 max_level_on_startup: 0
 
 # Sound monitors (jack ports). Assign '' to not set.
