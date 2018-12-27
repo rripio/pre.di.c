@@ -23,13 +23,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-""" A module that runs miscels
+""" A module that runs miscels. 
+    This module is ussually called from a listening server.
 """
 
 import subprocess as sp
-import yaml
-import jack
-import mpd
 import time
 
 def process(data):
