@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
     Starts / stops a server which listen for some player related tasks
-    supported into the 'players' module
+    supported by the 'players' module
     
     use:   scripts/players.py    start | stop
 """
