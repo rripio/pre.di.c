@@ -28,27 +28,26 @@
 """
 
 import subprocess as sp
-import time
 
-def process(data):
+def do(task):
     """
-        Only certain received 'data' will be validated and processed,
+        Only certain 'tasks' will be validated and processed,
         then returns back some useful info to the asking client.
     """
 
     # First clearing the new line
-    data = data.replace('\n','')
+    task = task.replace('\n','')
 
     # A custom script that switches on/off the amplifier
     # notice: subprocess.check_output(cmd) returns bytes-like,
     #         but if cmd fails an exception will be raised, so used with 'try'
-    if data == 'ampli on':
+    if task == 'ampli on':
         try:
             sp.check_output( '/home/predic/bin_custom/ampli.sh on'.split() )
             return b'done'
         except:
             return b'error'
-    elif data == 'ampli off':
+    elif task == 'ampli off':
         try:
             sp.check_output( '/home/predic/bin_custom/ampli.sh off'.split() )
             return b'done'
@@ -57,9 +56,9 @@ def process(data):
 
     # User macros: macro files are named this way: '~/macros/N_macro_name',
     #              so N will serve as button keypad position from web control page
-    elif data[:6] == 'macro_':
+    elif task[:6] == 'macro_':
         try:
-            cmd = '/home/predic/macros/' + data[6:]
+            cmd = '/home/predic/macros/' + task[6:]
             sp.run( "'" + cmd + "'", shell=True ) # needs shell to user bash scripts to work
             return b'done'
         except:
