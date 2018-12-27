@@ -25,17 +25,17 @@
         PHP will response to the client via the standard php output (echo xxx, readfile(xx), etcetera)
     */
 
-    // Retrieves the running loudspeaker on pre.di.c
-    function get_loudspeaker() {
+    // Retrieves configured items from pre.di.c 'config.yml' file
+    function get_config($item) {
         $tmp = "";
         $cfile = fopen("/home/predic/config/config.yml", "r")
                   or die("Unable to open file!");
         while( !feof($cfile) ) {
             $linea = fgets($cfile);
-            $found = strpos( $linea, "loudspeaker");
+            $found = strpos( $linea, $item);
             if ( $found !== false ) {
                 $tmp = str_replace( "\n", "", $linea);
-                $tmp = str_replace( "loudspeaker:", "", $tmp);
+                $tmp = str_replace( $item, "", $tmp);
                 $tmp = trim($tmp);
             }
         }
@@ -46,19 +46,15 @@
     //////////////////////////////////////////////////////
     // Communicates to the pre.di.c TCP/IP servers.
     //////////////////////////////////////////////////////
-    // Available server ports are:
-    //      9999    pre.di.c audio server
-    //      9990    aux server (amplifier, user macros)
-    //      9991    players interface server
-    //////////////////////////////////////////////////////
-    function predic_socket ($service_port, $cmd) {
-        $address = "localhost";
+    function predic_socket ($service, $cmd) {
+        $address = get_config( $service."_address" );
+        $port    = get_config( $service."_port" );
         /* Creates a TCP socket*/
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if ($socket === false) {
             echo "socket_create() failed: " . socket_strerror(socket_last_error()) . "\n";
         }
-        $result = socket_connect($socket, $address, $service_port);
+        $result = socket_connect($socket, $address, $port);
         if ($result === false) {
             echo "socket_connect() failed: ($result) " . socket_strerror(socket_last_error($socket)) . "\n";
         }
@@ -103,41 +99,41 @@
         readfile($fpath);
     }
 
-    // AMPLIFIER switching
+    // AMPLIFIER switching are handled by the 'aux' server
     elseif ( $command == "amplion" ) {
         // The remote script will store the amplifier state into
         // ~/.ampli so that the web can update it.
-        predic_socket( 9990, 'ampli on');
+        predic_socket( 'aux', 'ampli on');
     }
     elseif ( $command == "amplioff" ) {
-        predic_socket( 9990, 'ampli off');
+        predic_socket( 'aux', 'ampli off');
     }
     elseif ( $command == "amplistatus" ) {
         readfile("/home/predic/.ampli"); // php cannot acces inside /tmp for securety reasons.
     }
 
-    // PLAYER related commands
-    elseif ( substr( $command, 0, 7 ) === "player_" ) {
-        // A regular playback control (player_play, player_pause, etc)
-        echo predic_socket( 9991, $command );
-    }
-    elseif ( substr( $command, 0, 4 ) === "http" ) {
-        // A stream url to be played back
-        echo predic_socket( 9991, $command );
-    }
-
-    // User MACROS commands
+    // USER MACROS are handled by the 'aux' server
     elseif ( $command === "list_macros" ) {
         $macros_array = scandir("/home/predic/macros/");
         echo json_encode( $macros_array );
     }
     elseif ( substr( $command, 0, 6 ) === "macro_" ) {
-        echo predic_socket( 9990, $command );
+        echo predic_socket( 'aux', $command );
     }
 
-    //// Any else will be an STANDARD pre.di.c command, then forwarded to pre.di.c's server
+    // PLAYER related commands are handled by the 'players' server
+    elseif ( substr( $command, 0, 7 ) === "player_" ) {
+        // A regular playback control (player_play, player_pause, etc)
+        echo predic_socket( 'players', $command );
+    }
+    elseif ( substr( $command, 0, 4 ) === "http" ) {
+        // A stream url to be played back
+        echo predic_socket( 'players', $command );
+    }
+
+    //// Any else will be an STANDARD pre.di.c command, then handled by the 'control' server
     else {
-        echo predic_socket( 9999, $command );
+        echo predic_socket( 'control', $command );
     }
 
 ?>
