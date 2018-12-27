@@ -24,17 +24,19 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-    Starts and stops mplayer for internet streams playback.
-    e.g.: podcasts or internet radio stations.
+    Starts and stops Mplayer for internet streams playback like
+    podcasts or internet radio stations.
+    
+    Also changes on the fly the played stream.
 
-    Use:   istreams.py  start  [ preset_num* | preset_name* ] &
+    Internet streams presets can be configured into:
+        config/istreams.yml
+
+    Use:   istreams.py  start  [ preset_num | preset_name ]
                         stop
                         preset <preset_num>
                         name   <preset_name>
                         url    <some_url_stream>
-
-    Internet streams presets can be configured into:
-        config/istreams.yml
 
 """
 
@@ -49,30 +51,33 @@ import basepaths as bp
 import getconfigs as gc
 import predic as pd
 
-### Mplayer aditional options:
+##################
+# Script settings:
+##################
+# DEFAULT preset number:
+default_preset = '2'
+# Internet streams / stations PRESETS FILE:
+presets_fname = bp.config_folder + 'istreams.yml'
+# Name used from pre.di.c. for info and pid saving
+program_alias = 'mplayer-istreams'
+
+############################
+# Mplayer options:
+############################
 # -quiet: see channels change
 # -really-quiet: silent
 options = '-quiet -nolirc'
-# Aditional option to avoid Mplayer default "Playlist parsing disabled for security reasons."
-# This applies to RTVE, which iradio urls are given in .m3u playlist format.
+# Aditional option to avoid Mplayer defaults to "Playlist parsing disabled for security reasons."
+# This applies to RTVE.es, which radio urls are given in .m3u playlist format.
 # - one can download the .m3u then lauch the inside url with mplayer
 # - or, easy way, we can allow playlit parsing on Mplayer.
-#        if "rtve" in emisoraUrl:
 options += " -allow-dangerous-playlist-parsing"
-
-### Script config:
-# DEFAULT preset number:
-default_preset = '2'
-# internet streams / stations file:
-presets_fname = bp.config_folder + 'istreams.yml'
-# command fifo filename
+# Mplayer input commands fifo filename
 istreams_fifo = bp.main_folder + 'istreams_fifo'
 # Mplayer path:
 mplayer_path = '/usr/bin/mplayer'
 # Mplayer outputs redirected to:
 mplayer_redirection_path = '/home/predic/tmp/.istreams'
-# name used for info and pid saving
-program_alias = 'mplayer-istreams'
 
 
 def load_url(url):
@@ -121,7 +126,7 @@ def stop():
 
 if __name__ == '__main__':
 
-    ### Reading the iradio stations file
+    ### Reading the presets stations file
     presets = {}
     f = open(presets_fname, 'r')
     tmp = f.read()
@@ -131,12 +136,12 @@ if __name__ == '__main__':
     except:
         print ( '(istreams.py) YAML error into ' + presets_fname )
 
-    ### reading the command line
+    ### Reading the command line
     if sys.argv[1:]:
 
         opc = sys.argv[1]
 
-        # Start the script and optionally load a preset/name
+        # Starts the script and optionally load a preset/name
         if opc == 'start':
             start()
             if sys.argv[2:]:
@@ -152,20 +157,21 @@ if __name__ == '__main__':
         elif opc == 'stop':
             stop()
 
-        # Selects a preset number on the fly
+        # ON THE FLY changing a preset number
         elif opc == 'preset':
             select_by_preset( sys.argv[2] )
 
-        # Selects a preset name on the fly
+        # ON THE FLY changing a preset name
         elif opc == 'name':
             select_by_name( sys.argv[2] )
 
-        # Loads an url stream on the fly
+        # ON THE FLY loading an url stream
         elif opc == 'url':
             load_url( sys.argv[2] )
 
+        # SHOWS A HELP
         elif '-h' in opc:
             print(__doc__)
 
         else:
-            print('(istreams.py) Bad option')
+            print( '(scripts/istreams.py) Bad option' )
