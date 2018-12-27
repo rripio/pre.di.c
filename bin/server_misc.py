@@ -31,7 +31,7 @@
     e.g:     server_misc.py players
              server_misc.py aux
 """
-# TODO: threading the run_server() ...
+# TODO: avoid time.sleep under run_server() maybe 'threading' or 'with' ¿?
 
 # LISTENING ADDRESS & PORT are configured into 'config/config.yml'
 from getconfigs import config
