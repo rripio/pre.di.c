@@ -23,7 +23,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-""" A module that runs miscels. 
+""" A module interface that runs miscellaneous local tasks. 
     This module is ussually called from a listening server.
 """
 
@@ -31,6 +31,7 @@ import subprocess as sp
 
 def do(task):
     """
+        This do() is the entry interface function from a listening server.
         Only certain 'tasks' will be validated and processed,
         then returns back some useful info to the asking client.
     """
@@ -38,7 +39,9 @@ def do(task):
     # First clearing the new line
     task = task.replace('\n','')
 
-    # A custom script that switches on/off the amplifier
+    ###################################
+    # Switching ON/OFF an amplifier
+    ###################################
     # notice: subprocess.check_output(cmd) returns bytes-like,
     #         but if cmd fails an exception will be raised, so used with 'try'
     if task == 'ampli on':
@@ -54,8 +57,13 @@ def do(task):
         except:
             return b'error'
 
-    # User macros: macro files are named this way: '~/macros/N_macro_name',
-    #              so N will serve as button keypad position from web control page
+    ###################################
+    # USER MACROS under macros/ folder
+    ###################################
+    # Macro files are named this way: 'macros/N_macroname',
+    # so N will serve as button keypad position from web control page
+    # The task phrase syntax must be like: 'macro_N_macroname',
+    # that is prefixed with the reserved word 'macro_'
     elif task[:6] == 'macro_':
         try:
             cmd = '/home/predic/macros/' + task[6:]
