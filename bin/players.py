@@ -300,7 +300,7 @@ def do(task):
     task = task.replace('\n','')
 
     # Tasks to querying the current music player
-    if task == 'player_get_meta':
+    if   task == 'player_get_meta':
         return get_meta()
     elif task == 'player_state':
         return control('state')
