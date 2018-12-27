@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    Starts a server which listen for some auxiliary tasks
+    Starts / stops a server which listen for some auxiliary tasks
     supported into the 'aux' module
     
     use:   scripts/aux.py    start | stop
