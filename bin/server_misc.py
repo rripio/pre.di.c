@@ -31,6 +31,7 @@
     e.g:     server_misc.py players
              server_misc.py aux
 """
+# TODO: threading the run_server() ...
 
 # LISTENING ADDRESS & PORT are configured into 'config/config.yml'
 from getconfigs import config
@@ -44,7 +45,7 @@ import time
 import subprocess as sp
 
 def server_socket(host, port):
-    """ Makes a socket for listening clients """
+    """ Makes a socket that listen to clients """
 
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -61,30 +62,30 @@ def server_socket(host, port):
     try:
         s.bind((host, port))
     except:
-        print( f'(server_misc [{opc}]) Error binding port', port )
+        print( f'(server_misc [{service}]) Error binding port', port )
         s.close()
         sys.exit(-1)
 
-    # return socket state
+    # returns the socket object
     return s
 
 def run_server(host, port, verbose=False):
 
     # create the socket
-    fsocket = server_socket(host, port)
+    mysocket = server_socket(host, port)
 
     # main loop to proccess conections
     backlog = 10
     while True:
         # listen ports
-        fsocket.listen(10)  # number of connections in queue
+        mysocket.listen(10)  # number of connections in queue
         if verbose:
-            print( f'(server_misc [{opc}]) listening on \'localhost\':{port}' )
+            print( f'(server_misc [{service}]) listening on \'localhost\':{port}' )
         # accept client connection
-        sc, addr = fsocket.accept()
+        sc, remote = mysocket.accept()
         # somo info
         if verbose:
-            print( f'(server_misc [{opc}]) connected to client {addr[0]}' )
+            print( f'(server_misc [{service}]) connected to client {remote[0]}' )
 
         # buffer loop to proccess received command
         while True:
@@ -94,7 +95,7 @@ def run_server(host, port, verbose=False):
             if not data:
                 # nothing in buffer, client has disconnected too soon
                 if verbose:
-                    print (f'(server_misc [{opc}]) Client disconnected. '
+                    print (f'(server_misc [{service}]) Client disconnected. '
                           '              Closing connection...' )
                 sc.close()
                 break
@@ -103,16 +104,16 @@ def run_server(host, port, verbose=False):
             elif data.rstrip('\r\n') == 'quit':
                 sc.send(b'OK\n')
                 if verbose:
-                    print( f'(server_misc [{opc}]) closing connection...' )
+                    print( f'(server_misc [{service}]) closing connection...' )
                 sc.close()
                 break
 
             elif data.rstrip('\r\n') == 'shutdown':
                 sc.send(b'OK\n')
                 if verbose:
-                    print( f'(server_misc [{opc}]) closing connection...' )
+                    print( f'(server_misc [{service}]) closing connection...' )
                 sc.close()
-                fsocket.close()
+                mysocket.close()
                 sys.exit(1)
 
             # If not a reserved word, then process the received thing:
@@ -133,7 +134,7 @@ def run_server(host, port, verbose=False):
                     sc.send( b'ACK\n' )
 
                 if verbose:
-                    print( f'(server_misc [{opc}]) connected to client {addr[0]}' )
+                    print( f'(server_misc [{service}]) connected to client {remote[0]}' )
 
             # wait a bit, loop again
             time.sleep(0.01)
