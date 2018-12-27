@@ -27,12 +27,12 @@
     Starts and stops Mplayer for internet streams playback like
     podcasts or internet radio stations.
     
-    Also changes on the fly the played stream.
+    Also used to change on the fly the played stream.
 
-    Internet streams presets can be configured into:
+    Internet stream presets can be configured into:
         config/istreams.yml
 
-    Use:   istreams.py  start  [ preset_num | preset_name ]
+    Use:   istreams.py  start  [ <preset_num> | <preset_name> ]
                         stop
                         preset <preset_num>
                         name   <preset_name>
@@ -54,9 +54,9 @@ import predic as pd
 ##################
 # Script settings:
 ##################
-# DEFAULT preset number:
+# DEFAULT PRESET number:
 default_preset = '2'
-# Internet streams / stations PRESETS FILE:
+# PRESETS FILE for internet streams / stations:
 presets_fname = bp.config_folder + 'istreams.yml'
 # Name used from pre.di.c. for info and pid saving
 program_alias = 'mplayer-istreams'
@@ -94,15 +94,18 @@ def select_by_name(preset_name):
     for preset,dict in presets.items():
         if dict['name'] == preset_name:
             load_url( dict['url'] )
-            return
+            return True
     print( f'(istreams.py) preset \'{preset_name}\' not found' )
+    return False
 
 def select_by_preset(preset_num):
     """ loads a stream by its preset number """
     try:
         load_url( presets[ int(preset_num) ]['url'] )
+        return True
     except:
         print( f'(istreams.py) error in preset # {preset_num}' )
+        return False
 
 def start():
 
@@ -141,7 +144,7 @@ if __name__ == '__main__':
 
         opc = sys.argv[1]
 
-        # Starts the script and optionally load a preset/name
+        # STARTS the script and optionally load a preset/name
         if opc == 'start':
             start()
             if sys.argv[2:]:
@@ -153,7 +156,7 @@ if __name__ == '__main__':
             else:
                 select_by_preset(default_preset)
 
-        # Stops all this stuff
+        # STOPS all this stuff
         elif opc == 'stop':
             stop()
 
@@ -169,9 +172,8 @@ if __name__ == '__main__':
         elif opc == 'url':
             load_url( sys.argv[2] )
 
-        # SHOWS A HELP
-        elif '-h' in opc:
-            print(__doc__)
-
         else:
             print( '(scripts/istreams.py) Bad option' )
+
+    else:
+        print(__doc__)
