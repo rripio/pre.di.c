@@ -75,10 +75,10 @@ def run_server(host, port, verbose=False):
     mysocket = server_socket(host, port)
 
     # main loop to proccess conections
-    backlog = 10
+    maxconns = 10
     while True:
         # listen ports
-        mysocket.listen(10)  # number of connections in queue
+        mysocket.listen(maxconns)  # number of connections in queue
         if verbose:
             print( f'(server_misc [{service}]) listening on \'localhost\':{port}' )
         # accept client connection
