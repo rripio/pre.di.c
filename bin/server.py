@@ -124,11 +124,11 @@ def run_server(host, port, verbose=False):
                 if verbose:
                     print  ('>>> ' + data )
                 
-                ############################################################
-                # PROCESSING MODULE IMPORTED AT STARTING UP THIS SERVER,
+                #######################################################################
+                # PROCESSING by using the IMPORTED MODULE when starting up this server,
                 # always must use the the do() function from the  module.
                 result = processing.do(data)
-                ############################################################
+                #######################################################################
 
                 # And send back the result
                 # NOTICE: it is expected to receive a result as a bytes-like object
@@ -154,4 +154,4 @@ if __name__ == "__main__":
         run_server( host=address, port=port, verbose=verbose )
 
     except:
-        print( f'(server.py) error trying processing module \'{service}\'. Bye.' )
+        print( f'(server.py) error trying the processing module \'{service}\'. Bye.' )
