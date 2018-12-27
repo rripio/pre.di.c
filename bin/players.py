@@ -23,7 +23,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-""" A module that controls and retrieve track info from the current player
+""" A module that controls and retrieve metadata info from the current player.
+    This module is ussually called from a listening server.
 """
 
 # TODO: a command line interface could be useful
@@ -288,31 +289,32 @@ def control(action):
     else:
         return ''.encode()
 
-def process(data):
+def do(task):
     """
-        Only certain received 'data' will be validated and processed,
+        This do() is the entry interface function from a listening server.
+        Only certain received 'tasks' will be validated and processed,
         then returns back some useful info to the asking client.
     """
 
     # First clearing the new line
-    data = data.replace('\n','')
+    task = task.replace('\n','')
 
-    # Queries the current music player
-    if data == 'player_get_meta':
+    # Tasks to querying the current music player
+    if task == 'player_get_meta':
         return get_meta()
-    elif data == 'player_state':
+    elif task == 'player_state':
         return control('state')
-    elif data == 'player_stop':
+    elif task == 'player_stop':
         return control('stop')
-    elif data == 'player_pause':
+    elif task == 'player_pause':
         return control('pause')
-    elif data == 'player_play':
+    elif task == 'player_play':
         return control('play')
-    elif data == 'player_next':
+    elif task == 'player_next':
         return control('next')
-    elif data == 'player_previous':
+    elif task == 'player_previous':
         return control('previous')
 
-    # An url to be played back is received:
-    elif data[:7] == 'http://':
-        sp.run( f'/home/predic/scripts/istreams.py url {data}'.split() )
+    # A pseudo task, an url to be played back:
+    elif task[:7] == 'http://':
+        sp.run( f'/home/predic/scripts/istreams.py url {task}'.split() )
