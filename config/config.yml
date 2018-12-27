@@ -40,8 +40,9 @@ jack_monitors: ''
 
 ## Paths & options
 
-# Control server
-control_path: ~/bin/server.py
+# The generic server (will be called 'server.py control' for pre.di.c control)
+server_path: ~/bin/server.py
+
 # Screen output: 0 (nothing) - 1 (minimal) - 2 (full)
 control_output: 0
 # Screen erasing between commands: True - False
