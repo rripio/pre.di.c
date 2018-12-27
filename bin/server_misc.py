@@ -24,6 +24,11 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 """ A general purpose TCP server for pre.di.c to process auxiliary jobs
+
+    Use:     server_misc.py <processing_module>
+
+    e.g:     server_misc.py players
+             server_misc.py aux
 """
 
 import socket
@@ -39,7 +44,7 @@ def server_socket(host, port):
     except socket.error as e:
         print(f'(server) Error creating socket: {e}')
         sys.exit(-1)
-    # we use opción socket.SO_REUSEADDR to avoid this error:
+    # we use socket.SO_REUSEADDR to avoid this error:
     # socket.error: [Errno 98] Address already in use
     # that can happen if we reinit this script.
     # This is because the previous execution has left the socket in a
@@ -107,7 +112,12 @@ def run_server(host, port, verbose=False):
             else:
                 if verbose:
                     print ('>>> ' + data)
-                result = process.process(data)
+                
+                #########################################################
+                # THE PROCESSING MODULE LOADED AT STARTING UP THE SERVER:
+                result = process.do(data)
+                #########################################################
+
                 # And send back the result
                 if result:
                     sc.send( result )
