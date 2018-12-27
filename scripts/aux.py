@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
     Starts / stops a server which listen for some auxiliary tasks
-    supported into the 'aux' module
+    supported by the 'aux' module
     
     use:   scripts/aux.py    start | stop
 """
