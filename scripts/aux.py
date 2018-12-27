@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-    Starts a server listening for some auxiliary tasks as
-    - amplifier switch on/off
-    - uer macros execution
+    Starts a server which listen for some auxiliary tasks
+    supported into the 'aux' module
     
     use:   scripts/aux.py    start | stop
 """
@@ -25,6 +24,6 @@ if sys.argv[1:]:
             'stop'  : stop
             }[ sys.argv[1] ]()
     except:
-        print('(server_aux) bad option')
+        print( '(scripts/aux.py) bad option' )
 else:
     print(__doc__)
