@@ -128,12 +128,14 @@ def init_server():
 
     print('\n(startaudio) starting server\n')
     try:
-        control = Popen(['python3'
-                            , os.path.expanduser(gc.config['control_path'])])
+        control = Popen( ['python3', 
+                          os.path.expanduser( gc.config['server_path'] ), 
+                          'control'] )
     except:
         print('\n(startaudio) server didn\'t load')
         sys.exit() # initaudio stopped
-    # waiting for server
+
+    # Waiting for the server
     total_time = rem_time = 10
     while rem_time:
         print(f'(startaudio) waiting for server ({(total_time-rem_time)}s)')
