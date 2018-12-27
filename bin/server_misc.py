@@ -23,7 +23,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-""" A general purpose TCP server for pre.di.c to process auxiliary jobs
+"""
+    A general purpose TCP server for pre.di.c to process auxiliary jobs
 
     Use:     server_misc.py <processing_module>
 
@@ -31,12 +32,11 @@
              server_misc.py aux
 """
 
-##############################################################
-# THE LISTENING PORT IS MAPPED AS PER THE SERVICE MODULE NAME:
-SERVICE_PORTS = {   'players':  9991,
-                    'aux':      9990
-                }
-##############################################################
+# LISTENING ADDRESS & PORT are configured into 'config/config.yml'
+from getconfigs import config
+
+# The 'verbose' option can be useful to debug:
+verbose = False
 
 import socket
 import sys
@@ -51,13 +51,13 @@ def server_socket(host, port):
     except socket.error as e:
         print( f'(server) Error creating socket: {e}' )
         sys.exit(-1)
-    # we use socket.SO_REUSEADDR to avoid this error:
+    # We use socket.SO_REUSEADDR to avoid this error:
     # socket.error: [Errno 98] Address already in use
     # that can happen if we reinit this script.
     # This is because the previous execution has left the socket in a
     # TIME_WAIT state, and cannot be immediately reused.
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    # tcp socket
+    # the tcp socket
     try:
         s.bind((host, port))
     except:
@@ -142,9 +142,12 @@ if __name__ == "__main__":
     
     service = sys.argv[1]
 
+    address = config[ service + '_address' ]
+    port    = config[ service + '_port' ]
+
     try:
         processing = __import__(service)
-        run_server( host='localhost', port=SERVICE_PORTS[service] )
+        run_server( host=address, port=port, verbose=verbose )
 
     except:
         print( f'(server_misc) error trying processing module \'{service}\'. Bye.' )
