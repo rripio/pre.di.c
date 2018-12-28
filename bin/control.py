@@ -20,12 +20,12 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-import time
 import socket
 import sys
 import jack
-import math as m
+import math
 import numpy as np
+import yaml
 
 import peq_control
 import basepaths as bp
@@ -73,7 +73,6 @@ def unplug_sources_of(jack_client, out_ports):
     """ Disconnect clients from predic inputs and monitor inputs """
 
     try:
-        # sources_L = jack.get_connections(out_ports[0])
         sources_L = jack_client.get_all_connections(out_ports[0])
         sources_R = jack_client.get_all_connections(out_ports[1])
         for source in sources_L:
@@ -475,9 +474,9 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             loudness_max_i = (gc.config['loudness_SPLmax']
                                         - gc.config['loudness_SPLmin'])
             if state['loudness_track']:
-                if (m.fabs(state['loudness_ref'])
+                if (math.fabs(state['loudness_ref'])
                         > gc.config['loudness_variation']):
-                    state['loudness_ref'] = m.copysign(
+                    state['loudness_ref'] = math.copysign(
                         gc.config['loudness_variation'], state['loudness_ref'])
                 loudness_i = (gc.config['loudness_SPLmax']
                     - (state['level'] + gc.config['loudness_SPLref']
@@ -534,7 +533,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             bf_atten_dB_1 = gain
             # add balance dB gains
             if abs(state['balance']) > gc.config['balance_variation']:
-                state['balance'] = m.copysign(
+                state['balance'] = math.copysign(
                         gc.config['balance_variation'] ,state['balance'])
             bf_atten_dB_0 = bf_atten_dB_0 - (state['balance'] / 2)
             bf_atten_dB_1 = bf_atten_dB_1 + (state['balance'] / 2)
@@ -542,7 +541,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             # polarity and mute
             m_polarity = {'+': 1, '-': -1}[state['polarity']]
             m_muted = float(not state['muted'])
-            m_gain = lambda x: m.pow(10, x/20) * m_polarity * m_muted
+            m_gain = lambda x: math.pow(10, x/20) * m_polarity * m_muted
             m_gain_0 = m_gain(bf_atten_dB_0)
             m_gain_1 = m_gain(bf_atten_dB_1)
             # commit final gain change
@@ -623,8 +622,8 @@ def do( cmdline ):
     """
     
     # terminal print out behavior
-    if getconfigs.config['control_output'] > 1:
-        if getconfigs.config['control_clear']:
+    if gc.config['control_output'] > 1:
+        if gc.config['control_clear']:
             # optional terminal clearing
             os.system('clear')
         else:
@@ -635,7 +634,7 @@ def do( cmdline ):
 
     # 'status' will read the state file and send it back as an YAML string
     if cmdline.rstrip('\r\n') == 'status':
-        result = yaml.dump( gs.state, default_flow_style=False )
+        result = yaml.dump( gc.state, default_flow_style=False )
 
     # Any else cmdline phrase will be processed by the 'proccess_commands()' function,
     # that answers with a state dict, and warnings if any:
