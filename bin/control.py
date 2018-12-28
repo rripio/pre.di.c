@@ -23,48 +23,55 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-""" A module interface that controls pre.di.c.
+""" A module interface that controls pre.di.c and  
+    prints out information to the running terminal.
     This module is called from the listening server.
+    This module uses 'server_process' that is the true pre.di.c controller.
 """
 
 import sys
 import os
 import yaml
 
-import basepaths as bp
-import server_process as sp
-import getconfigs as gc
-import predic as pd
+import basepaths
+import getconfigs
+import server_process
 
 def do(command):
+    """ Returns:
+        - 'OK' if the command was succesfully processed.
+        - 'ACK' if not.
+        - The state dictionary is command = 'status'
+    """
     
-    state = gc.state
-
-    if gc.config['control_output'] > 1:
-        if gc.config['control_clear']:
+    # terminal print out behavior
+    if getconfigs.config['control_output'] > 1:
+        if getconfigs.config['control_clear']:
             # optional terminal clearing
             os.system('clear')
         else:
             # separator
              print('=' * 70)
 
+    # server_process.py will need to know the current status when querying to do something
+    state = getconfigs.state
+    result = ''
+
+    # 'status' will read the state file and send it back as an YAML string
     if command.rstrip('\r\n') == 'status':
-        # Reads state file and sends it back
-        # as YAML string
         result = yaml.dump(state, default_flow_style=False)
 
+    # Any else command will be processed by the 'server_process' module,
+    # that answers with a state dict, and warnings if any:
     else:
-        # A command to be processed by server_process.py,
-        # that answers with a state dict, and warnings if any:
-        (state, warnings) = sp.proccess_commands(command, state)
+        (state, warnings) = server_process.proccess_commands(command, state)
 
         try:
-
             # Updates state file
-            with open(bp.state_path, 'w') as f:
+            with open(basepaths.state_path, 'w') as f:
                 yaml.dump(state, f, default_flow_style=False)
 
-            # Print warnings
+            # Prints warnings
             if len(warnings) > 0:
                 print("Warnings:")
                 for warning in warnings:
