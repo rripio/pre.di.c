@@ -643,7 +643,7 @@ def do( cmdline ):
 
         try:
             # Updates state file
-            with open( basepaths.state_path, 'w' ) as f:
+            with open( bp.state_path, 'w' ) as f:
                 yaml.dump( state, f, default_flow_style=False )
 
             # Prints warnings
