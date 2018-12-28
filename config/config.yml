@@ -60,7 +60,7 @@ brutefir_options: ''
 brutefir_ports: brutefir:in.L brutefir:in.R
 
 # Ecasound (optional)
-load_ecasound: True
+load_ecasound: False
 ecasound_path: /usr/bin/ecasound
 # Number of parametrics
 # Needed PEQxNN_defeat_Fs.ecs template in ~/config
