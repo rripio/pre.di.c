@@ -126,7 +126,7 @@ def run_server(host, port, verbose=False):
                 
                 #######################################################################
                 # PROCESSING by using the IMPORTED MODULE when starting up this server,
-                # always must use the the do() function from the module.
+                # always must use the the module do() function.
                 result = processing.do(data)
                 #######################################################################
 
