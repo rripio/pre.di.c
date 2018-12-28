@@ -615,9 +615,9 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 ###################################
 # Interfacing function for servers
 ###################################
-def do(command):
+def do( cmdline ):
     """ Returns:
-        - The state dictionary is command = 'status'
+        - The state dictionary if cmdline = 'status'
         - 'OK' if the command was succesfully processed.
         - 'ACK' if not.
     """
@@ -634,18 +634,18 @@ def do(command):
     result = ''
 
     # 'status' will read the state file and send it back as an YAML string
-    if command.rstrip('\r\n') == 'status':
-        result = yaml.dump(gs.state, default_flow_style=False)
+    if cmdline.rstrip('\r\n') == 'status':
+        result = yaml.dump( gs.state, default_flow_style=False )
 
-    # Any else command phrase will be processed by the 'proccess_commands()',
+    # Any else cmdline phrase will be processed by the 'proccess_commands()' function,
     # that answers with a state dict, and warnings if any:
     else:
-        (state, warnings) = proccess_commands(command)
+        (state, warnings) = proccess_commands( cmdline )
 
         try:
             # Updates state file
-            with open(basepaths.state_path, 'w') as f:
-                yaml.dump(state, f, default_flow_style=False)
+            with open( basepaths.state_path, 'w' ) as f:
+                yaml.dump( state, f, default_flow_style=False )
 
             # Prints warnings
             if len(warnings) > 0:
