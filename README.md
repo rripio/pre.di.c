@@ -8,7 +8,7 @@ Copyright (c) 2016-2018 Rafael Sánchez
 
 ## Requirements
 
-Python >= 3.6
+**Python** >= 3.6
 
 **~/.profile**
 ```
