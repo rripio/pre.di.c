@@ -126,7 +126,7 @@
         echo predic_socket( 'aux', $command );
     }
     elseif ( $command === "list_macros" ) {
-        $macros_array = scandir("/home/predic/macros/");
+        $macros_array = scandir("/home/predic/clients/macros/");
         echo json_encode( $macros_array );
     }
 
