@@ -53,7 +53,7 @@ def main(run_level):
             pd.wait4result(f'pgrep -f "{server_cmdline}"', '', 5, quiet=True)
         except:
             print('(stopaudio) forcing to stop server.py')
-            run ( [ 'pkill', '-9', '-f', server_cmdline ) ] , stdout=fnull, stderr=fnull )
+            run ( [ 'pkill', '-9', '-f', f'"{server_cmdline}"' ) ] , stdout=fnull, stderr=fnull )
 
         # ecasound
         if gc.config['load_ecasound']:
