@@ -13,5 +13,5 @@ Copyright (c) 2016-2018 Rafael Sánchez
 **~/.profile**
 ```
   ...
-  export PYTHONPATH=bin:clients
+  PYTHONPATH="$PYTHONPATH:$HOME/bin:$HOME/clients/bin"
 ```
