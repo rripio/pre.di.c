@@ -31,7 +31,6 @@
 
 import subprocess as sp
 import yaml
-import jack
 import mpd
 import time
 
