@@ -54,7 +54,7 @@ fi
 cd $destination
 
 ######################################################################
-# Prevent: BACKUP user files to *.LAST for current configurations
+# Prevent: backup .LAST for current configurations
 ######################################################################
 echo "(i) backing up *.LAST for config files"
 
@@ -66,13 +66,15 @@ cp .brutefir_defaults       .brutefir_defaults.LAST       >/dev/null 2>&1
 cp .mplayer/config          .mplayer/config.LAST          >/dev/null 2>&1
 cp .mplayer/channels.conf   .mplayer/channels.conf.LAST   >/dev/null 2>&1
 
-## folder CONFIG - yml files
-for file in config/*.yml ; do
-    mv "$file" "$file.LAST"
-done
-
-## folder CONFIG - PEQ template files
-rm -f config/PEQx*LAST # discarting previous if any
+## folder CONFIG:
+cp config/state.yml             config/state.yml.LAST
+cp config/config.yml            config/config.yml.LAST
+cp config/inputs.yml            config/inputs.yml.LAST
+cp config/scripts               config/scripts.LAST
+cp config/DVB-T.yml             config/DVB-T.yml.LAST           >/dev/null 2>&1
+cp config/DVB-T_state.yml       config/DVB-T_state.yml.LAST     >/dev/null 2>&1
+cp config/iradio_stations.yml   config/iradio_stations.yml.LAST >/dev/null 2>&1
+rm -f config/PEQx*LAST       # discarting previous if any
 for file in config/PEQx* ; do
     mv "$file" "$file.LAST"
 done
@@ -83,16 +85,8 @@ for file in scripts/* ; do
     cp "$file" "$file.LAST" >/dev/null 2>&1
 done
 
-## folder CLIENTS/WWW
-# - does not contains config nor user files -
-
-## folder CLIENTS/BIN
-for file in clients/bin/* ; do
-    cp "$file" "$file.LAST" >/dev/null 2>&1
-done
-
-## folder CLIENTS/MACROS
-# These are privative files, nothing to do here.
+## folder WWW - Notice config.ini still not in use in current web control page
+# cp www/config/config.ini    tmp/www_config.ini.LAST # en tmp/ pq www/ desaparecerá
 
 #########################################################
 # Cleaning
@@ -104,7 +98,7 @@ rm -f README*                                   >/dev/null 2>&1
 rm -f WIP*                                      >/dev/null 2>&1
 rm -rf bin/ # -f because maybe protected *.pyc
 rm -r doc/                                      >/dev/null 2>&1
-rm -r clients/www/                              >/dev/null 2>&1
+rm -r www/                                      >/dev/null 2>&1
 rm .brutefir_c*                                 >/dev/null 2>&1
 
 #########################################################
@@ -118,7 +112,7 @@ cp $origin/.brutefir*       $destination/           >/dev/null 2>&1
 cp -r $origin/.mplayer*     $destination/           >/dev/null 2>&1
 
 ########################################################################
-# If KEEPING CONFIG will restore the *LAST copies
+# If KEEP CONFIG:
 ########################################################################
 if [ "$keepConfig" ]; then
     echo "(i) Restoring user config files"
@@ -135,6 +129,10 @@ if [ "$keepConfig" ]; then
     echo "    ".mplayer/channels.conf
     mv .mplayer/channels.conf.LAST  .mplayer/channels.conf  >/dev/null 2>&1
 
+    # folder WWW
+    #echo "    "www/config/config.ini
+    #cp tmp/www_config.ini.LAST      www/config/config.ini
+
     # folder CONFIG:
     for file in config/*LAST ; do
         nfile=${file%.LAST}         # removes .LAST at the end '%'
@@ -143,7 +141,7 @@ if [ "$keepConfig" ]; then
     done
 
 ########################################################################
-# If NO KEEPING CONFIG, then overwrite:
+# If NO KEEP CONFIG, then overwrite:
 ########################################################################
 else
     # Some config files are provided with '.example' extension
@@ -153,7 +151,11 @@ else
     cp config/scripts.example           config/scripts
     cp config/DVB-T_state.example       config/DVB-T_state  >/dev/null 2>&1
     cp config/DVB-T.example             config/DVB-T        >/dev/null 2>&1
+    #cp www/config/config.ini.example    www/config/config.ini
 fi
+
+# Special case copied to tmp/ so lets' move it
+#mv -f tmp/www_config.ini.LAST    www/config/config.ini.LAST
 
 
 #########################################################
@@ -175,9 +177,10 @@ brutefir
 # restoring exec permissions under bin*
 #########################################################
 chmod +x bin/*                  >/dev/null 2>&1
-chmod +x clients/bin/*          >/dev/null 2>&1
 chmod +x bin_custom/*           >/dev/null 2>&1
 chmod +x bin_custom.example/*   >/dev/null 2>&1
+#chmod -R 644 www/*
+#chmod 666 www/config/config*
 cd
 
 #########################################################
