@@ -42,10 +42,9 @@ verbose = False
 
 import socket
 import sys
-import subprocess as sp
 
 def server_socket(host, port):
-    """ Makes a socket that listen to clients """
+    """ Returns a socket 's' that listen to clients """
 
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,7 +70,7 @@ def server_socket(host, port):
 
 def run_server(host, port, verbose=False):
     """ This is the server itself.
-        Inside the desired processing module is called
+        Inside, it is called the desired processing module
         to perform actions and giving results.
     """
 
@@ -85,25 +84,26 @@ def run_server(host, port, verbose=False):
         mysocket.listen(maxconns)
         if verbose:
             print( f'(server.py [{service}]) listening on \'localhost\':{port}' )
-        # Accepts a client connection when happens:
+
+        # Waits for a client to be connected:
         sc, remote = mysocket.accept()
         if verbose:
             print( f'(server.py [{service}]) connected to client {remote[0]}' )
 
-        # A buffer loop to proccess received orders
+        # A buffer loop to proccess received data
         while True:
             # Reception
             data = sc.recv(4096).decode()
 
             if not data:
-                # Nothing in buffer, closing because the client has disconnected too soon.
+                # Nothing in buffer, then will close because the client has disconnected too soon.
                 if verbose:
                     print (f'(server.py [{service}]) Client disconnected. \
                              Closing connection...' )
                 sc.close()
                 break
 
-            # Some reserved words for controling the communication:
+            # Reserved words for controling the communication ('quit' or 'shutdown')
             elif data.rstrip('\r\n') == 'quit':
                 sc.send(b'OK\n')
                 if verbose:
@@ -119,14 +119,14 @@ def run_server(host, port, verbose=False):
                 mysocket.close()
                 sys.exit(1)
 
-            # If not a reserved word, then process the received thing:
+            # If not a reserved word, then process the received data as a command:
             else:
                 if verbose:
                     print  ('>>> ' + data )
                 
                 #######################################################################
                 # PROCESSING by using the IMPORTED MODULE when starting up this server,
-                # always must use the the do() function from this module.
+                # always must use the the do() function from the module.
                 result = processing.do(data)
                 #######################################################################
 
@@ -142,6 +142,10 @@ def run_server(host, port, verbose=False):
 
 
 if __name__ == "__main__":
+    
+    if len(sys.argv) == 1:
+        print(__doc__)
+        sys.exit(-1)
     
     service = sys.argv[1]
 
