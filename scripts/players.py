@@ -15,9 +15,9 @@ def start():
     Popen( f'{server_path} players'.split() )
 
 def stop():
-    Popen( [ 'pkill', '-KILL', '-f', f'{server_path} players' ] )
+    Popen( [ 'pkill', '-KILL', '-f', f'"{server_path} players"' ] )
     # harakiri
-    Popen( ['pkill', '-KILL', '-f',  'scripts/aux.py'] )
+    Popen( ['pkill', '-KILL', '-f',  'scripts/players.py'] )
 
 if sys.argv[1:]:
     try:
