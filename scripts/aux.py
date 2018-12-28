@@ -15,7 +15,7 @@ def start():
     Popen( f'{server_path} aux'.split() )
 
 def stop():
-    Popen( [ 'pkill', '-KILL', '-f', f'{server_path} aux' ] )
+    Popen( [ 'pkill', '-KILL', '-f', f'"{server_path} aux"' ] )
     # harakiri
     Popen( ['pkill', '-KILL', '-f',  'scripts/aux.py'] )
 
