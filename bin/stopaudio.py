@@ -47,13 +47,13 @@ def main(run_level):
 
         # controlserver
         print('(stopaudio) stopping server')
-        server_cmdline = f'{ os.path.expanduser( gc.config['server_path'] ) } control'
+        server_cmdline = os.path.expanduser( gc.config['server_path'] ) + 'control'
         try:
             pd.client_socket('shutdown')
             pd.wait4result(f'pgrep -f "{server_cmdline}"', '', 5, quiet=True)
         except:
             print('(stopaudio) forcing to stop server.py')
-            run ( [ 'pkill', '-9', '-f', f'"{server_cmdline}"' ) ] , stdout=fnull, stderr=fnull )
+            run ( [ 'pkill', '-9', '-f', f'{server_cmdline}' ] , stdout=fnull, stderr=fnull )
 
         # ecasound
         if gc.config['load_ecasound']:
