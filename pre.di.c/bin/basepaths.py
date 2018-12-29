@@ -22,10 +22,13 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
+HOME = os.path.expanduser("~")
+
 ## customizable initial values
 
 # folders
-main_folder = '/home/predic/'
+main_folder = HOME + '/pre.di.c/'
 bin_folder = main_folder + 'bin/'
 config_folder = main_folder + 'config/'
 scripts_folder = main_folder + 'scripts/'
