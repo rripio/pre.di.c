@@ -1,0 +1,15 @@
+DRC:
+  filters: [f.drc.L, f.drc.R]
+  sets:
+    nearfield: [L_lp_DynA42, R_lp_DynA42]
+    none: [none, none]
+PEQ: {defeat: none, peq1: peq1.peq}
+XO:
+  filters: [f.fr.L, f.fr.R]
+  sets:
+    none: [none, none]
+    normal: [mp_DynA42_left, mp_DynA42_right]
+fs: 44100
+ref_level_gain: 0.0
+target_mag_curve: R20_ext-target_mag.dat
+target_pha_curve: R20_ext-target_pha.dat
