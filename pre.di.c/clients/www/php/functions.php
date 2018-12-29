@@ -28,12 +28,19 @@
             readfile("some_file_path");
     */
 
+    
+    ///////////////////////////////////////////////////////////////////////
+    // PLEASE CONFIGURE HERE THE PROPER $HOME PATH WHERE pre.di.c IS HOSTED
+    $home = "/home/predic";
+    ///////////////////////////////////////////////////////////////////////
+
     /////////////////////////////////////////////////////////////////////
     // Retrieves simple configured items from pre.di.c 'config.yml' file
     /////////////////////////////////////////////////////////////////////
     function get_config($item) {
+        global $home
         $tmp = "";
-        $cfile = fopen("/home/predic/config/config.yml", "r")
+        $cfile = fopen($home."/pre.di.c/config/config.yml", "r")
                   or die("Unable to open file!");
         while( !feof($cfile) ) {
             $linea = fgets($cfile);
@@ -98,13 +105,13 @@
     // READING CONFIG FILES
     // Notice: readfile() does an 'echo', so it returns the contents to the standard php output
     if ( $command == "read_inputs_file" ) {
-        readfile("/home/predic/config/inputs.yml");
+        readfile($home."/pre.di.c/config/inputs.yml");
     }
     elseif ( $command == "read_config_file" ) {
-        readfile("/home/predic/config/config.yml");
+        readfile($home."/pre.di.c/config/config.yml");
     }
     elseif ( $command == "read_speaker_file" ) {
-        $fpath = "/home/predic/loudspeakers/".get_config("loudspeaker")."/speaker.yml";
+        $fpath = $home."/pre.di.c/loudspeakers/".get_config("loudspeaker")."/speaker.yml";
         readfile($fpath);
     }
 
@@ -118,7 +125,7 @@
         predic_socket( 'aux', 'ampli off');
     }
     elseif ( $command == "amplistatus" ) {
-        readfile("/home/predic/.ampli"); // php cannot acces inside /tmp for securety reasons.
+        readfile($home."/.ampli"); // php cannot acces inside /tmp for securety reasons.
     }
 
     // USER MACROS are handled by the 'aux' server
@@ -126,7 +133,7 @@
         echo predic_socket( 'aux', $command );
     }
     elseif ( $command === "list_macros" ) {
-        $macros_array = scandir("/home/predic/clients/macros/");
+        $macros_array = scandir($home."/pre.di.c/clients/macros/");
         echo json_encode( $macros_array );
     }
 
