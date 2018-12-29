@@ -12,7 +12,7 @@ if [ -z $1 ] ; then
     exit 0
 fi
 
-destination=/home/predic
+destination=$HOME
 branch=$1
 origin=$destination/tmp/pre.di.c-$branch
 
@@ -66,27 +66,28 @@ cp .brutefir_defaults       .brutefir_defaults.LAST       >/dev/null 2>&1
 cp .mplayer/config          .mplayer/config.LAST          >/dev/null 2>&1
 cp .mplayer/channels.conf   .mplayer/channels.conf.LAST   >/dev/null 2>&1
 
-## folder CONFIG - yml files
+## folder CONFIG: yml files
 for file in config/*.yml ; do
     mv "$file" "$file.LAST"
 done
 
-## folder CONFIG - PEQ template files
-rm -f config/PEQx*LAST # discarting previous if any
+## folder CONFIG: PEQ template files
+rm -f config/PEQx*LAST                  # discarting previous *LAST if any
 for file in config/PEQx* ; do
     mv "$file" "$file.LAST"
 done
 
 ## folder SCRIPTS
-rm scripts/*LAST
+rm scripts/*LAST                        # discarting previous *LAST if any
 for file in scripts/* ; do
     cp "$file" "$file.LAST" >/dev/null 2>&1
 done
 
-## folder CLIENTS/WWW
-# - does not contains config nor user files -
+## folder CLIENTS / WWW
+# - does not contains config neither user files -
 
-## folder CLIENTS/BIN
+## folder CLIENTS / BIN
+rm clients/bin/*LAST                    # discarting previous *LAST if any
 for file in clients/bin/* ; do
     cp "$file" "$file.LAST" >/dev/null 2>&1
 done
@@ -98,27 +99,27 @@ done
 # Cleaning
 #########################################################
 echo "(i) Removing old files"
-rm -f CHANGES*                                  >/dev/null 2>&1
-rm -f LICENSE*                                  >/dev/null 2>&1
-rm -f README*                                   >/dev/null 2>&1
-rm -f WIP*                                      >/dev/null 2>&1
-rm -rf bin/ # -f because maybe protected *.pyc
-rm -r doc/                                      >/dev/null 2>&1
-rm -r clients/www/                              >/dev/null 2>&1
-rm .brutefir_c*                                 >/dev/null 2>&1
+rm -f CHANGES*          >/dev/null 2>&1
+rm -f LICENSE*          >/dev/null 2>&1
+rm -f README*           >/dev/null 2>&1
+rm -f WIP*              >/dev/null 2>&1
+rm -rf bin/             # use -f because maybe protected *.pyc
+rm -r doc/              >/dev/null 2>&1
+rm -r clients/www/      >/dev/null 2>&1
+rm .brutefir_c*         >/dev/null 2>&1
 
 #########################################################
 # Copying the new stuff
 #########################################################
 echo "(i) Copying from $origin to $destination"
 cp -r $origin/*             $destination/
-# hidden files must be explicit each one to copy them
-cp $origin/.mpdconf         $destination/           >/dev/null 2>&1
-cp $origin/.brutefir*       $destination/           >/dev/null 2>&1
+# hidden files must be explicited each one to be copied
+cp    $origin/.mpdconf      $destination/           >/dev/null 2>&1
+cp    $origin/.brutefir*    $destination/           >/dev/null 2>&1
 cp -r $origin/.mplayer*     $destination/           >/dev/null 2>&1
 
 ########################################################################
-# If KEEPING CONFIG will restore the *LAST copies
+# If wanted to KEEP CONFIGS, will restore the *LAST copies
 ########################################################################
 if [ "$keepConfig" ]; then
     echo "(i) Restoring user config files"
@@ -137,7 +138,7 @@ if [ "$keepConfig" ]; then
 
     # folder CONFIG:
     for file in config/*LAST ; do
-        nfile=${file%.LAST}         # removes .LAST at the end '%'
+        nfile=${file%.LAST}         # removes trailing .LAST '%'
         echo "    "$nfile
         mv $file $nfile
     done
@@ -172,7 +173,7 @@ echo "(i) A first dry brutefir run in order to generate some internal."
 brutefir
 
 #########################################################
-# restoring exec permissions under bin*
+# restoring exec permissions
 #########################################################
 chmod +x bin/*                  >/dev/null 2>&1
 chmod +x clients/bin/*          >/dev/null 2>&1
@@ -221,5 +222,5 @@ if [ "$updateWeb" ]; then
     sudo service apache2 reload
 fi
 
-#### And update the updater
-cp "$origin"/.install/update_predic.sh /home/predic/tmp/
+#### And updates the updater script
+cp "$origin"/.install/update_predic.sh $HOME/tmp/
