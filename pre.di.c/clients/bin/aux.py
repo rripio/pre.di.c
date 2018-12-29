@@ -62,8 +62,8 @@ def do(task):
             return b'error'
 
     ### USER MACROS
-    # Macro files are named this way: 'macros/N_macroname',
-    # so N will serve as button keypad position from web control page
+    # Macro files are named this way: 'N_macroname',
+    # so N will serve as button keypad position on the web control page.
     # The task phrase syntax must be like: 'macro_N_macroname',
     # that is prefixed with the reserved word 'macro_'
     elif task[:6] == 'macro_':
