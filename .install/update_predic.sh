@@ -201,6 +201,7 @@ chmod +x bin/*                  >/dev/null 2>&1
 cd pre.di.c
 chmod +x bin/*                  >/dev/null 2>&1
 chmod +x clients/bin/*          >/dev/null 2>&1
+chmod +x scripts/*              >/dev/null 2>&1
 chmod +x clients/macros/[1-9]*  >/dev/null 2>&1
 cd $destination
 
