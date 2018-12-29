@@ -59,6 +59,7 @@ cd $destination
 echo "(i) backing up *.LAST for config files"
 
 ## folder HOME:
+cp .asoundrc                .asoundrc.LAST                 >/dev/null 2>&1
 cp .mpdconf                 .mpdconf.LAST                 >/dev/null 2>&1
 cp .brutefir_defaults       .brutefir_defaults.LAST       >/dev/null 2>&1
 
@@ -125,6 +126,8 @@ if [ "$keepConfig" ]; then
     echo "(i) Restoring user config files"
 
     # folder HOME:
+    echo "    ".asoundrc
+    mv .asoundrc.LAST               .asoundrc                >/dev/null 2>&1
     echo "    ".mpdconf
     mv .mpdconf.LAST                .mpdconf                >/dev/null 2>&1
     echo "    .brutefir_defaults"
@@ -196,7 +199,7 @@ echo ""
 #########################################################
 # Website 'pre.di.c'
 #########################################################
-forig=$origin"/.install/pre.di.c.conf"
+forig=$origin"/.install/apache/pre.di.c.conf"
 fdest="/etc/apache2/sites-available/pre.di.c.conf"
 updateWeb=1
 echo ""
