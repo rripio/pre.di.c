@@ -1,6 +1,6 @@
 DRC_set: none
 PEQ_set: none
-XO_set: flat
+XO_set: normal
 balance: 0.0
 bass: 0
 input: analog
