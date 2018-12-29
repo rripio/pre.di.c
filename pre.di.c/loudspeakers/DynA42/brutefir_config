@@ -73,42 +73,42 @@ coeff "c.eq" {
 # -----------------------------------------
 
 coeff "L_lp_DynA42" {
-    filename:    "/home/predic/loudspeakers/DynA42/drc.L_lp_DynA42.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/DynA42/drc.L_lp_DynA42.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "L_mp_DynA42" {
-    filename:    "/home/predic/loudspeakers/DynA42/drc.L_mp_DynA42.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/DynA42/drc.L_mp_DynA42.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "R_lp_DynA42" {
-    filename:    "/home/predic/loudspeakers/DynA42/drc.R_lp_DynA42.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/DynA42/drc.R_lp_DynA42.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "R_mp_DynA42" {
-    filename:    "/home/predic/loudspeakers/DynA42/drc.R_mp_DynA42.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/DynA42/drc.R_mp_DynA42.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "mp_DynA42_left" {
-    filename:    "/home/predic/loudspeakers/DynA42/xo.mp_DynA42_left.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/DynA42/xo.mp_DynA42_left.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "mp_DynA42_right" {
-    filename:    "/home/predic/loudspeakers/DynA42/xo.mp_DynA42_right.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/DynA42/xo.mp_DynA42_right.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
