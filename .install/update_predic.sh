@@ -51,12 +51,13 @@ fi
 ###                                 MAIN                                     ###
 ################################################################################
 
+cd "$destination"
+mkdir pre.di.c          >/dev/null 2>&1 # if first install
+mkdir pre.di.c/.run     >/dev/null 2>&1 # if first install
 
 ######################################################################
 # BACKUP user files to *.LAST to keep current configurations
 ######################################################################
-
-cd "$destination"
 
 echo "(i) backing up *.LAST for config files"
 
@@ -69,7 +70,6 @@ cp .brutefir_defaults       .brutefir_defaults.LAST       >/dev/null 2>&1
 cp .mplayer/config          .mplayer/config.LAST          >/dev/null 2>&1
 cp .mplayer/channels.conf   .mplayer/channels.conf.LAST   >/dev/null 2>&1
 
-mkdir pre.di.c >/dev/null 2>&1 # if first install
 cd pre.di.c
 
 ## CONFIG: 'scripts' file and '*.yml' files
