@@ -1,0 +1,13 @@
+DRC_set: none
+PEQ_set: none
+XO_set: flat
+balance: 0.0
+bass: 0
+input: analog
+level: -20.0
+loudness_ref: 0.0
+loudness_track: false
+mono: false
+muted: false
+polarity: +
+treble: 0
