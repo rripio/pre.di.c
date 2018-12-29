@@ -98,7 +98,7 @@ function update_ampli_switch() {
 
 //////// USER MACROS ////////
 
-// Gets a list of user macros availables under /home/predic/macros/
+// Gets a list of user macros availables under pre.di.c/clients/macros/
 function list_macros() {
     var list  = [];
     var list2 = []; // a clean list version
