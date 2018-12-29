@@ -11,6 +11,6 @@ Must locate here any code to be intended as a **client** or **auxiliary** featur
 
 You must update your `PYTHONPATH` env variable for instance by editing your **`.profile`** home file:
 ```
-  PYTHONPATH=$PYTHONPATH:$HOME/pre.di.c/bin:$HOME/pre.di.c/clients/bin
+  export PYTHONPATH=$PYTHONPATH:$HOME/pre.di.c/bin:$HOME/pre.di.c/clients/bin
 ```
 
