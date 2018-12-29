@@ -1,0 +1,11 @@
+#!/bin/bash
+
+predic_addr='localhost'
+
+# 'nc' on Linux: -N shutdown the network socket after EOF on the input.
+echo show | nc -N $predic_addr 9999 > /dev/null
+
+# 'nc' on Mac OS:
+#echo show | nc $predic_addr 9999 > /dev/null
+
+cat /tmp/predic
