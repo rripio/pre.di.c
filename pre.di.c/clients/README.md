@@ -9,9 +9,8 @@ Must locate here any code to be intended as a **client** or **auxiliary** featur
 - etc
 
 
-Your must update your **~/.profile**
+You must update your `PYTHONPATH` env variable for instance by editing your **`.profile`** home file:
 ```
-  ...
-  PYTHONPATH="$PYTHONPATH:$HOME/pre.di.c/bin:$HOME/pre.di.c/clients/bin"
+  PYTHONPATH=$PYTHONPATH:$HOME/pre.di.c/bin:$HOME/pre.di.c/clients/bin
 ```
 
