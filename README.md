@@ -13,5 +13,5 @@ Copyright (c) 2016-2018 Rafael Sánchez
 **~/.profile**
 ```
   ...
-  PYTHONPATH="$PYTHONPATH:$HOME/bin:$HOME/clients/bin"
+  PYTHONPATH="$PYTHONPATH:$HOME/pre.di.c/bin:$HOME/pre.di.c/clients/bin"
 ```
