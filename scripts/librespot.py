@@ -11,7 +11,7 @@ from subprocess import run
 def start():
     # 'librespot' binary prints out the playing track and some info to stdout/stderr.
     # We redirect the print outs to a temporary file that will be periodically
-    # read from a player control daemon script, like the control web page.
+    # read from a player control daemon.
 
     cmd =  '/usr/bin/librespot --name rpi3clac --bitrate 320 --backend alsa' + \
            ' --device jack --disable-audio-cache --initial-volume=99'
