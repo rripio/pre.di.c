@@ -224,6 +224,13 @@ if [ "$updateWeb" ]; then
     sudo a2dissite 000-default.conf
     sudo service apache2 reload
 fi
+echo ""
+echo "(i) NOTICE:"
+echo "    If you install pre.di.c under a home other than '/home/predic'"
+echo "    please update accordingly:"
+echo "        /etc/apache2/sites-available/pre.di.c.conf"
+echo "        /home/YOURHOME/pre.di.c/clients/www/php/functions.php"
+
 
 #### And updates the updater script
 cp "$origin"/.install/update_predic.sh $HOME/tmp/
