@@ -12,6 +12,6 @@ Must locate here any code to be intended as a **client** or **auxiliary** featur
 Your must update your **~/.profile**
 ```
   ...
-  PYTHONPATH="$PYTHONPATH:$HOME/bin:$HOME/clients/bin"
+  PYTHONPATH="$PYTHONPATH:$HOME/pre.di.c/bin:$HOME/pre.di.c/clients/bin"
 ```
 
