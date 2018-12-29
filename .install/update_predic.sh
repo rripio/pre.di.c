@@ -12,7 +12,7 @@ if [ -z $1 ] ; then
     exit 0
 fi
 
-destination=/home/predic
+destination=$HOME
 branch=$1
 origin=$destination/tmp/pre.di.c-$branch
 
@@ -54,11 +54,12 @@ fi
 cd $destination
 
 ######################################################################
-# Prevent: backup .LAST for current configurations
+# Prevent: BACKUP user files to *.LAST for current configurations
 ######################################################################
 echo "(i) backing up *.LAST for config files"
 
 ## folder HOME:
+cp .asoundrc                .asoundrc.LAST                 >/dev/null 2>&1
 cp .mpdconf                 .mpdconf.LAST                 >/dev/null 2>&1
 cp .brutefir_defaults       .brutefir_defaults.LAST       >/dev/null 2>&1
 
@@ -66,58 +67,67 @@ cp .brutefir_defaults       .brutefir_defaults.LAST       >/dev/null 2>&1
 cp .mplayer/config          .mplayer/config.LAST          >/dev/null 2>&1
 cp .mplayer/channels.conf   .mplayer/channels.conf.LAST   >/dev/null 2>&1
 
-## folder CONFIG:
-cp config/state.yml             config/state.yml.LAST
-cp config/config.yml            config/config.yml.LAST
-cp config/inputs.yml            config/inputs.yml.LAST
-cp config/scripts               config/scripts.LAST
-cp config/DVB-T.yml             config/DVB-T.yml.LAST           >/dev/null 2>&1
-cp config/DVB-T_state.yml       config/DVB-T_state.yml.LAST     >/dev/null 2>&1
-cp config/iradio_stations.yml   config/iradio_stations.yml.LAST >/dev/null 2>&1
-rm -f config/PEQx*LAST       # discarting previous if any
+## folder CONFIG: yml files
+for file in config/*.yml ; do
+    mv "$file" "$file.LAST"
+done
+
+## folder CONFIG: PEQ template files
+rm -f config/PEQx*LAST                  # discarting previous *LAST if any
 for file in config/PEQx* ; do
     mv "$file" "$file.LAST"
 done
 
 ## folder SCRIPTS
-rm scripts/*LAST
+rm scripts/*LAST                        # discarting previous *LAST if any
 for file in scripts/* ; do
     cp "$file" "$file.LAST" >/dev/null 2>&1
 done
 
-## folder WWW - Notice config.ini still not in use in current web control page
-# cp www/config/config.ini    tmp/www_config.ini.LAST # en tmp/ pq www/ desaparecerá
+## folder CLIENTS / WWW
+# - does not contains config neither user files -
+
+## folder CLIENTS / BIN
+rm clients/bin/*LAST                    # discarting previous *LAST if any
+for file in clients/bin/* ; do
+    cp "$file" "$file.LAST" >/dev/null 2>&1
+done
+
+## folder CLIENTS/MACROS
+# These are privative files, nothing to do here.
 
 #########################################################
 # Cleaning
 #########################################################
 echo "(i) Removing old files"
-rm -f CHANGES*                                  >/dev/null 2>&1
-rm -f LICENSE*                                  >/dev/null 2>&1
-rm -f README*                                   >/dev/null 2>&1
-rm -f WIP*                                      >/dev/null 2>&1
-rm -rf bin/ # -f because maybe protected *.pyc
-rm -r doc/                                      >/dev/null 2>&1
-rm -r www/                                      >/dev/null 2>&1
-rm .brutefir_c*                                 >/dev/null 2>&1
+rm -f CHANGES*          >/dev/null 2>&1
+rm -f LICENSE*          >/dev/null 2>&1
+rm -f README*           >/dev/null 2>&1
+rm -f WIP*              >/dev/null 2>&1
+rm -rf bin/             # use -f because maybe protected *.pyc
+rm -r doc/              >/dev/null 2>&1
+rm -r clients/www/      >/dev/null 2>&1
+rm .brutefir_c*         >/dev/null 2>&1
 
 #########################################################
 # Copying the new stuff
 #########################################################
 echo "(i) Copying from $origin to $destination"
 cp -r $origin/*             $destination/
-# hidden files must be explicit each one to copy them
-cp $origin/.mpdconf         $destination/           >/dev/null 2>&1
-cp $origin/.brutefir*       $destination/           >/dev/null 2>&1
+# hidden files must be explicited each one to be copied
+cp    $origin/.mpdconf      $destination/           >/dev/null 2>&1
+cp    $origin/.brutefir*    $destination/           >/dev/null 2>&1
 cp -r $origin/.mplayer*     $destination/           >/dev/null 2>&1
 
 ########################################################################
-# If KEEP CONFIG:
+# If wanted to KEEP CONFIGS, will restore the *LAST copies
 ########################################################################
 if [ "$keepConfig" ]; then
     echo "(i) Restoring user config files"
 
     # folder HOME:
+    echo "    ".asoundrc
+    mv .asoundrc.LAST               .asoundrc                >/dev/null 2>&1
     echo "    ".mpdconf
     mv .mpdconf.LAST                .mpdconf                >/dev/null 2>&1
     echo "    .brutefir_defaults"
@@ -129,19 +139,15 @@ if [ "$keepConfig" ]; then
     echo "    ".mplayer/channels.conf
     mv .mplayer/channels.conf.LAST  .mplayer/channels.conf  >/dev/null 2>&1
 
-    # folder WWW
-    #echo "    "www/config/config.ini
-    #cp tmp/www_config.ini.LAST      www/config/config.ini
-
     # folder CONFIG:
     for file in config/*LAST ; do
-        nfile=${file%.LAST}         # removes .LAST at the end '%'
+        nfile=${file%.LAST}         # removes trailing .LAST '%'
         echo "    "$nfile
         mv $file $nfile
     done
 
 ########################################################################
-# If NO KEEP CONFIG, then overwrite:
+# If NO KEEPING CONFIG, then overwrite:
 ########################################################################
 else
     # Some config files are provided with '.example' extension
@@ -151,11 +157,7 @@ else
     cp config/scripts.example           config/scripts
     cp config/DVB-T_state.example       config/DVB-T_state  >/dev/null 2>&1
     cp config/DVB-T.example             config/DVB-T        >/dev/null 2>&1
-    #cp www/config/config.ini.example    www/config/config.ini
 fi
-
-# Special case copied to tmp/ so lets' move it
-#mv -f tmp/www_config.ini.LAST    www/config/config.ini.LAST
 
 
 #########################################################
@@ -174,13 +176,13 @@ echo "(i) A first dry brutefir run in order to generate some internal."
 brutefir
 
 #########################################################
-# restoring exec permissions under bin*
+# restoring exec permissions
 #########################################################
 chmod +x bin/*                  >/dev/null 2>&1
+chmod +x clients/bin/*          >/dev/null 2>&1
+chmod +x clients/macros/[1-9]*  >/dev/null 2>&1
 chmod +x bin_custom/*           >/dev/null 2>&1
 chmod +x bin_custom.example/*   >/dev/null 2>&1
-#chmod -R 644 www/*
-#chmod 666 www/config/config*
 cd
 
 #########################################################
@@ -197,7 +199,7 @@ echo ""
 #########################################################
 # Website 'pre.di.c'
 #########################################################
-forig=$origin"/.install/pre.di.c.conf"
+forig=$origin"/.install/apache/pre.di.c.conf"
 fdest="/etc/apache2/sites-available/pre.di.c.conf"
 updateWeb=1
 echo ""
@@ -223,5 +225,5 @@ if [ "$updateWeb" ]; then
     sudo service apache2 reload
 fi
 
-#### And update the updater
-cp "$origin"/.install/update_predic.sh /home/predic/tmp/
+#### And updates the updater script
+cp "$origin"/.install/update_predic.sh $HOME/tmp/

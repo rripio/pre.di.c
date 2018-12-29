@@ -29,6 +29,8 @@
 
 import subprocess as sp
 
+macros_folder = '/home/predic/clients/macros'
+
 def do(task):
     """
         This do() is the entry interface function from a listening server.
@@ -39,9 +41,9 @@ def do(task):
     # First clearing the new line
     task = task.replace('\n','')
 
-    ###################################
+    ###############################
     # Switching ON/OFF an amplifier
-    ###################################
+    ###############################
     # notice: subprocess.check_output(cmd) returns bytes-like,
     #         but if cmd fails an exception will be raised, so used with 'try'
     if task == 'ampli on':
@@ -57,16 +59,16 @@ def do(task):
         except:
             return b'error'
 
-    ###################################
-    # USER MACROS under macros/ folder
-    ###################################
+    #############
+    # USER MACROS
+    #############
     # Macro files are named this way: 'macros/N_macroname',
     # so N will serve as button keypad position from web control page
     # The task phrase syntax must be like: 'macro_N_macroname',
     # that is prefixed with the reserved word 'macro_'
     elif task[:6] == 'macro_':
         try:
-            cmd = '/home/predic/macros/' + task[6:]
+            cmd = f'{macros_folder}/{task[6:]}'
             sp.run( "'" + cmd + "'", shell=True ) # needs shell to user bash scripts to work
             return b'done'
         except:

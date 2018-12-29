@@ -5,3 +5,13 @@ pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
 Copyright (c) 2006-2011 Roberto Ripio  
 Copyright (c) 2011-2016 Alberto Miguélez  
 Copyright (c) 2016-2018 Rafael Sánchez  
+
+## Requirements
+
+**Python** >= 3.6
+
+**~/.profile**
+```
+  ...
+  PYTHONPATH="$PYTHONPATH:$HOME/bin:$HOME/clients/bin"
+```

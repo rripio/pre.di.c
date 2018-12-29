@@ -7,7 +7,7 @@ N determines the position into the web macros key pad.
 For example
 
 ```
-$ ls -1 macros/
+$ ls -1 clients/macros/
 1_RNE
 2_R.Clasica
 6_flat sound
@@ -22,5 +22,5 @@ Will show the following key pad layout:
     [     --      ]  [     --      ]  [    --      ]
 ```
 
-**NOTICE:** if no macro files `N_xxxx` were defined under `~/macros/` then **NO keypad** will be showed on the control web page.
+**NOTICE:** if no macro files `N_xxxx` were defined under `~/clients/macros/` then **NO keypad** will be showed on the control web page.
 

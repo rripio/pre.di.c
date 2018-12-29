@@ -127,10 +127,9 @@ def init_server():
     """loads server"""
 
     print('\n(startaudio) starting server\n')
+    server_path = os.path.expanduser( gc.config['server_path'] )
     try:
-        control = Popen( ['python3', 
-                          os.path.expanduser( gc.config['server_path'] ), 
-                          'control'] )
+        control = Popen( ['python3', server_path, 'control'] )
     except:
         print('\n(startaudio) server didn\'t load')
         sys.exit() # initaudio stopped

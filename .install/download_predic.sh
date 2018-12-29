@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ####################################################
-# CONFIGURE here the REPOSITORY to download from
+# CONFIGURE HERE the REPOSITORY to download from
 #reposite='https://github.com/rripio'
 reposite='https://github.com/rsantct'
 ####################################################
@@ -24,8 +24,8 @@ fi
 branch=$1
 
 # Prepare temp directory
-mkdir /home/predic/tmp > /dev/null 2>&1
-cd /home/predic/tmp
+mkdir $HOME/tmp > /dev/null 2>&1
+cd $HOME/tmp
 
 # Removes any existent master.zip or predic directory for this branch:
 rm $branch.zip
@@ -38,7 +38,8 @@ wget "$reposite"/pre.di.c/archive/"$branch".zip
 unzip $branch.zip
 rm $branch.zip
 
-# Drops install scripts into tmp/ to be accesible
+######################## (i) ######################## 
+# Drops the installing (download and update) scripts into tmp/ to be accesible
 cp -f pre.di.c-$branch/.install/*sh .
 
 # And back to home
