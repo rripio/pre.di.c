@@ -28,8 +28,11 @@
 """
 
 import subprocess as sp
+import os
+HOME = os.path.expanduser("~")
 
-macros_folder = '/home/predic/clients/macros'
+import basepaths as bp
+macros_folder = bp.main_folder + 'clients/macros'
 
 def do(task):
     """
@@ -41,27 +44,24 @@ def do(task):
     # First clearing the new line
     task = task.replace('\n','')
 
-    ###############################
-    # Switching ON/OFF an amplifier
-    ###############################
+    ### SWITCHING ON/OFF AN AMPLIFIER
     # notice: subprocess.check_output(cmd) returns bytes-like,
     #         but if cmd fails an exception will be raised, so used with 'try'
     if task == 'ampli on':
         try:
-            sp.check_output( '/home/predic/bin_custom/ampli.sh on'.split() )
+            print(bp.main_folder)
+            sp.check_output( f'{HOME}/bin/ampli.sh on'.split() )
             return b'done'
         except:
             return b'error'
     elif task == 'ampli off':
         try:
-            sp.check_output( '/home/predic/bin_custom/ampli.sh off'.split() )
+            sp.check_output( f'{HOME}/bin/ampli.sh off'.split() )
             return b'done'
         except:
             return b'error'
 
-    #############
-    # USER MACROS
-    #############
+    ### USER MACROS
     # Macro files are named this way: 'macros/N_macroname',
     # so N will serve as button keypad position from web control page
     # The task phrase syntax must be like: 'macro_N_macroname',
