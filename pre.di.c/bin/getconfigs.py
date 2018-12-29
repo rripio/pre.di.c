@@ -66,5 +66,5 @@ try:
     state = get_yaml(bp.state_path)
     channels = get_yaml(bp.channels_path)
 except:
-    print('\nError: some config file failed to load')
+    print('\n(getconfigs.py) Error: some config file failed to load')
     sys.exit()
