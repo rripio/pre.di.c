@@ -1,3 +1,10 @@
+## Configuration
+
+If you install pre.di.c un your own home other than `/home/predic` please configure it inside **`php/functions`**, for instance:
+
+    $home = "/home/predic";
+
+## Screenshots
 First screenshot shows advanced controls (hidden by default, toggled by the gear button)
 
 When 'iradio' or 'istreams' input, it appears an url link button [ &#9901; ] to provide an url stream address to be played
