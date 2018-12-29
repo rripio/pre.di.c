@@ -198,23 +198,23 @@ brutefir
 #########################################################
 
 cd pre.di.c
-
 chmod +x bin/*                  >/dev/null 2>&1
 chmod +x clients/bin/*          >/dev/null 2>&1
 chmod +x clients/macros/[1-9]*  >/dev/null 2>&1
-
-#########################################################
-# END
-#########################################################
-
 cd $destination
 
+#########################################################
 # A helping file to identify the current branch under pre.di.c/bin/
+#########################################################
 touch pre.di.c/bin/THIS_IS_"$branch"_BRANCH
 echo "as per update_predic.sh" > pre.di.c/bin/THIS_IS_"$branch"_BRANCH
 echo ""
 echo "(i) Done."
 echo ""
+
+#########################################################
+# END
+#########################################################
 
 
 #########################################################
