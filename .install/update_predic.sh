@@ -51,63 +51,72 @@ fi
 ###                                 MAIN                                     ###
 ################################################################################
 
-cd $destination
 
 ######################################################################
-# Prevent: BACKUP user files to *.LAST for current configurations
+# BACKUP user files to *.LAST to keep current configurations
 ######################################################################
+
+cd "$destination"
+
 echo "(i) backing up *.LAST for config files"
 
-## folder HOME:
+## HOME:
 cp .asoundrc                .asoundrc.LAST                 >/dev/null 2>&1
 cp .mpdconf                 .mpdconf.LAST                 >/dev/null 2>&1
 cp .brutefir_defaults       .brutefir_defaults.LAST       >/dev/null 2>&1
 
-## folder MPLAYER
+## MPLAYER
 cp .mplayer/config          .mplayer/config.LAST          >/dev/null 2>&1
 cp .mplayer/channels.conf   .mplayer/channels.conf.LAST   >/dev/null 2>&1
 
-## folder CONFIG: yml files
+mkdir pre.di.c >/dev/null 2>&1 # if first install
+cd pre.di.c
+
+## CONFIG: 'scripts' file and '*.yml' files
+mv config/scripts  config/scripts.LAST
 for file in config/*.yml ; do
     mv "$file" "$file.LAST"
 done
 
-## folder CONFIG: PEQ template files
-rm -f config/PEQx*LAST                  # discarting previous *LAST if any
+## CONFIG: PEQ template files
+rm -f config/PEQx*LAST                  # discard previous *LAST if any
 for file in config/PEQx* ; do
     mv "$file" "$file.LAST"
 done
 
-## folder SCRIPTS
-rm scripts/*LAST                        # discarting previous *LAST if any
+## SCRIPTS
+rm scripts/*LAST                        # discard previous *LAST if any
 for file in scripts/* ; do
     cp "$file" "$file.LAST" >/dev/null 2>&1
 done
 
-## folder CLIENTS / WWW
+## CLIENTS / WWW
 # - does not contains config neither user files -
 
-## folder CLIENTS / BIN
-rm clients/bin/*LAST                    # discarting previous *LAST if any
+## CLIENTS / BIN
+rm clients/bin/*LAST                    # discard previous *LAST if any
 for file in clients/bin/* ; do
     cp "$file" "$file.LAST" >/dev/null 2>&1
 done
 
-## folder CLIENTS/MACROS
+## CLIENTS / MACROS
 # These are privative files, nothing to do here.
 
 #########################################################
 # Cleaning
 #########################################################
 echo "(i) Removing old files"
-rm -f CHANGES*          >/dev/null 2>&1
-rm -f LICENSE*          >/dev/null 2>&1
-rm -f README*           >/dev/null 2>&1
-rm -f WIP*              >/dev/null 2>&1
-rm -rf bin/             # use -f because maybe protected *.pyc
-rm -r doc/              >/dev/null 2>&1
-rm -r clients/www/      >/dev/null 2>&1
-rm .brutefir_c*         >/dev/null 2>&1
+
+cd $destination
+
+rm -f CHANGES*                  >/dev/null 2>&1
+rm -f LICENSE*                  >/dev/null 2>&1
+rm -f README*                   >/dev/null 2>&1
+rm -f WIP*                      >/dev/null 2>&1
+rm -rf pre.di.c/bin/            # use -f because maybe protected *.pyc
+rm -r  pre.di.c/doc/            >/dev/null 2>&1
+rm -r  pre.di.c/clients/www/    >/dev/null 2>&1
+rm .brutefir_c*                 >/dev/null 2>&1
 
 #########################################################
 # Copying the new stuff
@@ -123,23 +132,28 @@ cp -r $origin/.mplayer*     $destination/           >/dev/null 2>&1
 # If wanted to KEEP CONFIGS, will restore the *LAST copies
 ########################################################################
 if [ "$keepConfig" ]; then
+
     echo "(i) Restoring user config files"
 
-    # folder HOME:
+    # HOME:
     echo "    ".asoundrc
-    mv .asoundrc.LAST               .asoundrc                >/dev/null 2>&1
+    mv .asoundrc.LAST               .asoundrc               >/dev/null 2>&1
+
     echo "    ".mpdconf
     mv .mpdconf.LAST                .mpdconf                >/dev/null 2>&1
-    echo "    .brutefir_defaults"
+
+    echo "    ".brutefir_defaults
     mv .brutefir_defaults.LAST      .brutefir_defaults      >/dev/null 2>&1
 
-    # folder MPLAYER
     echo "    ".mplayer/config
     mv .mplayer/config.LAST         .mplayer/config         >/dev/null 2>&1
+ 
     echo "    ".mplayer/channels.conf
     mv .mplayer/channels.conf.LAST  .mplayer/channels.conf  >/dev/null 2>&1
 
-    # folder CONFIG:
+    cd pre.di.c
+
+    # CONFIG ( *LAST will include '*.yml' files as well 'scripts' file )
     for file in config/*LAST ; do
         nfile=${file%.LAST}         # removes trailing .LAST '%'
         echo "    "$nfile
@@ -150,24 +164,28 @@ if [ "$keepConfig" ]; then
 # If NO KEEPING CONFIG, then overwrite:
 ########################################################################
 else
-    # Some config files are provided with '.example' extension
-    cp config/state.example             config/state
-    cp config/config.example            config/config
-    cp config/inputs.example            config/inputs
-    cp config/scripts.example           config/scripts
-    cp config/DVB-T_state.example       config/DVB-T_state  >/dev/null 2>&1
-    cp config/DVB-T.example             config/DVB-T        >/dev/null 2>&1
+    cd pre.di.c/config
+
+    # config files are provided with '.example' extension
+    cp scripts.example           scripts
+    cp state.yml.example         state.yml
+    cp config.yml.example        config.yml
+    cp inputs.yml.example        inputs.yml
+    cp DVB-T_state.yml.example   DVB-T_state.yml  >/dev/null 2>&1
+    cp DVB-T.example             DVB-T.yml        >/dev/null 2>&1
+    cp istreams.yml.example      istreams.yml.yml >/dev/null 2>&1
 fi
 
+cd $destination
 
 #########################################################
 # restoring FIFOs
 #########################################################
-echo "(i) Making fifos for mplayer services: dvb and cdda"
+echo "(i) Making fifos for mplayer services"
 rm -f *fifo
-mkfifo dvb_fifo
-mkfifo cdda_fifo
-mkfifo istreams_fifo
+mkfifo dvb_fifo         # DVB-T
+mkfifo cdda_fifo        # CDDA
+mkfifo istreams_fifo    # internet streams
 
 #########################################################
 # restoring brutefir_convolver
@@ -178,26 +196,29 @@ brutefir
 #########################################################
 # restoring exec permissions
 #########################################################
+
+cd pre.di.c
+
 chmod +x bin/*                  >/dev/null 2>&1
 chmod +x clients/bin/*          >/dev/null 2>&1
 chmod +x clients/macros/[1-9]*  >/dev/null 2>&1
-chmod +x bin_custom/*           >/dev/null 2>&1
-chmod +x bin_custom.example/*   >/dev/null 2>&1
-cd
 
 #########################################################
 # END
 #########################################################
-# helping file to identify the current branch under bin/
-touch ~/bin/THIS_IS_"$branch"_BRANCH
-echo "as per update_predic.sh" > ~/bin/THIS_IS_"$branch"_BRANCH
+
+cd $destination
+
+# A helping file to identify the current branch under pre.di.c/bin/
+touch pre.di.c/bin/THIS_IS_"$branch"_BRANCH
+echo "as per update_predic.sh" > pre.di.c/bin/THIS_IS_"$branch"_BRANCH
 echo ""
 echo "(i) Done."
 echo ""
 
 
 #########################################################
-# Website 'pre.di.c'
+# Website
 #########################################################
 forig=$origin"/.install/apache/pre.di.c.conf"
 fdest="/etc/apache2/sites-available/pre.di.c.conf"
@@ -228,9 +249,9 @@ echo ""
 echo "(i) NOTICE:"
 echo "    If you install pre.di.c under a home other than '/home/predic'"
 echo "    please update accordingly:"
-echo "        /etc/apache2/sites-available/pre.di.c.conf"
-echo "        /home/YOURHOME/pre.di.c/clients/www/php/functions.php"
+echo "        ""$fdest"
+echo "        ""$destination"/pre.di.c/clients/www/php/functions.php
 
 
 #### And updates the updater script
-cp "$origin"/.install/update_predic.sh $HOME/tmp/
+cp "$origin"/.install/update_predic.sh "$destination"/tmp/
