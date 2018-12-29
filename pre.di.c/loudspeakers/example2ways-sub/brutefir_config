@@ -76,112 +76,112 @@ coeff "c.eq" {
 # -----------------------------------------
 
 coeff "L_midfield_lp" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/drc.L_midfield_lp.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/drc.L_midfield_lp.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "L_midfield_mp" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/drc.L_midfield_mp.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/drc.L_midfield_mp.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "L_nearfield_lp" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/drc.L_nearfield_lp.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/drc.L_nearfield_lp.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "L_nearfield_mp" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/drc.L_nearfield_mp.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/drc.L_nearfield_mp.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "R_midfield_lp" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/drc.R_midfield_lp.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/drc.R_midfield_lp.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "R_midfield_mp" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/drc.R_midfield_mp.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/drc.R_midfield_mp.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "R_nearfield_lp" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/drc.R_nearfield_lp.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/drc.R_nearfield_lp.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "R_nearfield_mp" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/drc.R_nearfield_mp.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/drc.R_nearfield_mp.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "lp_beyma" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/xo.lp_beyma.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/xo.lp_beyma.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "lp_rel" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/xo.lp_rel.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/xo.lp_rel.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "lp_vifa_left" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/xo.lp_vifa_left.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/xo.lp_vifa_left.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "lp_vifa_right" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/xo.lp_vifa_right.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/xo.lp_vifa_right.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "mp_beyma" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/xo.mp_beyma.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/xo.mp_beyma.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "mp_rel" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/xo.mp_rel.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/xo.mp_rel.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "mp_vifa_left" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/xo.mp_vifa_left.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/xo.mp_vifa_left.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
 };
 
 coeff "mp_vifa_right" {
-    filename:    "/home/predic/loudspeakers/example2ways-sub/xo.mp_vifa_right.pcm";
+    filename:    "/home/predic/pre.di.c/loudspeakers/example2ways-sub/xo.mp_vifa_right.pcm";
     format:      "FLOAT_LE";
     shared_mem:  false;
     attenuation: 0;
