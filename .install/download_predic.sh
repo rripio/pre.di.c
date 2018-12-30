@@ -44,3 +44,4 @@ cp -f pre.di.c-$branch/.install/*sh .
 
 # And back to home
 cd
+rm download_predic.sh > /dev/null 2>&1
