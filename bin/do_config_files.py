@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 """
- Usage:     do_config_files.py   loudspeakers/myLoudspeaker/  [ -w ] [ |less ]
+ Usage:     do_config_files.py   /path/to/myLoudspeakerFolder  [ -w ] [ |less ]
 
             -w   Overwrites the existing 'speaker.yml' and 'brutefir_config',
                  otherwise '____.candidate' files will be provided.
@@ -37,10 +37,12 @@
 #   includes PEQ
 
 import sys, os
+import yaml
 HOME = os.path.expanduser("~")
 sys.path.append(HOME + "/bin")
+sys.path.append(HOME + "/pre.di.c/bin")
 
-import yaml
+import basepaths
 
 # Inside 'myLoudspeaker.yml' the channels are implicit as per the column used into
 # the 'fir:' field. For readability reasons it is not needed to use square brackets
@@ -516,7 +518,7 @@ if __name__ == "__main__":
     bfSettings_fname   = lspkFolder + '/brutefir_settings.yml'
     bfConfig_fname     = lspkFolder + '/brutefir_config'
     speaker_fname      = lspkFolder + '/speaker.yml'
-    predicConfig_fname = '/home/predic/config/config.yml'
+    predicConfig_fname = f'{basepaths.main_folder}/config/config.yml'
 
     # SCAN PCMS to load as available coeffs in brutefir_config
     drc_pcms = scan_drc( lspkFolder )
