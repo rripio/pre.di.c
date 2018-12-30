@@ -5,7 +5,7 @@
 """
 
 import sys
-from subprocess import run
+from subprocess import Popen
 
 import basepaths
 
@@ -20,11 +20,11 @@ def start():
     logFileName = f'{basepaths.main_folder}/.librespot_events'
 
     with open(logFileName, 'w') as logfile:
-        run( cmd.split(), stdout=logfile, stderr=logfile )
+        Popen( cmd.split(), stdout=logfile, stderr=logfile )
 
 def stop():
     """ harakiri """
-    run( 'pkill -f librespot'.split() )
+    Popen( 'pkill -f librespot'.split() )
 
 if sys.argv[1:]:
     try:
