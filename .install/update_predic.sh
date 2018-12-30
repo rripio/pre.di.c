@@ -215,8 +215,8 @@ echo ""
 #########################################################
 # Updates server side php to work under the user $HOME
 #########################################################
-sed -e '/\$home\ =/c\'"    "'\$home\ =\ '"$HOME"';' \
-       pre.di.c/clients/www/php/functions.php
+sed -i -e '/\$home\ =/c\'"    "'\$home\ =\ '"$HOME"';' \
+          pre.di.c/clients/www/php/functions.php
 
 #########################################################
 # And updates the updater script
