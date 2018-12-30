@@ -219,9 +219,12 @@ def get_mplayer_istreams_info():
            '", "artist":"' + artist + '", "album":"' + album + '", "title":"' + title + '" }'
 
 def timeFmt(x):
-    min = int(x / 60)
-    sec = int(round(x % 60))
-    return f'{min:0>2}:{sec:0>2}'
+    # x must be float
+    h = int( x / 3600 )         # hours
+    x = int( round(x % 3600) )  # updating x to reamining seconds
+    m = int( x / 60 )           # minutes from the new x
+    s = int( round(x % 60) )    # and seconds
+    return f'{h:0>2}:{m:0>2}:{s:0>2}'
 
 def predic_source():
     """ retrieves the current input source """
