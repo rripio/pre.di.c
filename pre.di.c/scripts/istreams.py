@@ -47,6 +47,8 @@ from subprocess import Popen
 import threading
 import yaml
 
+HOME = os.path.expanduser("~")
+
 import basepaths as bp
 import getconfigs as gc
 import predic as pd
@@ -73,11 +75,11 @@ options = '-quiet -nolirc'
 # - or, easy way, we can allow playlit parsing on Mplayer.
 options += " -allow-dangerous-playlist-parsing"
 # Mplayer input commands fifo filename
-istreams_fifo = bp.main_folder + 'istreams_fifo'
+istreams_fifo = f'{HOME}/istreams_fifo'
 # Mplayer path:
 mplayer_path = '/usr/bin/mplayer'
 # Mplayer outputs redirected to:
-mplayer_redirection_path = '/home/predic/tmp/.istreams'
+mplayer_redirection_path = f'{HOME}/tmp/.istreams'
 
 
 def load_url(url):
