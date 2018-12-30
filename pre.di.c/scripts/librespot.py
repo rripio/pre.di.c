@@ -7,8 +7,7 @@
 import sys
 from subprocess import run
 
-import os
-HOME = os.path.expanduser("~")
+import basepaths
 
 def start():
     # 'librespot' binary prints out the playing track and some info to stdout/stderr.
@@ -18,7 +17,7 @@ def start():
     cmd =  '/usr/bin/librespot --name rpi3clac --bitrate 320 --backend alsa' + \
            ' --device jack --disable-audio-cache --initial-volume=99'
 
-    logFileName = f'{HOME}/tmp/.librespotEvents'
+    logFileName = f'{basepaths.main_folder}/.librespot_events'
 
     with open(logFileName, 'w') as logfile:
         run( cmd.split(), stdout=logfile, stderr=logfile )
