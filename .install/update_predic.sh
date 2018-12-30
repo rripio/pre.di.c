@@ -213,12 +213,23 @@ echo "(i) Done."
 echo ""
 
 #########################################################
+# Updates server side php to work under the user $HOME
+#########################################################
+sed -e '/\$home\ =/c\'"    "'\$home\ =\ '"$HOME"';' \
+       pre.di.c/clients/www/php/functions.php
+
+#########################################################
+# And updates the updater script
+#########################################################
+cp "$origin"/.install/update_predic.sh "$destination"/tmp/
+
+#########################################################
 # END
 #########################################################
 
 
 #########################################################
-# Website
+# Apache site
 #########################################################
 forig=$origin"/.install/apache/pre.di.c.conf"
 fdest="/etc/apache2/sites-available/pre.di.c.conf"
@@ -250,8 +261,3 @@ echo "(i) NOTICE:"
 echo "    If you install pre.di.c under a home other than '/home/predic'"
 echo "    please update accordingly:"
 echo "        ""$fdest"
-echo "        ""$destination"/pre.di.c/clients/www/php/functions.php
-
-
-#### And updates the updater script
-cp "$origin"/.install/update_predic.sh "$destination"/tmp/
