@@ -1,6 +1,6 @@
 ## Configuration
 
-If you install pre.di.c on your own home other than `/home/predic` please configure it inside **`php/functions`**, for instance:
+If you install pre.di.c on your own home other than `/home/predic` please configure it inside **`php/functions.php`**, for instance:
 
     $home = "/home/predic";
 
