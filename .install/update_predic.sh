@@ -176,16 +176,7 @@ else
     cp istreams.yml.example      istreams.yml.yml >/dev/null 2>&1
 fi
 
-cd $destination
-
-#########################################################
-# restoring FIFOs
-#########################################################
-echo "(i) Making fifos for mplayer services"
-rm -f *fifo
-mkfifo dvb_fifo         # DVB-T
-mkfifo cdda_fifo        # CDDA
-mkfifo istreams_fifo    # internet streams
+cd "$destination"
 
 #########################################################
 # restoring brutefir_convolver
@@ -194,16 +185,23 @@ echo "(i) A first dry brutefir run in order to generate some internal."
 brutefir
 
 #########################################################
+# restoring FIFOs
+#########################################################
+echo "(i) Making fifos for mplayer services"
+rm -f pre.di.c/*fifo
+mkfifo pre.di.c/dvb_fifo         # DVB-T
+mkfifo pre.di.c/cdda_fifo        # CDDA
+mkfifo pre.di.c/istreams_fifo    # internet streams
+
+#########################################################
 # restoring exec permissions
 #########################################################
 
-chmod +x bin/*                  >/dev/null 2>&1
-cd pre.di.c
-chmod +x bin/*                  >/dev/null 2>&1
-chmod +x clients/bin/*          >/dev/null 2>&1
-chmod +x scripts/*              >/dev/null 2>&1
-chmod +x clients/macros/[1-9]*  >/dev/null 2>&1
-cd $destination
+chmod +x bin/*                          >/dev/null 2>&1
+chmod +x pre.di.c/bin/*                 >/dev/null 2>&1
+chmod +x pre.di.c/clients/bin/*         >/dev/null 2>&1
+chmod +x pre.di.c/scripts/*             >/dev/null 2>&1
+chmod +x pre.di.c/clients/macros/[1-9]* >/dev/null 2>&1
 
 #########################################################
 # A helping file to identify the current branch under pre.di.c/bin/
