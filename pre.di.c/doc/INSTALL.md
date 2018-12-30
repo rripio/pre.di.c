@@ -3,7 +3,7 @@
 
 ## First install:
 
-1- Download manually a copy of download_predic.sh, an run it:
+1- Download manually a copy of `download_predic.sh`, an run it:
 
 ```
 wget https://raw.githubusercontent.com/rripio/pre.di.c/master/.install/download_predic.sh
