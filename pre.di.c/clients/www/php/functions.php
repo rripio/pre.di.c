@@ -28,17 +28,14 @@
             readfile("some_file_path");
     */
 
-    
     ///////////////////////////////////////////////////////////////////////
     // PLEASE CONFIGURE HERE THE PROPER $HOME PATH WHERE pre.di.c IS HOSTED
     $home = "/home/predic";
     ///////////////////////////////////////////////////////////////////////
 
-    /////////////////////////////////////////////////////////////////////
     // Retrieves simple configured items from pre.di.c 'config.yml' file
-    /////////////////////////////////////////////////////////////////////
     function get_config($item) {
-        global $home
+        global $home;
         $tmp = "";
         $cfile = fopen($home."/pre.di.c/config/config.yml", "r")
                   or die("Unable to open file!");
@@ -56,12 +53,10 @@
         return $tmp;
     }
 
-    //////////////////////////////////////////////////////
     // Communicates to the pre.di.c TCP/IP servers.
     // Notice: server address and port are specified
     //         into 'config/config.yml' for each service,
     //         for instance 'control', 'players' or 'aux'.
-    //////////////////////////////////////////////////////
     function predic_socket ($service, $cmd) {
 
         $address = get_config( $service."_address" );
@@ -90,7 +85,6 @@
 
     ///////////////////////////   MAIN: ///////////////////////////////
     // listen to http request then returns results via standard output
-    ///////////////////////////////////////////////////////////////////
 
     /*  http://php.net/manual/en/reserved.variables.request.php
         PHP server side receives associative arrays, i.e. dictionaries, through by the 
