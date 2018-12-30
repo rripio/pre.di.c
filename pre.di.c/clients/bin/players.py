@@ -33,6 +33,10 @@ import subprocess as sp
 import yaml
 import mpd
 import time
+import os
+HOME = os.path.expanduser("~")
+
+import basepaths as bp
 
 # MPD settings:
 mpd_host    = 'localhost'
@@ -42,7 +46,7 @@ mpd_passwd  = None
 def get_predic_state():
     """ returns the YAML pre.di.c's status info """
 
-    f = open('/home/predic/config/state.yml', 'r')
+    f = open( bp.main_folder + 'config/state.yml', 'r')
     tmp = f.read()
     f.close()
     return yaml.load(tmp)
@@ -137,7 +141,7 @@ def get_librespot_meta():
         # Returns the current track title played by librespot.
         # 'scripts/librespot.py' handles the libresport print outs to be 
         #                        redirected to 'tmp/.librespotEvents'
-        tmp = sp.check_output( 'tail -n1 /home/predic/tmp/.librespotEvents'.split() )
+        tmp = sp.check_output( f'tail -n1 {HOME}/tmp/.librespotEvents'.split() )
         title  = tmp.decode().split('"')[-2]
         # JSON for JavaScript on control web page, NOTICE json requires double quotes:
     except:
@@ -158,7 +162,7 @@ def mplayer_cmd(cmd, service):
     if cmd == 'next':
         cmd = 'seek +60 0'
 
-    sp.Popen( f'echo "{cmd}" > /home/predic/{service}_fifo', shell=True)
+    sp.Popen( f'echo "{cmd}" > {HOME}/{service}_fifo', shell=True)
 
 def get_mplayer_istreams_info():
     """ gets metadata from Mplayer as per
@@ -170,7 +174,7 @@ def get_mplayer_istreams_info():
 
     # This is the file were Mplayer standard output has been redirected to,
     # so we can read there any answer when required to Mplayer slave daemon:
-    mplayer_redirection_path = '/home/predic/tmp/.istreams'
+    mplayer_redirection_path = f'{HOME}/tmp/.istreams'
 
     # Communicates to Mplayer trough by its input fifo to get the current media filename and bitrate:
     mplayer_cmd(cmd='get_audio_bitrate', service='istreams')
@@ -316,4 +320,4 @@ def do(task):
 
     # A pseudo task, an url to be played back:
     elif task[:7] == 'http://':
-        sp.run( f'/home/predic/scripts/istreams.py url {task}'.split() )
+        sp.run( bp.main_folder + f'scripts/istreams.py url {task}'.split() )
