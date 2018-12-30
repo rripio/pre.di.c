@@ -5,7 +5,11 @@
 
 Download manually a copy of download_predic.sh, an run it:
 
-`wget https://raw.githubusercontent.com/rripio/pre.di.c/master/.install/download_predic.sh`
+```
+wget https://raw.githubusercontent.com/rripio/pre.di.c/master/.install/download_predic.sh
+sh download_predic.sh
+rm download_predic.sh
+```
 
 At this point, the scripts will be accesible under `~/tmp`
 
