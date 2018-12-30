@@ -41,13 +41,10 @@
 """
 
 import sys
-import os
 import time
 from subprocess import Popen
 import threading
 import yaml
-
-HOME = os.path.expanduser("~")
 
 import basepaths as bp
 import getconfigs as gc
@@ -75,11 +72,11 @@ options = '-quiet -nolirc'
 # - or, easy way, we can allow playlit parsing on Mplayer.
 options += " -allow-dangerous-playlist-parsing"
 # Mplayer input commands fifo filename
-istreams_fifo = f'{HOME}/istreams_fifo'
+istreams_fifo = f'{bp.main_folder}/istreams_fifo'
 # Mplayer path:
 mplayer_path = '/usr/bin/mplayer'
 # Mplayer outputs redirected to:
-mplayer_redirection_path = f'{HOME}/tmp/.istreams'
+mplayer_redirection_path = f'{bp.main_folder}/.istreams_events'
 
 
 def load_url(url):
