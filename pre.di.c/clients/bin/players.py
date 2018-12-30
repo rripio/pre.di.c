@@ -33,8 +33,6 @@ import subprocess as sp
 import yaml
 import mpd
 import time
-import os
-HOME = os.path.expanduser("~")
 
 import basepaths as bp
 
@@ -141,7 +139,7 @@ def get_librespot_meta():
         # Returns the current track title played by librespot.
         # 'scripts/librespot.py' handles the libresport print outs to be 
         #                        redirected to 'tmp/.librespotEvents'
-        tmp = sp.check_output( f'tail -n1 {HOME}/tmp/.librespotEvents'.split() )
+        tmp = sp.check_output( f'tail -n1 {bp.main_folder}/.librespot_events'.split() )
         title  = tmp.decode().split('"')[-2]
         # JSON for JavaScript on control web page, NOTICE json requires double quotes:
     except:
@@ -162,7 +160,7 @@ def mplayer_cmd(cmd, service):
     if cmd == 'next':
         cmd = 'seek +60 0'
 
-    sp.Popen( f'echo "{cmd}" > {HOME}/{service}_fifo', shell=True)
+    sp.Popen( f'echo "{cmd}" > {bp.main_folder}/{service}_fifo', shell=True)
 
 def get_mplayer_istreams_info():
     """ gets metadata from Mplayer as per
@@ -174,7 +172,7 @@ def get_mplayer_istreams_info():
 
     # This is the file were Mplayer standard output has been redirected to,
     # so we can read there any answer when required to Mplayer slave daemon:
-    mplayer_redirection_path = f'{HOME}/tmp/.istreams'
+    mplayer_redirection_path = f'{bp.main_folder}/.istreams_events'
 
     # Communicates to Mplayer trough by its input fifo to get the current media filename and bitrate:
     mplayer_cmd(cmd='get_audio_bitrate', service='istreams')
