@@ -8,10 +8,11 @@ Copyright (c) 2016-2018 Rafael Sánchez
 
 ## Requirements
 
-**Python** >= 3.6
-
-Update your environment for instance by editing your **`.profile`** home file:
-
+- **Python** >= 3.6
+- python3-numpy
+- python3-yaml
+- **https://jackclient-python.readthedocs.io**
+- Update your environment for instance by editing your **`.profile`** home file:
 ```
 export PYTHONPATH="$PYTHONPATH:$HOME/pre.di.c/bin:$HOME/pre.di.c/clients/bin"
 export PATH="$PATH:$HOME/pre.di.c/bin"
