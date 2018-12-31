@@ -52,8 +52,10 @@ fi
 ################################################################################
 
 cd "$destination"
-mkdir pre.di.c          >/dev/null 2>&1 # if first install
-mkdir pre.di.c/.run     >/dev/null 2>&1 # if first install
+
+# if first install
+mkdir bin               >/dev/null 2>&1
+mkdir -p pre.di.c/.run  >/dev/null 2>&1
 
 ######################################################################
 # BACKUP user files to *.LAST to keep current configurations
@@ -62,7 +64,7 @@ mkdir pre.di.c/.run     >/dev/null 2>&1 # if first install
 echo "(i) backing up *.LAST for config files"
 
 ## HOME:
-cp .asoundrc                .asoundrc.LAST                 >/dev/null 2>&1
+cp .asoundrc                .asoundrc.LAST                >/dev/null 2>&1
 cp .mpdconf                 .mpdconf.LAST                 >/dev/null 2>&1
 cp .brutefir_defaults       .brutefir_defaults.LAST       >/dev/null 2>&1
 
@@ -73,19 +75,19 @@ cp .mplayer/channels.conf   .mplayer/channels.conf.LAST   >/dev/null 2>&1
 cd pre.di.c
 
 ## CONFIG: 'scripts' file and '*.yml' files
-mv config/scripts  config/scripts.LAST
+mv config/scripts  config/scripts.LAST >/dev/null 2>&1
 for file in config/*.yml ; do
     mv "$file" "$file.LAST"
 done
 
 ## CONFIG: PEQ template files
-rm -f config/PEQx*LAST                  # discard previous *LAST if any
+rm -f config/PEQx*LAST  >/dev/null 2>&1     # discard previous *LAST if any
 for file in config/PEQx* ; do
     mv "$file" "$file.LAST"
 done
 
 ## SCRIPTS
-rm scripts/*LAST                        # discard previous *LAST if any
+rm scripts/*LAST        >/dev/null 2>&1     # discard previous *LAST if any
 for file in scripts/* ; do
     cp "$file" "$file.LAST" >/dev/null 2>&1
 done
@@ -94,7 +96,7 @@ done
 # - does not contains config neither user files -
 
 ## CLIENTS / BIN
-rm clients/bin/*LAST                    # discard previous *LAST if any
+rm clients/bin/*LAST    >/dev/null 2>&1     # discard previous *LAST if any
 for file in clients/bin/* ; do
     cp "$file" "$file.LAST" >/dev/null 2>&1
 done
