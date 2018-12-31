@@ -175,7 +175,7 @@ else
     cp inputs.yml.example        inputs.yml
     cp DVB-T_state.yml.example   DVB-T_state.yml  >/dev/null 2>&1
     cp DVB-T.example             DVB-T.yml        >/dev/null 2>&1
-    cp istreams.yml.example      istreams.yml.yml >/dev/null 2>&1
+    cp istreams.yml.example      istreams.yml     >/dev/null 2>&1
 fi
 
 cd "$destination"
