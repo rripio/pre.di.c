@@ -14,6 +14,6 @@ Copyright (c) 2016-2018 Rafael Sánchez
 - **https://jackclient-python.readthedocs.io**
 - Update your environment for instance by editing your **`.profile`** home file:
 ```
-export PYTHONPATH="$PYTHONPATH:$HOME/pre.di.c/bin:$HOME/pre.di.c/clients/bin"
-export PATH="$PATH:$HOME/pre.di.c/bin"
+    export PYTHONPATH="$PYTHONPATH:$HOME/pre.di.c/bin:$HOME/pre.di.c/clients/bin"
+    export PATH="$PATH:$HOME/pre.di.c/bin"
 ```
