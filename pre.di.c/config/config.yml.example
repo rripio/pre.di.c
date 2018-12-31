@@ -2,10 +2,10 @@
 ## Numbers: assign "none" to not set
 ## Strings: assign "''" to not set
 
-loudspeaker: DynA42
+loudspeaker: example2ways-sub
 
 # Full ALSA identifier 'hw:Card,Device'
-system_card: hw:RPiCirrus,0
+system_card: hw:0,0
 # Cards external to jack (space sepated string if many)
 # Full ALSA identifier 'hw:Card,Device'
 external_cards: ''
@@ -50,9 +50,9 @@ control_clear: False
 
 # Jack
 jack_path: /usr/bin/jackd
-# jack on ALSA: omit cards and fs (managed in initaudio.py)
-#jack_options: --silent -R -dalsa -p2048 -n3
-jack_options:           -R -dalsa -p4096 -n3 --shorts
+# jack options on ALSA: omit cards and fs (managed in initaudio.py)
+jack_options:          -R -ddummy -P8 -C2
+#jack_options: --silent -R -dalsa -p2048 -n3 --shorts
 
 
 # Brutefir,
