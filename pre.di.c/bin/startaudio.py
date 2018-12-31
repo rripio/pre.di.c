@@ -72,11 +72,11 @@ def init_jack():
         print('\n(startaudio) error starting jack: unknown backend')
         sys.exit(-1)
 
-    # Some systems runs Pulseaudio, then it is needed to use pasuspender to lauch jackd
+    # Some systems runs Pulseaudio, pasuspender will release cards and launch jackd
     if 'pulseaudio' in check_output("pgrep -fl pulseaudio", shell=True).decode():
-        jack = Popen(['pasuspender', '--'] + jack_cmd_list)
-    else:
-        jack = Popen(jack_cmd_list)
+        jack_cmd_list = ['pasuspender', '--'] + jack_cmd_list
+
+    jack = Popen(jack_cmd_list)
 
     # waiting for jackd:
     if pd.wait4result('jack_lsp', 'system', tmax=10):
