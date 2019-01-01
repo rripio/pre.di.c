@@ -187,19 +187,29 @@ function update_player_controls() {
 
 // Shows the playing info metadata
 function update_player_info() {
+    var player      = "-";
+    var bitrate     = "-";
+    var time_pos    = "-:-:-";
+    var time_tot    = "-:-:-";
+    var artist      = "-";
+    var album       = "-";
+    var title       = "-";
+
     var myREQ = new XMLHttpRequest();
     var tmp = '';
     myREQ.open("GET", "php/functions.php?command=player_get_meta", async=false);
     myREQ.send();
     tmp = myREQ.responseText.replace('\n','');
-    dicci = JSON.parse( tmp );
-    var player      = dicci['player'];
-    var bitrate     = dicci['bitrate'];
-    var time_pos    = dicci['time_pos'];
-    var time_tot    = dicci['time_tot'];
-    var artist      = dicci['artist'];
-    var album       = dicci['album'];
-    var title       = dicci['title'];
+    if ( ! tmp.includes("failed") && ! tmp.includes("refused") )  {
+		dicci = JSON.parse( tmp );
+		player      = dicci['player'];
+		bitrate     = dicci['bitrate'];
+		time_pos    = dicci['time_pos'];
+		time_tot    = dicci['time_tot'];
+		artist      = dicci['artist'];
+		album       = dicci['album'];
+		title       = dicci['title'];
+	}
     // 'player' info not anymore needed because equals to 'input' value
     // document.getElementById("player").innerText = player + ':';
     document.getElementById("time").innerText       = time_pos + "\n" + time_tot;
