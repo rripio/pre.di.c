@@ -11,4 +11,5 @@ echo "releasing tcp/9999 ... .. ."
 fuser -kv 9999/tcp
 
 # Restarting the control server
+echo "restarting: server.py control"
 ~/pre.di.c/bin/server.py control &
