@@ -49,7 +49,6 @@ def do(task):
     #         but if cmd fails an exception will be raised, so used with 'try'
     if task == 'ampli on':
         try:
-            print(bp.main_folder)
             sp.check_output( f'{HOME}/bin/ampli.sh on'.split() )
             return b'done'
         except:
