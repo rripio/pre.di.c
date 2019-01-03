@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Useful script for Desktop and Pulseaudio systems.
-# If used, PLEASE place as FIRST position inside config/scripts
+# If used, PLEASE place at FIRST position inside config/scripts
 
 # CARDS BELOW ARE A USER CASE, PLEASE UPDATE WITH YOURS
 
