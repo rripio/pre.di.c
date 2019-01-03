@@ -22,120 +22,153 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-"""start and stop mplayer for DVB tasks
-use it with 'start' and 'stop' as options"""
+"""
+    Starts and stops Mplayer for DVB-T playback.
+
+    Also used to change on the fly the played stream.
+
+    DVB-T tuned channels are ussually stored at
+        ~/.mplayer/channels.conf
+
+    User presets can be configured into:
+        config/DVB-T.yml
+
+    Use:   DVB.py       start  [ <preset_num> | <channel_name> ]
+                        stop
+                        preset <preset_num>
+                        name   <channel_name>
+"""
+
+import os
+HOME = os.path.expanduser("~")
 
 import sys
-import os
 import time
-from subprocess import Popen
+import subprocess as sp
 import threading
+import yaml
 
 import basepaths as bp
 import getconfigs as gc
 import predic as pd
 
-## mplayer aditional options
+##################
+# Script settings:
+##################
+# DEFAULT PRESET number:
+default_preset = '2'
+# PRESETS FILE for internet streams / stations:
+presets_fname = bp.config_folder + 'DVB-T.yml'
+# Name used from pre.di.c. for info and pid saving
+program_alias = 'mplayer-dvb'
+# Mplayer DVB-T tuner file
+tuner_file = f'{HOME}/.mplayer/channels.conf'
 
+############################
+# Mplayer options:
+############################
 # -quiet: see channels change
 # -really-quiet: silent
 options = '-quiet -nolirc'
-# command fifo filename
-dvb_fifo = 'dvb_fifo'
-# mplayer path:
+# Mplayer input commands fifo filename
+input_fifo = f'{bp.main_folder}/dvb_fifo'
+# Mplayer path:
 mplayer_path = '/usr/bin/mplayer'
-# name used for info and pid saving
-program_alias = 'mplayer-dvb'
+# Mplayer outputs redirected to:
+mplayer_redirection_path = f'{bp.main_folder}/.dvb_events'
 
-# initialize
-dvb_fifo = bp.main_folder + dvb_fifo
-
-
-def select_channel(channel_name):
-    """ sets channel in mplayer """
+def select_by_name(channel_name):
+    """ loads a stream by its preset name """
 
     try:
-        command = ('loadfile dvb://' + channel_name + '\n')
-        with open(bp.main_folder + gc.config['mplayer_dvb_fifo'], 'w') as f:
-            f.write(command)
+        # check_output will fail if no command output
+        sp.check_output( ['grep', channel_name, tuner_file] ).decode()
+    except:
+        print( f'(scripts/DVB.py) Channel NOT found: \'{channel_name}\'' )
+        return False
+
+    try:
+        print( f'(scripts/DVB.py) trying to load \'{channel_name}\'' )
+        channel_name = channel_name.replace(" ", "\\ ")
+        command = ('loadfile dvb://' + channel_name + '\n' )
+        f = open( input_fifo, 'w')
+        f.write(command)
+        f.close()
         return True
     except:
         return False
 
-
-def select_preset(preset):
-    """ selects preset from DVB-t.ini """
-
-    # get channel name from preset number
-    if preset.isdigit():
-        preset = int(preset)
-        if preset in gc.channels['presets']:
-            channel_name = gc.channels['presets'][preset].replace(' ','\ ')
-        else:
-            return False
-        if channel_name != '':
-            # set channel in mplayer
-            if select_channel(channel_name):
-                return True
-    return False
-
-"""
-def change_radio(new_radiopreset, state=state):
-
-    # list of defined presets, discarding those white in DVB-t.ini
-    ldp = [ preset for preset in gc.channels['presets'] if preset ]
-    # command arguments
-    # 'next|prev' to walk through preset list
-    if new_radiopreset == 'next':
-        new_radiopreset = ldp[ (ldp.index(state['radio']) + 1)
-                                % len(ldp) ]
-    elif new_radiopreset == 'prev':
-        new_radiopreset = ldp[ (ldp.index(state['radio']) - 1)
-                                % len(ldp) ]
-    # last used preset, that is, 'radio':
-    elif new_radiopreset == 'restore':
-        new_radiopreset = state['radio']
-    #previously used preset, that is, 'radio_prev':
-    elif new_radiopreset == 'back':
-        new_radiopreset = state['radio_prev']
-    # direct preset selection
-    if select_preset(new_radiopreset):
-        if new_radiopreset != state['radio']:
-            state['radio_prev'] = state['radio']
-        state['radio'] = new_radiopreset
-    else:
-        state['radio'] = state_old['radio']
-        state['radio_prev'] = state_old['radio_prev']
-        warnings.append('Something went wrong when changing radio state')
-    return state
-"""
+def select_by_preset(preset_num):
+    """ loads a stream by its preset number """
+    try:
+        channel_name = presets[ int(preset_num) ]
+        select_by_name(channel_name)
+        return True
+    except:
+        print( f'(scripts/DVB.py) error in preset # {preset_num}' )
+        return False
 
 def start():
-
     # 1. Prepare a jack loop where MPLAYER outputs can connect.
     #    The jack_loop module will keep the loop alive, so we need to thread it.
     jloop = threading.Thread( target = pd.jack_loop, args=('dvb_loop',) )
     jloop.start()
-
-
     # 2. Mplayer DVB:
-    opts = f'{options} -idle -slave -profile dvb -input file={dvb_fifo}'
+    opts = f'{options} -idle -slave -profile dvb -input file={input_fifo}'
     command = f'{mplayer_path} {opts}'
-    pd.start_pid(command, program_alias)
-
+    with open(mplayer_redirection_path, 'w') as redir:
+        pd.start_pid(command, program_alias, redir)
 
 def stop():
-
     pd.kill_pid(program_alias)
+    # harakiri
+    sp.Popen( ['pkill', '-KILL', '-f', 'profile dvb'] )
+    sp.Popen( ['pkill', '-KILL', '-f', 'DVB.py start'] )
 
-if sys.argv[1:]:
+
+if __name__ == '__main__':
+
+    ### Reading the presets stations file
+    presets = {}
+    f = open(presets_fname, 'r')
+    tmp = f.read()
+    f.close()
     try:
-        option = {
-            'start' : start,
-            'stop'  : stop
-            }[sys.argv[1]]()
-    except KeyError:
-        print('DVB.py: bad option')
-else:
-    print(__doc__)
+        presets = yaml.load(tmp)
+    except:
+        print ( '(scripts/DVB.py) YAML error into ' + presets_fname )
 
+    ### Reading the command line
+    if sys.argv[1:]:
+
+        opc = sys.argv[1]
+
+        # STARTS the script and optionally load a preset/name
+        if opc == 'start':
+            start()
+            if sys.argv[2:]:
+                opc2 = sys.argv[2]
+                if opc2.isdigit():
+                    select_by_preset(opc2)
+                elif opc2.isalpha():
+                    select_by_name(opc2)
+            else:
+                select_by_preset(default_preset)
+
+        # STOPS all this stuff
+        elif opc == 'stop':
+            stop()
+
+        # ON THE FLY changing a preset number
+        elif opc == 'preset':
+            select_by_preset( sys.argv[2] )
+
+        # ON THE FLY changing a preset name
+        elif opc == 'name':
+            select_by_name( sys.argv[2] )
+
+        else:
+            print( '(scripts/DVB.py) Bad option' )
+
+    else:
+        print(__doc__)
