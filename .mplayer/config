@@ -4,16 +4,15 @@
 # af=resample=44100:0:2 # not necessary
 
 # USE:
-#   ao=jack:name=<mplayer_jack_name>:noconnect
+#   ao=jack:name=<mplayer_port_name>:noconnect
 # OR
 #   ao=jack:name=<mplayer_port_name>:port=<destination_port_name>
 
 [dvb]
-ao=jack:name=mplayer_dvb:noconnect
+ao=jack:name=mplayer_dvb:port=dvb_loop
 
 [cdda]
-ao=jack:name=mplayer_cdda:noconnect
+ao=jack:name=mplayer_cdda:port=cdda_loop
 
 [istreams]
 ao=jack:name=mplayer_istreams:port=istreams_loop
-
