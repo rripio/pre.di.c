@@ -162,7 +162,7 @@ def mplayer_cmd(cmd, service):
 
     sp.Popen( f'echo "{cmd}" > {bp.main_folder}/{service}_fifo', shell=True)
 
-def get_mplayer_istreams_info():
+def get_mplayer_info(service):
     """ gets metadata from Mplayer as per
         http://www.mplayerhq.hu/DOCS/tech/slave.txt """
 
@@ -172,13 +172,13 @@ def get_mplayer_istreams_info():
 
     # This is the file were Mplayer standard output has been redirected to,
     # so we can read there any answer when required to Mplayer slave daemon:
-    mplayer_redirection_path = f'{bp.main_folder}/.istreams_events'
+    mplayer_redirection_path = f'{bp.main_folder}/.{service}_events'
 
     # Communicates to Mplayer trough by its input fifo to get the current media filename and bitrate:
-    mplayer_cmd(cmd='get_audio_bitrate', service='istreams')
-    mplayer_cmd(cmd='get_file_name',     service='istreams')
-    mplayer_cmd(cmd='get_time_pos',      service='istreams')
-    mplayer_cmd(cmd='get_time_length',   service='istreams')
+    mplayer_cmd(cmd='get_audio_bitrate', service=service)
+    mplayer_cmd(cmd='get_file_name',     service=service)
+    mplayer_cmd(cmd='get_time_pos',      service=service)
+    mplayer_cmd(cmd='get_time_length',   service=service)
 
     # Waiting Mplayer ANS_xxxx to be writen to output file
     time.sleep(.25)
@@ -261,7 +261,10 @@ def get_meta():
         result = mpd_client('get_meta')
 
     elif source == 'istreams':
-        result = get_mplayer_istreams_info()
+        result = get_mplayer_info(service=source)
+
+    elif source == 'tdt' or 'dvb' in source:
+        result = get_mplayer_info(service='dvb')
 
     # As this is used by a server, we will return a bytes-like object:
     return result.encode()
