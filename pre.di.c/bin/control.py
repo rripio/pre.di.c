@@ -69,18 +69,24 @@ else:
 warnings = []
 
 
-def unplug_sources_of(jack_client, out_ports):
+def unplug_sources_of(jack_client, predic_ports):
     """ Disconnect clients from predic inputs and monitor inputs """
 
-    try:
-        sources_L = jack_client.get_all_connections(out_ports[0])
-        sources_R = jack_client.get_all_connections(out_ports[1])
-        for source in sources_L:
-            jack_client.disconnect(source.name, out_ports[0])
-        for source in sources_R:
-            jack_client.disconnect(source.name, out_ports[1])
-    except:
-        print('error disconnecting outputs')
+    def disconnect(pb_ports):
+        try:
+            sources_0 = jack_client.get_all_connections(pb_ports[0])
+            sources_1 = jack_client.get_all_connections(pb_ports[1])
+            for source in sources_0:
+                jack_client.disconnect(source.name, pb_ports[0])
+            for source in sources_1:
+                jack_client.disconnect(source.name, pb_ports[1])
+        except:
+            print(f'error disconnecting [{pb_ports}]')
+
+    disconnect(predic_ports)
+    monitor_ports = gc.config['jack_monitors'].split()
+    if monitor_ports:
+        disconnect(monitor_ports)
 
 
 def do_change_input(input_name, in_ports, out_ports, resampled=False):
