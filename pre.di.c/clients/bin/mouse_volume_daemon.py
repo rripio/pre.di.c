@@ -50,7 +50,7 @@ hostDir =   os.path.dirname( os.path.realpath(__file__) )
 STEPdB  = 2.0
 HRthr   = 6.0
 beep    = False
-beepPath = f'{hostDir}/2beeps.wav'
+beepPath = f'{hostDir}/3beeps.wav'
 ########################
 
 def getMouseEvent():
