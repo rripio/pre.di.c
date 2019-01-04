@@ -574,6 +574,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             commit_gain()
             change_eq()
             state['level'] = pd.calc_level(gain, state['input'])
+            state['headroom'] = float( np.round(headroom, 2) )
         # if not enough headroom tries lowering gain
         else:
             change_gain(gain + headroom)
