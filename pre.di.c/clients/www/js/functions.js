@@ -239,6 +239,9 @@ function page_initiate() {
     // Web header shows the loudspeaker name
     document.getElementById("main_lside").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
 
+    // Amplifier_switch_status
+    update_ampli_switch();
+
     // Queries the pre.di.c status and updates the page
     refresh_predic_status();
 
