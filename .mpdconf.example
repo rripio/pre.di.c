@@ -1,18 +1,17 @@
-#############################################
-## Ayuda: https://www.musicpd.org/doc/user ##
-##        man mpd.conf                     ##
-#############################################
+############################################
+## help: https://www.musicpd.org/doc/user ##
+##       man mpd.conf                     ##
+############################################
 
-# --- DIRECTORIO DE LA MUSICA ---
+# --- The music folder ---
 music_directory         "/home/predic/music"
 
-# --- DIRECTORIO DE PLAYLISTS ---
-#playlist_directory      "/home/predic/.config/mpd/playlists"
-# Opcion de listas compartidas en una carpeta de red:
-playlist_directory      "/mnt/qnas/media/playlists/"
+# --- The playlists store folder ---
+playlist_directory      "/home/predic/.config/mpd/playlists"
+# We can use a shared folder to share playlists
+#playlist_directory      "/mnt/qnas/media/playlists/"
 
-# --- DIECTORIO PARA USO INTERNO DE MPD
-# NOTA: ~/.config/mpd es una carpeta compatible con instalaciones MPD en Linux actuales.
+# --- Typical files when running MPD under a user session
 db_file                 "/home/predic/.config/mpd/database"
 log_file                "/home/predic/.config/mpd/log"
 pid_file                "/home/predic/.config/mpd/pid"
@@ -20,64 +19,61 @@ state_file              "/home/predic/.config/mpd/mpd_state"
 state_file_interval     "1"
 sticker_file            "/home/predic/.config/mpd/sticker.sqlite"
 
-# --- LISTENING ---
+# --- Listening address and port scope
 port                    "6600"
-# direcciones ip de escucha:
+# tpc:
 bind_to_address         "any"
-# escucha socket unix:
+# unix socket:
 bind_to_address         "/home/predic/.config/mpd/socket"
 
-# --- USUARIO que mostrará MPD al ejecutarse desde un usuario root
-# NOTA: esto no interesa en FIRtro
-#user                    "firtro"
+# --- User when wide system (root) running. NOT USED HERE
+#user                    "mpd"
 #group                   "audio"
 
-# --- DATA BASE UPDATE ---
+# --- Database update ---
 auto_update             "yes"
 #auto_update_depth       "3"
-# sigue links externos al directorio de musica:
+# Follows symlinks outside the music folder
 follow_outside_symlinks "yes"
-# sigue links internos al directorio de musica:
+# Follows symlinks inside the music folder
 follow_inside_symlinks  "no"
 
-# --- ENTRADAS ---
-# Reproducción de URLs:
+# --- Inputs ---
+# url playing:
 input {
     plugin "curl"
 }
-# Reproducción de CDs:
+# cd playing:
 input {
     plugin "cdio_paranoia"
 }
 
-# --- DECODERS ---
-# nota: ya suelen venir habilitados en el binario mpd
+# --- Decoders ---
+# usually already enabled by default
 #decoder {
 #    plugin "flac"
 #    enabled "yes"
 #}
-#decoder {
-#    plugin "mad"
-#    enabled "no"
-#}
     
-# --- SALIDAS ---
-# --- Salida a FIRtro (JACK)
+# --- Outputs ---
+# Jack
 audio_output {
     enabled         "yes"
     type            "jack"
-    name            "mpd"
     client_name     "mpd"
     always_on       "no"
+    # port name prefix in jack:
+    name            "jack"
+    # enumerate suffixes of the ports in jack :
     source_ports    "out_0,out_1"
-    # MUY IMPORTANTE: debemos declarar destination_ports para evitar que MPD 
-    #                 se conecte directamente a una via (system:playback_1/2)
+    # WARNING:  to avoid autoconnect to system:playback
+    #           we MUST declare destination_ports
     destination_ports "mpd_loop:input_1,mpd_loop:input_2"
-    # Forzado opcional del formarto "fs:bits:channels", admite asteriscos.
-    format          "*:*:2"
+    # Optionally format force <fs:bits:channels>, willcards are allowed:
+    #format          "*:*:2"
 }
-# --- Salida ALSA DUMMY para poder tener un volumen ficticio sincronizado con FIRtro
-#     NOTA: se necesita tener cargado el module snd_dummy en /etc/modules
+
+# Alsa dummy output useful for volume control shared with others (needs alsa 'snd_dummy' module loaded)
 audio_output {
     enabled         "yes"
     type            "alsa"
@@ -86,39 +82,39 @@ audio_output {
     mixer_control   "Master"
     mixer_type      "hardware"
 }
-# --- Salida de streaming para por ejemplo un navegador que quiera 
-# conectarse al servidor MPD
+
+# http streaming output
 audio_output {
     enabled         "no"
     type            "httpd"
     name            "MPD_Stream"
-      # encoder      "vorbis"                # optional, vorbis or lame
-      encoder      "lame"                    # optional, vorbis or lame
-      # encoder       "flac"
-      compression   "5"
-      port          "8000"
-      # bind_to_address "0.0.0.0"               # optional, IPv4 or IPv6
-      # quality         "5.0"                   # do not define if bitrate is defined
-      bitrate           "256"                   # do not define if quality is defined
-      format            "44100:16:2"
-      # max_clients     "0"                     # optional 0=no limit
+    # Encoder vorbis or lame
+    encoder      "lame"
+    compression   "5"
+    port          "8000"
+    # Optional address scope:
+    # bind_to_address "0.0.0.0"
+    # Define only quality or bitrate:
+    # quality         "5.0"                   
+    bitrate           "256"
+    format            "44100:16:2"
+    # Optional max clients, use 0 for no limit:
+    # max_clients     "0"
     always_on "yes"
 }
 
-# --- RESAMPLING para adecuarse a la salida ---
-# Opcion standard:
-#samplerate_converter       "Best Sinc Interpolator"
-# samplerate_converter       "Medium Sinc Interpolator"
-# Opcion SOX:
-samplerate_converter        "soxr high"
+# --- Output resampling
+samplerate_converter       "Best Sinc Interpolator"
+#samplerate_converter       "Medium Sinc Interpolator"
+#samplerate_converter        "soxr high"
 #samplerate_converter        "soxr very high"
 
-# --- REPLAY GAIN ---
+# --- Replay Gain
 replaygain                  "album"
 #replaygain_preamp           "0"
 #volume_normalization        "no"
 
-# --- MISCEL ---
+# --- Miscel (legacy options)
 filesystem_charset "UTF-8"
 #log_level                 "default"
 # audio_buffer_size        "4096"
@@ -128,14 +124,6 @@ filesystem_charset "UTF-8"
 #restore_paused                     "no"
 #save_absolute_paths_in_playlists   "no"
 
-# --- AJUSTES LOW LEVEL --- (actualmente innecesarios)
-#connection_timeout          "60"    (default)
-#max_connections             "5"        (default)
-#max_playlist_length         "16384"    (default)
-#max_command_list_size       "2048"    (default)
-#max_output_buffer_size      "8192"    (default)
-#                           
-
-# --- ZEROCONF --- (anuncio estandar del servidor MPD en nuestra red local)
+# --- Zeroconf announcement:
 zeroconf_enabled             "yes"
 zeroconf_name                "pre.di.c mpd :-)"
