@@ -49,13 +49,13 @@ def do(task):
     #         but if cmd fails an exception will be raised, so used with 'try'
     if task == 'ampli on':
         try:
-            sp.check_output( f'{HOME}/bin/ampli.sh on'.split() )
+            sp.Popen( f'{HOME}/bin/ampli.sh on'.split() )
             return b'done'
         except:
             return b'error'
     elif task == 'ampli off':
         try:
-            sp.check_output( f'{HOME}/bin/ampli.sh off'.split() )
+            sp.Popen( f'{HOME}/bin/ampli.sh off'.split() )
             return b'done'
         except:
             return b'error'
