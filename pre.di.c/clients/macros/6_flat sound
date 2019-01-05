@@ -1,7 +1,6 @@
 #!/bin/bash
 
-echo "control bass 0"             | nc -N localhost 9999
-echo "control treble 0"           | nc -N localhost 9999
-echo "control loudness_track off" | nc -N localhost 9999
-echo "control drc none"           | nc -N localhost 9999
-
+echo "bass 0"             | nc -N localhost 9999
+echo "treble 0"           | nc -N localhost 9999
+echo "loudness_track off" | nc -N localhost 9999
+echo "drc none"           | nc -N localhost 9999
