@@ -1,5 +1,4 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 # Copyright (c) 2016-2018 Rafael Sánchez
 # This file is part of pre.di.c
@@ -36,50 +35,61 @@
 """
 # v1.1b
 #   defaults to print capture  -->--  playback
-# TODO: python3
+# v1.2
+#   Python3 and new jack client
 
-import jack     # NOTICE this is the old jack module because we use here python2
+import jack
 import sys
 
-def jackConns(pattern="", direction='all'):
-    """        returns:  port, connection , port
+def jackConns(pattern='', InOut='all'):
     """
-    ports = []
-    jack.attach("tmp")
-    for p in [x for x in jack.get_ports() if pattern in x]:
-        connections = jack.get_connections(p)
-        for conn in connections:
-            flags = jack.get_port_flags(conn)
-            # Returns an integer which is the bitwise-or of all flags for a given port.
-            # haciendo pruebas veamos algunos flags de puertos:
-            # puertos escribibles (playback): 1 21     impares, ultimo bit a 1
-            # puertos leibles     (capture) : 2 18 22  pares,   ultimo bit a 0
-            if   flags % 2 :
-                d = "-c"
+        Select ports by name and/or by capture/playback.
+        Returns the selected ports connectios as string triplets:
+            [ (A_port, B_port, direction), ... ]
+    """
+    triplets = []
+    jc = jack.Client('tmp')
+    
+    if   InOut == 'out':
+        A_ports = jc.get_ports( name_pattern=pattern, is_output=True )
+
+    elif InOut == 'in':
+        A_ports = jc.get_ports( name_pattern=pattern, is_input=True )
+
+    elif InOut == 'all':
+        A_ports = jc.get_ports( name_pattern=pattern )
+
+    for A_port in A_ports:
+        B_ports = jc.get_all_connections(A_port)
+        for B_port in B_ports:
+            if A_port.is_input:
+                direction = '<'
             else:
-                d = "-p"
-            if direction == d or direction == "all":
-                ports.append((p, d , conn))
-    jack.detach()
-    return ports
+                direction = '>'
+            triplets.append( (A_port.name, B_port.name, direction) )
+
+    jc.close()
+    
+    return triplets
 
 if __name__ == "__main__" :
-    pname   = ""
-    dir     = '-c'
+
+    pattern   = ''
+    InOut     = '-c'
+
     if len(sys.argv) > 1:
         for opc in sys.argv[1:]:
-            if opc in ('-c', '-p'):
-                dir = opc
+            if opc == '-c':
+                InOut = 'out'
+            elif opc == '-p':
+                InOut = 'in'
             elif "-h" in opc:
-                print __doc__
+                print( __doc__ )
                 sys.exit(0)
             else:
-                pname = opc
-    print
-    for x in jackConns(pname, dir):
-        if x[1] == '-c':
-            tmp = '-->--'
-        if x[1] == '-p':
-            tmp = '--<--'
-        print x[0].ljust(30) + tmp.ljust(8) + x[2]
-    print
+                pattern = opc
+
+    print()
+    for a,b,d in jackConns(pattern, InOut):
+        print(f'{a:30}', f'--{d}--    ', b)
+    print()
