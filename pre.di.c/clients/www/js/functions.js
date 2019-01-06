@@ -313,6 +313,9 @@ function page_update(status) {
         document.getElementById("buttonLoud").style.color = "lightgray";
     }
 
+    // Loudspeaker name (can change in some systems)
+    document.getElementById("main_lside").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
+
     // Updates the amplifier switch
     update_ampli_switch()
     
