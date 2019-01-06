@@ -253,11 +253,12 @@ def main():
         print( f['index'].rjust(4) +" "+ f['fname'].ljust(11) + fa + f['pol'].rjust(4) + \
               f['cset'].rjust(7) +"   "+ f['cname'].ljust(16) + ca.ljust(11) + f['cpcm'] )
 
-    ################################
-    print( "\n--- Jack:\n" )
-    ################################
-    for a,b,d in jvc.jackConns(pattern='brutefir', InOut='out'):
-        print(f'{a:30}', f'--{d}--    ', b)    
+    #################################
+    #print( "\n--- Jack:\n" )
+    #################################
+    #for a,b,d in jvc.jackConns(pattern='brutefir', InOut='out'):
+    #    print(f'{a:30}', f'--{d}--    ', b)
+
     print()
 
 if __name__ == "__main__" :
