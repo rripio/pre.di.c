@@ -1,32 +1,33 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 # v1.1
-# eliminamos time.sleep, usamos un bucle para recibir datos
+#   remove time.sleep, will use a loop to receive data
+# v1.2
+#   python3 compatible
 
-from sys import argv as sys_argv
+import sys
 import socket
 
-def bfcli(comando):
-    """ para enviar comandos a Brutefir y recibir resultados
+def bfcli(cmd):
+    """ send commands to brutefir CLI and receive its responses
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(('localhost', 3000))
-    s.send(comando + "\n")
-    respuesta = ""
+    s.send( f'{cmd} \n'.encode() )
+    response = b''
     while True:    
-        recibido = s.recv(4096)
-        if recibido:
-            respuesta += recibido
+        received = s.recv(4096)
+        if received:
+            response = response + received
         else:
             break
     s.close()
-    # print respuesta # DEBUG
-    return respuesta
+    # print response # debug
+    return response.decode()
 
 if __name__ == '__main__':
     try:
-        comando = ";".join(sys_argv[1:]) + ";"
-        print bfcli(comando)
+        cmd = ";".join(sys.argv[1:]) + ";"
+        print( bfcli(cmd) )
     except:
-        "algo va mal :-("
+        print( '(brutefir_cli.py) something was wrong :-/' )
