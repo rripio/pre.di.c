@@ -1,5 +1,4 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 # Copyright (c) 2016-2018 Rafael Sánchez
 # This file is part of pre.di.c
@@ -57,12 +56,12 @@
 # - filters includes 'to_output' field attenuation and polarity
 # v3.0
 # - Adaptation to PRE.DI.C
-# TODO: python3
-
+# v3.1
+# - Minor bug and Python3
 
 import sys, os
 import subprocess
-import jack_view_connections as jc
+import jack_view_connections as jvc
 import brutefir_cli
 
 HOME = os.path.expanduser("~")
@@ -72,7 +71,7 @@ sys.path.append(HOME + "/bin")
 from basepaths import loudspeakers_folder
 import getconfigs
 
-loudspeaker = getconfigs.get_yaml(HOME+'/config/config.yml')['loudspeaker']
+loudspeaker     = getconfigs.config['loudspeaker']
 brutefir_config = loudspeakers_folder + loudspeaker + "/brutefir_config"
 
 def read_config():
@@ -187,7 +186,7 @@ def read_running():
             # NOTA: Se asume que se sale a una única output.
             #       Podría no ser cierto en configuraciones experimentales que
             #       mezclen vías sobre un mismo canal de la tarjet de sonido
-            if linea.strip() <> "to outputs:":
+            if linea.strip() != "to outputs:":
                 if linea.count('/') == 2:
                     pol   = linea.split('/')[-1].strip()
                     atten = linea.split('/')[-2].strip()
@@ -229,42 +228,37 @@ def main():
     read_running()
 
     ################################
-    print "\n--- Outputs map:"
+    print( "\n--- Outputs map:" )
     ################################
     for output in outputsMap:
-        print output[0].ljust(10), '-->   ', output[1]
+        print( output[0].ljust(10), '-->   ', output[1] )
 
     ################################
-    print "\n--- Coeffs available:\n"
+    print( "\n--- Coeffs available:\n" )
     ################################
-    print "                             coeff# coeff           coeffAtten pcm_name"
-    print "                             ------ -----           ---------- --------"
+    print( "                             coeff# coeff           coeffAtten pcm_name" )
+    print( "                             ------ -----           ---------- --------" )
     for c in coeffs:
         a = '{:+6.2f}'.format( float(c['atten']) )
-        print " "*29 + c['index'].rjust(4) +"   "+ c['name'].ljust(16) + a.ljust(11) + c['pcm']
+        print( " "*29 + c['index'].rjust(4) +"   "+ c['name'].ljust(16) + a.ljust(11) + c['pcm'] )
 
     ################################
-    print "\n--- Filters Running:\n"
+    print( "\n--- Filters Running:\n" )
     ################################
-    print "fil# filterName  atten pol   coeff# coeff           coeffAtten pcm_name"
-    print "---- ----------  ----- ---   ------ -----           ---------- --------"
+    print( "fil# filterName  atten pol   coeff# coeff           coeffAtten pcm_name" )
+    print( "---- ----------  ----- ---   ------ -----           ---------- --------" )
     for f in filters_running:
         fa = '{:+6.2f}'.format( float(f['atten']) )
         ca = '{:+6.2f}'.format( float(f['catten']) )
-        print f['index'].rjust(4) +" "+ f['fname'].ljust(11) + fa + f['pol'].rjust(4) + \
-              f['cset'].rjust(7) +"   "+ f['cname'].ljust(16) + ca.ljust(11) + f['cpcm']
+        print( f['index'].rjust(4) +" "+ f['fname'].ljust(11) + fa + f['pol'].rjust(4) + \
+              f['cset'].rjust(7) +"   "+ f['cname'].ljust(16) + ca.ljust(11) + f['cpcm'] )
 
     ################################
-    print "\n--- Jack:\n"
+    print( "\n--- Jack:\n" )
     ################################
-    for x in jc.jackConns('brutefir'):
-        if x[1] == '-c':
-            tmp = '-->--'
-        if x[1] == '-p':
-            tmp = '--<--'
-        print x[0].ljust(30) + tmp.ljust(8) + x[2]
-    print
-
+    for a,b,d in jvc.jackConns(pattern='brutefir', InOut='out'):
+        print(f'{a:30}', f'--{d}--    ', b)    
+    print()
 
 if __name__ == "__main__" :
 
