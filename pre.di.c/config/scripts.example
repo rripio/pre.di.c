@@ -1,11 +1,13 @@
-#sound-cards-prepare.sh  # Release cards from PA an restore asound settings (for desktop systems)
-#mpd_load.py         # Loads MPD
-istreams.py         # Mplayer based internet streams player script
-#DVB.py             # Mplayer based DVB-T player script
+#sound-cards-prepare.sh  # release cards from PA an restore asound settings
+#external_cards.py       # Runs external cards resampled in JACK
+alsa_loop_load.py       # Sets up alsa_loop ports in jack to be used from ALSA backended players
+#pulseaudio-jack-sink    # Pulseadio sink on jack to be used from Pulseaudio backended players
+#mpd_load.py             # Loads MPD
+istreams.py             # Mplayer based internet streams player script
+#DVB.py                  # Mplayer based DVB-T player script
 #netjack.py 
-alsa_loop_load.py   # Sets up alsa_loop ports in jack to be used from ALSA backended players
-#librespot.py        # Loads a Spotify Connect player client
-aux.py              # Loads a server to switching the amplifier and running user macros.
-players.py          # Loads a server to interfacing with players
-external_cards.py   # Runs external cards resampled in JACK
-#pulseaudio-jack-sink # Pulseadio sink on jack to be used from Pulseaudio backended players
+#librespot.py            # Loads librespot (a Spotify Connect player)
+#spotify_monitor.py      # Loads a Spotify Desktop monitor
+aux.py                  # Loads a server to switching the amplifier and running user macros.
+players.py              # Loads a server to interfacing with players
+#mouse_volume.py         # mouse controls the pre.di.c volume
