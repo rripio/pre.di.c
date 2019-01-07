@@ -35,7 +35,7 @@ ecasound_is_used = check_if_ecasound();     // Boolean indicates if pre.di.c use
 auto_update_interval = 1500;                // Auto-update interval millisec
 advanced_controls = false;                  // Default for showing advanced controls
 
-// Returns boolen as per 'load_ecasound = True|False' inside 'config/config.yml'
+// Returns boolen as per 'load_ecasound = true|false' inside 'config/config.yml'
 function check_if_ecasound() {
     var config  = get_file('config');
     var lines   = config.split('\n');
@@ -44,7 +44,7 @@ function check_if_ecasound() {
     for (i in lines) {
         line = lines[i];
         if ( line.trim().split(':')[0].trim() == 'load_ecasound' ){
-            if ( line.trim().split(':')[1].trim() == 'True') {
+            if ( line.trim().split(':')[1].trim().toLowerCase() == 'true' ) {
                 result = true;
             }
         }
