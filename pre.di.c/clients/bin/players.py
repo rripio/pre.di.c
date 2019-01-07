@@ -33,6 +33,7 @@ import subprocess as sp
 import yaml
 import mpd
 import time
+import json
 
 import basepaths as bp
 
@@ -40,6 +41,33 @@ import basepaths as bp
 mpd_host    = 'localhost'
 mpd_port    = 6600
 mpd_passwd  = None
+
+# The METADATA GENERIC TEMPLATE for pre.di.c clients, for example the web control page:
+metaTemplate = {
+    'player':   '-',
+    'time_pos': '-:-',
+    'time_tot': '-:-',
+    'bitrate':  '-',
+    'artist':   '-',
+    'album':    '-',
+    'title':    '-'
+    }
+
+# Gets librespot bitrate from librespot running process:
+try:
+    tmp = sp.check_output( 'pgrep -fa /usr/bin/librespot'.split() ).decode()
+    # /usr/bin/librespot --name rpi3clac --bitrate 320 --backend alsa --device jack --disable-audio-cache --initial-volume=99
+    librespot_bitrate = tmp.split('--bitrate')[1].split()[0].strip()
+except:
+    librespot_bitrate = '-'
+    
+def timeFmt(x):
+    # x must be float
+    h = int( x / 3600 )         # hours
+    x = int( round(x % 3600) )  # updating x to reamining seconds
+    m = int( x / 60 )           # minutes from the new x
+    s = int( round(x % 60) )    # and seconds
+    return f'{h:0>2}:{m:0>2}:{s:0>2}'
 
 def get_predic_state():
     """ returns the YAML pre.di.c's status info """
@@ -55,31 +83,28 @@ def mpd_client(query):
     def get_meta():
         """ gets info from mpd """
 
-        player = 'MPD'
-        time_pos = time_tot = '-:-'
-        bitrate = artist = album = title = '-'
-        
+        md = metaTemplate
+        md['player'] = 'MPD'
+
         if mpd_online:
 
             # We try because not all tracks have complete metadata fields:
-            try:    artist   = client.currentsong()['artist']
+            try:    md['artist']   = client.currentsong()['artist']
             except: pass
-            try:    album    = client.currentsong()['album']
+            try:    md['album']    = client.currentsong()['album']
             except: pass
-            try:    title    = client.currentsong()['title']
+            try:    md['title']    = client.currentsong()['title']
             except: pass
-            try:    bitrate  = client.status()['bitrate']   # given in kbps
+            try:    md['bitrate']  = client.status()['bitrate']   # given in kbps
             except: pass
-            try:    time_pos = timeFmt( float( client.status()['elapsed'] ) )
+            try:    md['time_pos'] = timeFmt( float( client.status()['elapsed'] ) )
             except: pass
-            try:    time_tot = timeFmt( float( client.currentsong()['time'] ) )
+            try:    md['time_tot'] = timeFmt( float( client.currentsong()['time'] ) )
             except: pass
 
             client.close()
-
-        return '{ "player":"' + player + '", "bitrate":"' + bitrate + \
-               '", "time_pos":"' + time_pos + '", "time_tot":"' + time_tot + \
-               '", "artist":"' + artist + '", "album":"' + album + '", "title":"' + title + '" }'
+        
+        return json.dumps( md )
 
     def stop():
         if mpd_online:
@@ -131,23 +156,21 @@ def get_librespot_meta():
     # More info can be retrieved from the spotify web, but it is necessary to register
     # for getting a privative and unique http request token for authentication.
 
-    player = 'Spotify'
-    time_pos = time_tot = '-:-'
-    bitrate = artist = album = title = '-'
+    md = metaTemplate
+    md['player'] = 'Spotify'
+    md['bitrate'] = librespot_bitrate
 
     try:
         # Returns the current track title played by librespot.
         # 'scripts/librespot.py' handles the libresport print outs to be 
         #                        redirected to 'tmp/.librespotEvents'
         tmp = sp.check_output( f'tail -n1 {bp.main_folder}/.librespot_events'.split() )
-        title  = tmp.decode().split('"')[-2]
+        md['title'] = tmp.decode().split('"')[-2]
         # JSON for JavaScript on control web page, NOTICE json requires double quotes:
     except:
         pass
 
-    return '{ "player":"' + player + '", "bitrate":"' + bitrate + \
-           '", "time_pos":"' + time_pos + '", "time_tot":"' + time_tot + \
-           '", "artist":"' + artist + '", "album":"' + album + '", "title":"' + title + '" }'
+    return json.dumps( md )
 
 def mplayer_cmd(cmd, service):
     """ Sends a command to Mplayer trough by its input fifo """
@@ -166,9 +189,8 @@ def get_mplayer_info(service):
     """ gets metadata from Mplayer as per
         http://www.mplayerhq.hu/DOCS/tech/slave.txt """
 
-    player = 'Mplayer'
-    time_pos = time_tot = '-:-'
-    bitrate = artist = album = title = '-'
+    md = metaTemplate
+    md['player'] = 'Mplayer'
 
     # This is the file were Mplayer standard output has been redirected to,
     # so we can read there any answer when required to Mplayer slave daemon:
@@ -201,30 +223,20 @@ def get_mplayer_info(service):
 
         if 'ANS_AUDIO_BITRATE=' in tmp[0]:
             bitrate = tmp[0].split('ANS_AUDIO_BITRATE=')[1].split('\n')[0].replace("'","")
-            bitrate = bitrate.split()[0]
+            md['bitrate'] = bitrate.split()[0]
 
         if 'ANS_FILENAME=' in tmp[1]:
-            title = tmp[1].split('ANS_FILENAME=')[1].split('?')[0].replace("'","")
+            md['title'] = tmp[1].split('ANS_FILENAME=')[1].split('?')[0].replace("'","")
 
         if 'ANS_TIME_POSITION=' in tmp[2]:
             time_pos = tmp[2].split('ANS_TIME_POSITION=')[1].split('\n')[0]
-            time_pos = timeFmt( float( time_pos ) )
+            md['time_pos'] = timeFmt( float( time_pos ) )
 
         if 'ANS_LENGTH=' in tmp[3]:
             time_tot = tmp[3].split('ANS_LENGTH=')[1].split('\n')[0]
-            time_tot = timeFmt( float( time_tot ) )
+            md['time_tot'] = timeFmt( float( time_tot ) )
 
-    return '{ "player":"' + player + '", "bitrate":"' + bitrate + \
-           '", "time_pos":"' + time_pos + '", "time_tot":"' + time_tot + \
-           '", "artist":"' + artist + '", "album":"' + album + '", "title":"' + title + '" }'
-
-def timeFmt(x):
-    # x must be float
-    h = int( x / 3600 )         # hours
-    x = int( round(x % 3600) )  # updating x to reamining seconds
-    m = int( x / 60 )           # minutes from the new x
-    s = int( round(x % 60) )    # and seconds
-    return f'{h:0>2}:{m:0>2}:{s:0>2}'
+    return json.dumps( md )
 
 def predic_source():
     """ retrieves the current input source """
@@ -240,34 +252,76 @@ def predic_source():
         time.sleep(.25)
     return source
 
+def get_spotify_meta():
+
+    md = metaTemplate
+    md['player'] = 'Spotify'
+    
+    
+    try:
+        events_file = f'{bp.main_folder}/.spotify_events'
+        f = open( events_file, 'r' )
+        tmp = f.read()
+        f.close()
+
+        tmp = json.loads( tmp )
+        # Example:
+        # {
+        # "mpris:trackid": "spotify:track:5UmNPIwZitB26cYXQiEzdP", 
+        # "mpris:length": 376386000, 
+        # "mpris:artUrl": "https://open.spotify.com/image/798d9b9cf2b63624c8c6cc191a3db75dd82dbcb9", 
+        # "xesam:album": "Doble Vivo (+ Solo Que la Una/Con Cordes del Mon)", 
+        # "xesam:albumArtist": ["Kiko Veneno"], 
+        # "xesam:artist": ["Kiko Veneno"], 
+        # "xesam:autoRating": 0.1, 
+        # "xesam:discNumber": 1, 
+        # "xesam:title": "Ser\u00e9 Mec\u00e1nico por Ti - En Directo", 
+        # "xesam:trackNumber": 3, 
+        # "xesam:url": "https://open.spotify.com/track/5UmNPIwZitB26cYXQiEzdP"
+        # }
+
+        for k in ('artist', 'album', 'title'):
+            value = tmp[ f'xesam:{k}']
+            if type(value) == list:
+                md[k] = ' '.join(value)
+            elif type(value) == str:
+                md[k] = value
+        
+        md['time_tot'] = timeFmt( tmp["mpris:length"]/1e6 )
+
+    except:
+        pass
+
+    return json.dumps( md )
+    
 def get_meta():
-    """ Constructs a dictionary-like string with the current track metadata
+    """ Makes a dictionary-like string with the current track metadata
         '{player: xxxx, artist: xxxx, album:xxxx, title:xxxx, etc... }'
         Then will return a bytes-like object from the referred string.
     """
-    player   = '-'
-    time_pos = time_tot = '-:-'
-    bitrate = artist = album = title = '-'
+    metadata = metaTemplate
     source = predic_source()
-    
-    result  = '{ "player":"' + player + '", "bitrate":"' + bitrate + \
-               '", "time_pos":"' + time_pos + '", "time_tot":"' + time_tot + \
-               '", "artist":"' + artist + '", "album":"' + album + '", "title":"' + title + '" }'
 
-    if   source == 'spotify':
-        result = get_librespot_meta()
+    if   source == 'respotify':
+        metadata = get_librespot_meta()
+    
+    elif source == 'spotify':
+        metadata = get_spotify_meta()
 
     elif source == 'mpd':
-        result = mpd_client('get_meta')
+        metadata = mpd_client('get_meta')
 
     elif source == 'istreams':
-        result = get_mplayer_info(service=source)
+        metadata = get_mplayer_info(service=source)
 
     elif source == 'tdt' or 'dvb' in source:
-        result = get_mplayer_info(service='dvb')
+        metadata = get_mplayer_info(service='dvb')
+
+    else:
+        metadata = json.dumps( metadata )
 
     # As this is used by a server, we will return a bytes-like object:
-    return result.encode()
+    return metadata.encode()
 
 def control(action):
     """ controls the playback """
