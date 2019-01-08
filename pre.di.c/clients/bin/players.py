@@ -43,6 +43,7 @@ mpd_port    = 6600
 mpd_passwd  = None
 
 # The METADATA GENERIC TEMPLATE for pre.di.c clients, for example the web control page:
+# Remember to use copies of this ;-)
 metaTemplate = {
     'player':   '-',
     'time_pos': '-:-',
@@ -83,7 +84,7 @@ def mpd_client(query):
     def get_meta():
         """ gets info from mpd """
 
-        md = metaTemplate
+        md = metaTemplate.copy()
         md['player'] = 'MPD'
 
         if mpd_online:
@@ -156,7 +157,7 @@ def get_librespot_meta():
     # More info can be retrieved from the spotify web, but it is necessary to register
     # for getting a privative and unique http request token for authentication.
 
-    md = metaTemplate
+    md = metaTemplate.copy()
     md['player'] = 'Spotify'
     md['bitrate'] = librespot_bitrate
 
@@ -189,7 +190,7 @@ def get_mplayer_info(service):
     """ gets metadata from Mplayer as per
         http://www.mplayerhq.hu/DOCS/tech/slave.txt """
 
-    md = metaTemplate
+    md = metaTemplate.copy()
     md['player'] = 'Mplayer'
 
     # This is the file were Mplayer standard output has been redirected to,
@@ -254,7 +255,7 @@ def predic_source():
 
 def get_spotify_meta():
 
-    md = metaTemplate
+    md = metaTemplate.copy()
     md['player'] = 'Spotify'
     
     
@@ -299,7 +300,7 @@ def get_meta():
         '{player: xxxx, artist: xxxx, album:xxxx, title:xxxx, etc... }'
         Then will return a bytes-like object from the referred string.
     """
-    metadata = metaTemplate
+    metadata = metaTemplate.copy()
     source = predic_source()
 
     if   source == 'respotify':
