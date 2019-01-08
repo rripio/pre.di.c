@@ -71,6 +71,9 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 
         td#levelInfo        { width:   5%; text-align: center; border: 1px solid white; border-radius: 10px/10px; }
 
+        td#LoudnessInfo     { border: 1px solid grey; border-radius: 10px/10px; width: 7%; font-size:0.6em;}
+        td#MonoInfo         { border: 1px solid grey; border-radius: 10px/10px; width: 7%; font-size:0.6em;}
+
         td#input            { width:  85%; text-align: right;  border: none;}
         
         td#treble           { border: 1px solid grey; border-radius: 10px/10px; }
@@ -97,13 +100,14 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 
         .buttons_table      { width: 100%; border-style: none; }
         
-        .button_cell        { width: 33%; border-style: none; }
+        .button_cell        { width: 33%; min-width: 33%; border-style: none; }
                 
-        .custom_buttons     { width: 100%;
+        .macro_buttons     { width: 100%;
                             font-size:0.90em;
                             box-shadow: 0 5px 10px 0 rgba(200,200,200,0.3), 0 3px 10px 0 rgba(0,0,0,0.1);
                             border:2px solid rgb(120,120,120);
-                            border-radius: 10px/10px; }
+                            border-radius: 10px/10px; 
+                            min-height: 2.5em;}
 
     </style>
 
@@ -128,26 +132,33 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
 
 
         <div>
-            <table id="level_ampli_input"><tr>
+            <table id="level_ampli_input">
+            <tr>
+                <!-- Amplifier swith -->
+                <td id="OnOff" rowspan="2">
+                    <select id="onoffSelector" onchange="ampli(this.value)">
+                      <option value="on" >ON </option>
+                      <option value="off">OFF</option>
+                    </select>
+                </td>
 
-            <!-- Amplifier swith -->
-            <td id="OnOff">
-                <select id="onoffSelector" onchange="ampli(this.value)">
-                  <option value="on" >ON </option>
-                  <option value="off">OFF</option>
-                </select>
-            </td>
+                <!-- Level display -->
+                <td id="levelInfo" rowspan="2"></td>
 
-            <!-- Level display -->
-            <td id="levelInfo"></td>
-            
-            <!-- Inputs selector, will be filled by javascript -->
-            <td id="input">
-                <button id="url_button"     style="text-align:center;font-size:0.7em;display:none" onclick="play_url()">&#9901</button>
-                <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
-            </td>
-
-            </tr></table>
+                <!-- A little indicator if Loudness-->
+                <td id="LoudnessInfo">&nbsp;</td>
+                
+                <!-- Inputs selector, will be filled by javascript -->
+                <td id="input" rowspan="2">
+                    <button id="url_button"     style="text-align:center;font-size:0.7em;display:none" onclick="play_url()">&#9901</button>
+                    <select id="inputsSelector" onchange="predic_cmd('input ' + this.value, update=false)" ></select>
+                </td>
+            </tr>
+            <tr>
+                <!-- A little indicator if Mono-->
+                <td id="MonoInfo">&nbsp;</td>
+            </tr>
+            </table>
 
         </div>
 
@@ -240,39 +251,39 @@ along with pre.di.c.  If not, see https://www.gnu.org/licenses/.
     </div><!--main-->
 
     <!-- 9 buttons keypad for customizable user macros (if any found) -->
-    <div id="custom_buttons" style="display:none">
+    <div id="macro_buttons" style="display:none">
         <table class="buttons_table">
           <tr>
             <td class="button_cell">
-            <button class="button custom_buttons" type="button" id="macro_button_1" onmousedown="user_macro('1', this.innerText)" >-</button>
+            <button class="button macro_buttons" type="button" id="macro_button_1" onmousedown="user_macro('1', this.innerText)" >-</button>
             </td>                                                                            
             <td class="button_cell">                                                         
-            <button class="button custom_buttons" type="button" id="macro_button_2" onmousedown="user_macro('2', this.innerText)" >-</button>
+            <button class="button macro_buttons" type="button" id="macro_button_2" onmousedown="user_macro('2', this.innerText)" >-</button>
             </td>                                                                            
             <td class="button_cell">                                                         
-            <button class="button custom_buttons" type="button" id="macro_button_3" onmousedown="user_macro('3', this.innerText)" >-</button>
-            </td>                                                                            
-          </tr>                                                                              
-          <tr>                                                                               
-            <td class="button_cell">                                                         
-            <button class="button custom_buttons" type="button" id="macro_button_4" onmousedown="user_macro('4', this.innerText)" >-</button>
-            </td>                                                                            
-            <td class="button_cell">                                                         
-            <button class="button custom_buttons" type="button" id="macro_button_5" onmousedown="user_macro('5', this.innerText)" >-</button>
-            </td>                                                                            
-            <td class="button_cell">                                                         
-            <button class="button custom_buttons" type="button" id="macro_button_6" onmousedown="user_macro('6', this.innerText)" >-</button>
+            <button class="button macro_buttons" type="button" id="macro_button_3" onmousedown="user_macro('3', this.innerText)" >-</button>
             </td>                                                                            
           </tr>                                                                              
           <tr>                                                                               
             <td class="button_cell">                                                         
-            <button class="button custom_buttons" type="button" id="macro_button_7" onmousedown="user_macro('7', this.innerText)" >-</button>
+            <button class="button macro_buttons" type="button" id="macro_button_4" onmousedown="user_macro('4', this.innerText)" >-</button>
             </td>                                                                            
             <td class="button_cell">                                                         
-            <button class="button custom_buttons" type="button" id="macro_button_8" onmousedown="user_macro('8', this.innerText)" >-</button>
+            <button class="button macro_buttons" type="button" id="macro_button_5" onmousedown="user_macro('5', this.innerText)" >-</button>
             </td>                                                                            
             <td class="button_cell">                                                         
-            <button class="button custom_buttons" type="button" id="macro_button_9" onmousedown="user_macro('9', this.innerText)" >-</button>
+            <button class="button macro_buttons" type="button" id="macro_button_6" onmousedown="user_macro('6', this.innerText)" >-</button>
+            </td>                                                                            
+          </tr>                                                                              
+          <tr>                                                                               
+            <td class="button_cell">                                                         
+            <button class="button macro_buttons" type="button" id="macro_button_7" onmousedown="user_macro('7', this.innerText)" >-</button>
+            </td>                                                                            
+            <td class="button_cell">                                                         
+            <button class="button macro_buttons" type="button" id="macro_button_8" onmousedown="user_macro('8', this.innerText)" >-</button>
+            </td>                                                                            
+            <td class="button_cell">                                                         
+            <button class="button macro_buttons" type="button" id="macro_button_9" onmousedown="user_macro('9', this.innerText)" >-</button>
             </td>
           </tr>
         </table>
