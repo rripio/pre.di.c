@@ -30,11 +30,12 @@
     DVB-T tuned channels are ussually stored at
         ~/.mplayer/channels.conf
 
-    User presets can be configured into:
+    User settings (presets, default) can be configured into:
         config/DVB-T.yml
 
     Use:   DVB.py       start  [ <preset_num> | <channel_name> ]
                         stop
+                        prev  (load previous from recent presets)
                         preset <preset_num>
                         name   <channel_name>
 """
@@ -46,27 +47,27 @@ import sys
 import time
 import subprocess as sp
 import threading
-import yaml
+
+#import yaml
+# ruamel.yaml preserves comments and items order when dumping to a file.
+# https://yaml.readthedocs.io/en/latest/basicuse.html
+from ruamel.yaml import YAML
 
 import basepaths as bp
 import getconfigs as gc
 import predic as pd
 
-##################
-# Script settings:
-##################
-# DEFAULT PRESET number:
-default_preset = '2'
-# PRESETS FILE for internet streams / stations:
-presets_fname = bp.config_folder + 'DVB-T.yml'
+## User settings under config/DVB-T.yml
+
+## Script settings:
+# DVB CONFIG file storing presets and recent stations:
+DVB_config_fpath = bp.config_folder + 'DVB-T.yml'
 # Name used from pre.di.c. for info and pid saving
 program_alias = 'mplayer-dvb'
 # Mplayer DVB-T tuner file
 tuner_file = f'{HOME}/.mplayer/channels.conf'
 
-############################
-# Mplayer options:
-############################
+## Mplayer options:
 # -quiet: see channels change
 # -really-quiet: silent
 options = '-quiet -nolirc'
@@ -101,8 +102,16 @@ def select_by_name(channel_name):
 def select_by_preset(preset_num):
     """ loads a stream by its preset number """
     try:
-        channel_name = presets[ int(preset_num) ]
+        channel_name = DVB_config['presets'][ preset_num ]
         select_by_name(channel_name)
+
+        # Saving and rotating recent preset:
+        last = DVB_config['recent_presets']['last']
+        if DVB_config['recent_presets']['last'] != preset_num:
+            DVB_config['recent_presets']['prev'] = last
+            DVB_config['recent_presets']['last'] = preset_num
+            dump_yaml( DVB_config, DVB_config_fpath )
+
         return True
     except:
         print( f'(scripts/DVB.py) error in preset # {preset_num}' )
@@ -125,19 +134,30 @@ def stop():
     sp.Popen( ['pkill', '-KILL', '-f', 'profile dvb'] )
     sp.Popen( ['pkill', '-KILL', '-f', 'DVB.py start'] )
 
+def load_yaml(fpath):
+    try:
+        yaml = YAML() # default round-trip mode preserve comments and order
+        doc = open(fpath, 'r')
+        d = yaml.load( doc.read() )
+        doc.close()
+        return d
+    except:
+        print ( '(scripts/DVB.py) YAML error loading ' + fpath )
+
+def dump_yaml(d, fpath):
+    try:
+        yaml = YAML() # default round-trip mode preserve comments and order
+        doc = open(fpath, 'w')
+        yaml.dump( d, doc )
+        doc.close()
+    except:
+        print ( '(scripts/DVB.py) YAML error dumping ' + fpath )
 
 if __name__ == '__main__':
 
-    ### Reading the presets stations file
-    presets = {}
-    f = open(presets_fname, 'r')
-    tmp = f.read()
-    f.close()
-    try:
-        presets = yaml.load(tmp)
-    except:
-        print ( '(scripts/DVB.py) YAML error into ' + presets_fname )
-
+    ### Reading the DVB-T config file
+    DVB_config = load_yaml( DVB_config_fpath )
+    
     ### Reading the command line
     if sys.argv[1:]:
 
@@ -149,11 +169,14 @@ if __name__ == '__main__':
             if sys.argv[2:]:
                 opc2 = sys.argv[2]
                 if opc2.isdigit():
-                    select_by_preset(opc2)
+                    select_by_preset( int(opc2) )
                 elif opc2.isalpha():
                     select_by_name(opc2)
             else:
-                select_by_preset(default_preset)
+                if DVB_config['default_preset'] != 0:
+                    select_by_preset( DVB_config['default_preset'] )
+                else:
+                    select_by_preset( DVB_config['recent_presets']['last'] )
 
         # STOPS all this stuff
         elif opc == 'stop':
@@ -161,7 +184,9 @@ if __name__ == '__main__':
 
         # ON THE FLY changing a preset number
         elif opc == 'preset':
-            select_by_preset( sys.argv[2] )
+            select_by_preset( int(sys.argv[2]) )
+        elif opc == 'prev':
+            select_by_preset( DVB_config['recent_presets']['prev'] )
 
         # ON THE FLY changing a preset name
         elif opc == 'name':
