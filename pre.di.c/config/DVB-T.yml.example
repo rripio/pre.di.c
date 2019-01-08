@@ -10,7 +10,7 @@ presets:
   8: ONDA CERO
   9: ONDA MADRID
 
-# Leaving 0 below will start loading recent_presets last item
+# If 0 here, then DVB.py will start loading last item from recent_presets
 default_preset: 0
 
 recent_presets:
