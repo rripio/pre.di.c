@@ -35,7 +35,7 @@ ecasound_is_used = check_if_ecasound();     // Boolean indicates if pre.di.c use
 auto_update_interval = 1500;                // Auto-update interval millisec
 advanced_controls = false;                  // Default for showing advanced controls
 
-// Returns boolen as per 'load_ecasound = true|false' inside 'config/config.yml'
+// Returns boolen as per 'load_ecasound = True|False' inside 'config/config.yml'
 function check_if_ecasound() {
     var config  = get_file('config');
     var lines   = config.split('\n');
@@ -127,7 +127,7 @@ function filling_macro_buttons() {
     // If no macros on the list, do nothing, so leaving "display:none" on the buttons keypad div
     if ( macros.length < 1 ) { return; }
     // If any macro found, lets show the macros keypad
-    document.getElementById( "custom_buttons").style.display = "block";
+    document.getElementById( "macro_buttons").style.display = "block";
     var macro = ''
     for (i in macros) {
         macro = macros[i];
@@ -239,7 +239,7 @@ function page_initiate() {
     // Web header shows the loudspeaker name
     document.getElementById("main_lside").innerText = ':: pre.di.c :: ' + get_loudspeaker() + ' ::';
 
-    // Amplifier_switch_status
+    // Amplifier switch status
     update_ampli_switch();
 
     // Queries the pre.di.c status and updates the page
@@ -284,33 +284,40 @@ function page_update(status) {
     if ( ecasound_is_used == true){
         document.getElementById("peqSelector").value    =           status_decode(status, 'PEQ_set');
     }
+
     // MONO, LOUDNESS buttons text lower case if deactivated
     document.getElementById("buttonMono").innerHTML = UpLow( 'mono', status_decode(status, 'mono') );
     document.getElementById("buttonLoud").innerHTML = UpLow( 'loud', status_decode(status, 'loudness_track') );
 
-    // Highlights activated buttons
+    // Highlights activated buttons and related indicators
     if ( status_decode(status, 'muted') == 'true' ) {
         document.getElementById("buttonMute").style.background = "rgb(185, 185, 185)";
         document.getElementById("buttonMute").style.color = "white";
         document.getElementById("buttonMute").style.fontWeight = "bolder";
+        document.getElementById("levelInfo").style.color = "darkgray";
     } else {
         document.getElementById("buttonMute").style.background = "rgb(100, 100, 100)";
         document.getElementById("buttonMute").style.color = "lightgray";
         document.getElementById("buttonMute").style.fontWeight = "normal";
+        document.getElementById("levelInfo").style.color = "white";
     }
     if ( status_decode(status, 'mono') == 'true' ) {
         document.getElementById("buttonMono").style.background = "rgb(185, 185, 185)";
         document.getElementById("buttonMono").style.color = "white";
+        document.getElementById("MonoInfo").innerText = 'M';
     } else {
         document.getElementById("buttonMono").style.background = "rgb(100, 100, 100)";
         document.getElementById("buttonMono").style.color = "lightgray";
+        document.getElementById("MonoInfo").innerText = '·';
     }
     if ( status_decode(status, 'loudness_track') == 'true' ) {
         document.getElementById("buttonLoud").style.background = "rgb(185, 185, 185)";
         document.getElementById("buttonLoud").style.color = "white";
+        document.getElementById("LoudnessInfo").innerText = 'L';
     } else {
         document.getElementById("buttonLoud").style.background = "rgb(100, 100, 100)";
         document.getElementById("buttonLoud").style.color = "lightgray";
+        document.getElementById("LoudnessInfo").innerText = '·';
     }
 
     // Loudspeaker name (can change in some systems)
