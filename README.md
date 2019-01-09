@@ -9,8 +9,13 @@ Copyright (c) 2016-2018 Rafael Sánchez
 ## Requirements
 
 - **Python** >= 3.6
-- python3-numpy
-- python3-pyaml
+
+```
+python3 -m pip install numpy
+python3 -m pip install pyaml
+python3 -m pip install python-mpd
+```
+
 - **https://jackclient-python.readthedocs.io**
 ```
     sudo python3 -m pip install --upgrade setuptools
