@@ -13,7 +13,7 @@ Copyright (c) 2016-2018 Rafael Sánchez
 ```
 python3 -m pip install numpy
 python3 -m pip install pyaml
-python3 -m pip install python-mpd
+python3 -m pip install python-mpd2
 ```
 
 - **https://jackclient-python.readthedocs.io**
