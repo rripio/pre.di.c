@@ -562,7 +562,7 @@ if __name__ == "__main__":
     try:
         lspk = yaml.load(tmp)
     except:
-        print ( 'YAML error into ' + lspk_file )
+        print ( 'YAML error into ' + lspk_fname )
         sys.exit()
     # NOTICE: Channels are not explicit, neither declared as a list for end user's
     #         convenience, so channels are implicit as per the columns they are written into.
