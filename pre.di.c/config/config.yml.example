@@ -9,19 +9,20 @@ system_card: hw:0,0
 
 # Cards external to jack
 # resamplingQ: 0..4 for alsa_in/out or 16..96 for zita-a2j/j2a
-external_cards:
-    # JackName
-        # {alsacard, resampler, resamplingQ, misc_params}
-    CSL: 
-        alsacard:       hw:Device,0
-        resampler:      zita-a2j
-        resamplingQ:    96
-        misc_params:    ''
-    DEQ2496:
-        alsacard:       hw:miniStreamer,0
-        resampler:      zita-j2a
-        resamplingQ:    96
-        misc_params:    ''
+external_cards: ''
+#external_cards:
+#    # JackName
+#        # {alsacard, resampler, resamplingQ, misc_params}
+#    CSL: 
+#        alsacard:       hw:Device,0
+#        resampler:      zita-a2j
+#        resamplingQ:    96
+#        misc_params:    ''
+#    DEQ2496:
+#        alsacard:       hw:miniStreamer,0
+#        resampler:      zita-j2a
+#        resamplingQ:    96
+#        misc_params:    ''
 
 # Delay between commands (seconds)
 command_delay: 1
