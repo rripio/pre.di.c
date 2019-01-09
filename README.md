@@ -10,7 +10,7 @@ Copyright (c) 2016-2018 Rafael Sánchez
 
 - **Python** >= 3.6
 - python3-numpy
-- python3-yaml
+- python3-pyaml
 - **https://jackclient-python.readthedocs.io**
 ```
     sudo python3 -m pip install --upgrade setuptools
