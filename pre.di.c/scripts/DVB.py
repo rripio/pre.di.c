@@ -104,15 +104,14 @@ def select_by_preset(preset_num):
     try:
         channel_name = DVB_config['presets'][ preset_num ]
         select_by_name(channel_name)
-
-        # Saving and rotating recent preset:
+        # Rotating and saving recent preset:
         last = DVB_config['recent_presets']['last']
-        if DVB_config['recent_presets']['last'] != preset_num:
+        if preset_num != last:
             DVB_config['recent_presets']['prev'] = last
             DVB_config['recent_presets']['last'] = preset_num
             dump_yaml( DVB_config, DVB_config_fpath )
-
         return True
+
     except:
         print( f'(scripts/DVB.py) error in preset # {preset_num}' )
         return False
@@ -122,7 +121,7 @@ def start():
     #    The jack_loop module will keep the loop alive, so we need to thread it.
     jloop = threading.Thread( target = pd.jack_loop, args=('dvb_loop',) )
     jloop.start()
-    # 2. Mplayer DVB:
+    # 2. Launching Mplayer for DVB service:
     opts = f'{options} -idle -slave -profile dvb -input file={input_fifo}'
     command = f'{mplayer_path} {opts}'
     with open(mplayer_redirection_path, 'w') as redir:
@@ -136,7 +135,7 @@ def stop():
 
 def load_yaml(fpath):
     try:
-        yaml = YAML() # default round-trip mode preserve comments and order
+        yaml = YAML() # default round-trip mode preserve comments and items order
         doc = open(fpath, 'r')
         d = yaml.load( doc.read() )
         doc.close()
@@ -146,7 +145,7 @@ def load_yaml(fpath):
 
 def dump_yaml(d, fpath):
     try:
-        yaml = YAML() # default round-trip mode preserve comments and order
+        yaml = YAML() # default round-trip mode preserve comments and items order
         doc = open(fpath, 'w')
         yaml.dump( d, doc )
         doc.close()
@@ -182,13 +181,13 @@ if __name__ == '__main__':
         elif opc == 'stop':
             stop()
 
-        # ON THE FLY changing a preset number
+        # ON THE FLY changing to a preset number or rotates recent
         elif opc == 'preset':
             select_by_preset( int(sys.argv[2]) )
         elif opc == 'prev':
             select_by_preset( DVB_config['recent_presets']['prev'] )
 
-        # ON THE FLY changing a preset name
+        # ON THE FLY changing to a preset name
         elif opc == 'name':
             select_by_name( sys.argv[2] )
 
