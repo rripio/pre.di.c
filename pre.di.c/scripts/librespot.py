@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-""" Launch 'librespot', a Spotify Connect player client
-    
+"""
+    Launch 'librespot', a Spotify Connect player client
+
     use:    librespot.py   start | stop
 """
 
 import sys
 from subprocess import Popen
+from socket import gethostname
 
 import basepaths
 
@@ -14,7 +16,7 @@ def start():
     # We redirect the print outs to a temporary file that will be periodically
     # read from a player control daemon.
 
-    cmd =  '/usr/bin/librespot --name rpi3clac --bitrate 320 --backend alsa' + \
+    cmd =  f'/usr/bin/librespot --name {gethostname()} --bitrate 320 --backend alsa' + \
            ' --device jack --disable-audio-cache --initial-volume=99'
 
     logFileName = f'{basepaths.main_folder}/.librespot_events'
