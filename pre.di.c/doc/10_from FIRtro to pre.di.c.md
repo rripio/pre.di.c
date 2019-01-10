@@ -147,3 +147,45 @@ jack_options:          -R -ddummy -P8 -C2
 - Run pre.di.c
 
     `startaudio.py`
+
+You can use the `read_brutefir_process.py` tool to see how coefficients and output mapping are running into Brutefir:
+
+       $ read_brutefir_process.py
+
+       --- Outputs map:
+       hi.L       -->    system:playback_1
+       hi.R       -->    system:playback_2
+       lo.L       -->    system:playback_3
+       lo.R       -->    system:playback_4
+
+       --- Coeffs available:
+
+                                    coeff# coeff           coeffAtten pcm_name
+                                    ------ -----           ---------- --------
+                                       0   c.eq             +0.00     dirac pulse
+                                       1   L_multipV1       +0.00     drc.L_multipV1.pcm
+                                       2   R_multipV1       +0.00     drc.R_multipV1.pcm
+                                       3   hi_lp            +0.00     xo.hi_lp.pcm
+                                       4   lo_lp            +0.00     xo.lo_lp.pcm
+                                       5   hi_mp            +0.00     xo.hi_mp.pcm
+                                       6   lo_mp            +0.00     xo.lo_mp.pcm
+
+       --- Filters Running:
+
+       fil# filterName  atten pol   coeff# coeff           coeffAtten pcm_name
+       ---- ----------  ----- ---   ------ -----           ---------- --------
+          0 f.eq.L      +0.00   1      0   c.eq             +0.00     dirac pulse
+          1 f.eq.R      +0.00   1      0   c.eq             +0.00     dirac pulse
+          2 f.drc.L     +0.00   1      1   L_multipV1       +0.00     drc.L_multipV1.pcm
+          3 f.drc.R     +0.00   1      2   R_multipV1       +0.00     drc.L_multipV1.pcm
+          4 f.lo.L      +0.00   1      6   lo_mp            +0.00     xo.lo_mp.pcm
+          5 f.hi.L      +0.00   1      5   hi_mp            +0.00     xo.hi_mp.pcm
+          6 f.lo.R      +0.00   1      6   lo_mp            +0.00     xo.lo_mp.pcm
+          7 f.hi.R      +0.00   1      5   hi_mp            +0.00     xo.hi_mp.pcm
+
+       $
+
+If things seems to work well, you can set `jack_options` to use the **real alsa** sound card, for instance:
+
+       jack_options: -R -dalsa -p1024 -n
+
