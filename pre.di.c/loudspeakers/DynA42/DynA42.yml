@@ -4,10 +4,10 @@ room_gain:      5.0
 house_gain:     -2.0
 
 peq_sets:
-    peq1:               peq1.peq
+    defeat:               none
 
 drc_sets:
-    none:               none                        none
+    defeat:               none                        none
     nearfield:          drc.L_lp_DynA42.pcm         drc.R_lp_DynA42.pcm
 
 xo_sets:
