@@ -108,8 +108,8 @@ def do_header():
     h1 += '# --------------------------------------------\n'
 
     h2 = ('''
-    # modulo "cli" para puerto tct/ip para consultas y cambios al vuelo
-    # y modulo "eq" para el EQ del preamplificador de predic
+    # - "cli" module manages Brutefir on the fly via tcp
+    # - "eq"  module supports the preamp EQ stage
 
     logic:
 
