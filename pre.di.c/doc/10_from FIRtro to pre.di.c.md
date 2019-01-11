@@ -4,7 +4,7 @@
 
 So 'fs' is no longer stored inside `config/state.yml`
 
-**NOTICE** that pre.di.c uses YAML files, no longer .ini files are used.
+**NOTICE** also that pre.di.c uses YAML files, .ini files kind of are no longer used.
 
        (i) PLEASE set your editor to tab by using 4 spaces
 
@@ -49,26 +49,27 @@ So forgot old `drc-1-L_xxxxx.pcm` naming from FIRtro, neither `drc` subfolders.
 Copy all pcm stuff you will need here and rename pcm files as convenient. For example
 
 ```
-    ls -1 *pcm > renaming
+    $ ls -1 *pcm > renaming        # prepare a temporary script
 
-    nano renaming
+    $ nano renaming
     
         Edit here each line to something like:
 
         mv  lp-high.pcm                     xo.high_lp.pcm
         mv  drc-1-L_somodrcdescription.pcm  drc.L_somodrcdescription.pcm
-        ... etc ...
+
+       ... etc
         
-    sh renaming
-    rm renaming
-    ls -1 *pcm
+    $ sh renaming                  # rename files
+    $ rm renaming                  # delete this temporary
+    $ ls -1 *pcm                   # check new names
 ```
 
 - Copy here the example target files:
 
     `cp  ../example2ways-sub/R20_ext*   .`
 
-- Copy a template for the loudspeaker definition
+- Copy a template to prepare a *high level* loudspeaker definition
 
     `cp  ../example2ways-sub/example2ways-sub.yml  mylspkname.yml`
     
@@ -115,7 +116,7 @@ xo_sets:
     (target_spl, room_gain and house_gain settings have no effect, still...)
 
    
-When you're done, you can generate the low level files needed for pre.di.c to work:
+When you're done, you can generate a candidate set of *low level* files needed for pre.di.c to work with your loudspeaker, i.e `speaker.yml` and `brutefir_config`:
 
 ```
     cd ~
@@ -123,7 +124,7 @@ When you're done, you can generate the low level files needed for pre.di.c to wo
 ```
 
  
-If all is right use `-w` to write down the candidate files.
+If all is right add `-w` as argument to write down the candidate files.
 
 - Review the output section under the new `brutefir_config` file
 
