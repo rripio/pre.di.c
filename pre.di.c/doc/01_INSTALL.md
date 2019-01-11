@@ -2,7 +2,7 @@
 
 ## Required
 
-You need **Python>=3.6** and all python stuff as indicated in **`/README.md`**. Relogin when done.
+You need **Python>=3.6** and all python stuff as indicated in **[/README.md](https://github.com/Rsantct/pre.di.c/blob/master/README.md)**. Relogin when done.
 
 ## First pre.di.c install:
 
