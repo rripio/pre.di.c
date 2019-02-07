@@ -162,19 +162,22 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
     ## internal functions for actions
 
-    def change_target(throw_it):
+    def reload_target(throw_it):
 
         try:
-            (curves['target_mag'], curves['target_pha']) = pd.get_target()
-            state = change_gain(gain, True)
+            (curves['target_mag'], curves['target_pha']) = pd.read_target()
+            #print('DEBUG TARGET\n', curves['target_mag'])
+            state = change_gain(gain, do_change_eq=True)
         except:
             warnings.append('Something went wrong when changing target state')
+        return state
 
 
     def show(throw_it):
 
         state = pd.show_file()
         return(state)
+
 
     def change_input(input, state=state):
 
@@ -574,7 +577,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 #    if True:
     try:
         state = {
-            'target':           change_target,
+            'reload_target':    reload_target,
             'show':             show,
             'input':            change_input,
             'xo':               change_xovers,
