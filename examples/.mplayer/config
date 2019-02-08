@@ -1,6 +1,0 @@
-[dvb]
-ao=jack:name=mplayer_dvb:port=dvb_loop
-
-[cdda]
-ao=jack:name=mplayer_cdda:noconnect
-
