@@ -1,0 +1,17 @@
+# DVB-T presets (radio or not)
+
+presets:
+    1: Radio Nacional
+    2: Radio Clasica dolby
+    3: Radio3 HQ
+    4: Radio Exterior
+    5: Radio5
+    6: SER
+    7: Kiss FM
+    8: ONDA CERO
+    9: ONDA MADRID
+    10:
+    11: canal inexistente
+
+input:
+    dvb_input: tdt
