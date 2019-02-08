@@ -165,7 +165,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
     def reload_target(throw_it):
 
         try:
-            (curves['target_mag'], curves['target_pha']) = pd.read_target()
+            (curves['target_mag'], curves['target_pha']) = pd.get_target()
             #print('DEBUG TARGET\n', curves['target_mag'])
             state = change_gain(gain, do_change_eq=True)
         except:
