@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# A command line utility to send commands to pre.di.c
+
+###  CONFIG HERE THE SERVER TO BE CONTROLLED: ###
+server='localhost'
+
+echo "["$server"]"
+if [[ $(uname) == *'Linux'* ]];then
+    # 'nc' on Linux: -N shutdown the network socket after EOF on the input.
+    echo "$@" | nc -N $server 9999
+else
+    # 'nc' on Mac OS:
+    echo "$@" | nc    $server 9999
+fi
