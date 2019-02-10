@@ -62,8 +62,8 @@ control_clear: False
 jack_path: /usr/bin/jackd
 # jack options
 # jack on ALSA: omit cards and fs (managed in initaudio.py)
-#jack_options: --silent -R -P 90 -dalsa -p256
-jack_options:          -R -ddummy -P8 -C2
+#jack_options:          -R -ddummy -P8 -C2
+jack_options: --silent -R -P 90 -dalsa -p256
 
 
 # brutefir
