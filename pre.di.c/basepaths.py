@@ -20,11 +20,15 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
+HOME = os.path.expanduser("~")
+
 ## customizable initial values
 
 # folders
-home_folder = '/home/predic/'
-main_folder = home_folder + 'pre.di.c/'
+#home_folder = '/home/predic/'
+home_folder = HOME                          # only used from DVB.py :-/
+main_folder = home_folder + '/pre.di.c/'
 bin_folder = main_folder
 config_folder = main_folder + 'config/'
 clients_folder = main_folder + 'clients/'
