@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#!/usr/bin/env python3
 
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
@@ -127,10 +127,11 @@ def init_server():
     print('\n(startaudio) starting server\n')
     try:
         control = Popen(['python3'
-                            , bp.server_path])
+                            , bp.server_path, 'control'])
     except:
         print('\n(startaudio) server didn\'t load')
         sys.exit() # initaudio stopped
+
     # waiting for server
     total_time = rem_time = 10 * gc.config['command_delay']
     while rem_time:
