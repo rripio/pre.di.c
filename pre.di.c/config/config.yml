@@ -49,6 +49,9 @@ jack_monitors: ''
 
 ## paths & options
 
+# The generic server (will be called 'server.py control' for pre.di.c control)
+server_path: ~/pre.di.c/server.py
+
 # control server
 # screen output: 0 (nothing) - 1 (minimal) - 2 (full)
 control_output: 0
@@ -92,6 +95,10 @@ bfcli_port: 3000
 # 127.0.0.1 listen only to local connections
 control_address: 0.0.0.0
 control_port: 9999
+
+# Auxiliary service servers (optional)
+aux_address: localhost
+aux_port: 9990
 
 
 
