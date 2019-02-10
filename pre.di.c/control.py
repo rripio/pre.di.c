@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
-# Copyright (C) 2018 Roberto Ripio
+# Copyright (C) 2018 Roberto Ripio, Rafael Sánchez
 #
 # pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
 # Copyright (c) 2006-2011 Roberto Ripio
@@ -20,6 +22,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
+import socket
+import yaml
 import time
 import socket
 import sys
@@ -569,7 +573,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
     ## parse  commands and select corresponding actions
 
-    if gc.config['server_output'] > 0:
+    if gc.config['control_output'] > 0:
         print(f'Command: {full_command}')
 #    if True:
     try:
@@ -600,3 +604,53 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
     return (state, warnings)
 
 # end of proccess_commands()
+
+
+##############################################
+# Interface function to plug this on server.py
+##############################################
+def do( cmdline ):
+    """ Returns:
+        - The state dictionary if cmdline = 'status'
+        - 'OK' if the command was succesfully processed.
+        - 'ACK' if not.
+    """
+    
+    # terminal print out behavior
+    if gc.config['control_output'] > 1:
+        if gc.config['control_clear']:
+            # optional terminal clearing
+            os.system('clear')
+        else:
+            # separator
+             print('=' * 70)
+
+    result = ''
+
+    # 'status' will read the state file and send it back as an YAML string
+    if cmdline.rstrip('\r\n') == 'status':
+        result = yaml.dump( gc.state, default_flow_style=False )
+
+    # Any else cmdline phrase will be processed by the 'proccess_commands()' function,
+    # that answers with a state dict, and warnings if any:
+    else:
+        (state, warnings) = proccess_commands( cmdline )
+
+        try:
+            # Updates state file
+            with open( bp.state_path, 'w' ) as f:
+                yaml.dump( state, f, default_flow_style=False )
+
+            # Prints warnings
+            if len(warnings) > 0:
+                print("Warnings:")
+                for warning in warnings:
+                    print("\t", warning)
+                result = 'ACK\n'
+            else:
+                result = 'OK\n'
+        except:
+            result = 'ACK\n'
+
+    # It is expected to return bytes-like things to the server
+    return result.encode()
