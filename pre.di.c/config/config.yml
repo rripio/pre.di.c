@@ -23,8 +23,6 @@ resampler: zita
 # resampling quality (optional) (0..4 for alsa, 16..96 for zita)
 resamplingQ: 96
 
-
-
 ## misc
 
 # delay between commands (seconds)
@@ -53,15 +51,17 @@ jack_monitors: ''
 
 # control server
 # screen output: 0 (nothing) - 1 (minimal) - 2 (full)
-server_output: 0
+control_output: 0
 # screen erasing between commands: True - False
-server_clear: False
+control_clear: False
 
 # jack
 jack_path: /usr/bin/jackd
 # jack options
 # jack on ALSA: omit cards and fs (managed in initaudio.py)
-jack_options: --silent -R -P 90 -dalsa -p256
+#jack_options: --silent -R -P 90 -dalsa -p256
+jack_options:          -R -ddummy -P8 -C2
+
 
 # brutefir
 brutefir_path: /usr/bin/brutefir
