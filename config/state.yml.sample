@@ -3,13 +3,11 @@ PEQ_set: defeat
 XO_set: mp
 balance: 0.0
 bass: 0
-input: tdt
-level: -6.0
+input: a
+level: -12.0
 loudness_ref: 0.0
 loudness_track: false
 mono: false
 muted: true
 polarity: +
-radio: '3'
-radio_prev: '2'
 treble: 0

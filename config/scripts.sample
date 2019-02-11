@@ -1,4 +1,14 @@
-mpd_load.py # Don't name this mpd.py since it could interfere with mpd module
-DVB.py
-netjack.py
-alsa_loop_load.py # Sets up alsa_loop ports in jack to be used from ALSA players
+# client load scripts listed in this file are launched on start.
+# names refer to any kind of executable in folder 'scripts'.
+#
+# bug: do not leave blank lines or an error will arise.
+# comments are allowed even inline. Begin comments with '#'
+#
+# Don't name this mpd.py since it could interfere with mpd module
+# mpd_load.py
+# DVB.py
+#
+# netjack.py
+#
+# Sets up alsa_loop ports in jack to be used from ALSA players
+alsa_loop_load.py

@@ -1,3 +1,20 @@
+# inputs configuration
+
+# input_name:
+
+#   gain: float(dB)         # gain shift of input
+
+#   in_ports:               # jack input ports
+#       - input_jack_port_1
+#       - input_jack_port_2
+
+#   resampled: False|True   # True if inputs needs to be resampled
+                            # to card clock (spdif and the like).
+
+#   xo: filter_set_name     # name of crossover filter set to be 
+                            # activated automatically when the input
+                            # is selected
+
 a:
     gain: 0.0
     in_ports:
@@ -6,26 +23,26 @@ a:
     resampled: False
     xo: mp
 
-mpd:
-    gain: 0
-    in_ports:
-        - mpd_loop:output_1
-        - mpd_loop:output_2
-    resampled: False
-    xo: mp
-
-net:
-    gain: 0
-    in_ports:
-        - net:from_slave_1
-        - net:from_slave_2
-    resampled: False
-    xo: mp
-
-tdt:
-    gain: 0
-    in_ports:
-        - dvb_loop:output_1
-        - dvb_loop:output_2
-    resampled: False
-    xo: mp
+#mpd:
+#    gain: 0
+#    in_ports:
+#        - mpd_loop:output_1
+#        - mpd_loop:output_2
+#    resampled: False
+#    xo: mp
+#
+#net:
+#    gain: 0
+#    in_ports:
+#        - net:from_slave_1
+#        - net:from_slave_2
+#    resampled: False
+#    xo: mp
+#
+#tdt:
+#    gain: 0
+#    in_ports:
+#        - dvb_loop:output_1
+#        - dvb_loop:output_2
+#    resampled: False
+#    xo: mp
