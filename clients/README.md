@@ -1,3 +1,3 @@
 #### clients
-This is the place where all code related to pre.di.c clients goes.  
-Some ciients may not need any code here if all that thay need lies in their launch script, under the _scripts_ folder.
+This is the place where goes all code related to pre.di.c clients.  
+Some ciients may not need any code here if all that they need lies in their launch script, under the _scripts_ folder.
