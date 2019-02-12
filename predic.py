@@ -45,12 +45,13 @@ def read_scripts():
         # init a list of scripts to load
         scripts = []
         for line in scripts_file:
-            # skip commented lines
-            if line.strip()[0] == '#':
+            # skip blank lines
+            if not line.strip():
                 continue
-            # dispise options if incorrectly set
-            script = line.split()[0]
-            if script:
+            # skip commented lines
+            if line.strip()[0] != '#':
+                # dispise options if incorrectly set
+                script = line.split()[0]
                 scripts.append(script)
     return scripts
 
