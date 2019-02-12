@@ -240,24 +240,22 @@ def main(run_level):
         init_ecasound()
         init_server()
         # inboard players
-        if run_level in ['scripts', 'all']:
-            # launch external scripts, sources and clients
-            print('\n(startaudio): starting scripts...')
-            # allow comments in scripts list
-            for line in [ x for x in open(bp.script_list_path)
-                                if not '#' in x.strip()[0] ]:
-                # dispise options if incorrectly set
-                script = line.strip().split()[0]
-                path = f'{bp.scripts_folder}{script}'
-                try:
-                    p = Popen(f'{path} start'.split())
-                    print(f'pid {p.pid:4}: {script}')
-                    with open(f'{bp.pids_folder}{script}.pid', 'w') as pidfile:
-                        pidfile.write(f'{p.pid}')
-                except OSError as err:
-                    print(f'error launching script:\n\t{err}')
-                except:
-                    print(f'problem launching script {line}')
+    if run_level in ['scripts', 'all']:
+        # launch external scripts, sources and clients
+        print('\n(startaudio): starting scripts...')
+        scripts = pd.read_scripts()
+        for script in scripts:
+            try:
+                script_path = f'{bp.scripts_folder}{script}'
+                command = f'{script_path} start'
+                Popen(command.split())
+                print(f'pid {p.pid:4}: {script}')
+                with open(f'{bp.pids_folder}{script}.pid', 'w') as pidfile:
+                    pidfile.write(f'{p.pid}')
+            except OSError as err:
+                print(f'error launching script:\n\t{err}')
+            except:
+                print(f'problem launching script {script}')
         # restoring previous state
         init_state_settings()
         # restoring inputs
