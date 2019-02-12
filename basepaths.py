@@ -38,9 +38,6 @@ server_filename = 'server.py'
 config_filename = 'config.yml'
 state_filename = 'state.yml'
 inputs_filename = 'inputs.yml'
-channels_filename = 'DVB-T.yml'
-media_config_filename = 'media.ini'
-mcd_config_filename = 'mcd.ini'
 script_list_filename = 'scripts'
 
 speaker_filename = 'speaker.yml'
@@ -55,10 +52,6 @@ config_path = config_folder + config_filename
 state_path = config_folder + state_filename
 inputs_path = config_folder + inputs_filename
 script_list_path = config_folder + script_list_filename
-
-channels_path = config_folder + channels_filename
-media_config_path = config_folder + media_config_filename
-mcd_config_path = config_folder + mcd_config_filename
 
 # we still don't know the loudspeaker name, so speaker_path
 # is built downstream

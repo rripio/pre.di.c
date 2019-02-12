@@ -62,7 +62,6 @@ try:
     (speaker, target_mag_path, target_pha_path) = get_speaker()
     inputs = get_yaml(bp.inputs_path)
     state = get_yaml(bp.state_path)
-    channels = get_yaml(bp.channels_path)
 except:
     print('\nError: some config file failed to load')
     sys.exit()
