@@ -289,7 +289,6 @@ def show(throw_it=None, state=gc.state):
     print()
     print(f"Crossover set  {gc.state['XO_set']:>6s}")
     print(f"DRC set        {gc.state['DRC_set']:>6s}")
-    print(f"PEQ            {gc.state['PEQ_set']:>6s}")
 
     print()
     print(f"Input          {gc.state['input']:>6s}")

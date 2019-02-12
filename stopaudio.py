@@ -25,7 +25,7 @@
 """Stops predic audio system
     Usage:
     initaudio.py [ core | scripts | all ]   (default 'all')
-    core: jack, brutefir, ecasound, server
+    core: jack, brutefir, server
     scripts: everything else (players and clients)
     all: all of the above
 """
@@ -50,11 +50,6 @@ def main(run_level):
             pd.client_socket('shutdown')
         except:
             Popen (['pkill', '-9', '-f', bp.server_path]
-                                        , stdout=fnull, stderr=fnull)
-        # ecasound
-        if gc.config['load_ecasound']:
-            print('(stopaudio) stopping ecasound')
-            Popen (['killall', '-KILL', 'ecasound']
                                         , stdout=fnull, stderr=fnull)
         # brutefir
         print('(stopaudio) stopping brutefir')

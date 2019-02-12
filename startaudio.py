@@ -25,7 +25,7 @@
 """Starts predic audio system
     Usage:
     initaudio.py [ core | scripts | all ]   (default 'all')
-    core: jack, brutefir, ecasound, server
+    core: jack, brutefir, server
     players: everything else (players and clients)
     all: all of the above
 """
@@ -41,8 +41,6 @@ import stopaudio
 import predic as pd
 import basepaths as bp
 import getconfigs as gc
-
-if gc.config['load_ecasound']: import peq_control
 
 
 def limit_level(level_on_startup, max_level_on_startup):
@@ -98,28 +96,6 @@ def init_brutefir():
     else:
         print('\n(startaudio) error starting brutefir')
         sys.exit()
-
-def init_ecasound():
-    """loads ecasound"""
-
-    if gc.config['load_ecasound']:
-        import peq_control
-        print('\n(startaudio) starting ecasound')
-        ecsFile = (f"{bp.config_folder}PEQx{gc.config['ecasound_filters']}"
-                    f"_defeat_{gc.speaker['fs']}.ecs")
-        if not os.path.exists(ecsFile):
-            print('(startaudio) check ecasound_filters in config.ini')
-            print('(startaudio) error: cannot find ' + ecsFile)
-            sys.exit(-1)
-        ecsCmd = '-q --server -s:' + ecsFile
-        ecasound = Popen([gc.config['ecasound_path']] + ecsCmd.split())
-        # waiting for ecasound:
-        if  pd.wait4result('jack_lsp', 'ecasound', tmax=5, quiet=True):
-            print('(startaudio) ecasound started :-)')
-        else:
-            print('(startaudio) error starting ecasound')
-            sys.exit()
-
 
 def init_server():
     """loads server"""
@@ -189,14 +165,6 @@ def init_state_settings():
     pd.client_socket( 'drc ' + str( gc.state['DRC_set'] ) )
     # XO_set will be adjusted when restoring inputs
 
-    # restore PEQ_set
-    if gc.config['load_ecasound']:
-        peqSet  = gc.state['PEQ_set']
-        speaker,_,_ = gc.get_speaker()
-        peqFile = speaker['PEQ'][peqSet]
-        if peqFile != 'none':
-            peq_control.loadPEQini( peqFile )
-
 
 def init_inputs():
     """restore selected input as stored in state.ini"""
@@ -232,12 +200,11 @@ def init_inputs():
 
 def main(run_level):
 
-    # Jack, Brutefir, Ecasound, Server
+    # Jack, Brutefir, Server
     if run_level in ['core', 'all']:
         # load basic audio kernel
         init_jack()
         init_brutefir()
-        init_ecasound()
         init_server()
         # inboard players
     if run_level in ['scripts', 'all']:

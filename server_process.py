@@ -27,7 +27,6 @@ import jack
 import math as m
 import numpy as np
 
-import peq_control
 import basepaths as bp
 import getconfigs as gc
 import predic as pd
@@ -59,10 +58,7 @@ except:
     print('Failed to load EQ files')
     sys.exit(-1)
 # audio ports
-if gc.config['load_ecasound']:
-    audio_ports = gc.config['ecasound_ports']
-else:
-    audio_ports = gc.config['brutefir_ports']
+audio_ports = gc.config['brutefir_ports']
 # warnings
 warnings = []
 
@@ -84,8 +80,7 @@ def unplug_sources_of(jack_client, out_ports):
 
 def do_change_input(input_name, in_ports, out_ports, resampled=False):
     """ 'in_ports':   list [L,R] of jack capture ports of chosen source
-    'out_ports':  list of ports in 'audio_ports' variable
-                  depends on use of brutefir/ecasound """
+    'out_ports':  list of ports in 'audio_ports' variable"""
 
     monitor_ports = gc.config['jack_monitors'].split()
     # switch
@@ -135,7 +130,6 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
     # normally write state, but there are exceptions
     state_write = True
-    change_peq = False
     # control variable for switching to relative commands
     add = False
     # erase warnings
@@ -263,28 +257,6 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             except:
                 state['DRC_set'] = state_old['DRC_set']
                 warnings.append('Something went wrong when changing DRC state')
-        return state
-
-
-    def change_peq(PEQ_set, state=state):
-
-        state['PEQ_set'] = PEQ_set
-        try:
-            if PEQ_set in gc.speaker['PEQ']:
-                peqFile = gc.speaker['PEQ'][PEQ_set]
-                if peqFile == 'none':
-                    peq_control.PEQdefeat( gc.speaker['fs'] )
-                    # restore input connections because peq defeating causes
-                    # ecasaound input jack ports to be disconnected:
-                    change_input( state['input'], state )
-                else:
-                    peq_control.loadPEQini( peqFile )
-            else:
-                state['PEQ_set'] = state_old['PEQ_set']
-                print('bad PEQ name')
-        except:
-            state['PEQ_set'] = state_old['PEQ_set']
-            warnings.append('Something went wrong when changing PEQ state')
         return state
 
 
@@ -579,7 +551,6 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             'input':            change_input,
             'xo':               change_xovers,
             'drc':              change_drc,
-            'peq':              change_peq,
             'polarity':         change_polarity,
             'mono':             change_mono,
             'mute':             change_mute,
