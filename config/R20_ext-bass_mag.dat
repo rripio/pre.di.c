@@ -1,3 +1,16 @@
+# R20_ext-bass_mag.dat
+# 
+# List of magnitude values for a Baxandall bass tone control.
+#
+# Columns correspond to bass settings of an integer values series
+# from +6 to -6 dB.
+#
+# Rows correspond to frequency points in 'R20_ext-freq.dat' file.
+#
+# Frequency points are taken from R20 Renard series of preferred numbers
+# (https://en.wikipedia.org/wiki/Renard_series) with one aditional
+# frequency point at each end of the 20-20k audio band.
+ 
  5.99888658e+000 4.99909349e+000 3.99928858e+000 2.99947440e+000 1.99965336e+000 9.99827802e-001 0.00000000e+000 -9.99827802e-001 -1.99965336e+000 -2.99947440e+000 -3.99928858e+000 -4.99909349e+000 -5.99888658e+000
  5.99831009e+000 4.99862423e+000 3.99892037e+000 2.99920239e+000 1.99947399e+000 9.99738701e-001 0.00000000e+000 -9.99738701e-001 -1.99947399e+000 -2.99920239e+000 -3.99892037e+000 -4.99862423e+000 -5.99831009e+000
  5.99735082e+000 4.99784339e+000 3.99830768e+000 2.99874980e+000 1.99917552e+000 9.99590446e-001 0.00000000e+000 -9.99590446e-001 -1.99917552e+000 -2.99874980e+000 -3.99830768e+000 -4.99784339e+000 -5.99735082e+000

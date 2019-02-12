@@ -1,3 +1,16 @@
+# R20_ext-treble_mag.dat
+# 
+# List of magnitude values for a Baxandall treble tone control.
+#
+# Columns correspond to treble settings of an integer values series
+# from +6 to -6 dB.
+#
+# Rows correspond to frequency points in 'R20_ext-freq.dat' file.
+#
+# Frequency points are taken from R20 Renard series of preferred numbers
+# (https://en.wikipedia.org/wiki/Renard_series) with one aditional
+# frequency point at each end of the 20-20k audio band.
+
  1.08098775e-007 8.93075736e-008 7.09426032e-008 5.29150028e-008 3.51382471e-008 1.75277587e-008 0.00000000e+000 -1.75277192e-008 -3.51382897e-008 -5.29150041e-008 -7.09426192e-008 -8.93075263e-008 -1.08098779e-007
  1.38110676e-007 1.14045003e-007 9.05558549e-008 6.75225889e-008 4.48282183e-008 2.23582274e-008 0.00000000e+000 -2.23581898e-008 -4.48282330e-008 -6.75226203e-008 -9.05558472e-008 -1.14044974e-007 -1.38110686e-007
  1.81065107e-007 1.49421537e-007 1.18585566e-007 8.83877614e-008 5.86639104e-008 2.92538688e-008 0.00000000e+000 -2.92538323e-008 -5.86639214e-008 -8.83877854e-008 -1.18585595e-007 -1.49421504e-007 -1.81065128e-007

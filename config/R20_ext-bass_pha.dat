@@ -1,3 +1,16 @@
+# R20_ext-bass_pha.dat
+# 
+# List of phase values for a Baxandall bass tone control.
+#
+# Columns correspond to bass settings of an integer values series
+# from +6 to -6 dB.
+#
+# Rows correspond to frequency points in 'R20_ext-freq.dat' file.
+#
+# Frequency points are taken from R20 Renard series of preferred numbers
+# (https://en.wikipedia.org/wiki/Renard_series) with one aditional
+# frequency point at each end of the 20-20k audio band.
+
  -3.24477486e+000 -2.69947368e+000 -2.15663424e+000 -1.61575992e+000 -1.07635696e+000 -5.37933725e-001 0.00000000e+000 5.37933725e-001 1.07635696e+000 1.61575992e+000 2.15663424e+000 2.69947368e+000 3.24477486e+000
  -3.61618871e+000 -3.00837026e+000 -2.40334991e+000 -1.80056285e+000 -1.19944772e+000 -5.99445778e-001 0.00000000e+000 5.99445778e-001 1.19944772e+000 1.80056285e+000 2.40334991e+000 3.00837026e+000 3.61618871e+000
  -4.06631575e+000 -3.38269442e+000 -2.70229883e+000 -2.02447738e+000 -1.34858277e+000 -6.73970958e-001 0.00000000e+000 6.73970958e-001 1.34858277e+000 2.02447738e+000 2.70229883e+000 3.38269442e+000 4.06631575e+000

@@ -1,3 +1,12 @@
+# R20_ext-freq.dat
+# 
+# List of frequencies to be used with corresponding  values of magnitude and
+# phase from xxxx_mag.dat and xxxx_pha.dat files.
+#
+# Frequency points are taken from R20 Renard series of preferred numbers
+# (https://en.wikipedia.org/wiki/Renard_series) with one aditional
+# frequency point at each end of the 20-20k audio band.
+
 18
 20
 22.4

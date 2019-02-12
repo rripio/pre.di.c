@@ -1,3 +1,16 @@
+# R20_ext-treble_pha.dat
+# 
+# List of phase values for a Baxandall treble tone control.
+#
+# Columns correspond to treble settings of an integer values series
+# from +6 to -6 dB.
+#
+# Rows correspond to frequency points in 'R20_ext-freq.dat' file.
+#
+# Frequency points are taken from R20 Renard series of preferred numbers
+# (https://en.wikipedia.org/wiki/Renard_series) with one aditional
+# frequency point at each end of the 20-20k audio band.
+
  1.98468916e-001 1.65140083e-001 1.31948121e-001 9.88655195e-002 6.58648589e-002 3.29187877e-002 0.00000000e+000 -3.29187877e-002 -6.58648589e-002 -9.88655195e-002 -1.31948121e-001 -1.65140083e-001 -1.98468916e-001
  2.20523716e-001 1.83491200e-001 1.46610779e-001 1.09851883e-001 7.31840414e-002 3.65768617e-002 0.00000000e+000 -3.65768617e-002 -7.31840414e-002 -1.09851883e-001 -1.46610779e-001 -1.83491200e-001 -2.20523716e-001
  2.46990608e-001 2.05513470e-001 1.64206705e-001 1.23036066e-001 8.19674234e-002 4.09667312e-002 0.00000000e+000 -4.09667312e-002 -8.19674234e-002 -1.23036066e-001 -1.64206705e-001 -2.05513470e-001 -2.46990608e-001
