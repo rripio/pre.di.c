@@ -38,6 +38,24 @@ import basepaths as bp
 import getconfigs as gc
 
 
+def read_scripts():
+    """reads list of scripts to launch from config/scripts file"""
+
+    with open (bp.script_list_path) as scripts_file:
+        # init a list of scripts to load
+        scripts = []
+        for line in scripts_file:
+            # skip blank lines
+            if not line.strip():
+                continue
+            # skip commented lines
+            if line.strip()[0] != '#':
+                # dispise options if incorrectly set
+                script = line.split()[0]
+                scripts.append(script)
+    return scripts
+
+
 def start_pid(command, alias):
     """starts a program and writes its pid
     command: full path with options

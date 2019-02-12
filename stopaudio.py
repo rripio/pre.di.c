@@ -44,55 +44,41 @@ fnull = open(os.devnull, 'w')
 def main(run_level):
 
     if run_level in ['core', 'all']:
-
         # controlserver
         print('(stopaudio) stopping server')
         try:
             pd.client_socket('shutdown')
-#            time.sleep(1)
         except:
             Popen (['pkill', '-9', '-f', bp.server_path]
                                         , stdout=fnull, stderr=fnull)
-#            time.sleep(.5)
-
         # ecasound
         if gc.config['load_ecasound']:
             print('(stopaudio) stopping ecasound')
             Popen (['killall', '-KILL', 'ecasound']
                                         , stdout=fnull, stderr=fnull)
-
         # brutefir
         print('(stopaudio) stopping brutefir')
         Popen (['killall', gc.config['brutefir_path']]
                                         , stdout=fnull, stderr=fnull)
-
         # jack
         print('(stopaudio) stopping jackd')
         Popen (['killall', 'jackd'], stdout=fnull, stderr=fnull)
-#        time.sleep(gc.config['command_delay'])
-
     if run_level in ['scripts', 'all']:
-
         # stop external scripts, sources and clients
         print('(stopaudio) stopping scripts')
-        # allow comments in scripts list
-        for line in [ x for x in open(bp.script_list_path)
-                            if not '#' in x.strip()[0] ]:
-            # dispise options if incorrectly set
-            script = line.strip().split()[0]
-            script_path = f'{bp.scripts_folder}{script}'
-            print(script_path)
+        scripts = pd.read_scripts()
+        for script in scripts:
             try:
+                script_path = f'{bp.scripts_folder}{script}'
                 command = f'{script_path} stop'
                 Popen(command.split())
-#                time.sleep(gc.config['command_delay'])
+                # kills launching script
                 pd.kill_pid(script)
-#                time.sleep(gc.config['command_delay'])
                 pd.wait4result('pgrep -f ' + script, '', 5, quiet=True)
             except OSError as err:
                 print(f'error launching script:\n\t{err}')
             except:
-                print(f'problem launching script {line}:\n\t{err}')
+                print(f'problem launching script {script}:\n\t{err}')
 
 
 if __name__ == '__main__':
