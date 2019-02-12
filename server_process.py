@@ -436,17 +436,18 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
             loudness_max_i = (gc.config['loudness_SPLmax']
                                         - gc.config['loudness_SPLmin'])
+            loudness_variation = (gc.config['loudness_SPLmax']
+                                        - gc.config['loudness_SPLref'])
             if state['loudness_track']:
-                if (m.fabs(state['loudness_ref'])
-                        > gc.config['loudness_variation']):
+                if (m.fabs(state['loudness_ref']) > loudness_variation):
                     state['loudness_ref'] = m.copysign(
-                        gc.config['loudness_variation'], state['loudness_ref'])
+                            loudness_variation, state['loudness_ref'])
                 loudness_i = (gc.config['loudness_SPLmax']
                     - (state['level'] + gc.config['loudness_SPLref']
                                             + state['loudness_ref']))
             else:
                 # index of all zeros curve
-                loudness_i = gc.config['loudness_variation']
+                loudness_i = loudness_variation
             if loudness_i < 0:
                 loudness_i = 0
             if loudness_i > loudness_max_i:

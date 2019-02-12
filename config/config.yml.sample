@@ -101,7 +101,6 @@ loudness_SPLmax: 90
 loudness_SPLmin: 70
 # max dB deviation from 0
 tone_variation: 6
-loudness_variation: 7
 balance_variation: 6
 # jump between equalization curves (dB)
 # not yet implemented, given as an indication that must be assumed
