@@ -39,12 +39,16 @@ input "L", "R" {
 };
 
 output "fr.L", "fr.R" {
-	# mapping of 2 outputs
+	# mapping of 4 outputs
+    # woofers on 0,1 outputs in order to not fry
+    # tweeters by accident
 	device: "jack" { ports:
-	"system:playback_1"/"fr.L", "system:playback_2"/"fr.R";
+	"system:playback_1"/"w.L", "system:playback_2"/"w.R";
+	"system:playback_3"/"m.L", "system:playback_4"/"m.R";
+	"system:playback_5"/"t.L", "system:playback_6"/"t.R";
 	};
 	sample:   "AUTO";
-	channels: 2/0,1;
+	channels: 6/0,1,2,3,4,5;
 	maxdelay: 1000;
 	dither:   true;
     # 'samples' that are equivalent in 'ms' to 0,0
@@ -98,29 +102,85 @@ coeff "c.drc.2.R" {
 
 # XO-EQ
 
-coeff "c.xo.mp.fr.L" {
-	filename:    "xo-mp-fr-L.pcm";
+coeff "c.xo.mp.t.L" {
+	filename:    "xo-mp-t-L.pcm";
 	format:      "FLOAT_LE";
 	shared_mem:  false;
 	attenuation: 0;
 };
 
-coeff "c.xo.mp.fr.R" {
-	filename:    "xo-mp-fr-R.pcm";
+coeff "c.xo.mp.t.R" {
+	filename:    "xo-mp-t-R.pcm";
 	format:      "FLOAT_LE";
 	shared_mem:  false;
 	attenuation: 0;
 };
 
-coeff "c.xo.lp.fr.L" {
-	filename:    "xo-lp-fr-L.pcm";
+coeff "c.xo.mp.m.L" {
+	filename:    "xo-mp-m-L.pcm";
 	format:      "FLOAT_LE";
 	shared_mem:  false;
 	attenuation: 0;
 };
 
-coeff "c.xo.lp.fr.R" {
-	filename:    "xo-lp-fr-R.pcm";
+coeff "c.xo.mp.m.R" {
+	filename:    "xo-mp-m-R.pcm";
+	format:      "FLOAT_LE";
+	shared_mem:  false;
+	attenuation: 0;
+};
+
+coeff "c.xo.mp.w.L" {
+	filename:    "xo-mp-w-L.pcm";
+	format:      "FLOAT_LE";
+	shared_mem:  false;
+	attenuation: 0;
+};
+
+coeff "c.xo.mp.w.R" {
+	filename:    "xo-mp-w-R.pcm";
+	format:      "FLOAT_LE";
+	shared_mem:  false;
+	attenuation: 0;
+};
+
+coeff "c.xo.lp.t.L" {
+	filename:    "xo-mp-t-L.pcm";
+	format:      "FLOAT_LE";
+	shared_mem:  false;
+	attenuation: 0;
+};
+
+coeff "c.xo.lp.t.R" {
+	filename:    "xo-lp-t-R.pcm";
+	format:      "FLOAT_LE";
+	shared_mem:  false;
+	attenuation: 0;
+};
+
+coeff "c.xo.lp.m.L" {
+	filename:    "xo-lp-m-L.pcm";
+	format:      "FLOAT_LE";
+	shared_mem:  false;
+	attenuation: 0;
+};
+
+coeff "c.xo.lp.m.R" {
+	filename:    "xo-lp-m-R.pcm";
+	format:      "FLOAT_LE";
+	shared_mem:  false;
+	attenuation: 0;
+};
+
+coeff "c.xo.lp.w.L" {
+	filename:    "xo-lp-w-L.pcm";
+	format:      "FLOAT_LE";
+	shared_mem:  false;
+	attenuation: 0;
+};
+
+coeff "c.xo.lp.w.R" {
+	filename:    "xo-lp-w-R.pcm";
 	format:      "FLOAT_LE";
 	shared_mem:  false;
 	attenuation: 0;
@@ -163,16 +223,44 @@ filter "f.drc.R" {
 
 # XO
 
-filter "f.fr.L" {
+filter "f.t.L" {
 	from_filters: "f.drc.L";
-	to_outputs:   "fr.L"/0.0/1;
+	to_outputs:   "t.L"/0.0/1;
     # starts with mp XO-EQ
-	coeff:        "c.xo.mp.fr.L";
+	coeff:        "c.xo.mp.t.L";
 };
 
-filter "f.fr.R" {
+filter "f.t.R" {
 	from_filters: "f.drc.R";
-	to_outputs:   "fr.R"/0.0/1;
+	to_outputs:   "t.R"/0.0/1;
     # starts with mp XO-EQ
-	coeff:        "c.xo.mp.fr.R";
+	coeff:        "c.xo.mp.t.R";
+};
+
+filter "f.m.L" {
+	from_filters: "f.drc.L";
+	to_outputs:   "m.L"/0.0/1;
+    # starts with mp XO-EQ
+	coeff:        "c.xo.mp.m.L";
+};
+
+filter "f.m.R" {
+	from_filters: "f.drc.R";
+	to_outputs:   "m.R"/0.0/1;
+    # starts with mp XO-EQ
+	coeff:        "c.xo.mp.m.R";
+};
+
+filter "f.w.L" {
+	from_filters: "f.drc.L";
+	to_outputs:   "w.L"/0.0/1;
+    # starts with mp XO-EQ
+	coeff:        "c.xo.mp.w.L";
+};
+
+filter "f.w.R" {
+	from_filters: "f.drc.R";
+	to_outputs:   "w.R"/0.0/1;
+    # starts with mp XO-EQ
+	coeff:        "c.xo.mp.w.R";
 };
