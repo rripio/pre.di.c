@@ -18,7 +18,7 @@ You have been warned.
 
 #### example_1_ways
 
-This example can be used as template for a full range setup.
+This example can be used as a template for a full range setup.
 
 All impulse files provided are deltas that do not make any effective filtering, and are meant to be overwritten with the equalizing impulses of your choice.
 
@@ -26,7 +26,7 @@ The given structure allows for 2 room correction filter sets and 2 speaker equal
 
 #### example_2_ways
 
-This example can be used as template for a two ways speaker setup.
+This example can be used as a template for a two ways speaker setup.
 
 Example crossovers are provided at 3000 hz. There are two set of these, linear phase very sharp filters and minimum phase Linkwitz-Riley fourth order filters, without any added equalization. They are meant to be overwritten with the equalizing impulses of your choice.
 
@@ -36,6 +36,6 @@ The given structure allows for 2 room correction filter sets and 2 speaker equal
 
 #### example_3_ways
 
-This example can be used as template for a three ways speaker setup.
+This example can be used as a template for a three ways speaker setup.
 
 All that have been said on _the example_2_ways_ setup applies here, except the filters supplied have crossover points of 300 and 3000 hz.
