@@ -73,8 +73,6 @@ brutefir_ports: brutefir:input-0 brutefir:input-1
 
 ## net
 
-# predic IP address
-ip_address: 192.168.1.3
 # brutefir cli address and port
 bfcli_address: 127.0.0.1
 bfcli_port: 3000
