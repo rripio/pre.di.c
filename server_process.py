@@ -64,7 +64,7 @@ warnings = []
 
 
 def unplug_sources_of(jack_client, out_ports):
-    """ Disconnect clients from predic inputs and monitor inputs """
+    """disconnect clients from predic inputs and monitor inputs"""
 
     try:
         # sources_L = jack.get_connections(out_ports[0])
@@ -79,8 +79,8 @@ def unplug_sources_of(jack_client, out_ports):
 
 
 def do_change_input(input_name, in_ports, out_ports, resampled=False):
-    """ 'in_ports':   list [L,R] of jack capture ports of chosen source
-    'out_ports':  list of ports in 'audio_ports' variable"""
+    """'in_ports':   list [L,R] of jack capture ports of chosen source
+'out_ports':  list of ports in 'audio_ports' variable"""
 
     monitor_ports = gc.config['jack_monitors'].split()
     # switch

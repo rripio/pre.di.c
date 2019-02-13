@@ -20,7 +20,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Miscellanea of utility functions for use in predic scripts"""
+"""miscellanea of utility functions for use in predic scripts"""
 
 
 import socket
@@ -138,7 +138,7 @@ def jack_loop(clientname):
 
 
 def server_socket(host, port):
-    """Makes a socket for listening clients"""
+    """makes a socket for listening clients"""
 
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -164,7 +164,7 @@ def server_socket(host, port):
 
 
 def client_socket(data, quiet=True):
-    """Makes a socket for talking to the server"""
+    """makes a socket for talking to the server"""
 
     server = 'localhost'
     port = gc.config['control_port']
@@ -221,6 +221,7 @@ def wait4result(command, answer, tmax=4, quiet=False):
 
 
 def calc_gain(level, input):
+    """calculates gain from level, reference gain, and input gain"""
 
     input_gain = calc_input_gain(input)
     gain = (level + gc.speaker['ref_level_gain'] + input_gain)
@@ -235,7 +236,7 @@ def calc_level(gain, input):
 
 
 def calc_headroom(gain, balance, eq_mag):
-    """ calculate headroom from gain and equalizer """
+    """calculates headroom from gain and equalizer"""
 
     headroom = ( gc.config['gain_max'] - gain - np.max(eq_mag)
                     - abs(balance/2))
@@ -248,6 +249,7 @@ def calc_input_gain(input):
 
 
 def get_target():
+    """reads target file from disk"""
 
     # reload target, so we can change it for testing
     # overwriting the target files outside predic
@@ -258,7 +260,7 @@ def get_target():
 
 
 def show(throw_it=None, state=gc.state):
-    """ shows a status report """
+    """shows a status report"""
 
     gain = calc_gain(gc.state['level'] , gc.state['input'])
     headroom = calc_headroom(gain, gc.state['balance'], get_target()[0])
@@ -303,7 +305,7 @@ def show(throw_it=None, state=gc.state):
     return state
 
 def show_file(throw_it=None, state=gc.state):
-    """ writes a status report to temp file """
+    """writes a status report to temp file"""
 
     with open('/tmp/predic', 'w') as f:
         with cl.redirect_stdout(f):

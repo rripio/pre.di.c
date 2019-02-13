@@ -27,7 +27,7 @@ import basepaths as bp
 
 
 def get_yaml(filepath):
-    """ returns dictionary from yaml config file"""
+    """returns dictionary from yaml config file"""
 
     with open(filepath) as configfile:
         config_dict = yaml.load(configfile)
@@ -36,7 +36,7 @@ def get_yaml(filepath):
 
 
 def get_speaker():
-    """ returns speaker dictionary from yaml speaker config file"""
+    """returns speaker dictionary from yaml speaker config file"""
 
     # get main config file for getting loudspeaker name
     mainconfig =  get_yaml(bp.config_path)

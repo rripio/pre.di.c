@@ -129,8 +129,7 @@ def init_server():
 
 def init_state_settings():
     """restore audio settings as stored in state.yaml
-       and takes care of options to reset some of them
-    """
+and takes care of options to reset some of them"""
 
     # tone reset
     if gc.config['tone_reset_on_startup']:
@@ -199,6 +198,7 @@ def init_inputs():
 
 
 def main(run_level):
+    """main loading function"""
 
     # Jack, Brutefir, Server
     if run_level in ['core', 'all']:
