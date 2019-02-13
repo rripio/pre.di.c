@@ -24,9 +24,9 @@
 
 """Stops predic audio system
     Usage:
-    initaudio.py [ core | scripts | all ]   (default 'all')
+    stopaudio.py [ core | clients | all ]   (default 'all')
     core: jack, brutefir, server
-    scripts: everything else (players and clients)
+    clients: everything else (players and clients)
     all: all of the above
 """
 
@@ -58,22 +58,22 @@ def main(run_level):
         # jack
         print('(stopaudio) stopping jackd')
         Popen (['killall', 'jackd'], stdout=fnull, stderr=fnull)
-    if run_level in ['scripts', 'all']:
+    if run_level in ['clients', 'all']:
         # stop external scripts, sources and clients
-        print('(stopaudio) stopping scripts')
-        scripts = pd.read_scripts()
-        for script in scripts:
+        print('(stopaudio) stopping clients')
+        clients = pd.read_clients()
+        for client in clients:
             try:
-                script_path = f'{bp.scripts_folder}{script}'
-                command = f'{script_path} stop'
+                client_path = f'{bp.clients_folder}{client}'
+                command = f'{client_path} stop'
                 Popen(command.split())
                 # kills launching script
-                pd.kill_pid(script)
-                pd.wait4result('pgrep -f ' + script, '', 5, quiet=True)
+                pd.kill_pid(client)
+                pd.wait4result('pgrep -f ' + client, '', 5, quiet=True)
             except OSError as err:
-                print(f'error launching script:\n\t{err}')
+                print(f'error launching client:\n\t{err}')
             except:
-                print(f'problem launching script {script}:\n\t{err}')
+                print(f'problem launching client {client}:\n\t{err}')
 
 
 if __name__ == '__main__':

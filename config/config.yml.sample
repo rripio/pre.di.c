@@ -14,7 +14,7 @@ loudspeaker: example_1_way
 
 # system card
 # (full ALSA identifier hw:Tarjeta,Device)
-system_card: hw:USB,0
+system_card: hw:0,0
 # cards external to jack (space sepated string if many)
 # (full ALSA identifier hw:Tarjeta,Device)
 external_cards: ''

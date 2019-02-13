@@ -38,22 +38,22 @@ import basepaths as bp
 import getconfigs as gc
 
 
-def read_scripts():
-    """reads list of scripts to launch from config/scripts file"""
+def read_clients():
+    """reads list of programs to launch from config/clients file"""
 
-    with open (bp.script_list_path) as scripts_file:
-        # init a list of scripts to load
-        scripts = []
-        for line in scripts_file:
+    with open (bp.clients_list_path) as clients_file:
+        # init a list of clients to load
+        clients = []
+        for line in clients_file:
             # skip blank lines
             if not line.strip():
                 continue
             # skip commented lines
             if line.strip()[0] != '#':
                 # dispise options if incorrectly set
-                script = line.split()[0]
-                scripts.append(script)
-    return scripts
+                client = line.split()[0]
+                clients.append(client)
+    return clients
 
 
 def start_pid(command, alias):
@@ -72,17 +72,17 @@ def start_pid(command, alias):
         print(f'problem launching {alias}')
 
 
-def kill_pid(script):
-    """kills a script process after retrieving its saved pid"""
+def kill_pid(client):
+    """kills a client proccess after retrieving its saved pid"""
 
     try:
-        pid_path = f'{bp.pids_folder}{script}.pid'
+        pid_path = f'{bp.pids_folder}{client}.pid'
         with open(pid_path) as pidfile:
             pid = int(pidfile.readline())
             os.remove(pid_path)
             os.kill(pid, 9)
     except:
-        print(f'problem killing {script}')
+        print(f'problem killing {client}')
 
 def jack_loop(clientname):
     """creates a jack loop with given 'clientname'"""

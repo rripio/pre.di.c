@@ -28,7 +28,6 @@ main_folder = home_folder + 'pre.di.c/'
 bin_folder = main_folder
 config_folder = main_folder + 'config/'
 clients_folder = main_folder + 'clients/'
-scripts_folder = main_folder + 'scripts/'
 loudspeakers_folder = main_folder + 'loudspeakers/'
 pids_folder = main_folder + 'run/'
 
@@ -38,7 +37,7 @@ server_filename = 'server.py'
 config_filename = 'config.yml'
 state_filename = 'state.yml'
 inputs_filename = 'inputs.yml'
-script_list_filename = 'scripts'
+clients_list_filename = 'clients'
 
 speaker_filename = 'speaker.yml'
 
@@ -51,7 +50,7 @@ server_path = main_folder + server_filename
 config_path = config_folder + config_filename
 state_path = config_folder + state_filename
 inputs_path = config_folder + inputs_filename
-script_list_path = config_folder + script_list_filename
+clients_list_path = config_folder + clients_list_filename
 
 # we still don't know the loudspeaker name, so speaker_path
 # is built downstream

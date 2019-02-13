@@ -116,7 +116,6 @@ def start():
     #    The jack_loop module will keep the loop alive, so we need to thread it.
     jloop = threading.Thread( target = pd.jack_loop, args=('dvb_loop',) )
     jloop.start()
-    
     # 2. Mplayer DVB:
     opts = f'{options} -idle -slave -profile dvb -input file={dvb_fifo}'
     command = f'{mplayer_path} {opts}'

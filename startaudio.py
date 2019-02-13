@@ -24,7 +24,7 @@
 
 """Starts predic audio system
     Usage:
-    initaudio.py [ core | scripts | all ]   (default 'all')
+    startaudio.py [ core | clients | all ]   (default 'all')
     core: jack, brutefir, server
     players: everything else (players and clients)
     all: all of the above
@@ -207,22 +207,22 @@ def main(run_level):
         init_brutefir()
         init_server()
         # inboard players
-    if run_level in ['scripts', 'all']:
-        # launch external scripts, sources and clients
-        print('\n(startaudio): starting scripts...')
-        scripts = pd.read_scripts()
-        for script in scripts:
+    if run_level in ['clients', 'all']:
+        # launch external clients, sources and clients
+        print('\n(startaudio): starting clients...')
+        clients = pd.read_clients()
+        for client in clients:
             try:
-                script_path = f'{bp.scripts_folder}{script}'
-                command = f'{script_path} start'
+                client_path = f'{bp.clients_folder}{client}'
+                command = f'{client_path} start'
                 Popen(command.split())
-                print(f'pid {p.pid:4}: {script}')
-                with open(f'{bp.pids_folder}{script}.pid', 'w') as pidfile:
+                print(f'pid {p.pid:4}: {client}')
+                with open(f'{bp.pids_folder}{client}.pid', 'w') as pidfile:
                     pidfile.write(f'{p.pid}')
             except OSError as err:
-                print(f'error launching script:\n\t{err}')
+                print(f'error launching client:\n\t{err}')
             except:
-                print(f'problem launching script {script}')
+                print(f'problem launching client {client}')
         # restoring previous state
         init_state_settings()
         # restoring inputs
