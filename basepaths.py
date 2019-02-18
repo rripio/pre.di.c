@@ -22,9 +22,13 @@
 
 ## customizable initial values
 
+import os
+
+
 # folders
-home_folder = '/home/predic/'
-main_folder = home_folder + 'pre.di.c/'
+# main folder is the folder this very module is run from
+# allways put a slash after a folder name
+main_folder = f'{os.path.dirname(__file__)}/'
 bin_folder = main_folder
 config_folder = main_folder + 'config/'
 clients_folder = main_folder + 'clients/'

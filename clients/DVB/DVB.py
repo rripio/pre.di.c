@@ -41,14 +41,18 @@ import predic as pd
 # -really-quiet: silent
 options = '-quiet -nolirc'
 # command fifo filename
-dvb_fifo = '.mplayer/dvb_fifo'
+dvb_fifo = 'dvb_fifo'
 # mplayer path:
 mplayer_path = '/usr/bin/mplayer'
 # name used for info and pid saving
 program_alias = 'mplayer-dvb'
 
 # initialize
-dvb_fifo = bp.home_folder + dvb_fifo
+# get program folder for subsequent aux files finding
+# allways put a slash after directories
+dvb_folder = f'{os.path.dirname(sys.argv[0])}/'
+dvb_fifo = dvb_folder + dvb_fifo
+
 
 
 def select_channel(channel_name):
