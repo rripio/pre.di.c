@@ -2,12 +2,12 @@
 
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
-# Copyright (C) 2018 Roberto Ripio
+# Copyright (C) 2018-2019 Roberto Ripio
 #
 # pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
-# Copyright (c) 2006-2011 Roberto Ripio
-# Copyright (c) 2011-2016 Alberto Miguélez
-# Copyright (c) 2016-2018 Rafael Sánchez
+# Copyright (C) 2006-2011 Roberto Ripio
+# Copyright (C) 2011-2016 Alberto Miguélez
+# Copyright (C) 2016-2018 Rafael Sánchez
 #
 # pre.di.c is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Starts predic audio system
+"""Starts pre.di.c audio system
     Usage:
     startaudio.py [ core | clients | all ]   (default 'all')
     core: jack, brutefir, server

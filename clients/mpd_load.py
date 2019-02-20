@@ -2,12 +2,12 @@
 
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
-# Copyright (C) 2018 Roberto Ripio
+# Copyright (C) 2018-2019 Roberto Ripio
 #
 # pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
-# Copyright (c) 2006-2011 Roberto Ripio
-# Copyright (c) 2011-2016 Alberto Miguélez
-# Copyright (c) 2016-2018 Rafael Sánchez
+# Copyright (C) 2006-2011 Roberto Ripio
+# Copyright (C) 2011-2016 Alberto Miguélez
+# Copyright (C) 2016-2018 Rafael Sánchez
 #
 # pre.di.c is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
     return client
 
 
-def set_predic_vol_loop(c):
+def set_predic_vol_loop(C):
     """loop: reads mpd volume, sets predic volume"""
 
     while True:
@@ -119,7 +119,7 @@ def start():
             c = connect_mpd('localhost', 6600)
             c.timeout = 10
             c.idletimeout = None
-            set_predic_vol_loop(c)
+            set_predic_vol_loop(C)
             c.close()
             c.disconnect()
         except:
