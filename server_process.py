@@ -283,27 +283,28 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
         return state
 
 
-    def change_mono(mono, state=state):
+    def change_midside(midside, state=state):
 
-        try:
-            state['mono'] = {
-                'on':       True,
-                'off':      False,
-                'toggle':   not state['mono']
-                }[mono]
-        except KeyError:
-            state['mono'] = state_old['mono']
-            warnings.append('Option ' + arg + ' incorrect')
-            return state
-        try:
-            if state['mono']:
-                bf_cli('cffa 2 0 m0.5 ; cffa 2 1 m0.5 '
-                       '; cffa 3 1 m0.5 ; cffa 3 0 m0.5')
-            else:
-                bf_cli('cffa 2 0 m1 ; cffa 2 1 m0 ; cffa 3 1 m1 ; cffa 3 0 m0')
-        except:
-            state['mono'] = state_old['mono']
-            warnings.append('Something went wrong when changing mono state')
+        if midside in ['mid', 'side', 'off']:
+            state['midside'] = midside
+            try:
+                if state['midside']=='mid':
+                    bf_cli('cffa 2 0 m0.5 ; cffa 2 1 m0.5 '
+                            '; cffa 3 0 m0.5 ; cffa 3 1 m0.5')
+                elif state['midside']=='side':
+                    bf_cli('cffa 2 0 m1 ; cffa 2 1 m-1 '
+                            '; cffa 3 0 m1 ; cffa 3 1 m-1')
+                else:
+                    bf_cli('cffa 2 0 m1 ; cffa 2 1 m0 '
+                            '; cffa 3 0 m0 ; cffa 3 1 m1')
+            except:
+                state['midside'] = state_old['midside']
+                warnings.append('Something went wrong when changing '
+                                'midside state')
+        else:
+            state['midside'] = state_old['midside']
+            warnings.append('bad midside option: has to be "mid", "side"'
+                                'or "off"')
         return state
 
 
@@ -553,7 +554,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             'xo':               change_xovers,
             'drc':              change_drc,
             'polarity':         change_polarity,
-            'mono':             change_mono,
+            'midside':          change_midside,
             'mute':             change_mute,
             'loudness_track':   change_loudness_track,
             'loudness_ref':     change_loudness_ref,

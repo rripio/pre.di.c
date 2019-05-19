@@ -151,12 +151,11 @@ and takes care of options to reset some of them"""
         pd.client_socket('loudness_track '
             + ('on' if gc.state['loudness_track'] else 'off'))
         pd.client_socket('loudness_ref ' + str(gc.state['loudness_ref']))
-    # mono reset
-    if gc.config['mono_reset_on_startup']:
-        pd.client_socket('mono off')
+    # midside reset
+    if gc.config['midside_reset_on_startup']:
+        pd.client_socket('midside off')
     else:
-        pd.client_socket('mono '
-            + ('on' if gc.state['mono'] else 'off'))
+        pd.client_socket('midside ' + str(gc.state['midside']))
     # optional limited volume on start
     limit_level(gc.config['level_on_startup']
                 , gc.config['max_level_on_startup'])
