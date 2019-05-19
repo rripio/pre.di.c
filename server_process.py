@@ -262,24 +262,17 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
     def change_polarity(polarity, state=state):
 
-        if polarity in ['+', '-', 'toggle']:
-            if polarity == 'toggle':
-                polarity = {
-                    '+': '-',
-                    '-': '+'
-                    }[state['polarity']]
+        if polarity in ['+', '-', '+-', '-+']:
             state['polarity'] = polarity
             try:
-                bf_cli('cfia 0 0 m' + polarity + '1 '
-                     '; cfia 1 1 m' + polarity + '1')
                 state = change_gain(gain)
             except:
                 state['polarity'] = state_old['polarity']
                 warnings.append('Something went wrong when changing polarity state')
         else:
             state['polarity'] = state_old['polarity']
-            warnings.append('bad polarity option: has to be "+", "-"'
-                                'or "toggle"')
+            warnings.append('bad polarity option: has to be "+", "-", "+-" '
+                                'or "-+"')
         return state
 
 
@@ -504,11 +497,14 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             bf_atten_dB_1 = bf_atten_dB_1 + (state['balance'] / 2)
             # from dB to multiplier to implement easily
             # polarity and mute
-            m_polarity = {'+': 1, '-': -1}[state['polarity']]
+            m_polarity_0 = {'+': 1, '-': -1,
+                             '+-': 1, '-+': -1}[state['polarity']]
+            m_polarity_1 = {'+': 1, '-': -1,
+                             '+-': -1, '-+': 1}[state['polarity']]
             m_muted = float(not state['muted'])
-            m_gain = lambda x: m.pow(10, x/20) * m_polarity * m_muted
-            m_gain_0 = m_gain(bf_atten_dB_0)
-            m_gain_1 = m_gain(bf_atten_dB_1)
+            m_gain = lambda x: m.pow(10, x/20) * m_muted
+            m_gain_0 = m_gain(bf_atten_dB_0) * m_polarity_0
+            m_gain_1 = m_gain(bf_atten_dB_1) * m_polarity_1
             # commit final gain change
             bf_cli('cfia 0 0 m' + str(m_gain_0)
               + ' ; cfia 1 1 m' + str(m_gain_1))
