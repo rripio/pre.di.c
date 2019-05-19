@@ -277,11 +277,8 @@ def show(throw_it=None, state=gc.state):
     muted = ('(muted)' if gc.state['muted'] else ' ')
     print(f"Level          {gc.state['level']: 6.1f}", muted)
     print(f"Balance        {gc.state['balance']: 6.1f}")
-    print(f"Polarity            {gc.state['polarity']:6}")
-    if gc.state['mono']:
-        print(f"Mono           {'on':>6s}")
-    else:
-        print(f"Mono           {'off':>6s}")
+    print(f"Polarity       {gc.state['polarity']:>6s}")
+    print(f"Midside        {gc.state['midside']:>6s}")
 
     print()
     print(f"Bass           {gc.state['bass']: 6.1f}")

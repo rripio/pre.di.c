@@ -37,7 +37,7 @@ gain_max: 6
 tone_reset_on_startup : False
 balance_reset_on_startup : False
 loudness_reset_on_startup : False
-mono_reset_on_startup: False
+midside_reset_on_startup: False
 # volume settings on startup. assign null to not set
 level_on_startup: null
 # max Volume on startup. Leave blank to not set

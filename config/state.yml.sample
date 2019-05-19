@@ -6,7 +6,7 @@ input: a
 level: -12.0
 loudness_ref: 0.0
 loudness_track: false
-mono: false
+midside: 'off'
 muted: true
 polarity: +
 treble: 0
