@@ -285,9 +285,9 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                     bf_cli('cffa 2 0 m0.5 ; cffa 2 1 m0.5 '
                             '; cffa 3 0 m0.5 ; cffa 3 1 m0.5')
                 elif state['midside']=='side':
-                    bf_cli('cffa 2 0 m1 ; cffa 2 1 m-1 '
-                            '; cffa 3 0 m1 ; cffa 3 1 m-1')
-                else:
+                    bf_cli('cffa 2 0 m0.5 ; cffa 2 1 m-0.5 '
+                            '; cffa 3 0 m0.5 ; cffa 3 1 m-0.5')
+                elif state['midside']=='off':
                     bf_cli('cffa 2 0 m1 ; cffa 2 1 m0 '
                             '; cffa 3 0 m0 ; cffa 3 1 m1')
             except:
@@ -303,41 +303,33 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
     def change_mute(mute, state=state):
 
-        try:
-            state['muted'] = {
-                'on':       True,
-                'off':      False,
-                'toggle':   not state['muted']
-                }[mute]
-        except KeyError:
+        if mute in ['on', 'off']:
+            state['muted'] = mute
+            try:
+                state = change_gain(gain)
+            except:
+                state['muted'] = state_old['muted']
+                warnings.append('Something went wrong '
+                                'when changing mute state')
+        else:
             state['muted'] = state_old['muted']
-            warnings.append('Option ' + arg + ' incorrect')
-            return state
-        try:
-            state = change_gain(gain)
-        except:
-            state['muted'] = state_old['muted']
-            warnings.append('Something went wrong when changing mute state')
+            warnings.append('bad mute option: has to be "on" or "off"')
         return state
 
 
     def change_loudness_track(loudness_track, state=state):
 
-        try:
-            state['loudness_track'] = {
-                'on':       True,
-                'off':      False,
-                'toggle':   not state['loudness_track']
-                }[loudness_track]
-        except KeyError:
-            state['loudness_track'] = state_old['loudness_track']
-            warnings.append('Option ' + arg + ' incorrect')
-            return state
-        try:
-            state = change_gain(gain)
-        except:
-            state['loudness_track'] = state_old['loudness_track']
-            warnings.append('Something went wrong when changing loudness_track state')
+        if loudness_track in ['on', 'off']:
+            state['loudness_track'] = loudness_track
+            try:
+                state = change_gain(gain)
+            except:
+                state['loudness_track'] = state_old['loudness_track']
+                warnings.append('Something went wrong when changing loudness_track state')
+        else:
+            state['muted'] = state_old['muted']
+            warnings.append('bad loudness_track option: '
+                                'has to be "on" or "off"')
         return state
 
 
@@ -432,7 +424,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                                         - gc.config['loudness_SPLmin'])
             loudness_variation = (gc.config['loudness_SPLmax']
                                         - gc.config['loudness_SPLref'])
-            if state['loudness_track']:
+            if state['loudness_track'] == 'on':
                 if (m.fabs(state['loudness_ref']) > loudness_variation):
                     state['loudness_ref'] = m.copysign(
                             loudness_variation, state['loudness_ref'])
@@ -501,7 +493,8 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                              '+-': 1, '-+': -1}[state['polarity']]
             m_polarity_1 = {'+': 1, '-': -1,
                              '+-': -1, '-+': 1}[state['polarity']]
-            m_muted = float(not state['muted'])
+            m_muted = {'on': 0, 'off': 1}[state['muted']]
+#            m_muted = float(not state['muted'])
             m_gain = lambda x: m.pow(10, x/20) * m_muted
             m_gain_0 = m_gain(bf_atten_dB_0) * m_polarity_0
             m_gain_1 = m_gain(bf_atten_dB_1) * m_polarity_1
