@@ -148,8 +148,7 @@ and takes care of options to reset some of them"""
         pd.client_socket('loudness_track off')
         pd.client_socket('loudness_ref 0')
     else:
-        pd.client_socket('loudness_track '
-            + ('on' if gc.state['loudness_track'] else 'off'))
+        pd.client_socket('loudness_track ' gc.state['loudness_track'])
         pd.client_socket('loudness_ref ' + str(gc.state['loudness_ref']))
     # midside reset
     if gc.config['midside_reset_on_startup']:

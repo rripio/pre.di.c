@@ -265,7 +265,8 @@ def show(throw_it=None, state=gc.state):
     gain = calc_gain(gc.state['level'] , gc.state['input'])
     headroom = calc_headroom(gain, gc.state['balance'], get_target()[0])
     input_gain = calc_input_gain(gc.state['input'])
-    tracking_loud = (' ' if gc.state['loudness_track'] else '(tracking off)')
+    tracking_loud = (' ' if gc.state['loudness_track'] == 'on'
+                                            else '(tracking off)')
 
     print()
     print(f"Loudspeaker is {gc.config['loudspeaker']}")
@@ -274,7 +275,7 @@ def show(throw_it=None, state=gc.state):
     print(f"Ref level gain {gc.speaker['ref_level_gain']: 6.1f}")
 
     print()
-    muted = ('(muted)' if gc.state['muted'] else ' ')
+    muted = ('(muted)' if gc.state['muted']=='on' else ' ')
     print(f"Level          {gc.state['level']: 6.1f}", muted)
     print(f"Balance        {gc.state['balance']: 6.1f}")
     print(f"Polarity       {gc.state['polarity']:>6s}")
