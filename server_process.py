@@ -287,7 +287,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                 elif state['midside']=='side':
                     bf_cli('cffa 2 0 m1 ; cffa 2 1 m-1 '
                             '; cffa 3 0 m1 ; cffa 3 1 m-1')
-                else:
+                elif state['midside']=='mid':
                     bf_cli('cffa 2 0 m1 ; cffa 2 1 m0 '
                             '; cffa 3 0 m0 ; cffa 3 1 m1')
             except:
