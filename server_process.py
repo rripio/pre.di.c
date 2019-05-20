@@ -282,14 +282,14 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             state['midside'] = midside
             try:
                 if state['midside']=='mid':
-                    bf_cli('cffa 2 0 m0.5 ; cffa 2 1 m0.5 '
-                            '; cffa 3 0 m0.5 ; cffa 3 1 m0.5')
+                    bf_cli('cfia 0 0 m0.5 ; cfia 0 1 m0.5 '
+                            '; cfia 1 0 m0.5 ; cfia 1 1 m0.5')
                 elif state['midside']=='side':
-                    bf_cli('cffa 2 0 m0.5 ; cffa 2 1 m-0.5 '
-                            '; cffa 3 0 m0.5 ; cffa 3 1 m-0.5')
+                    bf_cli('cfia 0 0 m0.5 ; cfia 0 1 m-0.5 '
+                            '; cfia 1 0 m0.5 ; cfia 1 1 m-0.5')
                 elif state['midside']=='off':
-                    bf_cli('cffa 2 0 m1 ; cffa 2 1 m0 '
-                            '; cffa 3 0 m0 ; cffa 3 1 m1')
+                    bf_cli('cfia 0 0 m1 ; cfia 0 1 m0 '
+                            '; cfia 1 0 m0 ; cfia 1 1 m1')
             except:
                 state['midside'] = state_old['midside']
                 warnings.append('Something went wrong when changing '
@@ -303,7 +303,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
     def change_mute(mute, state=state):
 
-        if mute in ['on', 'off']:
+        if mute in ['on', 'off', 'l', 'r']:
             state['muted'] = mute
             try:
                 state = change_gain(gain)
@@ -493,14 +493,15 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                              '+-': 1, '-+': -1}[state['polarity']]
             m_polarity_1 = {'+': 1, '-': -1,
                              '+-': -1, '-+': 1}[state['polarity']]
-            m_muted = {'on': 0, 'off': 1}[state['muted']]
+            m_muted_0 = {'on': 0, 'off': 1, 'l': 0, 'r': 1}[state['muted']]
+            m_muted_1 = {'on': 0, 'off': 1, 'l': 1, 'r': 0}[state['muted']]
 #            m_muted = float(not state['muted'])
-            m_gain = lambda x: m.pow(10, x/20) * m_muted
-            m_gain_0 = m_gain(bf_atten_dB_0) * m_polarity_0
-            m_gain_1 = m_gain(bf_atten_dB_1) * m_polarity_1
+            m_gain = lambda x: m.pow(10, x/20)
+            m_gain_0 = m_gain(bf_atten_dB_0) * m_polarity_0 * m_muted_0
+            m_gain_1 = m_gain(bf_atten_dB_1) * m_polarity_1 * m_muted_1
             # commit final gain change
-            bf_cli('cfia 0 0 m' + str(m_gain_0)
-              + ' ; cfia 1 1 m' + str(m_gain_1))
+            bf_cli('cffa 2 0 m' + str(m_gain_0)
+              + ' ; cffa 3 1 m' + str(m_gain_1))
 
 
         # backs up actual gain
