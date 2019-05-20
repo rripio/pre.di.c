@@ -195,28 +195,28 @@ coeff "c.xo.lp.w.R" {
 #EQ
 
 filter "f.eq.L" {
-	from_inputs:  "L";
-	to_filters:   "f.drc.L","f.drc.R";
+    from_inputs:  "L"//1,"R"//0;
+    to_filters:   "f.drc.L";
 	coeff:        "c.eq";
 };
 
 filter "f.eq.R" {
-	from_inputs:  "R";
-	to_filters:   "f.drc.R","f.drc.L";
+    from_inputs:  "L"//0,"R"//1;
+    to_filters:   "f.drc.R";
 	coeff:        "c.eq";
 };
 
 # DRC
 
 filter "f.drc.L" {
-	from_filters: "f.eq.L"//1,"f.eq.R"//0;
-	to_filters:   "f.fr.L";
+    from_filters: "f.eq.L";
+	to_filters:   "f.t.L","f.m.L","f.w.L";
 	coeff:        -1;
 };
 
 filter "f.drc.R" {
-	from_filters: "f.eq.R"//1,"f.eq.L"//0;
-	to_filters:   "f.fr.R";
+    from_filters: "f.eq.R";
+	to_filters:   "f.t.R","f.m.R","f.w.R";
     # starts without DRC EQ
 	coeff:        -1;
 };
