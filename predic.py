@@ -265,8 +265,6 @@ def show(throw_it=None, state=gc.state):
     gain = calc_gain(gc.state['level'] , gc.state['input'])
     headroom = calc_headroom(gain, gc.state['balance'], get_target()[0])
     input_gain = calc_input_gain(gc.state['input'])
-    tracking_loud = (' ' if gc.state['loudness_track'] == 'on'
-                                            else '(tracking off)')
 
     print()
     print(f"Loudspeaker is {gc.config['loudspeaker']}")
@@ -275,8 +273,8 @@ def show(throw_it=None, state=gc.state):
     print(f"Ref level gain {gc.speaker['ref_level_gain']: 6.1f}")
 
     print()
-    muted = ('(muted)' if gc.state['muted']=='on' else ' ')
-    print(f"Level          {gc.state['level']: 6.1f}", muted)
+    print(f"Level          {gc.state['level']: 6.1f}")
+    print(f"Mute           {gc.state['muted']:>6s}")
     print(f"Balance        {gc.state['balance']: 6.1f}")
     print(f"Polarity       {gc.state['polarity']:>6s}")
     print(f"Midside        {gc.state['midside']:>6s}")
@@ -284,7 +282,8 @@ def show(throw_it=None, state=gc.state):
     print()
     print(f"Bass           {gc.state['bass']: 6.1f}")
     print(f"Treble         {gc.state['treble']: 6.1f}")
-    print(f"Loudness ref   {gc.state['loudness_ref']: 6.1f}", tracking_loud)
+    print(f"Loudness       {gc.state['loudness_track']:>6s}")
+    print(f"Loudness ref   {gc.state['loudness_ref']: 6.1f}")
 
     print()
     print(f"Crossover set  {gc.state['XO_set']:>6s}")
