@@ -28,8 +28,8 @@ import time
 import os
 import yaml
 
+import control
 import basepaths as bp
-import server_process as sp
 import getconfigs as gc
 import predic as pd
 
@@ -91,9 +91,9 @@ if __name__ == '__main__':
                 sys.exit(1)
             else:
                 # command received in 'data',
-                # then send command to server_process.py,
+                # then send command to control.py,
                 # that answers with state dict
-                (state, warnings) = (sp.proccess_commands
+                (state, warnings) = (control.proccess_commands
                                                 (data, state))
                 # writes state file
                 try:
