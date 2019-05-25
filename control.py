@@ -303,17 +303,33 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
     def change_mute(mute, state=state):
 
-        if mute in ['on', 'off', 'l', 'r']:
-            state['muted'] = mute
+        if mute in ['on', 'off']:
+            state['mute'] = mute
             try:
                 state = change_gain(gain)
             except:
-                state['muted'] = state_old['muted']
+                state['mute'] = state_old['mute']
                 warnings.append('Something went wrong '
                                 'when changing mute state')
         else:
-            state['muted'] = state_old['muted']
+            state['mute'] = state_old['mute']
             warnings.append('bad mute option: has to be "on" or "off"')
+        return state
+
+
+    def change_solo(solo, state=state):
+
+        if solo in ['off', 'l', 'r']:
+            state['solo'] = solo
+            try:
+                state = change_gain(gain)
+            except:
+                state['solo'] = state_old['solo']
+                warnings.append('Something went wrong '
+                                'when changing solo state')
+        else:
+            state['solo'] = state_old['solo']
+            warnings.append('bad solo option: has to be "l" or "r"')
         return state
 
 
@@ -327,7 +343,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                 state['loudness_track'] = state_old['loudness_track']
                 warnings.append('Something went wrong when changing loudness_track state')
         else:
-            state['muted'] = state_old['muted']
+            state['mute'] = state_old['mute']
             warnings.append('bad loudness_track option: '
                                 'has to be "on" or "off"')
         return state
@@ -479,29 +495,34 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
         def commit_gain():
 
-            bf_atten_dB_0 = gain
-            bf_atten_dB_1 = gain
+            bf_atten_dB_l = gain
+            bf_atten_dB_r = gain
             # add balance dB gains
             if abs(state['balance']) > gc.config['balance_variation']:
                 state['balance'] = m.copysign(
                         gc.config['balance_variation'] ,state['balance'])
-            bf_atten_dB_0 = bf_atten_dB_0 - (state['balance'] / 2)
-            bf_atten_dB_1 = bf_atten_dB_1 + (state['balance'] / 2)
+            bf_atten_dB_l = bf_atten_dB_l - (state['balance'] / 2)
+            bf_atten_dB_r = bf_atten_dB_r + (state['balance'] / 2)
             # from dB to multiplier to implement easily
             # polarity and mute
-            m_polarity_0 = {'+': 1, '-': -1,
+            #
+            # then channel gains are the product of
+            # gain, polarity, mute and solo
+            m_mute = {'on': 0, 'off': 1}[state['mute']]
+            m_polarity_l = {'+': 1, '-': -1,
                              '+-': 1, '-+': -1}[state['polarity']]
-            m_polarity_1 = {'+': 1, '-': -1,
+            m_polarity_r = {'+': 1, '-': -1,
                              '+-': -1, '-+': 1}[state['polarity']]
-            m_muted_0 = {'on': 0, 'off': 1, 'l': 0, 'r': 1}[state['muted']]
-            m_muted_1 = {'on': 0, 'off': 1, 'l': 1, 'r': 0}[state['muted']]
-#            m_muted = float(not state['muted'])
-            m_gain = lambda x: m.pow(10, x/20)
-            m_gain_0 = m_gain(bf_atten_dB_0) * m_polarity_0 * m_muted_0
-            m_gain_1 = m_gain(bf_atten_dB_1) * m_polarity_1 * m_muted_1
+            m_solo_l  = {'off': 1, 'l': 1, 'r': 0}[state['solo']]
+            m_solo_r  = {'off': 1, 'l': 0, 'r': 1}[state['solo']]
+            m_gain = lambda x: m.pow(10, x/20) * m_mute
+            m_gain_l = (m_gain(bf_atten_dB_l)
+                            * m_polarity_l * m_solo_l)
+            m_gain_r = (m_gain(bf_atten_dB_r)
+                            * m_polarity_r * m_solo_r)
             # commit final gain change
-            bf_cli('cffa 2 0 m' + str(m_gain_0)
-              + ' ; cffa 3 1 m' + str(m_gain_1))
+            bf_cli('cffa 2 0 m' + str(m_gain_l)
+                        + ' ; cffa 3 1 m' + str(m_gain_r))
 
 
         # backs up actual gain
@@ -546,6 +567,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             'polarity':         change_polarity,
             'midside':          change_midside,
             'mute':             change_mute,
+            'solo':             change_solo,
             'loudness_track':   change_loudness_track,
             'loudness_ref':     change_loudness_ref,
             'treble':           change_treble,

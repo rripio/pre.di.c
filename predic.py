@@ -274,7 +274,8 @@ def show(throw_it=None, state=gc.state):
 
     print()
     print(f"Level          {gc.state['level']: 6.1f}")
-    print(f"Mute           {gc.state['muted']:>6s}")
+    print(f"Mute           {gc.state['mute']:>6s}")
+    print(f"Solo           {gc.state['solo']:>6s}")
     print(f"Balance        {gc.state['balance']: 6.1f}")
     print(f"Polarity       {gc.state['polarity']:>6s}")
     print(f"Midside        {gc.state['midside']:>6s}")
