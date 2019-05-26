@@ -329,7 +329,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                                 'when changing solo state')
         else:
             state['solo'] = state_old['solo']
-            warnings.append('bad solo option: has to be "l" or "r"')
+            warnings.append('bad solo option: has to be "l", "r" or "off"')
         return state
 
 
