@@ -48,7 +48,7 @@ def main(run_level):
         # controlserver
         print('(stopaudio) stopping server')
         try:
-            pd.client_socket('shutdown')
+            pd.client_socket('quit')
         except:
             Popen (['pkill', '-9', '-f', bp.server_path]
                                         , stdout=fnull, stderr=fnull)

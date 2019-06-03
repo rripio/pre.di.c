@@ -114,7 +114,7 @@ def init_server():
         try:
             # we must use close() to stop connection
             # and watch till no exception
-            pd.client_socket('quit')
+            pd.client_socket('status')
             break
         except:
             pass
