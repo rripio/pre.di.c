@@ -547,7 +547,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
         # if not enough headroom tries lowering gain
         else:
             change_gain(gain + headroom)
-            print('headroom hitted, lowering gain...')
+            print('headroom hit, lowering gain...')
         return state
     # end of change_gain()
 
