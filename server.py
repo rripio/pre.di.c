@@ -48,12 +48,9 @@ async def handle_commands(reader, writer):
             writer.write(yaml.dump(state, default_flow_style=False).encode())
             writer.write(b'OK\n')
             await writer.drain()
-        elif data.rstrip('\r\n') == 'quit':
-            writer.write(b'OK\n')
-            await writer.drain()
             if gc.config['server_output'] > 1:
                 print('(server) closing connection...')
-        elif data.rstrip('\r\n') == 'shutdown':
+        elif data.rstrip('\r\n') == 'quit':
             writer.write(b'OK\n')
             await writer.drain()
             if gc.config['server_output'] > 1:
