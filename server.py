@@ -42,48 +42,52 @@ async def handle_commands(reader, writer):
     data = rawdata.decode()
     addr = writer.get_extra_info('peername')
 
-    if data.rstrip('\r\n') == 'status':
-        # echo state to client as YAML string
-        writer.write(yaml.dump(state, default_flow_style=False).encode())
-        writer.write(b'OK\n')
-        await writer.drain()
-    elif data.rstrip('\r\n') == 'quit':
-        writer.write(b'OK\n')
-        await writer.drain()
-        if gc.config['server_output'] > 1:
-            print('(server) closing connection...')
-    elif data.rstrip('\r\n') == 'shutdown':
-        writer.write(b'OK\n')
-        await writer.drain()
-        if gc.config['server_output'] > 1:
-            print('(server) closing connection...')
-        sys.exit(1)
+    try:
+        if data.rstrip('\r\n') == 'status':
+            # echo state to client as YAML string
+            writer.write(yaml.dump(state, default_flow_style=False).encode())
+            writer.write(b'OK\n')
+            await writer.drain()
+        elif data.rstrip('\r\n') == 'quit':
+            writer.write(b'OK\n')
+            await writer.drain()
+            if gc.config['server_output'] > 1:
+                print('(server) closing connection...')
+        elif data.rstrip('\r\n') == 'shutdown':
+            writer.write(b'OK\n')
+            await writer.drain()
+            if gc.config['server_output'] > 1:
+                print('(server) closing connection...')
+            sys.exit(1)
 
-    else:
-        # command received in 'data',
-        # then send command to control.py,
-        # that answers with state dict
-        (state, warnings) = (control.proccess_commands
-                                        (data, state))
-        # writes state file
-        try:
-            with open(bp.state_path, 'w') as f:
-                yaml.dump(state, f, default_flow_style=False)
-            # print warnings
-            if len(warnings) > 0:
-                print("Warnings:")
-                for warning in warnings:
-                    print("\t", warning)
+        else:
+            # command received in 'data',
+            # then send command to control.py,
+            # that answers with state dict
+            (state, warnings) = (control.proccess_commands
+                                            (data, state))
+            # writes state file
+            try:
+                with open(bp.state_path, 'w') as f:
+                    yaml.dump(state, f, default_flow_style=False)
+                # print warnings
+                if len(warnings) > 0:
+                    print("Warnings:")
+                    for warning in warnings:
+                        print("\t", warning)
+                    writer.write(b'ACK\n')
+                    await writer.drain()
+                else:
+                    writer.write(b'OK\n')
+                    await writer.drain()
+            except:
                 writer.write(b'ACK\n')
                 await writer.drain()
-            else:
-                writer.write(b'OK\n')
-                await writer.drain()
-        except:
-            writer.write(b'ACK\n')
-            await writer.drain()
-
-    writer.close()
+    except:
+        print('(server) En exception occurred...')
+        raise
+    finally:
+        writer.close()
 
 async def main():
 
@@ -94,16 +98,15 @@ async def main():
     addr = server.sockets[0].getsockname()
     if gc.config['server_output'] > 0:
         print(f"(server) listening on address {addr}")
+#    loop = server.get_loop()
 
 #    async with server:
 #        await server.serve_forever()
     try:
+#        await server.serve_forever()
         await server.serve_forever()
-    except SystemExit:
+    except:
         print('(server) closing server...')
-        raise
-    finally:
-        server.close()
 
 asyncio.run(main())
 
