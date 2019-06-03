@@ -5,9 +5,9 @@ bass: 0
 input: a
 level: -12.0
 loudness_ref: 0.0
-loudness_track: false
+loudness_track: 'off'
 midside: 'off'
-mute: true
+mute: 'off'
 polarity: +
 solo: 'off'
 treble: 0
