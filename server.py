@@ -50,12 +50,6 @@ async def handle_commands(reader, writer):
             await writer.drain()
             if gc.config['server_output'] > 1:
                 print('(server) closing connection...')
-        elif data.rstrip('\r\n') == 'quit':
-            writer.write(b'OK\n')
-            await writer.drain()
-            if gc.config['server_output'] > 1:
-                print('(server) closing connection...')
-            sys.exit(1)
 
         else:
             # command received in 'data',
@@ -82,7 +76,6 @@ async def handle_commands(reader, writer):
                 await writer.drain()
     except:
         print('(server) En exception occurred...')
-        raise
     finally:
         writer.close()
 
@@ -95,15 +88,7 @@ async def main():
     addr = server.sockets[0].getsockname()
     if gc.config['server_output'] > 0:
         print(f"(server) listening on address {addr}")
-#    loop = server.get_loop()
-
-#    async with server:
-#        await server.serve_forever()
-    try:
-#        await server.serve_forever()
-        await server.serve_forever()
-    except:
-        print('(server) closing server...')
+    await server.serve_forever()
 
 asyncio.run(main())
 
