@@ -112,8 +112,6 @@ def init_server():
     while rem_time:
         print(f'(startaudio) waiting for server ({(total_time-rem_time)}s)')
         try:
-            # we must use close() to stop connection
-            # and watch till no exception
             pd.client_socket('status')
             break
         except:
