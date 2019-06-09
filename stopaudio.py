@@ -47,10 +47,7 @@ def main(run_level):
     if run_level in ['core', 'all']:
         # controlserver
         print('(stopaudio) stopping server')
-        try:
-            pd.client_socket('quit')
-        except:
-            Popen (['pkill', '-9', '-f', bp.server_path]
+        Popen (['pkill', '-9', '-f', bp.server_path]
                                         , stdout=fnull, stderr=fnull)
         # brutefir
         print('(stopaudio) stopping brutefir')

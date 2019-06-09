@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-import socket
+import asyncio
 import sys
 import time
 import os
@@ -34,84 +34,60 @@ import getconfigs as gc
 import predic as pd
 
 
-state = gc.state
-fsocket = pd.server_socket(gc.config['control_address']
-                        , gc.config['control_port'])
-# main loop to proccess conections
-# number of connections in queue
-backlog = 10
-while True:
-    # listen ports
-    fsocket.listen(backlog)
-    if gc.config['server_output'] > 1:
-        print('(server) listening on address '
-                f"{gc.config['control_address']}"
-                f", port{gc.config['control_port']}...")
-    # accept client connection
-    sc, addr = fsocket.accept()
-    # somo info
-    if gc.config['server_output'] > 1:
-        if gc.config['server_clear']:
-            # optional terminal clearing
-            os.system('clear')
-        else:
-            # separator
-             print('=' * 70)
-        print(f'(server) connected to client {addr[0]}')
-    # buffer loop to proccess received command
-    while True:
-        # reception
-        try:
-            data = sc.recv(4096).decode()
-            if not data:
-                # nothing in buffer
-                sc.close()
-                break
-            elif data.rstrip('\r\n') == 'status':
-                # echo state to client as YAML string
-                sc.send(yaml.dump(state,
-                                    default_flow_style=False).encode())
-                sc.send(b'OK\n')
-    #        elif data.rstrip('\r\n') == 'quit':
-    #            sc.send(b'OK\n')
-    #            if gc.config['server_output'] > 1:
-    #                print('(server) closing connection...')
-    #            sc.close()
-    #            break
-            elif data.rstrip('\r\n') == 'quit':
-                sc.send(b'OK\n')
-                if gc.config['server_output'] > 1:
-                    print('(server) closing connection...')
-                sc.close()
-                fsocket.close()
-                sys.exit(1)
-            else:
-                # command received in 'data',
-                # then send command to control.py,
-                # that answers with state dict
-                (state, warnings) = (control.proccess_commands
-                                                (data, state))
-                # writes state file
-                try:
-                    with open(bp.state_path, 'w') as f:
-                        yaml.dump(state, f, default_flow_style=False)
-                # print warnings
-                    if len(warnings) > 0:
-                        print("Warnings:")
-                        for warning in warnings:
-                            print("\t", warning)
-                        sc.send(b'ACK\n')
-                    else:
-                        sc.send(b'OK\n')
-                except:
-                    sc.send(b'ACK\n')
-                if gc.config['server_output'] > 1:
-                    print(f'(server) connected to client {addr[0]}')
-        except SystemExit:
-            raise
-        except:
-            pass
-        # wait a bit, loop again
-        time.sleep(0.01 * gc.config['command_delay'])
+async def handle_commands(reader, writer):
 
+    state = gc.state
+    rawdata = await reader.read(100)
+    data = rawdata.decode()
+    addr = writer.get_extra_info('peername')
+
+    try:
+        if data.rstrip('\r\n') == 'status':
+            # echo state to client as YAML string
+            writer.write(yaml.dump(state, default_flow_style=False).encode())
+            writer.write(b'OK\n')
+            await writer.drain()
+            if gc.config['server_output'] > 1:
+                print('(server) closing connection...')
+
+        else:
+            # command received in 'data',
+            # then send command to control.py,
+            # that answers with state dict
+            (state, warnings) = (control.proccess_commands
+                                            (data, state))
+            # writes state file
+            try:
+                with open(bp.state_path, 'w') as f:
+                    yaml.dump(state, f, default_flow_style=False)
+                # print warnings
+                if len(warnings) > 0:
+                    print("Warnings:")
+                    for warning in warnings:
+                        print("\t", warning)
+                    writer.write(b'ACK\n')
+                    await writer.drain()
+                else:
+                    writer.write(b'OK\n')
+                    await writer.drain()
+            except:
+                writer.write(b'ACK\n')
+                await writer.drain()
+    except:
+        print('(server) En exception occurred...')
+    finally:
+        writer.close()
+
+async def main():
+
+    server = await asyncio.start_server(
+                handle_commands,
+                gc.config['control_address'],
+                gc.config['control_port'])
+    addr = server.sockets[0].getsockname()
+    if gc.config['server_output'] > 0:
+        print(f"(server) listening on address {addr}")
+    await server.serve_forever()
+
+asyncio.run(main())
 
