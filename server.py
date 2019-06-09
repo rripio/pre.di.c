@@ -31,7 +31,6 @@ import yaml
 import control
 import basepaths as bp
 import getconfigs as gc
-import predic as pd
 
 
 async def handle_commands(reader, writer):
