@@ -137,32 +137,6 @@ def jack_loop(clientname):
             print('\n(predic.jack_loop)  Terminated')
 
 
-def server_socket(host, port):
-    """makes a socket for listening clients"""
-
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    except socket.error as e:
-        print(f'(server) Error creating socket: {e}')
-        sys.exit(-1)
-    # we use opción socket.SO_REUSEADDR to avoid this error:
-    # socket.error: [Errno 98] Address already in use
-    # that can happen if we reinit this script.
-    # This is because the previous execution has left the socket in a
-    # TIME_WAIT state, and cannot be immediately reused.
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    # tcp socket
-    try:
-        s.bind((host, port))
-    except:
-        print('(server) Error binding port', port)
-        s.close()
-        sys.exit(-1)
-
-    # return socket state
-    return s
-
-
 def client_socket(data, quiet=True):
     """makes a socket for talking to the server"""
 
