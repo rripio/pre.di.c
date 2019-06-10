@@ -23,9 +23,6 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 import asyncio
-import sys
-import time
-import os
 import yaml
 
 import control
