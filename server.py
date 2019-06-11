@@ -70,7 +70,7 @@ async def handle_commands(reader, writer):
                 writer.write(b'ACK\n')
                 await writer.drain()
     except:
-        print('(server) En exception occurred...')
+        print('(server) An exception occurred...')
     finally:
         writer.close()
 
