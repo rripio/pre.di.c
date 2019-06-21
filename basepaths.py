@@ -41,7 +41,8 @@ server_filename = 'server.py'
 config_filename = 'config.yml'
 state_filename = 'state.yml'
 inputs_filename = 'inputs.yml'
-clients_list_filename = 'clients'
+clients_start_filename = 'clients.start'
+clients_stop_filename = 'clients.stop'
 
 speaker_filename = 'speaker.yml'
 
@@ -54,7 +55,8 @@ server_path = main_folder + server_filename
 config_path = config_folder + config_filename
 state_path = config_folder + state_filename
 inputs_path = config_folder + inputs_filename
-clients_list_path = config_folder + clients_list_filename
+clients_start_path = config_folder + clients_start_filename
+clients_stop_path = config_folder + clients_stop_filename
 
 # we still don't know the loudspeaker name, so speaker_path
 # is built downstream

@@ -47,7 +47,7 @@ def main(run_level):
     if run_level in ['core', 'all']:
         # controlserver
         print('(stopaudio) stopping server')
-        Popen (['pkill', '-9', '-f', bp.server_path]
+        Popen (['pkill', '-f', bp.server_path]
                                         , stdout=fnull, stderr=fnull)
         # brutefir
         print('(stopaudio) stopping brutefir')
@@ -59,19 +59,14 @@ def main(run_level):
     if run_level in ['clients', 'all']:
         # stop external scripts, sources and clients
         print('(stopaudio) stopping clients')
-        clients = pd.read_clients()
-        for client in clients:
+        clients_stop = pd.read_clients('stop')
+        for command in clients_stop:
             try:
-                client_path = f'{bp.clients_folder}{client}'
-                command = f'{client_path} stop'
-                Popen(command.split())
-                # kills launching script
-                pd.kill_pid(client)
-                pd.wait4result('pgrep -f ' + client, '', 5, quiet=True)
-            except OSError as err:
-                print(f'error launching client:\n\t{err}')
+                command_path = f'{bp.clients_folder}{command}'
+#                command = f'{client_path} stop'
+                Popen(command_path.split())
             except:
-                print(f'problem launching client {client}:\n\t{err}')
+                print(f'problem stopping client "{client}":\n\t{err}')
 
 
 if __name__ == '__main__':

@@ -38,10 +38,17 @@ import basepaths as bp
 import getconfigs as gc
 
 
-def read_clients():
-    """reads list of programs to launch from config/clients file"""
+def read_clients(phase):
+    """reads list of programs to launch from config/clients.start file
+    and programs to stop from onfig/clients.stop file.
+    phase: <'start'|'stop'> phase of client activation or deactivation"""
 
-    with open (bp.clients_list_path) as clients_file:
+    if   phase == 'start':
+        clients_list_path = bp.clients_start_path
+    elif phase == 'stop':
+        clients_list_path = bp.clients_stop_path
+
+    with open (clients_list_path) as clients_file:
         # init a list of clients to load
         clients = []
         for line in clients_file:
@@ -50,8 +57,7 @@ def read_clients():
                 continue
             # skip commented lines
             if line.strip()[0] != '#':
-                # dispise options if incorrectly set
-                client = line.split()[0]
+                client=line
                 clients.append(client)
     return clients
 

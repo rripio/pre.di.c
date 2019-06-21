@@ -1,4 +1,5 @@
 asound.*
 *.yml
 *.ini
-clients
+clients.start
+clients.stop

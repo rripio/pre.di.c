@@ -105,7 +105,8 @@ def start():
     # starts MPD
     print('(mpd_load.py) starting mpd')
     mpd_command = f'{mpd_path} {mpd_options}'
-    pd.start_pid(mpd_command, mpd_alias)
+#    pd.start_pid(mpd_command, mpd_alias)
+    Popen(mpd_command.split())
 
     # volume linked to mpd (optional)  # THIS MUST BE REVIEWED
     if mpd_volume_linked:
@@ -130,8 +131,8 @@ def start():
 def stop():
     """kills mpd"""
 
-#    pd.kill_pid(mpd_alias)
     Popen('mpd --kill'.split())
+#    pd.kill_pid(mpd_alias)
     time.sleep(gc.config['command_delay']*5)
 
 

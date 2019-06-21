@@ -1,0 +1,10 @@
+# client stop scripts listed in this file are launched on shutdown.
+# names refer to any kind of executable with paths relative to folder
+# 'clients' or its subfolders, and corresponding options, if any
+
+# Don't name this mpd.py since it could interfere with mpd module
+mpd_load.py stop
+
+DVB/DVB_load.py stop
+
+

@@ -206,17 +206,12 @@ def main(run_level):
     if run_level in ['clients', 'all']:
         # launch external clients, sources and clients
         print('\n(startaudio): starting clients...')
-        clients = pd.read_clients()
-        for client in clients:
+        clients_start = pd.read_clients('start')
+        for client in clients_start:
             try:
-                client_path = f'{bp.clients_folder}{client}'
-                command = f'{client_path} start'
-                Popen(command.split())
+                command_path = f'{bp.clients_folder}{client}'
+                p=Popen(command_path.split())
                 print(f'pid {p.pid:4}: {client}')
-                with open(f'{bp.pids_folder}{client}.pid', 'w') as pidfile:
-                    pidfile.write(f'{p.pid}')
-            except OSError as err:
-                print(f'error launching client:\n\t{err}')
             except:
                 print(f'problem launching client {client}')
         # restoring previous state

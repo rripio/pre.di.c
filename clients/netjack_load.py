@@ -22,14 +22,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-"""start and stop mplayer for DVB tasks
-use it with 'start' and 'stop' as options"""
+"""start and stop mplayer for DVB tasks"""
 
-import sys
 import time
 from subprocess import Popen
 
-import basepaths as bp
 import getconfigs as gc
 
 ## user configuration
@@ -37,26 +34,7 @@ import getconfigs as gc
 netjack_path = '/usr/bin/jack_load netmanager'
 
 
-def start():
-
-    print('starting netjack\n')
-    Popen(netjack_path.split())
-    time.sleep(gc.config['command_delay'])
-
-
-def stop():
-
-    pass
-
-
-if sys.argv[1:]:
-    try:
-        option = {
-            'start' : start,
-            'stop'  : stop
-            }[sys.argv[1]]()
-    except KeyError:
-        print('netjack.py: bad option')
-else:
-    print(__doc__)
+print('starting netjack\n')
+Popen(netjack_path.split())
+time.sleep(gc.config['command_delay'])
 
