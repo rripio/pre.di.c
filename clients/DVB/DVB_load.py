@@ -116,11 +116,12 @@ def change_radio(new_radiopreset, state=state):
 
 def start():
 
-    # 1. Prepare a jack loop where DVB outputs can connect.
-    #    The jack_loop module will keep the loop alive, so we need to thread it.
+    # create jack loop for connections
+    # The jack_loop module will keep the loop alive, so we need to thread it.
     jloop = threading.Thread( target = pd.jack_loop, args=('dvb_loop',) )
     jloop.start()
-    # 2. Mplayer DVB:
+
+    # starts mplayer DVB:
     opts = f'{options} -idle -slave -profile dvb -input file={dvb_fifo}'
     command = f'{mplayer_path} {opts}'
     pd.start_pid(command, program_alias)

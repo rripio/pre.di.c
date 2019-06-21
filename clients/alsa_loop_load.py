@@ -3,9 +3,13 @@
 """sets up alsa_loop ports in jack to be used from ALSA sound
 backend players"""
 
-from predic import jack_loop
+import threading
+import predic as pd
 
-# jack_loop will keep the loop alive
-jack_loop('alsa_loop')
+# create jack loop for connections
+# The jack_loop module will keep the loop alive, so we need to thread it.
+#pd.jack_loop('alsa_loop')
+jloop = threading.Thread( target = pd.jack_loop, args=('alsa_loop',) )
+jloop.start()
 
 
