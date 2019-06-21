@@ -69,6 +69,8 @@ async def handle_commands(reader, writer):
             except:
                 writer.write(b'ACK\n')
                 await writer.drain()
+    except ConnectionResetError:
+        print('(server) still no connection...')
     except:
         print('(server) An exception occurred...')
     finally:
