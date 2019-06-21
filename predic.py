@@ -56,7 +56,8 @@ def read_clients(phase):
             if not line.strip():
                 continue
             # skip commented lines
-            if line.strip()[0] != '#':
+            line = line.partition('#')[0].strip()
+            if line:
                 client=line
                 clients.append(client)
     return clients
