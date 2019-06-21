@@ -137,7 +137,6 @@ def stop():
 
     Popen('mpd --kill'.split())
 #    pd.kill_pid(mpd_alias)
-    time.sleep(gc.config['command_delay']*5)
 
 
 if sys.argv[1:]:
@@ -150,4 +149,3 @@ if sys.argv[1:]:
         print('mpd_load.py: bad option')
 else:
     print(__doc__)
-

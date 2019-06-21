@@ -177,9 +177,10 @@ def wait4result(command, answer, tmax=4, quiet=False):
     """looks for chain "answer" in "command" output"""
 
     # wait tmax seconds to get an answer
-    tryings =  20
-    refresh_time = float(tmax) / tryings
-    while tryings:
+    interval = gc.config['command_delay'] / 10
+    rem_time = tmax
+
+    while rem_time:
         try:
             if answer in sp.check_output(command, shell=True,
                         universal_newlines=True):
@@ -188,10 +189,10 @@ def wait4result(command, answer, tmax=4, quiet=False):
                 break
         except:
             pass
-        tryings -= 1
-        time.sleep(refresh_time)
+        rem_time -= interval
+        time.sleep(interval)
 
-    if tryings:
+    if rem_time:
         return True
     else:
         if not quiet:

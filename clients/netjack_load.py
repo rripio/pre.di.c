@@ -34,7 +34,6 @@ import getconfigs as gc
 netjack_path = '/usr/bin/jack_load netmanager'
 
 
-print('starting netjack\n')
+print('\n(netjack_load.py) starting netjack\n')
 Popen(netjack_path.split())
-time.sleep(gc.config['command_delay'])
 

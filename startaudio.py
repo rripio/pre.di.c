@@ -108,16 +108,19 @@ def init_server():
         print('\n(startaudio) server didn\'t load')
         sys.exit() # initaudio stopped
     # waiting for server
-    total_time = rem_time = 10 * gc.config['command_delay']
+    total_time_factor = 10
+    total_time = rem_time = total_time_factor * gc.config['command_delay']
+    interval_factor = 10
+    interval = gc.config['command_delay'] / interval_factor
     while rem_time:
-        print(f'(startaudio) waiting for server ({(total_time-rem_time)}s)')
+        print(f'(startaudio) waiting for server ({(total_time-rem_time):.2f}s)')
         try:
             pd.client_socket('status')
             break
         except:
             pass
-        rem_time -= 1 * gc.config['command_delay']
-        time.sleep(gc.config['command_delay'])
+        rem_time -= interval
+        time.sleep(interval)
     if rem_time:
         print('\n(startaudio) server started :-)')
     else:
@@ -172,9 +175,13 @@ def init_inputs():
     # wait for input ports to be up
     ports = pd.gc.inputs[input]['in_ports']
     jc = jack.Client('tmp')
-    # lets try 20 times to connect to input ports
-    loops = 20
-    while loops:
+
+    total_time_factor = 10
+    total_time = rem_time = total_time_factor * gc.config['command_delay']
+    interval_factor = 10
+    interval = gc.config['command_delay'] / interval_factor
+
+    while rem_time:
         channels = ('L','R')
         n = len(channels)
         for port_name in ports:
@@ -182,9 +189,9 @@ def init_inputs():
                 n -=1
         if n == 0:
             break
-        time.sleep(gc.config['command_delay'] * 0.5)
-        loops -= 1
-    if loops:
+        rem_time -= interval
+        time.sleep(interval)
+    if rem_time:
         # input ports up and ready :-)
         pd.client_socket('input ' + gc.state['input'], quiet=True)
     else:
