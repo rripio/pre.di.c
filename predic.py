@@ -184,7 +184,7 @@ def wait4result(command, answer, tmax=4, quiet=False):
             if answer in sp.check_output(command, shell=True,
                         universal_newlines=True):
                 if not quiet:
-                    print('found {answer} in command {command}')
+                    print(f'\nfound string "{answer}" in output of command: {command}')
                 break
         except:
             pass
@@ -195,8 +195,8 @@ def wait4result(command, answer, tmax=4, quiet=False):
         return True
     else:
         if not quiet:
-            print(f'Time out >{tmax}s waiting for{answer}'
-                    f' in command {command}')
+            print(f'\ntime out >{tmax}s waiting for string "{answer}"'
+                    f' in output of command: {command}')
         return False
 
 

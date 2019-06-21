@@ -33,7 +33,7 @@
 import sys
 import os
 import time
-from subprocess import Popen
+import subprocess as sp
 
 import jack
 
@@ -71,14 +71,14 @@ def init_jack():
     elif not 'dummy' in gc.config['jack_options']:
         print('\n(startaudio) error starting jack: unknown backend')
         sys.exit(-1)
-    jack = Popen(jack_cmd_list)
-    # waiting for jackd:
-    if pd.wait4result('jack_lsp', 'system'):
+    try:
+        jack = sp.Popen(jack_cmd_list)
+        # waiting for jackd:
+        sp.run('jack_wait -w'.split())
         print('\n(startaudio) jack started :-)')
-    else:
+    except:
         print('\n(startaudio) error starting jack')
         sys.exit()
-
 
 def init_brutefir():
     """loads brutefir"""
@@ -87,11 +87,11 @@ def init_brutefir():
     # folder in brutefir_config
     os.chdir(bp.loudspeakers_folder + gc.config['loudspeaker'])
     print(f'\n(startaudio) starting brutefir on {os.getcwd()}')
-    Popen([gc.config['brutefir_path'], gc.config['brutefir_options']
+    sp.Popen([gc.config['brutefir_path'], gc.config['brutefir_options']
             ,'brutefir_config'])
     # waiting for brutefir
     if  pd.wait4result('echo "quit" | nc localhost 3000', 'Welcome',
-        tmax=5, quiet=True):
+        tmax=5):
         print('\n(startaudio) brutefir started :-)')
     else:
         print('\n(startaudio) error starting brutefir')
@@ -102,7 +102,7 @@ def init_server():
 
     print('\n(startaudio) starting server\n')
     try:
-        control = Popen(['python3'
+        control = sp.Popen(['python3'
                             , bp.server_path])
     except:
         print('\n(startaudio) server didn\'t load')
@@ -210,7 +210,7 @@ def main(run_level):
         for client in clients_start:
             try:
                 command_path = f'{bp.clients_folder}{client}'
-                p=Popen(command_path.split())
+                p=sp.Popen(command_path.split())
                 print(f'pid {p.pid:4}: {client}')
             except:
                 print(f'problem launching client {client}')

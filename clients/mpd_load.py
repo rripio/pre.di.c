@@ -106,12 +106,15 @@ def start():
     print('(mpd_load.py) starting mpd')
     mpd_command = f'{mpd_path} {mpd_options}'
 #    pd.start_pid(mpd_command, mpd_alias)
-    Popen(mpd_command.split())
+    try:
+        Popen(mpd_command.split())
+    except:
+        print('(mpd_load.py) mpd loading failed')
 
     # volume linked to mpd (optional)  # THIS MUST BE REVIEWED
     if mpd_volume_linked:
         print('(mpd_load.py) waiting for mpd')
-        if  pd.wait4result('pgrep -l mpd', 'mpd', tmax=10, quiet=True):
+        if  pd.wait4result('pgrep -l mpd', 'mpd', tmax=10):
             print('(mpd_load.py) mpd started :-)')
         else:
             print('(mpd_load.py) error detecting mpd, client_mpd'
