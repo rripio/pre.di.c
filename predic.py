@@ -174,27 +174,28 @@ def client_socket(data, quiet=True):
             print('Closing connection...')
 
 
-def wait4result(command, answer, tmax=4, quiet=False):
+def wait4result(command, answer,
+                tmax=5,
+                interval = gc.config['command_delay'] / 10,
+                quiet=False):
     """looks for chain "answer" in "command" output"""
 
-    # wait tmax seconds to get an answer
-    interval = gc.config['command_delay'] / 10
-    rem_time = tmax
+    time_start = time.time()
 
-    while rem_time:
+    def elapsed():
+        return time.time() - time_start
+
+    while elapsed() < tmax:
         try:
             if answer in sp.check_output(command, shell=True,
                         universal_newlines=True):
                 if not quiet:
-                    print(f'\nfound string "{answer}" in output of command: {command}')
-                break
+                    print(f'\nfound string "{answer}" in output of '
+                                                    'command: {command}')
+                return True
         except:
             pass
-        rem_time -= interval
         time.sleep(interval)
-
-    if rem_time:
-        return True
     else:
         if not quiet:
             print(f'\ntime out >{tmax}s waiting for string "{answer}"'
