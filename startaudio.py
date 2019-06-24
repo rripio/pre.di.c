@@ -90,8 +90,7 @@ def init_brutefir():
     sp.Popen([gc.config['brutefir_path'], gc.config['brutefir_options']
             ,'brutefir_config'])
     # waiting for brutefir
-    if  pd.wait4result('echo "quit" | nc localhost 3000', 'Welcome',
-        tmax=5):
+    if  pd.wait4result('echo "quit" | nc localhost 3000', 'Welcome'):
         print('\n(startaudio) brutefir started :-)')
     else:
         print('\n(startaudio) error starting brutefir')
@@ -108,20 +107,7 @@ def init_server():
         print('\n(startaudio) server didn\'t load')
         sys.exit() # initaudio stopped
     # waiting for server
-    total_time_factor = 10
-    total_time = rem_time = total_time_factor * gc.config['command_delay']
-    interval_factor = 10
-    interval = gc.config['command_delay'] / interval_factor
-    while rem_time:
-        print(f'(startaudio) waiting for server ({(total_time-rem_time):.2f}s)')
-        try:
-            pd.client_socket('status')
-            break
-        except:
-            pass
-        rem_time -= interval
-        time.sleep(interval)
-    if rem_time:
+    if pd.wait4result('echo status| nc localhost 9999', 'OK'):
         print('\n(startaudio) server started :-)')
     else:
         print('\n(startaudio) server not accesible Bye :-/')
