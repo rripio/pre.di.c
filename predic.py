@@ -191,7 +191,7 @@ def wait4result(command, answer,
                         universal_newlines=True):
                 if not quiet:
                     print(f'\nfound string "{answer}" in output of '
-                                                    'command: {command}')
+                                                    f'command: {command}')
                 return True
         except:
             pass
