@@ -3,7 +3,7 @@
 # 'clients' or its subfolders, and corresponding options, if any
 
 # Don't name this mpd.py since it could interfere with mpd module
-#mpd_load.py start
+#mpd/mpd_load.py start
 
 #DVB/DVB_load.py start
 

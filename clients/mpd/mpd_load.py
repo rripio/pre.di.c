@@ -39,13 +39,7 @@ import getconfigs as gc
 
 
 ## user config
-
-mpd_path = '/usr/bin/mpd'
-mpd_options = ''
-mpd_port = '6600'
-mpd_volume_linked = True
-# Must be positive integer
-slider_range = 48
+config_filename = 'mpd_load.yaml'
 
 
 def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
@@ -70,7 +64,7 @@ def set_predic_vol_loop(c):
         # set gain
         g = str(int(round(
                 ((m.log(1+float(newVol)/100)/m.log(2))**1.293-1)
-                * slider_range + gc.config['gain_max']))-6)
+                * mpd_conf['slider_range'] + gc.config['gain_max']))-6)
         pd.client_socket("gain " + g, quiet=True)
 
 
@@ -78,7 +72,7 @@ def set_mpd_vol_loop(gain):
 
     # update mpd "fake volume"
     vol = (100 * (m.exp(max(
-            ((gain - gc.config['gain_max']) / slider_range + 1),0)
+            ((gain - gc.config['gain_max']) / mpd_conf['slider_range'] + 1),0)
             ** (1/1.293) * m.log(2)) - 1))
      # minimal mpd volume
     if vol < 1: vol = 1
@@ -101,7 +95,7 @@ def start():
 
     # starts MPD
     print('(mpd_load.py) starting mpd')
-    mpd_command = f'{mpd_path} {mpd_options}'
+    mpd_command = f'{mpd_conf["path"]} {mpd_conf["options"]}'
     try:
         sp.Popen(mpd_command.split())
     except:
@@ -109,9 +103,9 @@ def start():
         return
 
     # volume linked to mpd (optional)  # THIS MUST BE REVIEWED
-    if mpd_volume_linked:
+    if mpd_conf['volume_linked']:
         print('(mpd_load.py) waiting for mpd')
-        if pd.wait4result(f'echo close|nc localhost {mpd_port}',
+        if pd.wait4result(f'echo close|nc localhost {mpd_conf["port"]}',
                                                  'OK MPD'):
             print('(mpd_load.py) mpd started :-)')
             try:
@@ -134,6 +128,8 @@ def stop():
 
 
 if sys.argv[1:]:
+    dir = os.path.dirname(os.path.realpath(__file__))
+    mpd_conf = gc.get_yaml(dir + '/' + config_filename)
     try:
         option = {
             'start' : start,
