@@ -28,9 +28,9 @@ use it with 'start' and 'stop' as options"""
 import os
 import sys
 import time
-import math as m
-from subprocess import Popen
 import threading
+import math as m
+import subprocess as sp
 
 import mpd
 
@@ -42,9 +42,8 @@ import getconfigs as gc
 
 mpd_path = '/usr/bin/mpd'
 mpd_options = ''
-mpd_alias = 'mpd'
-#mpd_volume_linked = True
-mpd_volume_linked = False
+mpd_port = '6600'
+mpd_volume_linked = True
 # Must be positive integer
 slider_range = 48
 
@@ -54,12 +53,12 @@ def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
 
     client = mpd.MPDClient()
     client.connect(mpd_host, mpd_port)
-    if mpd_passwd is not None:
+    if mpd_passwd:
         client.password(mpd_passwd)
     return client
 
 
-def set_predic_vol_loop(C):
+def set_predic_vol_loop(c):
     """loop: reads mpd volume, sets predic volume"""
 
     while True:
@@ -71,7 +70,7 @@ def set_predic_vol_loop(C):
         # set gain
         g = str(int(round(
                 ((m.log(1+float(newVol)/100)/m.log(2))**1.293-1)
-                * slider_range + gc.config['gain_max'])))
+                * slider_range + gc.config['gain_max']))-6)
         pd.client_socket("gain " + g, quiet=True)
 
 
@@ -81,9 +80,6 @@ def set_mpd_vol_loop(gain):
     vol = (100 * (m.exp(max(
             ((gain - gc.config['gain_max']) / slider_range + 1),0)
             ** (1/1.293) * m.log(2)) - 1))
-
-#    vol = 100*(m.exp(max((gain/slider_range+1),0)
-#                                    **(1/1.293)*m.log(2))-1)
      # minimal mpd volume
     if vol < 1: vol = 1
     try:
@@ -99,44 +95,42 @@ def start():
     """loads mpd and jack loop"""
 
     # create jack loop for connections
-    # The jack_loop module will keep the loop alive, so we need to thread it.
+    # The jack_loop module will keep the loop alive, so we need to thread it
     jloop = threading.Thread( target = pd.jack_loop, args=('mpd_loop',) )
     jloop.start()
 
     # starts MPD
     print('(mpd_load.py) starting mpd')
     mpd_command = f'{mpd_path} {mpd_options}'
-#    pd.start_pid(mpd_command, mpd_alias)
     try:
-        Popen(mpd_command.split())
+        sp.Popen(mpd_command.split())
     except:
         print('(mpd_load.py) mpd loading failed')
+        return
 
     # volume linked to mpd (optional)  # THIS MUST BE REVIEWED
     if mpd_volume_linked:
         print('(mpd_load.py) waiting for mpd')
-        if  pd.wait4result('pgrep -l mpd', 'mpd', tmax=10):
+        if pd.wait4result(f'echo close|nc localhost {mpd_port}',
+                                                 'OK MPD'):
             print('(mpd_load.py) mpd started :-)')
+            try:
+                c = connect_mpd()
+                c.timeout = 10
+                c.idletimeout = None
+                set_predic_vol_loop(c)
+                c.close()
+                c.disconnect()
+            except:
+                print('(mpd_load.py) mpd socket loop broke')
         else:
-            print('(mpd_load.py) error detecting mpd, client_mpd'
-                                                ' won\'t start')
-        try:
-            c = connect_mpd('localhost', 6600)
-            c.timeout = 10
-            c.idletimeout = None
-            set_predic_vol_loop(C)
-            c.close()
-            c.disconnect()
-        except:
-            print('(mpd_load.py) mpd socket loop broke')
-
+            print('(mpd_load.py) client_mpd didn\'t start')
 
 
 def stop():
     """kills mpd"""
 
-    Popen('mpd --kill'.split())
-#    pd.kill_pid(mpd_alias)
+    sp.Popen('mpd --kill'.split())
 
 
 if sys.argv[1:]:
