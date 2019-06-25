@@ -37,11 +37,17 @@ jack_monitors: ''
 
 
 
-## paths & options
+## core
 
-# control server screen output:
+# server
+# screen output:
 # 0 (minimal), 1 (informative), 2 (debug)
 server_output: 0
+# address and port
+# 0.0.0.0 listen to all net connections
+# 127.0.0.1 listen only to local connections
+control_address: 0.0.0.0
+control_port: 9999
 
 # jack
 jack_path: /usr/bin/jackd
@@ -54,19 +60,9 @@ brutefir_path: /usr/bin/brutefir
 # for options see https://www.ludd.ltu.se/~torger/brutefir.html#config
 brutefir_options: ''
 brutefir_ports: brutefir:input-0 brutefir:input-1
-
-
-
-## net
-
-# brutefir cli address and port
+# cli address and port
 bfcli_address: 127.0.0.1
 bfcli_port: 3000
-# control script address and port
-# 0.0.0.0 listen to all net connections
-# 127.0.0.1 listen only to local connections
-control_address: 0.0.0.0
-control_port: 9999
 
 
 
