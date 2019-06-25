@@ -71,12 +71,11 @@ def init_jack():
     elif not 'dummy' in gc.config['jack_options']:
         print('\n(startaudio) error starting jack: unknown backend')
         sys.exit(-1)
-    try:
-        jack = sp.Popen(jack_cmd_list)
-        # waiting for jackd:
-        sp.run('jack_wait -w -t 5'.split())
+    jack = sp.Popen(jack_cmd_list)
+    # waiting for jackd:
+    if pd.wait4result('jack_lsp', 'system'):
         print('\n(startaudio) jack started :-)')
-    except:
+    else:
         print('\n(startaudio) error starting jack')
         sys.exit()
 
