@@ -10,4 +10,4 @@
 #netjack_load.py
 
 # Sets up alsa_loop ports in jack to be used from ALSA players
-alsa_loop_load.py
+alsa_loop_load.py start

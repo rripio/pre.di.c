@@ -7,4 +7,5 @@
 
 #DVB/DVB_load.py stop
 
+alsa_loop_load.py stop
 
