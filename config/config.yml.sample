@@ -4,24 +4,12 @@
 
 
 
-## speakers
+## hardware
 
 loudspeaker: example_1_way
-
-
-
-## cards
-
 # system card
 # (full ALSA identifier hw:Tarjeta,Device)
 system_card: hw:0,0
-# cards external to jack (space sepated string if many)
-# (full ALSA identifier hw:Tarjeta,Device)
-external_cards: ''
-# resampler for external cards: alsa | zita
-resampler: zita
-# resampling quality (optional) (0..4 for alsa, 16..96 for zita)
-resamplingQ: 96
 
 
 
