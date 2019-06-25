@@ -118,7 +118,7 @@ def bf_cli(command):
             s.connect((gc.config['bfcli_address'], gc.config['bfcli_port']))
             command = command + '; quit\n'
             s.send(command.encode())
-            if gc.config['server_output'] > 1:
+            if gc.config['server_output'] == 2:
                 print('command sent to brutefir')
         except:
             warnings.append ('Brutefir error')
@@ -554,9 +554,6 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
     ## parse  commands and select corresponding actions
 
-    if gc.config['server_output'] > 0:
-        print(f'Command: {full_command}')
-#    if True:
     try:
         state = {
             'target':           change_target,

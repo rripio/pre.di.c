@@ -40,10 +40,11 @@ async def handle_commands(reader, writer):
     try:
         if data.rstrip('\r\n') == 'status':
             # echo state to client as YAML string
-            writer.write(yaml.dump(state, default_flow_style=False).encode())
+            writer.write(yaml.dump(state,
+                                    default_flow_style=False).encode())
             writer.write(b'OK\n')
             await writer.drain()
-            if gc.config['server_output'] > 1:
+            if gc.config['server_output'] == 2:
                 print('(server) closing connection...')
 
         else:
@@ -52,6 +53,14 @@ async def handle_commands(reader, writer):
             # that answers with state dict
             (state, warnings) = (control.proccess_commands
                                             (data, state))
+            # a try block avoids blocking of state file writing
+            # when the terminal that launched startaudio.py is closed
+            try:
+                if gc.config['server_output'] in [1, 2]:
+                    print(f'Command: {data}')
+            except:
+                pass
+
             # writes state file
             try:
                 with open(bp.state_path, 'w') as f:
@@ -83,7 +92,7 @@ async def main():
                 gc.config['control_address'],
                 gc.config['control_port'])
     addr = server.sockets[0].getsockname()
-    if gc.config['server_output'] > 0:
+    if gc.config['server_output'] in [1, 2]:
         print(f"(server) listening on address {addr}")
     await server.serve_forever()
 
