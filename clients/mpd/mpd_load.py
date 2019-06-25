@@ -105,8 +105,9 @@ def start():
     # volume linked to mpd (optional)  # THIS MUST BE REVIEWED
     if mpd_conf['volume_linked']:
         print('(mpd_load.py) waiting for mpd')
-        if pd.wait4result(f'echo close|nc localhost {mpd_conf["port"]}',
-                                                 'OK MPD'):
+        if pd.wait4result(
+                f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
+                                                                 'OK MPD'):
             print('(mpd_load.py) mpd started :-)')
             try:
                 c = connect_mpd()
