@@ -63,7 +63,6 @@ def main(run_level):
         for command in clients_stop:
             try:
                 command_path = f'{bp.clients_folder}{command}'
-#                command = f'{client_path} stop'
                 Popen(command_path.split())
             except:
                 print(f'problem stopping client "{client}":\n\t{err}')
