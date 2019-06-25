@@ -74,7 +74,7 @@ def init_jack():
     try:
         jack = sp.Popen(jack_cmd_list)
         # waiting for jackd:
-        sp.run('jack_wait -w'.split())
+        sp.run('jack_wait -w -t 5'.split())
         print('\n(startaudio) jack started :-)')
     except:
         print('\n(startaudio) error starting jack')
