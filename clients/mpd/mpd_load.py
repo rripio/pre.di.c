@@ -122,9 +122,11 @@ def start():
 
 
 def stop():
-    """kills mpd"""
+    """kills mpd and this script"""
 
-    sp.Popen('mpd --kill'.split())
+    sp.Popen(('pkill -f ' +
+                '/home/predic/pre.di.c/clients/mpd/mpd_load.py').split())
+    sp.Popen('pkill -f /usr/bin/mpd'.split())
 
 
 if sys.argv[1:]:

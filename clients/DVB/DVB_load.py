@@ -25,15 +25,17 @@
 """start and stop mplayer for DVB tasks
 use it with 'start' and 'stop' as options"""
 
+
 import sys
 import os
 import time
-from subprocess import Popen
 import threading
 
 import basepaths as bp
 import getconfigs as gc
 import predic as pd
+import subprocess as sp
+
 
 ## mplayer aditional options
 
@@ -114,6 +116,7 @@ def change_radio(new_radiopreset, state=state):
     return state
 """
 
+
 def start():
 
     # create jack loop for connections
@@ -124,11 +127,14 @@ def start():
     # starts mplayer DVB:
     opts = f'{options} -idle -slave -profile dvb -input file={dvb_fifo}'
     command = f'{mplayer_path} {opts}'
-    pd.start_pid(command, program_alias)
+    sp.Popen(command.split())
+
 
 def stop():
 
-    pd.kill_pid(program_alias)
+    sp.Popen('pkill -f /home/predic/pre.di.c/clients/DVB/DVB_load.py'.split())
+    sp.Popen('pkill -f /usr/bin/mplayer'.split())
+
 
 if sys.argv[1:]:
     try:

@@ -22,7 +22,7 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-"""start and stop mplayer for DVB tasks"""
+"""start netjack"""
 
 import time
 from subprocess import Popen
