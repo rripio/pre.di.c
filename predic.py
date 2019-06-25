@@ -176,8 +176,7 @@ def client_socket(data, quiet=True):
 
 def wait4result(command, answer,
                 tmax=5,
-                interval = gc.config['command_delay'] / 10,
-                quiet=False):
+                interval = gc.config['command_delay'] / 10):
     """looks for chain "answer" in "command" output"""
 
     time_start = time.time()
@@ -189,7 +188,7 @@ def wait4result(command, answer,
         try:
             if answer in sp.check_output(command, shell=True,
                         universal_newlines=True):
-                if not quiet:
+                if gc.config['server_output'] in [1, 2]:
                     print(f'\nfound string "{answer}" in output of '
                                                     f'command: {command}')
                 return True
@@ -197,7 +196,7 @@ def wait4result(command, answer,
             pass
         time.sleep(interval)
     else:
-        if not quiet:
+        if gc.config['server_output'] in [1, 2]:
             print(f'\ntime out >{tmax}s waiting for string "{answer}"'
                     f' in output of command: {command}')
         return False
