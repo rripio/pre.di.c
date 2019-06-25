@@ -52,7 +52,7 @@ jack_monitors: ''
 ## paths & options
 
 # control server
-# screen output: 0 (nothing) - 1 (minimal) - 2 (full)
+# screen output: 0 (minimal), 1 (informative), 2 (debug)
 server_output: 0
 # screen erasing between commands: True - False
 server_clear: False
