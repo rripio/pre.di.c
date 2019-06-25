@@ -63,34 +63,6 @@ def read_clients(phase):
     return clients
 
 
-def start_pid(command, alias):
-    """starts a program and writes its pid
-    command: full path with options
-    alias  : name given for pid retrieving and error output"""
-
-    try:
-        p = sp.Popen(command.split())
-        print(f'\tpid {p.pid:4}: {alias}')
-        with open(f'{bp.pids_folder}{alias}.pid', 'w') as pidfile:
-            pidfile.write(f'{p.pid}')
-    except OSError as err:
-        print(f'error launching {alias}:\n\t{err}')
-    except:
-        print(f'problem launching {alias}')
-
-
-def kill_pid(client):
-    """kills a client proccess after retrieving its saved pid"""
-
-    try:
-        pid_path = f'{bp.pids_folder}{client}.pid'
-        with open(pid_path) as pidfile:
-            pid = int(pidfile.readline())
-            os.remove(pid_path)
-            os.kill(pid, 9)
-    except:
-        print(f'problem killing {client}')
-
 def jack_loop(clientname):
     """creates a jack loop with given 'clientname'"""
     # CREDITS:  https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
