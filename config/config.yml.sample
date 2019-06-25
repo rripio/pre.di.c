@@ -51,11 +51,9 @@ jack_monitors: ''
 
 ## paths & options
 
-# control server
-# screen output: 0 (minimal), 1 (informative), 2 (debug)
+# control server screen output:
+# 0 (minimal), 1 (informative), 2 (debug)
 server_output: 0
-# screen erasing between commands: True - False
-server_clear: False
 
 # jack
 jack_path: /usr/bin/jackd
