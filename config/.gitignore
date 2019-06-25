@@ -1,5 +1,8 @@
+.gitignore
 asound.*
 *.yml
 *.ini
 clients.start
 clients.stop
+clients
+config.yml.newstyle
