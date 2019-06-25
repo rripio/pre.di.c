@@ -108,7 +108,7 @@ def init_server():
         print('\n(startaudio) server didn\'t load')
         sys.exit() # initaudio stopped
     # waiting for server
-    if pd.wait4result('echo status| nc localhost 9999 2>/dev/null', 'OK'):
+    if pd.wait4result('echo ping| nc localhost 9999 2>/dev/null', 'OK'):
         print('\n(startaudio) server started :-)')
     else:
         print('\n(startaudio) server not accesible Bye :-/')

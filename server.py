@@ -47,6 +47,13 @@ async def handle_commands(reader, writer):
             if gc.config['server_output'] == 2:
                 print('(server) closing connection...')
 
+        elif data.rstrip('\r\n') == 'ping':
+            # just answers OK
+            writer.write(b'OK\n')
+            await writer.drain()
+            if gc.config['server_output'] == 2:
+                print('(server) closing connection...')
+
         else:
             # command received in 'data',
             # then send command to control.py,
