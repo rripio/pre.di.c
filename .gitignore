@@ -109,4 +109,9 @@ venv.bak/
 
 # nano swap files
 *.swp
+# config files
+*.yml
+*.ini
+clients.start
+clients.stop
 
