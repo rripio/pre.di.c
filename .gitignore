@@ -114,4 +114,5 @@ venv.bak/
 *.ini
 clients.start
 clients.stop
-
+# backups
+.bak
