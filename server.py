@@ -92,6 +92,7 @@ async def handle_commands(reader, writer):
     finally:
         writer.close()
 
+
 async def main():
 
     server = await asyncio.start_server(
@@ -103,5 +104,5 @@ async def main():
         print(f"(server) listening on address {addr}")
     await server.serve_forever()
 
-asyncio.run(main())
 
+asyncio.run(main())
