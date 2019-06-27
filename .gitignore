@@ -115,4 +115,4 @@ venv.bak/
 clients.start
 clients.stop
 # backups
-.bak
+*.bak
