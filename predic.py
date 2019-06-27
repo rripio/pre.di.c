@@ -230,7 +230,7 @@ def show(throw_it=None, state=gc.state):
     input_gain = calc_input_gain(gc.state['input'])
 
     print()
-    print(f"Loudspeaker is {gc.config['loudspeaker']}")
+    print(f"Loudspeaker: {gc.config['loudspeaker']}")
     print()
     print(f"fs             {gc.speaker['fs']:6}")
     print(f"Ref level gain {gc.speaker['ref_level_gain']: 6.1f}")
