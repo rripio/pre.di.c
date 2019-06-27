@@ -74,9 +74,9 @@ async def handle_commands(reader, writer):
                     yaml.dump(state, f, default_flow_style=False)
                 # print warnings
                 if len(warnings) > 0:
-                    print("Warnings:")
+                    print('Warnings:')
                     for warning in warnings:
-                        print("\t", warning)
+                        print('\t', warning)
                     writer.write(b'ACK\n')
                     await writer.drain()
                 else:
@@ -101,7 +101,7 @@ async def main():
                 gc.config['control_port'])
     addr = server.sockets[0].getsockname()
     if gc.config['server_output'] in [1, 2]:
-        print(f"(server) listening on address {addr}")
+        print(f'(server) listening on address {addr}')
     await server.serve_forever()
 
 
