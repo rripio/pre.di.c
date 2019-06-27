@@ -33,6 +33,7 @@ import contextlib as cl
 import threading
 
 import jack
+import yaml
 
 import basepaths as bp
 import getconfigs as gc
@@ -119,6 +120,10 @@ def jack_loop(clientname):
 def client_socket(data, quiet=True):
     """makes a socket for talking to the server"""
 
+    # avoid void command to reach server and get processed due to encoding
+    if data == '':
+        return b'ACK\n'
+
     server = 'localhost'
     port = gc.config['control_port']
 
@@ -137,13 +142,17 @@ def client_socket(data, quiet=True):
             print('Connected')
         try:
             # if a parameter is passed it is send to server
-            # and then connection is closed
-            if data:
-                s.send(data.encode())
+            s.send(data.encode())
+            # return raw bytes server answer
+            return s.recv(200)
         except:
             print(f'(client) unexpected error: {sys.exc_info()[0]}')
-        if not quiet:
-            print('Closing connection...')
+
+
+def get_state():
+    """retrieve state dictionary from server"""
+
+    return yaml.load(client_socket('status').decode().replace('OK\n', ''))
 
 
 def wait4result(command, answer,
