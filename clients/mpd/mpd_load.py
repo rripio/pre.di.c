@@ -52,44 +52,42 @@ def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
     return client
 
 
-def set_predic_vol_loop(c):
+def mpd_vol_loop():
     """loop: reads mpd volume, sets predic volume"""
 
+    interval = gc.config['command_delay'] / 10
+    mpd_client = connect_mpd()
+    mpd_vol = int(mpd_client.status()['volume'])
+    p_level = pd.get_state()['level']
     while True:
-        # 'c.idle' waits for a MPD change...,
-        # 'mixer' filters only volume events
-        c.idle('mixer')
-        # when something happens idle ends
-        newVol = c.status()['volume']
-        # set gain
-        g = str(int(round(
-                ((m.log(1+float(newVol)/100)/m.log(2))**1.293-1)
-                * mpd_conf['slider_range'] + gc.config['gain_max']))-6)
-        pd.client_socket("gain " + g, quiet=True)
-
-
-def set_mpd_vol_loop(gain):
-
-    # update mpd "fake volume"
-    vol = (100 * (m.exp(max(
-            ((gain - gc.config['gain_max']) / mpd_conf['slider_range'] + 1),0)
-            ** (1/1.293) * m.log(2)) - 1))
-     # minimal mpd volume
-    if vol < 1: vol = 1
-    try:
-        c = connect_mpd()
-        c.setvol(int(vol))
-        c.close()
-        c.disconnect()
-    except:
-        print("problem setting mpd volume")
+        # check volume changes in mpd
+        mpd_vol_old = mpd_vol
+        mpd_vol = int(mpd_client.status()['volume'])
+        if mpd_vol != mpd_vol_old:
+            # set level
+            p_level = round(((mpd_vol - 100) / 100 * mpd_conf['slider_range'])
+                                            - gc.speaker['ref_level_gain'])
+            pd.client_socket("level " + str(p_level), quiet=True)
+        p_level_old = p_level
+        p_level = pd.get_state()['level']
+        # check level changes in pre.di.c
+        if p_level != p_level_old:
+            p_gain = p_level + gc.speaker['ref_level_gain']
+            # update mpd "fake volume"
+            mpd_vol = round(p_gain * 100 / mpd_conf['slider_range'] + 100)
+            # minimal mpd volume
+            if mpd_vol < 0: mpd_vol = 0
+            mpd_client.setvol(int(mpd_vol))
+        time.sleep(interval)
+    mpd_client.close()
+    mpd_client.disconnect()
 
 
 def start():
     """loads mpd and jack loop"""
 
     # create jack loop for connections
-    # The jack_loop module will keep the loop alive, so we need to thread it
+    # The jack_loop function will keep the loop alive, so we need to thread it
     jloop = threading.Thread( target = pd.jack_loop, args=('mpd_loop',) )
     jloop.start()
 
@@ -102,7 +100,7 @@ def start():
         print('(mpd_load.py) mpd loading failed')
         return
 
-    # volume linked to mpd (optional)  # THIS MUST BE REVIEWED
+    # volume linked to mpd (optional)
     if mpd_conf['volume_linked']:
         print('(mpd_load.py) waiting for mpd')
         if pd.wait4result(
@@ -110,12 +108,8 @@ def start():
                                                                  'OK MPD'):
             print('(mpd_load.py) mpd started :-)')
             try:
-                c = connect_mpd()
-                c.timeout = 10
-                c.idletimeout = None
-                set_predic_vol_loop(c)
-                c.close()
-                c.disconnect()
+                mpdloop = threading.Thread( target = mpd_vol_loop )
+                mpdloop.start()
             except:
                 print('(mpd_load.py) mpd socket loop broke')
         else:
