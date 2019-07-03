@@ -60,24 +60,24 @@ def mpd_vol_loop():
     mpd_vol = int(mpd_client.status()['volume'])
     p_level = pd.get_state()['level']
     while True:
-        # check volume changes in mpd
-        mpd_vol_old = mpd_vol
-        mpd_vol = int(mpd_client.status()['volume'])
-        if mpd_vol != mpd_vol_old:
-            # set level
-            p_level = round(((mpd_vol - 100) / 100 * mpd_conf['slider_range'])
-                                            - gc.speaker['ref_level_gain'])
-            pd.client_socket("level " + str(p_level), quiet=True)
+        # check level changes in pre.di.c
         p_level_old = p_level
         p_level = pd.get_state()['level']
-        # check level changes in pre.di.c
         if p_level != p_level_old:
-            p_gain = p_level + gc.speaker['ref_level_gain']
             # update mpd "fake volume"
+            p_gain = p_level + gc.speaker['ref_level_gain']
             mpd_vol = round(p_gain * 100 / mpd_conf['slider_range'] + 100)
             # minimal mpd volume
             if mpd_vol < 0: mpd_vol = 0
             mpd_client.setvol(int(mpd_vol))
+        # check volume changes in mpd
+        mpd_vol_old = mpd_vol
+        mpd_vol = int(mpd_client.status()['volume'])
+        if mpd_vol != mpd_vol_old:
+            # update pre.di.c level
+            p_level = round(((mpd_vol - 100) / 100 * mpd_conf['slider_range'])
+                                                - gc.speaker['ref_level_gain'])
+            pd.client_socket("level " + str(p_level), quiet=True)
         time.sleep(interval)
     mpd_client.close()
     mpd_client.disconnect()
