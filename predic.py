@@ -208,7 +208,7 @@ def calc_headroom(gain, balance, eq_mag):
 
 def calc_input_gain(input):
 
-    return (gc.inputs[input]['gain'] if input in gc.inputs else 0)
+    return (gc.inputs[input]['gain'])
 
 
 def get_target():
