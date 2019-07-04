@@ -1,0 +1,15 @@
+# mpd path
+path: '/usr/bin/mpd'
+
+# mpd options
+options: ''
+port: '6600'
+
+# link mpd and predic volumes
+volume_linked: true
+# mpd volume range (dB from 0% to 100%)
+# 100% is then mapped to pre.di.c gain_max
+# gain at 0% is then gain_max - slider_range
+# must be positive integer
+slider_range: 48
+

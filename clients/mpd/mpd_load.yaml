@@ -1,7 +1,0 @@
-path: '/usr/bin/mpd'
-options: ''
-port: '6600'
-volume_linked: true
-# Must be positive integer
-slider_range: 48
-
