@@ -39,7 +39,7 @@ import getconfigs as gc
 
 
 ## user config
-config_filename = 'mpd_load.yaml'
+config_filename = 'config.yml'
 
 
 def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
@@ -59,16 +59,18 @@ def mpd_vol_loop():
         interval = gc.config['command_delay'] / 10
         mpd_client = connect_mpd()
         mpd_vol = int(mpd_client.status()['volume'])
-        p_level = pd.get_state()['level']
+        predic_level = pd.get_state()['level']
+        mpd_gain_min = gc.config['gain_max'] - mpd_conf['slider_range']
         try:
             while True:
                 # check level changes in pre.di.c
-                p_level_old = p_level
-                p_level = pd.get_state()['level']
-                if p_level != p_level_old:
+                predic_level_old = predic_level
+                predic_level = pd.get_state()['level']
+                if predic_level != predic_level_old:
                     # update mpd "fake volume"
-                    p_gain = p_level + gc.speaker['ref_level_gain']
-                    mpd_vol = round(p_gain * 100 / mpd_conf['slider_range'] + 100)
+                    predic_gain = predic_level + gc.speaker['ref_level_gain']
+                    mpd_vol = round((predic_gain - mpd_gain_min)
+                                            * 100 / mpd_conf['slider_range'])
                     # minimal mpd volume
                     if mpd_vol < 0: mpd_vol = 0
                     mpd_client.setvol(int(mpd_vol))
@@ -77,9 +79,11 @@ def mpd_vol_loop():
                 mpd_vol = int(mpd_client.status()['volume'])
                 if mpd_vol != mpd_vol_old:
                     # update pre.di.c level
-                    p_level = round(((mpd_vol - 100) / 100 * mpd_conf['slider_range'])
-                                                        - gc.speaker['ref_level_gain'])
-                    pd.client_socket("level " + str(p_level), quiet=True)
+                    predic_level = round((mpd_vol / 100
+                                        * mpd_conf['slider_range'])
+                                        + mpd_gain_min
+                                        - gc.speaker['ref_level_gain'])
+                    pd.client_socket("level " + str(predic_level), quiet=True)
                 time.sleep(interval)
         except:
             pass
