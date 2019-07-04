@@ -1,0 +1,17 @@
+# DVB-T config
+
+# please respect indentation when editing
+
+# name that DVB input will have in inputs.yml
+dvb_input: tdt
+
+## mplayer aditional options
+# -quiet: see channels change
+# -really-quiet: silent
+options: '-quiet -nolirc'
+
+# command fifo filename
+dvb_fifo: 'dvb_fifo'
+
+# mplayer path:
+mplayer_path: '/usr/bin/mplayer'

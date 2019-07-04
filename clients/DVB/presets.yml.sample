@@ -1,0 +1,19 @@
+# DVB-T presets (radio or not)
+
+# please respect indentation when editing
+
+# preset numbers assigned to stations names selected from
+# ~/.mplayer/channels.conf
+
+1: Radio Nacional
+2: Radio Clasica dolby
+3: Radio3 HQ
+4: Radio Exterior
+5: Radio5
+6: SER
+7: Kiss FM
+8: ONDA CERO
+9: ONDA MADRID
+10:
+11:
+
