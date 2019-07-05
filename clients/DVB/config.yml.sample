@@ -2,13 +2,16 @@
 
 # please respect indentation when editing
 
+# mplayer path:
+mplayer_path: '/usr/bin/mplayer'
+
 # mplayer aditional options:
 # -quiet: see channels change
 # -really-quiet: silent
 options: '-quiet -nolirc'
 
 # command fifo filename
-dvb_fifo: 'dvb_fifo'
+dvb_fifo: 'DVB_fifo'
 
-# mplayer path:
-mplayer_path: '/usr/bin/mplayer'
+# state filename:
+state: 'state.yml'
