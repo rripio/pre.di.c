@@ -2,7 +2,7 @@
 
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
-# Copyright (C) 2018 Roberto Ripio
+# Copyright (C) 2018-2019 Roberto Ripio
 #
 # pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
 # Copyright (c) 2006-2011 Roberto Ripio
@@ -28,34 +28,29 @@ use it with 'start' and 'stop' as options"""
 
 import sys
 import os
-import time
-import threading
+import subprocess as sp
+import multiprocessing as mp
 
-import basepaths as bp
 import getconfigs as gc
 import predic as pd
-import subprocess as sp
 
 
-## mplayer aditional options
-
-# -quiet: see channels change
-# -really-quiet: silent
-options = '-quiet -nolirc'
-# command fifo filename
-dvb_fifo = 'dvb_fifo'
-# mplayer path:
-mplayer_path = '/usr/bin/mplayer'
-# name used for info and pid saving
-program_alias = 'mplayer-dvb'
+## user config
+config_filename = 'config.yml'
 
 # initialize
+
 # get program folder for subsequent aux files finding
 # allways put a slash after directories
-dvb_folder = f'{os.path.dirname(sys.argv[0])}/'
-dvb_fifo = dvb_folder + dvb_fifo
+folder = f'{os.path.dirname(sys.argv[0])}/'
 
-
+# get config
+config = gc.get_yaml(folder + config_filename)
+dvb_fifo = folder + config['dvb_fifo']
+mplayer_path = config['mplayer_path']
+options = config['options']
+#get state
+state = gc.get_yaml(folder + config['state'])
 
 def select_channel(channel_name):
     """ sets channel in mplayer """
@@ -70,7 +65,7 @@ def select_channel(channel_name):
 
 
 def select_preset(preset):
-    """ selects preset from DVB-t.ini """
+    """ selects preset from DVB-t.yml """
 
     # get channel name from preset number
     if preset.isdigit():
@@ -79,29 +74,29 @@ def select_preset(preset):
             channel_name = gc.channels['presets'][preset].replace(' ','\ ')
         else:
             return False
-        if channel_name != '':
+        if channel_name:
             # set channel in mplayer
             if select_channel(channel_name):
                 return True
     return False
 
-"""
+
 def change_radio(new_radiopreset, state=state):
 
-    # list of defined presets, discarding those white in DVB-t.ini
-    ldp = [ preset for preset in gc.channels['presets'] if preset ]
+    # list of presets, discarding those white in presets.yml
+    presets = [ preset for preset in gc.channels['presets'] if preset ]
     # command arguments
     # 'next|prev' to walk through preset list
     if new_radiopreset == 'next':
-        new_radiopreset = ldp[ (ldp.index(state['radio']) + 1)
-                                % len(ldp) ]
+        new_radiopreset = presets[ (presets.index(state['radio']) + 1)
+                                % len(presets) ]
     elif new_radiopreset == 'prev':
-        new_radiopreset = ldp[ (ldp.index(state['radio']) - 1)
-                                % len(ldp) ]
+        new_radiopreset = presets[ (presets.index(state['radio']) - 1)
+                                % len(presets) ]
     # last used preset, that is, 'radio':
     elif new_radiopreset == 'restore':
         new_radiopreset = state['radio']
-    #previously used preset, that is, 'radio_prev':
+    # previously used preset, that is, 'radio_prev':
     elif new_radiopreset == 'back':
         new_radiopreset = state['radio_prev']
     # direct preset selection
@@ -114,14 +109,13 @@ def change_radio(new_radiopreset, state=state):
         state['radio_prev'] = state_old['radio_prev']
         warnings.append('Something went wrong when changing radio state')
     return state
-"""
 
 
 def start():
 
     # create jack loop for connections
     # The jack_loop module will keep the loop alive, so we need to thread it.
-    jloop = threading.Thread( target = pd.jack_loop, args=('dvb_loop',) )
+    jloop = mp.Process( target = pd.jack_loop, args=('dvb_loop',) )
     jloop.start()
 
     # starts mplayer DVB:

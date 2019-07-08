@@ -27,13 +27,13 @@ import socket
 import sys
 import time
 import os
-import numpy as np
 import subprocess as sp
 import contextlib as cl
-import threading
+import multiprocessing as mp
 
 import jack
 import yaml
+import numpy as np
 
 import basepaths as bp
 import getconfigs as gc
@@ -66,20 +66,23 @@ def read_clients(phase):
 
 def jack_loop(clientname):
     """creates a jack loop with given 'clientname'"""
-    # CREDITS:  https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
+    # CREDITS
+    # https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
 
     # The jack module instance for our looping ports
     client = jack.Client(name=clientname, no_start_server=True)
 
     if client.status.name_not_unique:
         client.close()
-        print( f'(predic.jack_loop) \'{clientname}\' already exists in JACK, nothing done.' )
+        print( f'(predic.jack_loop) \'{clientname}\''
+                            'already exists in JACK, nothing done.' )
         return
 
-    # Will use the threading.Event mechanism to keep this alive
-    event = threading.Event()
+    # Will use the multiprocessing.Event mechanism to keep this alive
+    event = mp.Event()
 
-    # This sets the actual loop that copies frames from our capture to our playback ports
+    # This sets the actual loop that copies frames from our capture
+    # to our playback ports
     @client.set_process_callback
     def process(frames):
         assert len(client.inports) == len(client.outports)
@@ -87,13 +90,15 @@ def jack_loop(clientname):
         for i, o in zip(client.inports, client.outports):
             o.get_buffer()[:] = i.get_buffer()
 
-    # If jack shutdowns, will trigger on 'event' so that the below 'whith client' will break.
+    # If jack shutdowns, will trigger on 'event' so that the below
+    # 'whith client' will break.
     @client.set_shutdown_callback
     def shutdown(status, reason):
         print('(predic.jack_loop) JACK shutdown!')
         print('(predic.jack_loop) JACK status:', status)
         print('(predic.jack_loop) JACK reason:', reason)
-        # This triggers an event so that the below 'with client' will terminate
+        # This triggers an event so that the below 'with client'
+        # will terminate
         event.set()
 
     # Create the ports

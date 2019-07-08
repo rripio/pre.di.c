@@ -4,17 +4,16 @@
 backend players"""
 
 import sys
-import threading
 import predic as pd
 import subprocess as sp
-
+import multiprocessing as mp
 
 def start():
 
     # create jack loop for connections
     # The jack_loop module will keep the loop alive, so we need to thread it.
     #pd.jack_loop('alsa_loop')
-    jloop = threading.Thread( target = pd.jack_loop, args=('alsa_loop',) )
+    jloop = mp.Process( target = pd.jack_loop, args=('alsa_loop',) )
     jloop.start()
 
 
