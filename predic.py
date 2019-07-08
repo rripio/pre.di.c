@@ -144,7 +144,7 @@ def client_socket(data, quiet=True):
             # if a parameter is passed it is send to server
             s.send(data.encode())
             # return raw bytes server answer
-            return s.recv(200)
+            return s.recv(256)
         except:
             print(f'(client) unexpected error: {sys.exc_info()[0]}')
 
