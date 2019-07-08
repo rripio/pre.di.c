@@ -28,6 +28,8 @@
 import sys
 import os
 
+import yaml
+
 import getconfigs as gc
 import predic as pd
 
@@ -40,11 +42,17 @@ config_filename = 'config.yml'
 # get program folder for subsequent aux files finding
 # allways put a slash after directories
 folder = f'{os.path.dirname(sys.argv[0])}/'
-# get config
-config = gc.get_yaml(folder + config_filename)
+# configs paths
+config_path = folder + config_filename
+config = gc.get_yaml(config_path)
+state_path = folder + config['state']
+presets_path = folder + config['presets']
+# get dictionaries
+state = gc.get_yaml(state_path)
+presets = gc.get_yaml(presets_path)
+# get command fifo name
 dvb_fifo = folder + config['dvb_fifo']
-#get state
-state = gc.get_yaml(folder + config['state'])
+
 
 def select_channel(channel_name):
     """ sets channel in mplayer """
@@ -58,14 +66,14 @@ def select_channel(channel_name):
         return False
 
 
-def select_preset(preset):
-    """ selects preset from DVB-t.yml """
+def select_preset(preset, preset_dict=presets):
+    """ selects preset from presets.yml """
 
     # get channel name from preset number
     if preset.isdigit():
         preset = int(preset)
-        if preset in gc.channels['presets']:
-            channel_name = gc.channels['presets'][preset].replace(' ','\ ')
+        if preset in preset_dict:
+            channel_name = preset_dict[preset].replace(' ','\ ')
         else:
             return False
         if channel_name:
@@ -75,44 +83,44 @@ def select_preset(preset):
     return False
 
 
-def change_radio(new_radiopreset, state=state):
+def change_radio(selected, preset_dict=presets, state=state):
+    """ process channel options """
 
     # list of presets, discarding those white in presets.yml
-    presets = [ preset for preset in gc.channels['presets'] if preset ]
+    state_old = state
+    presets = sorted(
+            [str(preset) for preset in preset_dict if preset_dict[preset]]
+            )
     # command arguments
     # 'next|prev' to walk through preset list
-    if new_radiopreset == 'next':
-        new_radiopreset = presets[ (presets.index(state['radio']) + 1)
-                                % len(presets) ]
-    elif new_radiopreset == 'prev':
-        new_radiopreset = presets[ (presets.index(state['radio']) - 1)
-                                % len(presets) ]
-    # last used preset, that is, 'radio':
-    elif new_radiopreset == 'restore':
-        new_radiopreset = state['radio']
-    # previously used preset, that is, 'radio_prev':
-    elif new_radiopreset == 'back':
-        new_radiopreset = state['radio_prev']
+    if selected == 'next':
+        selected = presets[ (presets.index(state['actual']) + 1)
+                                                        % len(presets) ]
+    elif selected == 'prev':
+        selected = presets[ (presets.index(state['actual']) - 1)
+                                                        % len(presets) ]
+    # last used preset, that is, 'actual':
+    elif selected == 'restore':
+        selected = state['actual']
+    # previously used preset, that is, 'previous':
+    elif selected == 'back':
+        selected = state['previous']
     # direct preset selection
-    if select_preset(new_radiopreset):
-        if new_radiopreset != state['radio']:
-            state['radio_prev'] = state['radio']
-        state['radio'] = new_radiopreset
+    if select_preset(selected):
+        if selected != state['actual']:
+            state['previous'] = state['actual']
+        state['actual'] = selected
     else:
-        state['radio'] = state_old['radio']
-        state['radio_prev'] = state_old['radio_prev']
-        warnings.append('Something went wrong when changing radio state')
+        state['actual'] = state_old['actual']
+        state['previous'] = state_old['previous']
+        print('(DVB_command) Something went wrong '
+                                    'when changing radio state')
     return state
 
 
 if sys.argv[1:]:
-    try:
-        option = {
-            'start' : start,
-            'stop'  : stop
-            }[sys.argv[1]]()
-    except KeyError:
-        print('DVB.py: bad option')
+    new_state = change_radio(sys.argv[1])
+    with open(state_path, 'w') as f:
+        yaml.dump(new_state, f, default_flow_style=False)
 else:
     print(__doc__)
-

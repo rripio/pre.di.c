@@ -15,3 +15,6 @@ dvb_fifo: 'DVB_fifo'
 
 # state filename:
 state: 'state.yml'
+
+#presets filename:
+presets: 'presets.yml'
