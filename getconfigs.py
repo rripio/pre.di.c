@@ -25,7 +25,6 @@ import yaml
 
 import basepaths as bp
 
-
 def get_yaml(filepath):
     """returns dictionary from yaml config file"""
 
@@ -62,6 +61,7 @@ try:
     (speaker, target_mag_path, target_pha_path) = get_speaker()
     inputs = get_yaml(bp.inputs_path)
     state = get_yaml(bp.state_path)
+    state_init = get_yaml(bp.state_init_path)
 except:
-    print('\nError: some config file failed to load')
+    print('\n(getconfigs) Error: some config file failed to load')
     sys.exit()

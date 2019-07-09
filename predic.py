@@ -37,6 +37,14 @@ import numpy as np
 
 import basepaths as bp
 import getconfigs as gc
+import stopaudio
+
+
+def stop_all():
+    """ stops all audio and the current script """
+
+    stopaudio.main('all')
+    sys.exit()
 
 
 def read_clients(phase):

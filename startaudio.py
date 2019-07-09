@@ -45,22 +45,6 @@ import basepaths as bp
 import getconfigs as gc
 
 
-def limit_level(level_on_startup, max_level_on_startup):
-    """limit volume as specified in config.ini"""
-
-    # if fixed volume on startup
-    if level_on_startup:
-        level = level_on_startup
-    elif max_level_on_startup:
-        if gc.state['level'] > max_level_on_startup:
-            level = max_level_on_startup
-        else:
-            level = gc.state['level']
-    else:
-        level = gc.state['level']
-    pd.client_socket('level ' + str(level))
-
-
 def init_jack():
     """loads jack server"""
 
@@ -79,7 +63,8 @@ def init_jack():
         print('\n(startaudio) jack started :-)')
     else:
         print('\n(startaudio) error starting jack')
-        sys.exit()
+        pd.stop_all()
+
 
 def init_brutefir():
     """loads brutefir"""
@@ -96,7 +81,8 @@ def init_brutefir():
         print('\n(startaudio) brutefir started :-)')
     else:
         print('\n(startaudio) error starting brutefir')
-        sys.exit()
+        pd.stop_all()
+
 
 def init_server():
     """loads server"""
@@ -107,55 +93,41 @@ def init_server():
                             , bp.server_path])
     except:
         print('\n(startaudio) server didn\'t load')
-        sys.exit() # initaudio stopped
+        stopaudio.main('all')
+        sys.exit()
     # waiting for server
     if pd.wait4result('echo ping| nc localhost 9999 2>/dev/null', 'OK'):
         print('\n(startaudio) server started :-)')
     else:
         print('\n(startaudio) server not accesible Bye :-/')
-        sys.exit() # initaudio stopped
+        pd.stop_all()
 
 
-def init_state_settings():
+def init_state_settings(state):
     """restore audio settings as stored in state.yaml
 and takes care of options to reset some of them"""
 
-    # tone reset
-    if gc.config['tone_reset_on_startup']:
-        pd.client_socket('bass 0')
-        pd.client_socket('treble 0')
-    else:
-        pd.client_socket('bass ' + str(gc.state['bass']))
-        pd.client_socket('treble ' + str(gc.state['treble']))
-    # balance reset
-    if gc.config['balance_reset_on_startup']:
-        pd.client_socket('balance 0')
-    else:
-        pd.client_socket('balance ' + str(gc.state['balance']))
-    # loudness reset
-    if gc.config['loudness_reset_on_startup']:
-        pd.client_socket('loudness_track off')
-        pd.client_socket('loudness_ref 0')
-    else:
-        pd.client_socket('loudness_track ' + gc.state['loudness_track'])
-        pd.client_socket('loudness_ref ' + str(gc.state['loudness_ref']))
-    # midside reset
-    if gc.config['midside_reset_on_startup']:
-        pd.client_socket('midside off')
-    else:
-        pd.client_socket('midside ' + str(gc.state['midside']))
-    # optional limited volume on start
-    limit_level(gc.config['level_on_startup']
-                , gc.config['max_level_on_startup'])
+    # tone
+    pd.client_socket('bass ' + str(state['bass']))
+    pd.client_socket('treble ' + str(state['treble']))
+    # balance
+    pd.client_socket('balance ' + str(state['balance']))
+    # loudness
+    pd.client_socket('loudness_track ' + state['loudness_track'])
+    pd.client_socket('loudness_ref ' + str(state['loudness_ref']))
+    # midside
+    pd.client_socket('midside ' + str(state['midside']))
+    # volume
+    pd.client_socket('level ' + str(state['level']))
     # restore DRC_set
-    pd.client_socket( 'drc ' + str( gc.state['DRC_set'] ) )
+    pd.client_socket('drc ' + str( state['DRC_set']))
     # XO_set will be adjusted when restoring inputs
 
 
-def init_inputs():
+def init_inputs(state):
     """restore selected input as stored in state.ini"""
 
-    input = gc.state['input']
+    input = state['input']
     print(f'\n(startaudio) restoring input: {input}')
     # exit if input is 'none'
     if input == 'none':
@@ -181,11 +153,25 @@ def init_inputs():
         time.sleep(interval)
     if rem_time:
         # input ports up and ready :-)
-        pd.client_socket('input ' + gc.state['input'], quiet=True)
+        pd.client_socket('input ' + state['input'], quiet=True)
     else:
         # input ports are down :-(
         print(f'\n(startaudio) time out restoring input \'{input}\''
                                         ', ports not available')
+
+
+def get_state():
+    """set initial state state as last saved or as user determined"""
+
+    state = gc.state
+
+    if gc.config['use_state_init']:
+        state_init = gc.state_init
+        for setting in state_init:
+             if state[setting]:
+                state[setting] = state_init[setting]
+
+    return state
 
 
 def main(run_level):
@@ -209,10 +195,12 @@ def main(run_level):
                 print(f'pid {p.pid:4}: {client}')
             except:
                 print(f'problem launching client {client}')
+        # getting operating state
+        state = get_state()
         # restoring previous state
-        init_state_settings()
+        init_state_settings(state)
         # restoring inputs
-        init_inputs()
+        init_inputs(state)
         # some info
         pd.show()
 

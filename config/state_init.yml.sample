@@ -1,0 +1,13 @@
+DRC_set: none
+XO_set: mp
+balance: 0.0
+bass: 0
+input: mpd
+level: -12.0
+loudness_ref: 0.0
+loudness_track: 'off'
+midside: 'off'
+mute: 'off'
+polarity: +
+solo: 'off'
+treble: 0

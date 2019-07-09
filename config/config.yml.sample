@@ -19,18 +19,10 @@ system_card: hw:0,0
 command_delay: 1
 # "beep" command options to indicate software load
 beep_options: ''
-# max digital gain (dB)
+# max allowed digital gain (dB)
 gain_max: 6
-# zero some settings on startup (True/False)
-tone_reset_on_startup : False
-balance_reset_on_startup : False
-loudness_reset_on_startup : False
-midside_reset_on_startup: False
-# volume settings on startup. assign null to not set
-level_on_startup: null
-# max Volume on startup. Leave blank to not set
-# precedes level_on_startup
-max_level_on_startup: 0
+# use fixed initial state, instead of last saved state
+use_state_init: true
 # sound monitors (jack ports). Assign '' to not set
 # input selector will connect sources to this ports
 jack_monitors: ''
@@ -40,8 +32,7 @@ jack_monitors: ''
 ## core
 
 # server
-# screen output:
-# 0 (minimal), 1 (informative), 2 (debug)
+# screen output: 0 (minimal), 1 (informative), 2 (debug)
 server_output: 0
 # address and port
 # 0.0.0.0 listen to all net connections
