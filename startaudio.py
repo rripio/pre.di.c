@@ -22,7 +22,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Starts pre.di.c audio system
+"""
+Starts pre.di.c audio system
     Usage:
     startaudio.py [ core | clients | all ]   (default 'all')
     core: jack, brutefir, server
@@ -33,6 +34,7 @@
 import sys
 import os
 import time
+import shlex
 import subprocess as sp
 
 import jack
@@ -222,11 +224,9 @@ if __name__ == '__main__':
         run_level = sys.argv[1]
     else:
         run_level = 'all'
-    if run_level in ['core', 'all']:
-        # stop proccesses
-        print('\n(startaudio) stopping proccesses\n')
-        stopaudio.main(run_level)
+    if run_level in ['core', 'clients', 'all']:
         print('\n(startaudio) starting runlevel ' + run_level)
         main(run_level)
+
     else:
         print(__doc__)
