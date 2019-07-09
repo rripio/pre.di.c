@@ -68,9 +68,6 @@ def main(run_level):
         # jack
         print('(stopaudio) stopping jackd')
         Popen (['pkill', '-f', 'jackd'], stdout=fnull, stderr=fnull)
-        # startaudio
-        Popen (['pkill', '-f', 'startaudio.py']
-                                        , stdout=fnull, stderr=fnull)
 
 
 if __name__ == '__main__':
