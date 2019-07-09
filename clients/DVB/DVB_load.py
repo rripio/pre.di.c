@@ -35,20 +35,22 @@ import getconfigs as gc
 import predic as pd
 
 
-## user config
+# filenames
 config_filename = 'config.yml'
+dvb_fifo_filename = 'DVB_fifo'
 
 # initialize
 
 # get program folder for subsequent aux files finding
 # allways put a slash after directories
 folder = f'{os.path.dirname(sys.argv[0])}/'
-
 # get config
 config = gc.get_yaml(folder + config_filename)
-dvb_fifo = folder + config['dvb_fifo']
+
 mplayer_path = config['mplayer_path']
 options = config['options']
+dvb_fifo = folder + dvb_fifo_filename
+
 
 def start():
 

@@ -9,12 +9,3 @@ mplayer_path: '/usr/bin/mplayer'
 # -quiet: see channels change
 # -really-quiet: silent
 options: '-quiet -nolirc'
-
-# command fifo filename
-dvb_fifo: 'DVB_fifo'
-
-# state filename:
-state: 'state.yml'
-
-#presets filename:
-presets: 'presets.yml'

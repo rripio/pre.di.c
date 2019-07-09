@@ -34,24 +34,21 @@ import getconfigs as gc
 import predic as pd
 
 
-## user config
-config_filename = 'config.yml'
-
-# initialize
-
+# filenames
+dvb_fifo_filename = 'DVB_fifo'
+state_filename = 'state.yml'
+presets_filename = 'presets.yml'
 # get program folder for subsequent aux files finding
 # allways put a slash after directories
 folder = f'{os.path.dirname(sys.argv[0])}/'
 # configs paths
-config_path = folder + config_filename
-config = gc.get_yaml(config_path)
-state_path = folder + config['state']
-presets_path = folder + config['presets']
+state_path = folder + state_filename
+presets_path = folder + presets_filename
 # get dictionaries
 state = gc.get_yaml(state_path)
 presets = gc.get_yaml(presets_path)
 # get command fifo name
-dvb_fifo = folder + config['dvb_fifo']
+dvb_fifo = folder + dvb_fifo_filename
 
 
 def select_channel(channel_name):
