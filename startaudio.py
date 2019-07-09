@@ -168,7 +168,7 @@ def get_state():
     if gc.config['use_state_init']:
         state_init = gc.state_init
         for setting in state_init:
-             if state[setting]:
+             if state_init[setting]:
                 state[setting] = state_init[setting]
 
     return state
