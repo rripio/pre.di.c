@@ -22,7 +22,8 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Stops pre.di.c audio system
+"""
+Stops pre.di.c audio system
     Usage:
     stopaudio.py [ core | clients | all ]   (default 'all')
     core: jack, brutefir, server
@@ -32,6 +33,7 @@
 
 import sys
 import os
+import time
 from subprocess import Popen
 
 import basepaths as bp
@@ -44,18 +46,6 @@ fnull = open(os.devnull, 'w')
 def main(run_level):
     """main stop function"""
 
-    if run_level in ['core', 'all']:
-        # controlserver
-        print('(stopaudio) stopping server')
-        Popen (['pkill', '-f', bp.server_path]
-                                        , stdout=fnull, stderr=fnull)
-        # brutefir
-        print('(stopaudio) stopping brutefir')
-        Popen (['killall', gc.config['brutefir_path']]
-                                        , stdout=fnull, stderr=fnull)
-        # jack
-        print('(stopaudio) stopping jackd')
-        Popen (['killall', 'jackd'], stdout=fnull, stderr=fnull)
     if run_level in ['clients', 'all']:
         # stop external scripts, sources and clients
         print('(stopaudio) stopping clients')
@@ -66,6 +56,21 @@ def main(run_level):
                 Popen(command_path.split())
             except:
                 print(f'problem stopping client "{client}":\n\t{err}')
+    if run_level in ['core', 'all']:
+        # controlserver
+        print('(stopaudio) stopping server')
+        Popen (['pkill', '-f', bp.server_path]
+                                        , stdout=fnull, stderr=fnull)
+        # brutefir
+        print('(stopaudio) stopping brutefir')
+        Popen (['pkill', '-f', gc.config['brutefir_path']]
+                                        , stdout=fnull, stderr=fnull)
+        # jack
+        print('(stopaudio) stopping jackd')
+        Popen (['pkill', '-f', 'jackd'], stdout=fnull, stderr=fnull)
+        # startaudio
+        Popen (['pkill', '-f', 'startaudio.py']
+                                        , stdout=fnull, stderr=fnull)
 
 
 if __name__ == '__main__':
@@ -73,7 +78,7 @@ if __name__ == '__main__':
     run_level = 'all'
     if sys.argv[1:]:
         run_level = sys.argv[1]
-    if run_level in ['core', 'players', 'all']:
+    if run_level in ['core', 'clients', 'all']:
         print('(stopaudio) stopping', run_level)
         main(run_level)
     else:
