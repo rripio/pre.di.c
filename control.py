@@ -565,7 +565,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             'midside':          change_midside,
             'mute':             change_mute,
             'solo':             change_solo,
-            'loudness_track':   change_loudness_track,
+            'loudness':         change_loudness_track,
             'loudness_ref':     change_loudness_ref,
             'treble':           change_treble,
             'bass':             change_bass,
