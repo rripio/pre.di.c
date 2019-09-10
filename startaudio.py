@@ -113,7 +113,7 @@ and takes care of options to reset some of them"""
     # balance
     pd.client_socket('balance ' + str(state['balance']))
     # loudness
-    pd.client_socket('loudness_track ' + state['loudness_track'])
+    pd.client_socket('loudness ' + state['loudness'])
     pd.client_socket('loudness_ref ' + str(state['loudness_ref']))
     # midside
     pd.client_socket('midside ' + str(state['midside']))

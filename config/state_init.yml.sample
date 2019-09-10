@@ -4,7 +4,7 @@ bass: 0
 input: mpd
 level: -12.0
 loudness_ref: 0.0
-loudness_track: 'off'
+loudness: 'off'
 midside: 'off'
 mute: 'off'
 polarity: +

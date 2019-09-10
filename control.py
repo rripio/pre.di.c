@@ -333,18 +333,18 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
         return state
 
 
-    def change_loudness_track(loudness_track, state=state):
+    def change_loudness_track(loudness, state=state):
 
-        if loudness_track in ['on', 'off']:
-            state['loudness_track'] = loudness_track
+        if loudness in ['on', 'off']:
+            state['loudness'] = loudness
             try:
                 state = change_gain(gain)
             except:
-                state['loudness_track'] = state_old['loudness_track']
-                warnings.append('Something went wrong when changing loudness_track state')
+                state['loudness'] = state_old['loudness']
+                warnings.append('Something went wrong when changing loudness state')
         else:
             state['mute'] = state_old['mute']
-            warnings.append('bad loudness_track option: '
+            warnings.append('bad loudness option: '
                                 'has to be "on" or "off"')
         return state
 
@@ -440,7 +440,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                                         - gc.config['loudness_SPLmin'])
             loudness_variation = (gc.config['loudness_SPLmax']
                                         - gc.config['loudness_SPLref'])
-            if state['loudness_track'] == 'on':
+            if state['loudness'] == 'on':
                 if (m.fabs(state['loudness_ref']) > loudness_variation):
                     state['loudness_ref'] = m.copysign(
                             loudness_variation, state['loudness_ref'])

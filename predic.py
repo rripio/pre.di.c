@@ -259,7 +259,7 @@ def show(throw_it=None, state=gc.state):
     print()
     print(f"Bass           {gc.state['bass']: 6.1f}")
     print(f"Treble         {gc.state['treble']: 6.1f}")
-    print(f"Loudness       {gc.state['loudness_track']:>6s}")
+    print(f"Loudness       {gc.state['loudness']:>6s}")
     print(f"Loudness ref   {gc.state['loudness_ref']: 6.1f}")
 
     print()
