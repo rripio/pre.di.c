@@ -165,7 +165,7 @@ def client_socket(data, quiet=True):
 def get_state():
     """retrieve state dictionary from server"""
 
-    return yaml.load(client_socket('status').decode().replace('OK\n', ''))
+    return yaml.safe_load(client_socket('status').decode().replace('OK\n', ''))
 
 
 def wait4result(command, answer,

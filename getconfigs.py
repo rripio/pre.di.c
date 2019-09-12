@@ -29,7 +29,7 @@ def get_yaml(filepath):
     """returns dictionary from yaml config file"""
 
     with open(filepath) as configfile:
-        config_dict = yaml.load(configfile)
+        config_dict = yaml.safe_load(configfile)
 
     return config_dict
 
@@ -45,7 +45,7 @@ def get_speaker():
                 + '/' + bp.speaker_filename )
 
     with open(full_path) as configfile:
-        config_dict = yaml.load(configfile)
+        config_dict = yaml.safe_load(configfile)
 
     target_mag_path = (bp.loudspeakers_folder + mainconfig['loudspeaker']
                         + '/' + config_dict['target_mag_curve'])
