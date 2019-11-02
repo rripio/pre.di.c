@@ -73,8 +73,10 @@ def init_brutefir():
     # folder in brutefir_config
     os.chdir(bp.loudspeakers_folder + gc.config['loudspeaker'])
     print(f'\n(startaudio) starting brutefir on {os.getcwd()}')
-    sp.Popen([gc.config['brutefir_path'], gc.config['brutefir_options']
-            ,'brutefir_config'])
+    brutefir_cmd_list = ([gc.config['brutefir_path']]
+                    + gc.config['brutefir_options'].split()
+                    + ['brutefir_config'])
+    brutefir = sp.Popen(brutefir_cmd_list)
     # waiting for brutefir
     if  pd.wait4result('echo "quit" | nc localhost 3000 2>/dev/null',
                                                             'Welcome'):
