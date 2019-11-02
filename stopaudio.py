@@ -59,12 +59,10 @@ def main(run_level):
     if run_level in ['core', 'all']:
         # controlserver
         print('(stopaudio) stopping server')
-        Popen (['pkill', '-f', bp.server_path]
-                                        , stdout=fnull, stderr=fnull)
+        Popen (['pkill', '-f', 'server.py'], stdout=fnull, stderr=fnull)
         # brutefir
         print('(stopaudio) stopping brutefir')
-        Popen (['pkill', '-f', gc.config['brutefir_path']]
-                                        , stdout=fnull, stderr=fnull)
+        Popen (['pkill', '-f', 'brutefir'], stdout=fnull, stderr=fnull)
         # jack
         print('(stopaudio) stopping jackd')
         Popen (['pkill', '-f', 'jackd'], stdout=fnull, stderr=fnull)

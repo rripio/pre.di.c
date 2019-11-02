@@ -7,9 +7,6 @@
 ## hardware
 
 loudspeaker: example_1_way
-# system card
-# (full ALSA identifier hw:Tarjeta,Device)
-system_card: hw:0,0
 
 
 
@@ -41,15 +38,13 @@ control_address: 0.0.0.0
 control_port: 9999
 
 # jack
-jack_path: /usr/bin/jackd
-# jack options
-# jack on ALSA: omit cards and fs (managed in initaudio.py)
-jack_options: --silent -R -P 90 -dalsa -p256
+# jack on ALSA: omit fs (managed in initaudio.py,
+# taken from loudspeaker config)
+jack_command: /usr/bin/chrt 95 /usr/bin/jackd --silent -R -P 90 -dalsa -p1024 hw:0,0
 
 # brutefir
-brutefir_path: /usr/bin/brutefir
 # for options see https://www.ludd.ltu.se/~torger/brutefir.html#config
-brutefir_options: ''
+brutefir_command: /usr/bin/chrt 90 /usr/bin/brutefir
 brutefir_ports: brutefir:input-0 brutefir:input-1
 # cli address and port
 bfcli_address: 127.0.0.1

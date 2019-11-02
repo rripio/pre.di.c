@@ -49,15 +49,7 @@ def init_jack():
     """loads jack server"""
 
     print('\n(startaudio) starting jack\n')
-    jack_cmd_list = ([gc.config['jack_path']]
-                        + gc.config['jack_options'].split()
-                        + ['-r'] + [str(gc.speaker['fs'])])
-    if 'alsa' in gc.config['jack_options']:
-        jack_cmd_list += ['-d' + gc.config['system_card']]
-    elif not 'dummy' in gc.config['jack_options']:
-        print('\n(startaudio) error starting jack: unknown backend')
-        sys.exit(-1)
-    jack = sp.Popen(jack_cmd_list)
+    jack = sp.Popen(gc.config['jack_command'].split())
     # waiting for jackd:
     if pd.wait4result('jack_lsp', 'system'):
         print('\n(startaudio) jack started :-)')
@@ -73,10 +65,8 @@ def init_brutefir():
     # folder in brutefir_config
     os.chdir(bp.loudspeakers_folder + gc.config['loudspeaker'])
     print(f'\n(startaudio) starting brutefir on {os.getcwd()}')
-    brutefir_cmd_list = ([gc.config['brutefir_path']]
-                    + gc.config['brutefir_options'].split()
-                    + ['brutefir_config'])
-    brutefir = sp.Popen(brutefir_cmd_list)
+    brutefir = sp.Popen(gc.config['brutefir_command'].split()
+                            + ['brutefir_config'])
     # waiting for brutefir
     if  pd.wait4result('echo "quit" | nc localhost 3000 2>/dev/null',
                                                             'Welcome'):
@@ -91,8 +81,7 @@ def init_server():
 
     print('\n(startaudio) starting server\n')
     try:
-        control = sp.Popen(['python3'
-                            , bp.server_path])
+        control = sp.Popen(['python3', bp.main_folder + 'server.py'])
     except:
         print('\n(startaudio) server didn\'t load')
         stopaudio.main('all')

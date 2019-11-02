@@ -36,23 +36,17 @@ loudspeakers_folder = main_folder + 'loudspeakers/'
 pids_folder = main_folder + 'run/'
 
 # filenames
-server_filename = 'server.py'
-
 config_filename = 'config.yml'
 state_filename = 'state.yml'
 state_init_filename = 'state_init.yml'
 inputs_filename = 'inputs.yml'
 clients_start_filename = 'clients.start'
 clients_stop_filename = 'clients.stop'
-
 speaker_filename = 'speaker.yml'
 
 ## program composed values
 
 # paths
-
-server_path = main_folder + server_filename
-
 config_path = config_folder + config_filename
 state_path = config_folder + state_filename
 state_init_path = config_folder + state_init_filename
