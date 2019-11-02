@@ -49,7 +49,8 @@ def init_jack():
     """loads jack server"""
 
     print('\n(startaudio) starting jack\n')
-    jack = sp.Popen(gc.config['jack_command'].split())
+    jack = sp.Popen(gc.config['jack_command'].split() + ['-r']
+                        + [str(gc.speaker['fs'])])
     # waiting for jackd:
     if pd.wait4result('jack_lsp', 'system'):
         print('\n(startaudio) jack started :-)')

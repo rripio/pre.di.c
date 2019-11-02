@@ -40,7 +40,7 @@ control_port: 9999
 # jack
 # jack on ALSA: omit fs (managed in initaudio.py,
 # taken from loudspeaker config)
-jack_command: /usr/bin/chrt 95 /usr/bin/jackd --silent -R -P 90 -dalsa -p1024 hw:0,0
+jack_command: /usr/bin/chrt 95 /usr/bin/jackd --silent -R -P 90 -dalsa -p1024 -d hw:0,0
 
 # brutefir
 # for options see https://www.ludd.ltu.se/~torger/brutefir.html#config
