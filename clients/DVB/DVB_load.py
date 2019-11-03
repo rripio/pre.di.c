@@ -35,21 +35,17 @@ import getconfigs as gc
 import predic as pd
 
 
+# initialize
+
 # filenames
 config_filename = 'config.yml'
-dvb_fifo_filename = 'DVB_fifo'
-
-# initialize
 
 # get program folder for subsequent aux files finding
 # allways put a slash after directories
 folder = f'{os.path.dirname(sys.argv[0])}/'
+
 # get config
 config = gc.get_yaml(folder + config_filename)
-
-mplayer_path = config['mplayer_path']
-options = config['options']
-dvb_fifo = folder + dvb_fifo_filename
 
 
 def start():
@@ -60,8 +56,9 @@ def start():
     jloop.start()
 
     # starts mplayer DVB:
-    opts = f'{options} -idle -slave -profile dvb -input file={dvb_fifo}'
-    command = f'{mplayer_path} {opts}'
+    dvb_fifo = folder + config["fifo_filename"]
+    opts = f'-idle -slave -profile dvb -input file={dvb_fifo}'
+    command = f'{config["command"]} {opts}'
     sp.Popen(command.split())
 
 

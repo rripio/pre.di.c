@@ -2,10 +2,11 @@
 
 # please respect indentation when editing
 
-# mplayer path:
-mplayer_path: '/usr/bin/mplayer'
-
+# mplayer command:
 # mplayer aditional options:
 # -quiet: see channels change
 # -really-quiet: silent
-options: '-quiet -nolirc'
+command: /usr/bin/mplayer -quiet -nolirc
+
+# commands FIFO filename
+fifo_filename: DVB_fifo

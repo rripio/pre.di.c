@@ -104,9 +104,8 @@ def start():
 
     # starts MPD
     print('(mpd_load.py) starting mpd')
-    mpd_command = f'{mpd_conf["path"]} {mpd_conf["options"]}'
     try:
-        sp.Popen(mpd_command.split())
+        sp.Popen(mpd_conf["command"].split())
     except:
         print('(mpd_load.py) mpd loading failed')
         return
