@@ -99,20 +99,12 @@ def init_state_settings(state):
     """restore audio settings as stored in state.yaml
 and takes care of options to reset some of them"""
 
-    # tone
-    pd.client_socket('bass ' + str(state['bass']))
-    pd.client_socket('treble ' + str(state['treble']))
-    # balance
-    pd.client_socket('balance ' + str(state['balance']))
-    # loudness
-    pd.client_socket('loudness ' + state['loudness'])
-    pd.client_socket('loudness_ref ' + str(state['loudness_ref']))
-    # midside
-    pd.client_socket('midside ' + str(state['midside']))
-    # volume
-    pd.client_socket('level ' + str(state['level']))
-    # restore DRC_set
-    pd.client_socket('drc ' + str( state['DRC_set']))
+    for setting in ['bass', 'treble', 'balance',
+                    'loudness', 'loudness_ref',
+                    'midside', 'polarity', 'solo',
+                    'drc', 'level', 'mute']:
+        pd.client_socket(setting + ' ' + str(state[setting]))
+
     # XO_set will be adjusted when restoring inputs
 
 

@@ -233,29 +233,29 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
         return state
 
 
-    def change_drc(DRC_set, state=state):
+    def change_drc(drc, state=state):
 
-        state['DRC_set'] = DRC_set
-        # if drc 'none' coefficient -1 is set, so latency and CPU usage
+        state['drc'] = drc
+        # if drc is 'none' coefficient -1 is set, so latency and CPU usage
         # are improved
-        if DRC_set == 'none':
+        if drc == 'none':
             filters = gc.speaker['DRC']['filters']
             for i in range(len(filters)):
                 bf_cli('cfc "'
                         + filters[i] + '" -1')
         else:
             try:
-                if DRC_set in gc.speaker['DRC']['sets']:
-                    coeffs = gc.speaker['DRC']['sets'][DRC_set]
+                if drc in gc.speaker['DRC']['sets']:
+                    coeffs = gc.speaker['DRC']['sets'][drc]
                     filters = gc.speaker['DRC']['filters']
                     for i in range(len(filters)):
                         bf_cli('cfc "'
                                 + filters[i] + '" "' + coeffs[i] + '"')
                 else:
-                    state['DRC_set'] = state_old['DRC_set']
+                    state['drc'] = state_old['drc']
                     print('bad DRC name')
             except:
-                state['DRC_set'] = state_old['DRC_set']
+                state['drc'] = state_old['drc']
                 warnings.append('Something went wrong when changing DRC state')
         return state
 
