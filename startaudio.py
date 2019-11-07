@@ -99,13 +99,26 @@ def init_state_settings(state):
     """restore audio settings as stored in state.yaml
 and takes care of options to reset some of them"""
 
-    for setting in ['bass', 'treble', 'balance',
-                    'loudness', 'loudness_ref',
-                    'midside', 'polarity', 'solo',
-                    'drc', 'level', 'mute']:
-        pd.client_socket(setting + ' ' + str(state[setting]))
+    # it is assumed that command name and setting name are the same
 
-    # XO_set will be adjusted when restoring inputs
+    # input associated xo will prevail if use_input_xo is set
+    # because init_inputs function is executed after this one
+
+    for setting in [
+            'xo',
+            'drc',
+            'polarity',
+            'midside',
+            'mute',
+            'solo',
+            'loudness',
+            'loudness_ref',
+            'treble',
+            'bass',
+            'balance',
+            'level'
+            ]:
+        pd.client_socket(setting + ' ' + str(state[setting]))
 
 
 def init_inputs(state):
@@ -152,9 +165,7 @@ def get_state():
     if gc.config['use_state_init']:
         state_init = gc.state_init
         for setting in state_init:
-             if state_init[setting]:
-                state[setting] = state_init[setting]
-
+            state[setting] = state_init[setting]
     return state
 
 

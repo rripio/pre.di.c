@@ -174,32 +174,34 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
         state['input'] = input
         try:
-            # if none disconnects all inputs
+            # if 'none', disconnects all inputs
             if input == 'none':
                 disconnect_inputs()
                 return state
             elif input == None:
                 raise
             elif input in gc.inputs:
-                state['XO_set'] = gc.inputs[input]['xo']
+                if do_change_input (input
+                        , gc.inputs[state['input']]['in_ports']
+                        , audio_ports.split()
+                        , gc.inputs[input]['resampled']):
+                        # input change went OK
+                    state = change_gain(gain)
+                    # change xo if configured so
+                    if gc.config['use_input_xo']:
+                        state['xo'] = gc.inputs[input]['xo']
+                        state = change_xovers(state['xo'])
+                else:
+                    warnings.append('Error changing to input ' + input)
+                    state['input']  = state_old['input']
+                    state['xo'] = state_old['xo']
             else:
                 state['input'] = state_old['input']
                 warnings.append('Input name "%s" incorrect' % input)
                 return state
-            if do_change_input (input
-                    , gc.inputs[state['input']]['in_ports']
-                    , audio_ports.split()
-                    , gc.inputs[input]['resampled']):
-                    # input change went OK
-                state = change_xovers(state['XO_set'])
-                state = change_gain(gain)
-            else:
-                warnings.append('Error changing to input ' + input)
-                state['input']  = state_old['input']
-                state['XO_set'] = state_old['XO_set']
         except:
             state['input']  = state_old['input']
-            state['XO_set'] = state_old['XO_set']
+            state['xo'] = state_old['xo']
             warnings.append('Something went wrong when changing input state')
         return state
 
@@ -216,7 +218,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
     def change_xovers(XO_set, state=state):
 
-        state['XO_set'] = XO_set
+        state['xo'] = XO_set
         try:
             if XO_set in gc.speaker['XO']['sets']:
                 coeffs = gc.speaker['XO']['sets'][XO_set]
@@ -225,10 +227,10 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                     bf_cli('cfc "'
                             + filters[i] + '" "' + coeffs[i] + '"')
             else:
-                state['XO_set'] = state_old['XO_set']
+                state['xo'] = state_old['xo']
                 print('bad XO name')
         except:
-            state['XO_set'] = state_old['XO_set']
+            state['xo'] = state_old['xo']
             warnings.append('Something went wrong when changing XO state')
         return state
 
@@ -236,7 +238,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
     def change_drc(drc, state=state):
 
         state['drc'] = drc
-        # if drc is 'none' coefficient -1 is set, so latency and CPU usage
+        # if drc 'none' coefficient -1 is set, so latency and CPU usage
         # are improved
         if drc == 'none':
             filters = gc.speaker['DRC']['filters']

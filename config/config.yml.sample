@@ -20,6 +20,8 @@ beep_options: ''
 gain_max: 6
 # use fixed initial state, instead of last saved state
 use_state_init: true
+# when changing inputs use associated xo
+use_input_xo: true
 # sound monitors (jack ports). Assign '' to not set
 # input selector will connect sources to this ports
 jack_monitors: ''

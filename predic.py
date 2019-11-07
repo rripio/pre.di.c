@@ -263,7 +263,7 @@ def show(throw_it=None, state=gc.state):
     print(f"Loudness ref   {gc.state['loudness_ref']: 6.1f}")
 
     print()
-    print(f"Crossover set  {gc.state['XO_set']:>6s}")
+    print(f"Crossover set  {gc.state['xo']:>6s}")
     print(f"DRC set        {gc.state['drc']:>6s}")
 
     print()
