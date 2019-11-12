@@ -34,22 +34,19 @@ def get_yaml(filepath):
     return config_dict
 
 
-def get_speaker():
+def get_speaker(config):
     """returns speaker dictionary from yaml speaker config file"""
 
-    # get main config file for getting loudspeaker name
-    mainconfig =  get_yaml(bp.config_path)
-
     full_path = ( bp.loudspeakers_folder
-                + mainconfig['loudspeaker']
+                + config['loudspeaker']
                 + '/' + bp.speaker_filename )
 
     with open(full_path) as configfile:
         config_dict = yaml.safe_load(configfile)
 
-    target_mag_path = (bp.loudspeakers_folder + mainconfig['loudspeaker']
+    target_mag_path = (bp.loudspeakers_folder + config['loudspeaker']
                         + '/' + config_dict['target_mag_curve'])
-    target_pha_path = (bp.loudspeakers_folder + mainconfig['loudspeaker']
+    target_pha_path = (bp.loudspeakers_folder + config['loudspeaker']
                         + '/' + config_dict['target_pha_curve'])
 
     return (config_dict, target_mag_path, target_pha_path)
@@ -58,7 +55,7 @@ def get_speaker():
 # dictionaries
 try:
     config = get_yaml(bp.config_path)
-    (speaker, target_mag_path, target_pha_path) = get_speaker()
+    (speaker, target_mag_path, target_pha_path) = get_speaker(config)
     inputs = get_yaml(bp.inputs_path)
     state = get_yaml(bp.state_path)
     state_init = get_yaml(bp.state_init_path)

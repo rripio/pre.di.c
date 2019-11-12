@@ -20,10 +20,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-## customizable initial values
-
 import os
 
+
+## customizable initial values
 
 # folders
 # main folder is the folder this very module is run from
@@ -43,6 +43,7 @@ inputs_filename = 'inputs.yml'
 clients_start_filename = 'clients.start'
 clients_stop_filename = 'clients.stop'
 speaker_filename = 'speaker.yml'
+
 
 ## program composed values
 
