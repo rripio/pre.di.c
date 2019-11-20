@@ -181,10 +181,10 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             elif input == None:
                 raise
             elif input in gc.inputs:
-                if do_change_input (input
-                        , gc.inputs[state['input']]['in_ports']
-                        , audio_ports.split()
-                        , gc.inputs[input]['resampled']):
+                if do_change_input (input,
+                        gc.inputs[state['input']]['in_ports'],
+                        audio_ports.split(),
+                        gc.inputs[input]['resampled']):
                         # input change went OK
                     state = change_gain(gain)
                     # change xo if configured so
