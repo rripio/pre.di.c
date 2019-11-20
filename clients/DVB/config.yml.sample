@@ -3,10 +3,9 @@
 # please respect indentation when editing
 
 # mplayer command:
-# mplayer aditional options:
-# -quiet: see channels change
-# -really-quiet: silent
-command: /usr/bin/mplayer -quiet -nolirc
+# mplayer aditional options set in ~/.mplayer/config
+command: /usr/bin/mplayer -profile dvb
 
 # commands FIFO filename
+# option -input file={dvb_fifo} is added in program
 fifo_filename: DVB_fifo

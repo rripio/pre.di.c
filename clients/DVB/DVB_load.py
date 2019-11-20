@@ -57,8 +57,7 @@ def start():
 
     # starts mplayer DVB:
     dvb_fifo = folder + config["fifo_filename"]
-    opts = f'-idle -slave -profile dvb -input file={dvb_fifo}'
-    command = f'{config["command"]} {opts}'
+    command = f'{config["command"]} -input file={dvb_fifo}'
     sp.Popen(command.split())
 
 
