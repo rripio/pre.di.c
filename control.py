@@ -78,7 +78,7 @@ def unplug_sources_of(jack_client, out_ports):
         print('error disconnecting outputs')
 
 
-def do_change_input(input_name, in_ports, out_ports, resampled=False):
+def do_change_input(input_name, in_ports, out_ports):
     """'in_ports':   list [L,R] of jack capture ports of chosen source
 'out_ports':  list of ports in 'audio_ports' variable"""
 
@@ -183,8 +183,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             elif input in gc.inputs:
                 if do_change_input (input,
                         gc.inputs[state['input']]['in_ports'],
-                        audio_ports.split(),
-                        gc.inputs[input]['resampled']):
+                        audio_ports.split()):
                         # input change went OK
                     state = change_gain(gain)
                     # change xo if configured so
