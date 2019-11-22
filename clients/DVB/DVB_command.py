@@ -51,11 +51,13 @@ presets = gc.get_yaml(presets_path)
 dvb_fifo = folder + dvb_fifo_filename
 
 
-def select_channel(channel_name):
+def select_channel(channel_name, channel_gain):
     """ sets channel in mplayer """
 
     try:
-        command = ('loadfile dvb://' + channel_name + '\n')
+        command = (f"loadfile dvb://{channel_name}\n"
+                    f"af_cmdline volume {channel_gain}\n"
+                    'get_property volume\n')
         with open(dvb_fifo, 'w') as f:
             f.write(command)
         return True
@@ -70,12 +72,13 @@ def select_preset(preset, preset_dict=presets):
     if preset.isdigit():
         preset = int(preset)
         if preset in preset_dict:
-            channel_name = preset_dict[preset].replace(' ','\ ')
+            channel_name = preset_dict[preset]["name"].replace(' ','\ ')
+            channel_level = preset_dict[preset]["gain"]
         else:
             return False
         if channel_name:
             # set channel in mplayer
-            if select_channel(channel_name):
+            if select_channel(channel_name, channel_level):
                 return True
     return False
 
