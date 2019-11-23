@@ -21,6 +21,8 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import sys
+import numpy as np
 
 
 ## customizable initial values
@@ -54,6 +56,44 @@ state_init_path = config_folder + state_init_filename
 inputs_path = config_folder + inputs_filename
 clients_start_path = config_folder + clients_start_filename
 clients_stop_path = config_folder + clients_stop_filename
+
+
+## equalizer
+
+# jump between equalization curves is 1dB
+# all values of bass, treble and loudness are rounded to the closer integer
+
+# filenames
+frequencies = 'R20_ext-freq.dat'
+loudness_mag_curves = 'R20_ext-loudness_mag.dat'
+loudness_pha_curves = 'R20_ext-loudness_pha.dat'
+treble_mag_curves = 'R20_ext-treble_mag.dat'
+treble_pha_curves = 'R20_ext-treble_pha.dat'
+bass_mag_curves = 'R20_ext-bass_mag.dat'
+bass_pha_curves = 'R20_ext-bass_pha.dat'
+
+# parameters
+
+loudness_SPLref = 83
+loudness_SPLmax = 90
+loudness_SPLmin = 70
+tone_variation = 6
+balance_variation = 6
+
+# curves
+try:
+    curves = {
+        'frequencies'         : np.loadtxt(config_folder + frequencies),
+        'loudness_mag_curves' : np.loadtxt(config_folder + loudness_mag_curves),
+        'loudness_pha_curves' : np.loadtxt(config_folder + loudness_pha_curves),
+        'treble_mag_curves'   : np.loadtxt(config_folder + treble_mag_curves),
+        'treble_pha_curves'   : np.loadtxt(config_folder + treble_pha_curves),
+        'bass_mag_curves'     : np.loadtxt(config_folder + bass_mag_curves),
+        'bass_pha_curves'     : np.loadtxt(config_folder + bass_pha_curves)
+        }
+except:
+    print('Failed to load EQ files')
+    sys.exit(-1)
 
 # we still don't know the loudspeaker name, so speaker_path
 # is built downstream

@@ -51,27 +51,3 @@ brutefir_ports: brutefir:input-0 brutefir:input-1
 # cli address and port
 bfcli_address: 127.0.0.1
 bfcli_port: 3000
-
-
-
-## equalizer
-
-# filenames of frequencies, loudness curves, tone control curves, 
-frequencies: R20_ext-freq.dat
-loudness_mag_curves: R20_ext-loudness_mag.dat
-loudness_pha_curves: R20_ext-loudness_pha.dat
-treble_mag_curves: R20_ext-treble_mag.dat
-treble_pha_curves: R20_ext-treble_pha.dat
-bass_mag_curves: R20_ext-bass_mag.dat
-bass_pha_curves: R20_ext-bass_pha.dat
-loudness_SPLref: 83
-loudness_SPLmax: 90
-loudness_SPLmin: 70
-# max dB deviation from 0
-tone_variation: 6
-balance_variation: 6
-# jump between equalization curves (dB)
-# not yet implemented, given as an indication that must be assumed
-step: 1
-
-

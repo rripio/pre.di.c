@@ -27,35 +27,20 @@ import jack
 import math as m
 import numpy as np
 
-import basepaths as bp
+import init
 import getconfigs as gc
 import predic as pd
 
 ## initialize
 
-# EQ curves
-cf = bp.config_folder
+# target curves
 try:
-    curves = {
-        'freq'                : np.loadtxt(cf
-                                + gc.config['frequencies']),
-        'loudness_mag_curves' : np.loadtxt(cf
-                                + gc.config['loudness_mag_curves']),
-        'loudness_pha_curves' : np.loadtxt(cf
-                                + gc.config['loudness_pha_curves']),
-        'treble_mag'          : np.loadtxt(cf
-                                + gc.config['treble_mag_curves']),
-        'treble_pha'          : np.loadtxt(cf
-                                + gc.config['treble_pha_curves']),
-        'bass_mag'            : np.loadtxt(cf
-                                + gc.config['bass_mag_curves']),
-        'bass_pha'            : np.loadtxt(cf
-                                + gc.config['bass_pha_curves']),
+    target = {
         'target_mag'          : np.loadtxt(gc.target_mag_path),
         'target_pha'          : np.loadtxt(gc.target_pha_path)
         }
 except:
-    print('Failed to load EQ files')
+    print('Failed to load target files')
     sys.exit(-1)
 # audio ports
 audio_ports = gc.config['brutefir_ports']
@@ -125,7 +110,8 @@ def bf_cli(command):
 
 
 # main function for command proccessing
-def proccess_commands(full_command, state=gc.state, curves=curves):
+def proccess_commands(
+        full_command, state=gc.state, curves=init.curves, target = target):
     """proccesses commands for predic control"""
 
     # normally write state, but there are exceptions
@@ -159,7 +145,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
     def change_target(throw_it):
 
         try:
-            (curves['target_mag'], curves['target_pha']) = pd.get_target()
+            (target['target_mag'], target['target_pha']) = pd.get_target()
             state = change_gain(gain)
         except:
             warnings.append('Something went wrong when changing target state')
@@ -269,7 +255,8 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
                 state = change_gain(gain)
             except:
                 state['polarity'] = state_old['polarity']
-                warnings.append('Something went wrong when changing polarity state')
+                warnings.append(
+                        'Something went wrong when changing polarity state')
         else:
             state['polarity'] = state_old['polarity']
             warnings.append('bad polarity option: has to be "+", "-", "+-" '
@@ -401,8 +388,7 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
     def change_level(level, state=state, add=add):
 
         try:
-            state['level'] = (float(level)
-                                    + state['level'] * add)
+            state['level'] = (float(level) + state['level'] * add)
             gain = pd.calc_gain(state['level'], state['input'])
             state = change_gain(gain)
         except:
@@ -421,15 +407,17 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
         def change_eq():
 
             eq_str = ''
-            l = len(curves['freq'])
+            l = len(curves['frequencies'])
             for i in range(l):
-                eq_str = eq_str + str(curves['freq'][i]) + '/' + str(eq_mag[i])
+                eq_str = (eq_str + str(curves['frequencies'][i])
+                                                + '/' + str(eq_mag[i]))
                 if i != l:
                     eq_str += ', '
             bf_cli('lmc eq "c.eq" mag ' + eq_str)
             eq_str = ''
             for i in range(l):
-                eq_str = eq_str + str(curves['freq'][i]) + '/' + str(eq_pha[i])
+                eq_str = (eq_str + str(curves['frequencies'][i])
+                                                + '/' + str(eq_pha[i]))
                 if i != l:
                     eq_str += ', '
             bf_cli('lmc eq "c.eq" phase ' + eq_str)
@@ -437,16 +425,16 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
         def change_loudness():
 
-            loudness_max_i = (gc.config['loudness_SPLmax']
-                                        - gc.config['loudness_SPLmin'])
-            loudness_variation = (gc.config['loudness_SPLmax']
-                                        - gc.config['loudness_SPLref'])
+            loudness_max_i = (init.loudness_SPLmax
+                                        - init.loudness_SPLmin)
+            loudness_variation = (init.loudness_SPLmax
+                                        - init.loudness_SPLref)
             if state['loudness'] == 'on':
                 if (m.fabs(state['loudness_ref']) > loudness_variation):
                     state['loudness_ref'] = m.copysign(
                             loudness_variation, state['loudness_ref'])
-                loudness_i = (gc.config['loudness_SPLmax']
-                    - (state['level'] + gc.config['loudness_SPLref']
+                loudness_i = (init.loudness_SPLmax
+                    - (state['level'] + init.loudness_SPLref
                                             + state['loudness_ref']))
             else:
                 # index of all zeros curve
@@ -466,31 +454,31 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
         def change_treble():
 
-            treble_i = gc.config['tone_variation'] - state['treble']
+            treble_i = init.tone_variation - state['treble']
             if treble_i < 0:
                 treble_i = 0
-            if treble_i > 2 * gc.config['tone_variation']:
-                treble_i = 2 * gc.config['tone_variation']
+            if treble_i > 2 * init.tone_variation:
+                treble_i = 2 * init.tone_variation
             # force integer
             treble_i = int(round(treble_i))
-            eq_mag = curves['treble_mag'][:,treble_i]
-            eq_pha = curves['treble_pha'][:,treble_i]
-            state['treble'] = gc.config['tone_variation'] - treble_i
+            eq_mag = curves['treble_mag_curves'][:,treble_i]
+            eq_pha = curves['treble_pha_curves'][:,treble_i]
+            state['treble'] = init.tone_variation - treble_i
             return eq_mag, eq_pha
 
 
         def change_bass():
 
-            bass_i = gc.config['tone_variation'] - state['bass']
+            bass_i = init.tone_variation - state['bass']
             if bass_i < 0:
                 bass_i = 0
-            if bass_i > 2 * gc.config['tone_variation']:
-                bass_i = 2 * gc.config['tone_variation']
+            if bass_i > 2 * init.tone_variation:
+                bass_i = 2 * init.tone_variation
             # force integer
             bass_i = int(round(bass_i))
-            eq_mag = curves['bass_mag'][:,bass_i]
-            eq_pha = curves['bass_pha'][:,bass_i]
-            state['bass'] = gc.config['tone_variation'] - bass_i
+            eq_mag = curves['bass_mag_curves'][:,bass_i]
+            eq_pha = curves['bass_pha_curves'][:,bass_i]
+            state['bass'] = init.tone_variation - bass_i
             return eq_mag, eq_pha
 
 
@@ -499,9 +487,9 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
             bf_atten_dB_l = gain
             bf_atten_dB_r = gain
             # add balance dB gains
-            if abs(state['balance']) > gc.config['balance_variation']:
+            if abs(state['balance']) > init.balance_variation:
                 state['balance'] = m.copysign(
-                        gc.config['balance_variation'] ,state['balance'])
+                        init.balance_variation ,state['balance'])
             bf_atten_dB_l = bf_atten_dB_l - (state['balance'] / 2)
             bf_atten_dB_r = bf_atten_dB_r + (state['balance'] / 2)
             # from dB to multiplier to implement easily
@@ -533,8 +521,8 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
         t_mag,      t_pha      = change_treble()
         b_mag,      b_pha      = change_bass()
         # compose EQ curves with target
-        eq_mag = curves['target_mag'] + l_mag + t_mag + b_mag
-        eq_pha = curves['target_pha'] + l_pha + t_pha + b_pha
+        eq_mag = target['target_mag'] + l_mag + t_mag + b_mag
+        eq_pha = target['target_pha'] + l_pha + t_pha + b_pha
         # calculate headroom
         headroom = pd.calc_headroom(gain, abs(state['balance']/2), eq_mag)
         # moves headroom to accomodate input gain. It can lead to clipping
@@ -555,29 +543,29 @@ def proccess_commands(full_command, state=gc.state, curves=curves):
 
     ## parse  commands and select corresponding actions
 
-    try:
-        state = {
-            'target':           change_target,
-            'show':             show,
-            'input':            change_input,
-            'xo':               change_xovers,
-            'drc':              change_drc,
-            'polarity':         change_polarity,
-            'midside':          change_midside,
-            'mute':             change_mute,
-            'solo':             change_solo,
-            'loudness':         change_loudness_track,
-            'loudness_ref':     change_loudness_ref,
-            'treble':           change_treble,
-            'bass':             change_bass,
-            'balance':          change_balance,
-            'level':            change_level,
-            'gain':             change_gain
-            }[command](arg)
-    except KeyError:
-        warnings.append(f"Unknown command '{command}'")
-    except:
-        warnings.append(f"Problems in command '{command}'")
+#    try:
+    state = {
+        'target':           change_target,
+        'show':             show,
+        'input':            change_input,
+        'xo':               change_xovers,
+        'drc':              change_drc,
+        'polarity':         change_polarity,
+        'midside':          change_midside,
+        'mute':             change_mute,
+        'solo':             change_solo,
+        'loudness':         change_loudness_track,
+        'loudness_ref':     change_loudness_ref,
+        'treble':           change_treble,
+        'bass':             change_bass,
+        'balance':          change_balance,
+        'level':            change_level,
+        'gain':             change_gain
+        }[command](arg)
+#    except KeyError:
+#        warnings.append(f"Unknown command '{command}'")
+#    except:
+#        warnings.append(f"Problems in command '{command}'")
 
     # return a dictionary of predic state
     return (state, warnings)

@@ -23,7 +23,7 @@
 import sys
 import yaml
 
-import basepaths as bp
+import init
 
 def get_yaml(filepath):
     """returns dictionary from yaml config file"""
@@ -37,16 +37,16 @@ def get_yaml(filepath):
 def get_speaker(config):
     """returns speaker dictionary from yaml speaker config file"""
 
-    full_path = ( bp.loudspeakers_folder
+    full_path = ( init.loudspeakers_folder
                 + config['loudspeaker']
-                + '/' + bp.speaker_filename )
+                + '/' + init.speaker_filename )
 
     with open(full_path) as configfile:
         config_dict = yaml.safe_load(configfile)
 
-    target_mag_path = (bp.loudspeakers_folder + config['loudspeaker']
+    target_mag_path = (init.loudspeakers_folder + config['loudspeaker']
                         + '/' + config_dict['target_mag_curve'])
-    target_pha_path = (bp.loudspeakers_folder + config['loudspeaker']
+    target_pha_path = (init.loudspeakers_folder + config['loudspeaker']
                         + '/' + config_dict['target_pha_curve'])
 
     return (config_dict, target_mag_path, target_pha_path)
@@ -54,11 +54,11 @@ def get_speaker(config):
 
 # dictionaries
 try:
-    config = get_yaml(bp.config_path)
+    config = get_yaml(init.config_path)
     (speaker, target_mag_path, target_pha_path) = get_speaker(config)
-    inputs = get_yaml(bp.inputs_path)
-    state = get_yaml(bp.state_path)
-    state_init = get_yaml(bp.state_init_path)
+    inputs = get_yaml(init.inputs_path)
+    state = get_yaml(init.state_path)
+    state_init = get_yaml(init.state_init_path)
 except:
     print('\n(getconfigs) Error: some config file failed to load')
     sys.exit()

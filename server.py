@@ -26,7 +26,7 @@ import asyncio
 import yaml
 
 import control
-import basepaths as bp
+import init
 import getconfigs as gc
 
 
@@ -70,7 +70,7 @@ async def handle_commands(reader, writer):
 
             # writes state file
             try:
-                with open(bp.state_path, 'w') as f:
+                with open(init.state_path, 'w') as f:
                     yaml.dump(state, f, default_flow_style=False)
                 # print warnings
                 if len(warnings) > 0:

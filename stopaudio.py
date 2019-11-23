@@ -36,7 +36,7 @@ import os
 import time
 from subprocess import Popen
 
-import basepaths as bp
+import init
 import getconfigs as gc
 import predic as pd
 
@@ -52,7 +52,7 @@ def main(run_level):
         clients_stop = pd.read_clients('stop')
         for command in clients_stop:
             try:
-                command_path = f'{bp.clients_folder}{command}'
+                command_path = f'{init.clients_folder}{command}'
                 Popen(command_path.split())
             except:
                 print(f'problem stopping client "{client}":\n\t{err}')

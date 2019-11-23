@@ -35,9 +35,9 @@ import jack
 import yaml
 import numpy as np
 
-import basepaths as bp
-import getconfigs as gc
+import init
 import stopaudio
+import getconfigs as gc
 
 
 def stop_all():
@@ -53,9 +53,9 @@ def read_clients(phase):
     phase: <'start'|'stop'> phase of client activation or deactivation"""
 
     if   phase == 'start':
-        clients_list_path = bp.clients_start_path
+        clients_list_path = init.clients_start_path
     elif phase == 'stop':
-        clients_list_path = bp.clients_stop_path
+        clients_list_path = init.clients_stop_path
 
     with open (clients_list_path) as clients_file:
         # init a list of clients to load
