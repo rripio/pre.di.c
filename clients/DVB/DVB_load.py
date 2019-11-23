@@ -49,6 +49,7 @@ config = gc.get_yaml(folder + config_filename)
 
 
 def start():
+    """loads mplayer and jack loop"""
 
     # create jack loop for connections
     # The jack_loop module will keep the loop alive, so we need to thread it.
@@ -57,14 +58,16 @@ def start():
 
     # starts mplayer DVB:
     dvb_fifo = folder + config["fifo_filename"]
-    command = f'{config["command"]} -input file={dvb_fifo}'
+    command = f'{config["start_command"]} -input file={dvb_fifo}'
     sp.Popen(command.split())
 
 
 def stop():
+    """kills mplayer and this script"""
 
-    sp.Popen('pkill -f /home/predic/pre.di.c/clients/DVB/DVB_load.py'.split())
-    sp.Popen('pkill -f /usr/bin/mplayer'.split())
+    dir = os.path.dirname(os.path.realpath(__file__))
+    sp.Popen(f'{config["stop_command"]}'.split())
+    sp.Popen(f'pkill -f {dir}/DVB_load.py'.split())
 
 
 if sys.argv[1:]:

@@ -105,7 +105,7 @@ def start():
     # starts MPD
     print('(mpd_load.py) starting mpd')
     try:
-        sp.Popen(mpd_conf["command"].split())
+        sp.Popen(mpd_conf["start_command"].split())
     except:
         print('(mpd_load.py) mpd loading failed')
         return
@@ -134,14 +134,13 @@ def start():
 def stop():
     """kills mpd and this script"""
 
-    sp.Popen(('pkill -f ' +
-                '/home/predic/pre.di.c/clients/mpd/mpd_load.py').split())
-    sp.Popen('pkill -f /usr/bin/mpd'.split())
+    sp.Popen(mpd_conf["stop_command"].split())
+    sp.Popen((f'pkill -f {dir}/mpd_load.py').split())
 
 
 if sys.argv[1:]:
     dir = os.path.dirname(os.path.realpath(__file__))
-    mpd_conf = gc.get_yaml(dir + '/' + config_filename)
+    mpd_conf = gc.get_yaml(f'{dir}/{config_filename}')
     try:
         option = {
             'start' : start,

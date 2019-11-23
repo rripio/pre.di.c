@@ -1,10 +1,13 @@
-# DVB-T config
+# DVB-T client config
 
 # please respect indentation when editing
 
-# mplayer command:
+# mplayer start command line:
 # mplayer aditional options set in ~/.mplayer/config
-command: /usr/bin/mplayer -profile dvb
+start_command: /usr/bin/mplayer -profile dvb
+
+# mplayer kill command line:
+stop_command: pkill -f /usr/bin/mplayer
 
 # commands FIFO filename
 # option -input file={dvb_fifo} is added in program

@@ -1,8 +1,15 @@
-# mpd command
-#command: /usr/bin/chrt 90 /usr/bin/mpd
-command: /usr/bin/mpd
+# mpd client config
 
-# mpd options
+# please respect indentation when editing
+
+# mpd start command line:
+#command: /usr/bin/chrt 90 /usr/bin/mpd
+start_command: /usr/bin/mpd
+
+# mpd kill command line:
+stop_command: pkill -f /usr/bin/mpd
+
+# port to connect to
 port: '6600'
 
 # link mpd and predic volumes
