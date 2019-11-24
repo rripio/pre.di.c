@@ -1,4 +1,9 @@
-# Entradas externas
+## lirc include config file
+
+
+
+# external inputs 
+
 # mode external
 begin external
 	begin

@@ -1,4 +1,9 @@
-# Music Player Daemon
+## lirc include config file
+
+
+
+# music player daemon
+
 # mode mpd
 begin mpd
     begin

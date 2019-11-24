@@ -1,14 +1,22 @@
+## lirc main config file
 
-#Ecualización y crossover
+
+
+# EQ and XO
+
 include ~/.config/lirc/eqxorc
 
+
 # Starts in mpd mode
+
 begin
 	flags = startup_mode
 	mode = mpd
 end
 
-# On/off
+
+# on / off
+
 begin
 	prog = irexec
 	button = KEY_POWER2
@@ -19,7 +27,10 @@ begin
     button = KEY_SELECT
 	config = ~/bin/stopaudio
 end
-# Controles de sonido
+
+
+# sound controls
+
 begin
      prog = irexec
      button = KEY_MUTE
@@ -76,6 +87,7 @@ begin tones
     end
 end tones
 
+
 # levels
 
 begin
@@ -113,7 +125,9 @@ begin
 	config = ~/bin/control 'loudness off'
 end
 
-# Controles de navegación y entradas internas
+
+# inputs
+
 begin
     button = KEY_TV
     prog = irexec
@@ -142,7 +156,10 @@ end
 #    button = TV
 #end
 
-# Music Player Daemon
+
+# modes
+
+# music player daemon
 # mode mpd
 include ~/.config/lirc/mpdrc
 
@@ -154,6 +171,6 @@ include ~/.config/lirc/cddarc
 # mode tdt
 include ~/.config/lirc/tdtrc
 
-## Entradas externas
-## mode external
+# external inputs
+# mode external
 #include ~/.config/lirc/externalrc
