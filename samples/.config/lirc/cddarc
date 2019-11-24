@@ -1,4 +1,9 @@
+## lirc include config file
+
+
+
 # mplayer cdda
+
 # mode cdda
 begin cdda 
     begin

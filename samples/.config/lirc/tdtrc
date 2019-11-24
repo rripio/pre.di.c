@@ -1,6 +1,10 @@
-# mplayer tdt
-# mode tdt
+## lirc include config file
 
+
+
+# mplayer tdt
+
+# mode tdt
 begin tdt 
     begin  
          prog = irexec
