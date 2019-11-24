@@ -1,0 +1,16 @@
+# general options
+
+idle=true
+slave=true
+nolirc=true
+quiet=true
+
+# profiles
+
+[dvb]
+ao=jack:name=mplayer_dvb:port=dvb_loop
+af=volume=0
+
+[cdda]
+ao=jack:name=mplayer_cdda:noconnect
+

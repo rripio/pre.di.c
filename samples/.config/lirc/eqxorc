@@ -1,0 +1,47 @@
+#Ecualización y crossover
+
+#XO Botón azul
+begin
+    prog = irexec
+    button = KEY_BLUE
+    button = 1
+	config = ~/bin/control 'xo lp'
+	flags = quit
+end
+begin
+    prog = irexec
+    button = KEY_BLUE
+    button = 2
+	config = ~/bin/control 'xo mp'
+	flags = quit
+end
+
+#EQ Botón amarillo
+begin
+    prog = irexec
+    button = KEY_YELLOW
+    button = 0
+	config = ~/bin/control 'drc 0'
+	flags = quit
+end
+begin
+    prog = irexec
+    button = KEY_YELLOW
+    button = 1
+	config = ~/bin/control 'drc 1'
+	flags = quit
+end
+begin
+    prog = irexec
+    button = KEY_YELLOW
+    button = 2
+	config = ~/bin/control 'drc 2'
+	flags = quit
+end
+begin
+    prog = irexec
+    button = KEY_YELLOW
+    button = 3
+	config = ~/bin/control 'drc 3'
+	flags = quit
+end

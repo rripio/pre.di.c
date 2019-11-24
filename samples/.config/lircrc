@@ -1,0 +1,159 @@
+
+#Ecualización y crossover
+include ~/.config/lirc/eqxorc
+
+# Starts in mpd mode
+begin
+	flags = startup_mode
+	mode = mpd
+end
+
+# On/off
+begin
+	prog = irexec
+	button = KEY_POWER2
+	config = ~/bin/startaudio
+end
+begin
+	prog = irexec
+    button = KEY_SELECT
+	config = ~/bin/stopaudio
+end
+# Controles de sonido
+begin
+     prog = irexec
+     button = KEY_MUTE
+	 config = ~/bin/control 'mute on'
+	 config = ~/bin/control 'mute off'
+end
+begin
+    prog = irexec
+    button = KEY_PREVIOUS
+	config = ~/bin/control 'loudness on'
+	config = ~/bin/control 'loudness off'
+end
+begin
+    mode = tones
+    button = KEY_MENU
+end
+
+begin tones
+    begin
+        prog = irexec
+        button = KEY_VOLUMEUP
+        config = ~/bin/control 'bass +1 add'
+        repeat = 1
+        delay = 1
+        flags = quit
+    end
+    begin
+        prog = irexec
+        button = KEY_VOLUMEDOWN
+		config = ~/bin/control 'bass -1 add'
+        repeat = 1
+        delay = 1
+        flags = quit
+    end
+    begin
+        prog = irexec
+        button = KEY_CHANNELUP
+		config = ~/bin/control 'treble +1 add'
+        repeat = 1
+        delay = 1
+        flags = quit
+    end
+    begin
+        prog = irexec
+        button = KEY_CHANNELDOWN
+		config = ~/bin/control 'treble -1 add'
+        repeat = 1
+        delay = 1
+        flags = quit
+    end
+    begin
+        flags = mode
+        button = KEY_EXIT
+    end
+end tones
+
+# levels
+
+begin
+    prog = irexec
+    button = KEY_CHANNELUP
+	config = ~/bin/control 'loudness +1 add'
+    repeat = 1
+    delay = 1
+end
+begin
+    prog = irexec
+    button = KEY_CHANNELDOWN
+	config = ~/bin/control 'loudness -1 add'
+    repeat = 1
+    delay = 1
+end
+begin
+    prog = irexec
+    button = KEY_VOLUMEUP
+	config = ~/bin/control 'level +1 add'
+    repeat = 5
+#    delay = 1
+end
+begin
+    prog = irexec
+    button = KEY_VOLUMEDOWN
+	config = ~/bin/control 'level -1 add'
+    repeat = 1
+    delay = 1
+end
+begin
+    prog = irexec
+    button = KEY_PREVIOUS
+	config = ~/bin/control 'loudness on'
+	config = ~/bin/control 'loudness off'
+end
+
+# Controles de navegación y entradas internas
+begin
+    button = KEY_TV
+    prog = irexec
+    config = ~/bin/control "input a"
+end
+begin
+    mode = mpd
+    button = KEY_AUDIO
+    prog = irexec
+    config = ~/bin/control "input mpd"
+end
+begin
+    mode = tdt
+    button = KEY_RADIO
+    prog = irexec
+    config = ~/bin/control "input tdt"
+end
+#begin
+#    mode = cdda
+#    button = KEY_EPG
+#    prog = irexec
+#    config = ~/bin/control "input cdda"
+#end
+#begin
+#    mode = external
+#    button = TV
+#end
+
+# Music Player Daemon
+# mode mpd
+include ~/.config/lirc/mpdrc
+
+# mplayer cdda
+# mode cdda
+include ~/.config/lirc/cddarc
+
+# mplayer tdt
+# mode tdt
+include ~/.config/lirc/tdtrc
+
+## Entradas externas
+## mode external
+#include ~/.config/lirc/externalrc

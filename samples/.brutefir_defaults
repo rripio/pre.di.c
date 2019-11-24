@@ -1,0 +1,69 @@
+## general settings
+
+
+
+float_bits: 32;             # internal floating point precision
+sampling_rate: 44100;       # sampling rate in Hz of audio interfaces
+filter_length: 65536;       # length of filters
+config_file: "~/.brutefir_config"; # standard location of main config file
+overflow_warnings: true;    # echo warnings to stderr if overflow occurs
+show_progress: true;        # echo filtering progress to stderr
+max_dither_table_size: 0;   # maximum size in bytes of precalculated dither
+allow_poll_mode: false;     # allow use of input poll mode
+modules_path: ".";          # extra path where to find BruteFIR modules
+monitor_rate: false;        # monitor sample rate
+powersave: false;           # pause filtering when input is zero
+lock_memory: true;          # try to lock memory if realtime prio is set
+sdf_length: -1;             # subsample filter half length in samples
+safety_limit: 20;           # if non-zero max dB in output before aborting
+convolver_config: "~/.brutefir_convolver"; # location of convolver config file
+
+# I/O
+
+input {
+	device: "file" {};  # module and parameters to get audio
+	sample: "S16_LE";   # sample format
+	channels: 2/0,1;    # number of open channels / which to use
+	delay: 0,0;         # delay in samples for each channel
+	maxdelay: -1;       # max delay for variable delays
+	subdelay: 0,0;      # subsample delay in 1/100th sample for each channel
+	mute: false,false;  # mute active on startup for each channel
+};
+
+output {
+	device: "file" {};  # module and parameters to put audio
+	sample: "S16_LE";   # sample format
+	channels: 2/0,1;    # number of open channels / which to use
+	delay: 0,0;         # delay in samples for each channel
+	maxdelay: -1;       # max delay for variable delays
+	subdelay: 0,0;      # subsample delay in 1/100th sample for each channel
+	mute: false,false;  # mute active on startup for each channel
+	dither: false;      # apply dither
+};
+
+
+
+## coeffs
+
+
+
+coeff {
+	format: "TEXT";     # file format
+	attenuation: 0.0;   # attenuation in dB
+	blocks: -1;         # how long in blocks
+	skip: 0;            # how many bytes to skip
+	shared_mem: false;  # allocate in shared memory
+};
+
+
+
+
+## filters
+
+
+
+filter {
+	process: -1;        # process index to run in (-1 means auto)
+	delay: 0;           # predelay, in blocks
+	crossfade: false;   # crossfade when coefficient is changed
+};
