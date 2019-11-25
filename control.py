@@ -43,7 +43,7 @@ except:
     print('Failed to load target files')
     sys.exit(-1)
 # audio ports
-audio_ports = gc.config['brutefir_ports']
+audio_ports = gc.config['audio_ports']
 # warnings
 warnings = []
 
@@ -67,7 +67,7 @@ def do_change_input(input_name, in_ports, out_ports):
     """'in_ports':   list [L,R] of jack capture ports of chosen source
 'out_ports':  list of ports in 'audio_ports' variable"""
 
-    monitor_ports = gc.config['jack_monitors'].split()
+    monitor_ports = gc.config['monitors_ports'].split()
     # switch
     try:
         # jack.attach('tmp')
