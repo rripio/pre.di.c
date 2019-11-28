@@ -126,11 +126,8 @@ def init_inputs(state):
 
     input = state['input']
     print(f'\n(startaudio) restoring input: {input}')
-    # exit if input is 'none'
-    if input == 'none':
-        return
     # wait for input ports to be up
-    ports = pd.gc.inputs[input]['in_ports']
+    ports = gc.inputs[input]['in_ports']
     jc = jack.Client('tmp')
 
     total_time_factor = 10
