@@ -451,31 +451,31 @@ def proccess_commands(
 
         def change_treble():
 
-            treble_i = init.tone_variation - state['treble']
-            if treble_i < 0:
-                treble_i = 0
-            if treble_i > 2 * init.tone_variation:
-                treble_i = 2 * init.tone_variation
+            treble = state['treble']
+            if abs(treble) > init.tone_variation:
+                treble = m.copysign(init.tone_variation, treble)
+                warnings.append(f'treble must be in the +-{init.tone_variation} interval')
+            treble_i = init.tone_variation - treble
             # force integer
             treble_i = int(round(treble_i))
             eq_mag = curves['treble_mag_curves'][:,treble_i]
             eq_pha = curves['treble_pha_curves'][:,treble_i]
-            state['treble'] = init.tone_variation - treble_i
+            state['treble'] = treble
             return eq_mag, eq_pha
 
 
         def change_bass():
 
-            bass_i = init.tone_variation - state['bass']
-            if bass_i < 0:
-                bass_i = 0
-            if bass_i > 2 * init.tone_variation:
-                bass_i = 2 * init.tone_variation
+            bass = state['bass']
+            if abs(bass) > init.tone_variation:
+                bass = m.copysign(init.tone_variation, bass)
+                warnings.append(f'bass must be in the +-{init.tone_variation} interval')
+            bass_i = init.tone_variation - bass
             # force integer
             bass_i = int(round(bass_i))
             eq_mag = curves['bass_mag_curves'][:,bass_i]
             eq_pha = curves['bass_pha_curves'][:,bass_i]
-            state['bass'] = init.tone_variation - bass_i
+            state['bass'] = bass
             return eq_mag, eq_pha
 
 
