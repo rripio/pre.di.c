@@ -160,11 +160,7 @@ def proccess_commands(
 
         state['input'] = input
         try:
-            # if 'none', disconnects all inputs
-            if input == 'none':
-                disconnect_inputs()
-                return state
-            elif input == None:
+            if input == None:
                 raise
             elif input in gc.inputs:
                 if do_change_input (input,
@@ -191,14 +187,15 @@ def proccess_commands(
         return state
 
 
-    def disconnect_inputs():
+    def disconnect_inputs(state=state):
 
         try:
             tmp = jack.Client('tmp')
             unplug_sources_of(tmp, audio_ports.split())
             tmp.close()
         except:
-            warnings.append('Something went wrong when diconnecting inputs')
+            warnings.append('Something went wrong when disconnecting inputs')
+        return state
 
 
     def change_xovers(XO_set, state=state):
@@ -543,29 +540,30 @@ def proccess_commands(
 
     ## parse  commands and select corresponding actions
 
-#    try:
-    state = {
-        'target':           change_target,
-        'show':             show,
-        'input':            change_input,
-        'xo':               change_xovers,
-        'drc':              change_drc,
-        'polarity':         change_polarity,
-        'midside':          change_midside,
-        'mute':             change_mute,
-        'solo':             change_solo,
-        'loudness':         change_loudness_track,
-        'loudness_ref':     change_loudness_ref,
-        'treble':           change_treble,
-        'bass':             change_bass,
-        'balance':          change_balance,
-        'level':            change_level,
-        'gain':             change_gain
-        }[command](arg)
-#    except KeyError:
-#        warnings.append(f"Unknown command '{command}'")
-#    except:
-#        warnings.append(f"Problems in command '{command}'")
+    try:
+        state = {
+            'target':           change_target,
+            'show':             show,
+            'input':            change_input,
+            'noinput':          disconnect_inputs,
+            'xo':               change_xovers,
+            'drc':              change_drc,
+            'polarity':         change_polarity,
+            'midside':          change_midside,
+            'mute':             change_mute,
+            'solo':             change_solo,
+            'loudness':         change_loudness_track,
+            'loudness_ref':     change_loudness_ref,
+            'treble':           change_treble,
+            'bass':             change_bass,
+            'balance':          change_balance,
+            'level':            change_level,
+            'gain':             change_gain
+            }[command](arg)
+    except KeyError:
+        warnings.append(f"Unknown command '{command}'")
+    except:
+        warnings.append(f"Problems in command '{command}'")
 
     # return a dictionary of predic state
     return (state, warnings)
