@@ -101,7 +101,7 @@ def bf_cli(command):
     with socket.socket() as s:
         try:
             s.connect((gc.config['bfcli_address'], gc.config['bfcli_port']))
-            command = command + '; quit\n'
+            command = f'{command}; quit\n'
             s.send(command.encode())
             if gc.config['server_output'] == 2:
                 print('command sent to brutefir')
@@ -120,7 +120,7 @@ def proccess_commands(
     add = False
     # erase warnings
     warnings = []
-    # backup state to restore values in case of not enough headroom
+    # backup state to restore values in case of not enough headroom \
     # or error of any kind
     state_old = state.copy()
     # strips command final characters and split command from arguments
@@ -173,7 +173,7 @@ def proccess_commands(
                         state['xo'] = gc.inputs[input]['xo']
                         state = change_xovers(state['xo'])
                 else:
-                    warnings.append('Error changing to input ' + input)
+                    warnings.append(f'Error changing to input {input}')
                     state['input']  = state_old['input']
                     state['xo'] = state_old['xo']
             else:
@@ -206,8 +206,7 @@ def proccess_commands(
                 coeffs = gc.speaker['XO']['sets'][XO_set]
                 filters = gc.speaker['XO']['filters']
                 for i in range(len(filters)):
-                    bf_cli('cfc "'
-                            + filters[i] + '" "' + coeffs[i] + '"')
+                    bf_cli(f'cfc "{filters[i]}" "{coeffs[i]}"')
             else:
                 state['xo'] = state_old['xo']
                 print('bad XO name')
@@ -220,21 +219,19 @@ def proccess_commands(
     def change_drc(drc, state=state):
 
         state['drc'] = drc
-        # if drc 'none' coefficient -1 is set, so latency and CPU usage
+        # if drc 'none' coefficient -1 is set, so latency and CPU usage \
         # are improved
         if drc == 'none':
             filters = gc.speaker['DRC']['filters']
             for i in range(len(filters)):
-                bf_cli('cfc "'
-                        + filters[i] + '" -1')
+                bf_cli(f'cfc "{filters[i]}" -1')
         else:
             try:
                 if drc in gc.speaker['DRC']['sets']:
                     coeffs = gc.speaker['DRC']['sets'][drc]
                     filters = gc.speaker['DRC']['filters']
                     for i in range(len(filters)):
-                        bf_cli('cfc "'
-                                + filters[i] + '" "' + coeffs[i] + '"')
+                        bf_cli(f'cfc "{filters[i]}" "{coeffs[i]}"')
                 else:
                     state['drc'] = state_old['drc']
                     print('bad DRC name')
@@ -326,7 +323,8 @@ def proccess_commands(
                 state = change_gain(gain)
             except:
                 state['loudness'] = state_old['loudness']
-                warnings.append('Something went wrong when changing loudness state')
+                warnings.append('Something went wrong when changing '
+                                                        'loudness state')
         else:
             state['mute'] = state_old['mute']
             warnings.append('bad loudness option: '
@@ -342,7 +340,8 @@ def proccess_commands(
             state = change_gain(gain)
         except:
             state['loudness_ref'] = state_old['loudness_ref']
-            warnings.append('Something went wrong when changing loudness_ref state')
+            warnings.append('Something went wrong when changing '
+                                                    'loudness_ref state')
         return state
 
 
@@ -406,18 +405,16 @@ def proccess_commands(
             eq_str = ''
             l = len(curves['frequencies'])
             for i in range(l):
-                eq_str = (eq_str + str(curves['frequencies'][i])
-                                                + '/' + str(eq_mag[i]))
+                eq_str = (f'{eq_str}{curves["frequencies"][i]}/{eq_mag[i]}')
                 if i != l:
                     eq_str += ', '
-            bf_cli('lmc eq "c.eq" mag ' + eq_str)
+            bf_cli(f'lmc eq "c.eq" mag {eq_str}')
             eq_str = ''
             for i in range(l):
-                eq_str = (eq_str + str(curves['frequencies'][i])
-                                                + '/' + str(eq_pha[i]))
+                eq_str = (f'{eq_str}{curves["frequencies"][i]}/{eq_pha[i]}')
                 if i != l:
                     eq_str += ', '
-            bf_cli('lmc eq "c.eq" phase ' + eq_str)
+            bf_cli(f'lmc eq "c.eq" phase {eq_str}')
 
 
         def change_loudness():
@@ -440,7 +437,7 @@ def proccess_commands(
                 loudness_i = 0
             if loudness_i > loudness_max_i:
                 loudness_i = loudness_max_i
-            # loudness_i must be integer as it will be used as
+            # loudness_i must be integer as it will be used as \
             # index of loudness curves array
             loudness_i = int(round(loudness_i))
             loudeq_mag = curves['loudness_mag_curves'][:,loudness_i]
@@ -454,7 +451,8 @@ def proccess_commands(
             treble = state['treble']
             if abs(treble) > init.tone_variation:
                 treble = m.copysign(init.tone_variation, treble)
-                warnings.append(f'treble must be in the +-{init.tone_variation} interval')
+                warnings.append(f'treble must be in the '
+                                        '+-{init.tone_variation} interval')
             treble_i = init.tone_variation - treble
             # force integer
             treble_i = int(round(treble_i))
@@ -469,7 +467,8 @@ def proccess_commands(
             bass = state['bass']
             if abs(bass) > init.tone_variation:
                 bass = m.copysign(init.tone_variation, bass)
-                warnings.append(f'bass must be in the +-{init.tone_variation} interval')
+                warnings.append(f'bass must be in the '
+                                        '+-{init.tone_variation} interval')
             bass_i = init.tone_variation - bass
             # force integer
             bass_i = int(round(bass_i))
@@ -489,10 +488,8 @@ def proccess_commands(
                         init.balance_variation ,state['balance'])
             bf_atten_dB_l = bf_atten_dB_l - (state['balance'] / 2)
             bf_atten_dB_r = bf_atten_dB_r + (state['balance'] / 2)
-            # from dB to multiplier to implement easily
-            # polarity and mute
-            #
-            # then channel gains are the product of
+            # from dB to multiplier to implement easily polarity and mute
+            # then channel gains are the product of \
             # gain, polarity, mute and solo
             m_mute = {'on': 0, 'off': 1}[state['mute']]
             m_polarity_l = {'+': 1, '-': -1,
@@ -507,8 +504,7 @@ def proccess_commands(
             m_gain_r = (m_gain(bf_atten_dB_r)
                             * m_polarity_r * m_solo_r)
             # commit final gain change
-            bf_cli('cffa 2 0 m' + str(m_gain_l)
-                        + ' ; cffa 3 1 m' + str(m_gain_r))
+            bf_cli(f'cffa 2 0 m{str(m_gain_l)} ; cffa 3 1 m{str(m_gain_r)}')
 
 
         # backs up actual gain
@@ -522,7 +518,7 @@ def proccess_commands(
         eq_pha = target['target_pha'] + l_pha + t_pha + b_pha
         # calculate headroom
         headroom = pd.calc_headroom(gain, abs(state['balance']/2), eq_mag)
-        # moves headroom to accomodate input gain. It can lead to clipping
+        # moves headroom to accomodate input gain. It can lead to clipping \
         # because assumes equal dynamic range between sources
         headroom += pd.calc_input_gain(state['input'])
         # if enough headroom commit changes

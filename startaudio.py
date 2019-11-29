@@ -49,8 +49,8 @@ def init_jack():
     """loads jack server"""
 
     print('\n(startaudio) starting jack\n')
-    jack = sp.Popen(gc.config['jack_command'].split() + ['-r']
-                        + [str(gc.speaker['fs'])])
+    jack = sp.Popen(
+                f'{gc.config["jack_command"]} -r {gc.speaker["fs"]}'.split())
     # waiting for jackd:
     if pd.wait4result('jack_lsp', 'system'):
         print('\n(startaudio) jack started :-)')
@@ -62,12 +62,12 @@ def init_jack():
 def init_brutefir():
     """loads brutefir"""
 
-    # cd to brutefir config folder so filter paths are relative to this
+    # cd to brutefir config folder so filter paths are relative to this \
     # folder in brutefir_config
     os.chdir(init.loudspeakers_folder + gc.config['loudspeaker'])
     print(f'\n(startaudio) starting brutefir on {os.getcwd()}')
-    brutefir = sp.Popen(gc.config['brutefir_command'].split()
-                            + ['brutefir_config'])
+    brutefir = sp.Popen(
+                f'{gc.config["brutefir_command"]} brutefir_config'.split())
     # waiting for brutefir
     if  pd.wait4result('echo "quit" | nc localhost 3000 2>/dev/null',
                                                             'Welcome'):
@@ -82,7 +82,7 @@ def init_server():
 
     print('\n(startaudio) starting server\n')
     try:
-        control = sp.Popen(['python3', init.main_folder + 'server.py'])
+        control = sp.Popen(f'python3 {init.main_folder}server.py'.split())
     except:
         print('\n(startaudio) server didn\'t load')
         stopaudio.main('all')
@@ -100,8 +100,8 @@ def init_state_settings(state):
 and takes care of options to reset some of them"""
 
     # it is assumed that command name and setting name are the same
-
-    # input associated xo will prevail if use_input_xo is set
+    #
+    # input associated xo will prevail if use_input_xo is set \
     # because init_inputs function is executed after this one
 
     for setting in [
@@ -118,7 +118,7 @@ and takes care of options to reset some of them"""
             'balance',
             'level'
             ]:
-        pd.client_socket(setting + ' ' + str(state[setting]))
+        pd.client_socket(f'{setting} {state[setting]}')
 
 
 def init_inputs(state):
@@ -205,7 +205,7 @@ if __name__ == '__main__':
     else:
         run_level = 'all'
     if run_level in ['core', 'clients', 'all']:
-        print('\n(startaudio) starting runlevel ' + run_level)
+        print(f'\n(startaudio) starting runlevel {run_level}')
         main(run_level)
 
     else:

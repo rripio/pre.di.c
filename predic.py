@@ -77,7 +77,7 @@ def jack_loop(clientname):
     # CREDITS
     # https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
 
-    # The jack module instance for our looping ports
+    # the jack module instance for our looping ports
     client = jack.Client(name=clientname, no_start_server=True)
 
     if client.status.name_not_unique:
@@ -86,10 +86,10 @@ def jack_loop(clientname):
                             'already exists in JACK, nothing done.' )
         return
 
-    # Will use the multiprocessing.Event mechanism to keep this alive
+    # will use the multiprocessing.Event mechanism to keep this alive
     event = mp.Event()
 
-    # This sets the actual loop that copies frames from our capture
+    # this sets the actual loop that copies frames from our capture \
     # to our playback ports
     @client.set_process_callback
     def process(frames):
@@ -98,28 +98,28 @@ def jack_loop(clientname):
         for i, o in zip(client.inports, client.outports):
             o.get_buffer()[:] = i.get_buffer()
 
-    # If jack shutdowns, will trigger on 'event' so that the below
+    # if jack shutdowns, will trigger on 'event' so that the below \
     # 'whith client' will break.
     @client.set_shutdown_callback
     def shutdown(status, reason):
         print('(predic.jack_loop) JACK shutdown!')
         print('(predic.jack_loop) JACK status:', status)
         print('(predic.jack_loop) JACK reason:', reason)
-        # This triggers an event so that the below 'with client'
+        # this triggers an event so that the below 'with client' \
         # will terminate
         event.set()
 
-    # Create the ports
+    # create the ports
     for n in 1, 2:
         client.inports.register(f'input_{n}')
         client.outports.register(f'output_{n}')
     # client.activate() not needed, see below
 
-    # This is the keeping trick
+    # this is the keeping trick
     with client:
-        # When entering this with-statement, client.activate() is called.
-        # This tells the JACK server that we are ready to roll.
-        # Our above process() callback will start running now.
+        # when entering this with-statement, client.activate() is called
+        # this tells the JACK server that we are ready to roll
+        # our above process() callback will start running now
 
         print( f'(predic.jack_loop) running {clientname}' )
         try:

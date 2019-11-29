@@ -55,12 +55,12 @@ async def handle_commands(reader, writer):
                 print('(server) closing connection...')
 
         else:
-            # command received in 'data',
-            # then send command to control.py,
+            # command received in 'data', \
+            # then send command to control.py, \
             # that answers with state dict
             (state, warnings) = (control.proccess_commands
                                             (data, state))
-            # a try block avoids blocking of state file writing
+            # a try block avoids blocking of state file writing \
             # when the terminal that launched startaudio.py is closed
             try:
                 if gc.config['server_output'] in [1, 2]:

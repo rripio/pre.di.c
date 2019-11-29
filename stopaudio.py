@@ -52,20 +52,19 @@ def main(run_level):
         clients_stop = pd.read_clients('stop')
         for command in clients_stop:
             try:
-                command_path = f'{init.clients_folder}{command}'
-                Popen(command_path.split())
+                Popen(f'{init.clients_folder}{command}'.split())
             except:
                 print(f'problem stopping client "{client}":\n\t{err}')
     if run_level in ['core', 'all']:
         # controlserver
         print('(stopaudio) stopping server')
-        Popen (['pkill', '-f', 'server.py'], stdout=fnull, stderr=fnull)
+        Popen ('pkill -f server.py'.split(), stdout=fnull, stderr=fnull)
         # brutefir
         print('(stopaudio) stopping brutefir')
-        Popen (['pkill', '-f', 'brutefir'], stdout=fnull, stderr=fnull)
+        Popen ('pkill -f brutefir'.split(), stdout=fnull, stderr=fnull)
         # jack
         print('(stopaudio) stopping jackd')
-        Popen (['pkill', '-f', 'jackd'], stdout=fnull, stderr=fnull)
+        Popen ('pkill -f jackd'.split(), stdout=fnull, stderr=fnull)
 
 
 if __name__ == '__main__':
