@@ -214,8 +214,7 @@ def calc_level(gain, input):
 def calc_headroom(gain, balance, eq_mag):
     """calculates headroom from gain and equalizer"""
 
-    headroom = ( gc.config['gain_max'] - gain - np.max(eq_mag)
-                    - abs(balance/2))
+    headroom = ( init.gain_max - gain - np.max(eq_mag) - abs(balance))
     return headroom
 
 

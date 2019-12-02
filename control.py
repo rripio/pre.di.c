@@ -241,6 +241,10 @@ def proccess_commands(
         return state
 
 
+    # following funtions prepares their corresponding actions to be performed \
+    # by the change_gain() function
+
+
     def change_polarity(polarity, state=state):
 
         if polarity in ['+', '-', '+-', '-+']:
@@ -315,7 +319,7 @@ def proccess_commands(
         return state
 
 
-    def change_loudness_track(loudness, state=state):
+    def change_loudness(loudness, state=state):
 
         if loudness in ['on', 'off']:
             state['loudness'] = loudness
@@ -337,6 +341,13 @@ def proccess_commands(
         try:
             state['loudness_ref'] = (float(loudness_ref)
                                     + state['loudness_ref'] * add)
+            # clamp loudness_ref value
+            if abs(state['loudness_ref']) > init.loudness_ref_variation:
+                state['loudness_ref'] = m.copysign(init.loudness_ref_variation,
+                                                            state['loudness_ref'])
+                warnings.append('loudness reference level must be in the '
+                                    f'+-{init.loudness_ref_variation} interval')
+                warnings.append('loudness reference level clamped')
             state = change_gain(gain)
         except:
             state['loudness_ref'] = state_old['loudness_ref']
@@ -350,6 +361,12 @@ def proccess_commands(
         try:
             state['treble'] = (float(treble)
                                     + state['treble'] * add)
+            # clamp treble value
+            if m.fabs(state['treble']) > init.tone_variation:
+                state['treble'] = m.copysign(init.tone_variation, state['treble'])
+                warnings.append('treble must be in the '
+                                        f'+-{init.tone_variation} interval')
+                warnings.append('treble clamped')
             state = change_gain(gain)
         except:
             state['treble'] = state_old['treble']
@@ -362,6 +379,12 @@ def proccess_commands(
         try:
             state['bass'] = (float(bass)
                                     + state['bass'] * add)
+            # clamp bass value
+            if m.fabs(state['bass']) > init.tone_variation:
+                state['bass'] = m.copysign(init.tone_variation, state['bass'])
+                warnings.append('bass must be in the '
+                                        f'+-{init.tone_variation} interval')
+                warnings.append('bass clamped')
             state = change_gain(gain)
         except:
             state['bass'] = state_old['bass']
@@ -374,6 +397,16 @@ def proccess_commands(
         try:
             state['balance'] = (float(balance)
                                     + state['balance'] * add)
+            # clamp balance value
+            # 'balance' means deviation from 0 in R channel
+            # deviation of the L channel then goes symmetrical
+            if m.fabs(state['balance']) > init.balance_variation:
+                state['balance'] = m.copysign(
+                        init.balance_variation ,state['balance'])
+                warnings.append('balance must be in the '
+                                        f'+-{init.balance_variation}'
+                                        ' interval')
+                warnings.append('balance clamped')
             state = change_gain(gain)
         except:
             state['balance'] = state_old['balance']
@@ -383,6 +416,7 @@ def proccess_commands(
 
     def change_level(level, state=state, add=add):
 
+        # level clamp is comissioned to change_gain()
         try:
             state['level'] = (float(level) + state['level'] * add)
             gain = pd.calc_gain(state['level'], state['input'])
@@ -399,6 +433,20 @@ def proccess_commands(
 
         # gain command send its str argument directly
         gain = float(gain)
+        # clamp gain value
+        # just for information, numerical bounds before math range or \
+        # math domain error are +6165 dB and -6472 dB
+        if gain > init.gain_max:
+            gain = init.gain_max
+            warnings.append('max. gain must be less than '
+                                    f'{init.gain_max} dB')
+            warnings.append('gain clamped')
+        if gain < init.gain_min:
+            gain = init.gain_min
+            warnings.append('min. gain must be more than '
+                                    f'{init.gain_min} dB')
+            warnings.append('gain clamped')
+
 
         def change_eq():
 
@@ -419,20 +467,21 @@ def proccess_commands(
 
         def change_loudness():
 
-            loudness_max_i = (init.loudness_SPLmax
-                                        - init.loudness_SPLmin)
-            loudness_variation = (init.loudness_SPLmax
-                                        - init.loudness_SPLref)
+            # index of max loudness tones boost
+            loudness_max_i = (init.loudness_SPLmax - init.loudness_SPLmin)
+            # index of all zeros curve
+            loudness_null_i = (init.loudness_SPLmax - init.loudness_SPLref)
+            # set curve index
+            # higher index means higher boost
+            # increasing 'level' decreases boost
+            # increasing 'loudness_ref' increases boost
             if state['loudness'] == 'on':
-                if (m.fabs(state['loudness_ref']) > loudness_variation):
-                    state['loudness_ref'] = m.copysign(
-                            loudness_variation, state['loudness_ref'])
-                loudness_i = (init.loudness_SPLmax
-                    - (state['level'] + init.loudness_SPLref
-                                            + state['loudness_ref']))
+                loudness_i = (loudness_null_i
+                                    - state['level']
+                                    + state['loudness_ref'])
             else:
-                # index of all zeros curve
-                loudness_i = loudness_variation
+                # all zeros curve
+                loudness_i = loudness_null_i
             if loudness_i < 0:
                 loudness_i = 0
             if loudness_i > loudness_max_i:
@@ -448,33 +497,21 @@ def proccess_commands(
 
         def change_treble():
 
-            treble = state['treble']
-            if abs(treble) > init.tone_variation:
-                treble = m.copysign(init.tone_variation, treble)
-                warnings.append(f'treble must be in the '
-                                        '+-{init.tone_variation} interval')
-            treble_i = init.tone_variation - treble
+            treble_i = init.tone_variation - state['treble']
             # force integer
             treble_i = int(round(treble_i))
             eq_mag = curves['treble_mag_curves'][:,treble_i]
             eq_pha = curves['treble_pha_curves'][:,treble_i]
-            state['treble'] = treble
             return eq_mag, eq_pha
 
 
         def change_bass():
 
-            bass = state['bass']
-            if abs(bass) > init.tone_variation:
-                bass = m.copysign(init.tone_variation, bass)
-                warnings.append(f'bass must be in the '
-                                        '+-{init.tone_variation} interval')
-            bass_i = init.tone_variation - bass
+            bass_i = init.tone_variation - state['bass']
             # force integer
             bass_i = int(round(bass_i))
             eq_mag = curves['bass_mag_curves'][:,bass_i]
             eq_pha = curves['bass_pha_curves'][:,bass_i]
-            state['bass'] = bass
             return eq_mag, eq_pha
 
 
@@ -483,11 +520,8 @@ def proccess_commands(
             bf_atten_dB_l = gain
             bf_atten_dB_r = gain
             # add balance dB gains
-            if abs(state['balance']) > init.balance_variation:
-                state['balance'] = m.copysign(
-                        init.balance_variation ,state['balance'])
-            bf_atten_dB_l = bf_atten_dB_l - (state['balance'] / 2)
-            bf_atten_dB_r = bf_atten_dB_r + (state['balance'] / 2)
+            bf_atten_dB_l = bf_atten_dB_l - state['balance']
+            bf_atten_dB_r = bf_atten_dB_r + state['balance']
             # from dB to multiplier to implement easily polarity and mute
             # then channel gains are the product of \
             # gain, polarity, mute and solo
@@ -517,7 +551,7 @@ def proccess_commands(
         eq_mag = target['target_mag'] + l_mag + t_mag + b_mag
         eq_pha = target['target_pha'] + l_pha + t_pha + b_pha
         # calculate headroom
-        headroom = pd.calc_headroom(gain, abs(state['balance']/2), eq_mag)
+        headroom = pd.calc_headroom(gain, state['balance'], eq_mag)
         # moves headroom to accomodate input gain. It can lead to clipping \
         # because assumes equal dynamic range between sources
         headroom += pd.calc_input_gain(state['input'])
@@ -548,7 +582,7 @@ def proccess_commands(
             'midside':          change_midside,
             'mute':             change_mute,
             'solo':             change_solo,
-            'loudness':         change_loudness_track,
+            'loudness':         change_loudness,
             'loudness_ref':     change_loudness_ref,
             'treble':           change_treble,
             'bass':             change_bass,

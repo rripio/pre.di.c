@@ -75,11 +75,18 @@ bass_pha_curves = 'R20_ext-bass_pha.dat'
 
 # parameters
 
+# loudness curves references
 loudness_SPLref = 83
 loudness_SPLmax = 90
 loudness_SPLmin = 70
+# audio controls level clamping
+loudness_ref_variation = 12
 tone_variation = 6
 balance_variation = 6
+# max allowed digital gain (dB)
+gain_max = 0
+# min allowed digital gain (dB)
+gain_min = -100
 
 # curves
 try:
