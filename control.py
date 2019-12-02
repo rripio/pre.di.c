@@ -178,7 +178,8 @@ def proccess_commands(
                     state['xo'] = state_old['xo']
             else:
                 state['input'] = state_old['input']
-                warnings.append('Input name "%s" incorrect' % input)
+                warnings.append('bad name: input has to be in '
+                                f'{list(gc.inputs)}')
                 return state
         except:
             state['input']  = state_old['input']
@@ -209,7 +210,8 @@ def proccess_commands(
                     bf_cli(f'cfc "{filters[i]}" "{coeffs[i]}"')
             else:
                 state['xo'] = state_old['xo']
-                print('bad XO name')
+                warnings.append('bad name: XO has to be in '
+                                f'{list(gc.speaker["XO"]["sets"])}')
         except:
             state['xo'] = state_old['xo']
             warnings.append('Something went wrong when changing XO state')
@@ -234,7 +236,8 @@ def proccess_commands(
                         bf_cli(f'cfc "{filters[i]}" "{coeffs[i]}"')
                 else:
                     state['drc'] = state_old['drc']
-                    print('bad DRC name')
+                    warnings.append('bad name: DRC has to be in '
+                                    f'{list(gc.speaker["DRC"]["sets"])}')
             except:
                 state['drc'] = state_old['drc']
                 warnings.append('Something went wrong when changing DRC state')
@@ -247,7 +250,8 @@ def proccess_commands(
 
     def change_polarity(polarity, state=state):
 
-        if polarity in ['+', '-', '+-', '-+']:
+        options = ['+', '-', '+-', '-+']
+        if polarity in options:
             state['polarity'] = polarity
             try:
                 state = change_gain(gain)
@@ -257,14 +261,14 @@ def proccess_commands(
                         'Something went wrong when changing polarity state')
         else:
             state['polarity'] = state_old['polarity']
-            warnings.append('bad polarity option: has to be "+", "-", "+-" '
-                                'or "-+"')
+            warnings.append(f'bad option: polarity has to be in {options}')
         return state
 
 
     def change_midside(midside, state=state):
 
-        if midside in ['mid', 'side', 'off']:
+        options = ['mid', 'side', 'off']
+        if midside in options:
             state['midside'] = midside
             try:
                 if state['midside']=='mid':
@@ -282,14 +286,14 @@ def proccess_commands(
                                 'midside state')
         else:
             state['midside'] = state_old['midside']
-            warnings.append('bad midside option: has to be "mid", "side"'
-                                'or "off"')
+            warnings.append(f'bad option: midside has to be in {options}')
         return state
 
 
     def change_mute(mute, state=state):
 
-        if mute in ['on', 'off']:
+        options = ['on', 'off']
+        if mute in options:
             state['mute'] = mute
             try:
                 state = change_gain(gain)
@@ -299,13 +303,14 @@ def proccess_commands(
                                 'when changing mute state')
         else:
             state['mute'] = state_old['mute']
-            warnings.append('bad mute option: has to be "on" or "off"')
+            warnings.append(f'bad option: mute has to be in {options}')
         return state
 
 
     def change_solo(solo, state=state):
 
-        if solo in ['off', 'l', 'r']:
+        options = ['off', 'l', 'r']
+        if solo in options:
             state['solo'] = solo
             try:
                 state = change_gain(gain)
@@ -315,7 +320,7 @@ def proccess_commands(
                                 'when changing solo state')
         else:
             state['solo'] = state_old['solo']
-            warnings.append('bad solo option: has to be "l", "r" or "off"')
+            warnings.append(f'bad option: solo has to be in {options}')
         return state
 
 
