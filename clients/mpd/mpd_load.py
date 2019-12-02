@@ -34,6 +34,7 @@ import multiprocessing as mp
 
 import mpd
 
+import init
 import predic as pd
 import getconfigs as gc
 
