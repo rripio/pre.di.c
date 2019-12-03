@@ -43,8 +43,7 @@ config_filename = 'config.yml'
 state_filename = 'state.yml'
 state_init_filename = 'state_init.yml'
 inputs_filename = 'inputs.yml'
-clients_start_filename = 'clients.start'
-clients_stop_filename = 'clients.stop'
+clients_filename = 'clients.yml'
 speaker_filename = 'speaker.yml'
 
 
@@ -55,8 +54,7 @@ config_path = config_folder + config_filename
 state_path = config_folder + state_filename
 state_init_path = config_folder + state_init_filename
 inputs_path = config_folder + inputs_filename
-clients_start_path = config_folder + clients_start_filename
-clients_stop_path = config_folder + clients_stop_filename
+clients_path = config_folder + clients_filename
 
 
 ## equalizer

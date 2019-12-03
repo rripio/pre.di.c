@@ -48,33 +48,22 @@ def stop_all():
 
 
 def read_clients(phase):
-    """reads list of programs to launch from config/clients.start file
-    and programs to stop from onfig/clients.stop file.
+    """reads list of programs to start/stop from config/clients.yml file
     phase: <'start'|'stop'> phase of client activation or deactivation"""
 
-    if   phase == 'start':
-        clients_list_path = init.clients_start_path
-    elif phase == 'stop':
-        clients_list_path = init.clients_stop_path
+    clients_list_path = init.clients_path
 
     with open (clients_list_path) as clients_file:
-        # init a list of clients to load
-        clients = []
-        for line in clients_file:
-            # skip blank lines
-            if not line.strip():
-                continue
-            # skip commented lines
-            line = line.partition('#')[0].strip()
-            if line:
-                client=line
-                clients.append(client)
+        clients_dict = yaml.safe_load(clients_file)
+        # init a list of client actions
+        clients = [clients_dict[i][phase]
+                for i in clients_dict if phase in clients_dict[i]]
     return clients
 
 
 def jack_loop(clientname):
     """creates a jack loop with given 'clientname'"""
-    # CREDITS
+    # CREDITS:
     # https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
 
     # the jack module instance for our looping ports
