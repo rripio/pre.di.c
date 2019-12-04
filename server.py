@@ -68,8 +68,8 @@ async def handle_commands(reader, writer):
             except:
                 pass
 
-            # writes state file
             try:
+                # writes state file
                 with open(init.state_path, 'w') as f:
                     yaml.dump(state, f, default_flow_style=False)
                 # print warnings
