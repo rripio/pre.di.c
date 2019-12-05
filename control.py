@@ -53,7 +53,6 @@ def unplug_sources_of(jack_client, out_ports):
     """disconnect clients from predic inputs and monitor inputs"""
 
     try:
-        # sources_L = jack.get_connections(out_ports[0])
         sources_L = jack_client.get_all_connections(out_ports[0])
         sources_R = jack_client.get_all_connections(out_ports[1])
         for source in sources_L:
@@ -79,17 +78,18 @@ def do_change_input(input_name, in_ports, out_ports):
             try:
                 tmp.connect(in_ports[i], out_ports[i])
             except:
-                print(f'error connecting {in_ports[i]} <--> {out_ports[i]}')
+                warnings.append(f'error connecting {in_ports[i]}'
+                                            f' <--> {out_ports[i]}')
            # monitor inputs
             try:
                 if monitor_ports:
                     tmp.connect(in_ports[i], monitor_ports[i])
             except:
-                print('error connecting monitors')
+                warnings.append('error connecting monitors')
         tmp.close()
     except:
         # on exception returns False
-        print(f'error changing to input "{input_name}"')
+        warnings.append(f'error changing to input "{input_name}"')
         tmp.close()
         return False
     return True
@@ -107,7 +107,7 @@ def bf_cli(command):
             if gc.config['server_output'] == 2:
                 print('command sent to brutefir')
         except:
-            warnings.append ('Brutefir error')
+            warnings.append('Brutefir error')
 
 
 # main function for command proccessing
