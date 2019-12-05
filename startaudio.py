@@ -127,38 +127,38 @@ def init_inputs(state):
     input = state['input']
     print(f'\n(startaudio) restoring input: {input}')
     # wait for input ports to be up
-    ports = gc.inputs[input]['in_ports']
+    time_start = time.time()
+    tmax = gc.config['command_delay'] * 5
+    interval = gc.config['command_delay'] * 0.1
+    # make a jack client and tried to connect it to input ports
     jc = jack.Client('tmp')
-
-    total_time_factor = 10
-    total_time = rem_time = total_time_factor * gc.config['command_delay']
-    interval_factor = 10
-    interval = gc.config['command_delay'] / interval_factor
-
-    while rem_time:
-        channels = ('L','R')
-        n = len(channels)
-        for port_name in ports:
-            if jc.get_ports(port_name):
-                n -=1
-        if n == 0:
-            break
-        rem_time -= interval
-        time.sleep(interval)
-    if rem_time:
-        # input ports up and ready :-)
-        pd.client_socket('input ' + state['input'], quiet=True)
-    else:
-        # input ports are down :-(
-        print(f'\n(startaudio) time out restoring input \'{input}\''
-                                        ', ports not available')
+    while (time.time() - time_start) < tmax:
+        connected = False
+        try:
+            for port_name in gc.inputs[input]['in_ports']:
+                connected = connected and jc.get_ports(port_name)
+        except KeyError:
+            print(f'\n(startaudio) incorrect input \'{input}\''
+                            '\n(startaudio) please revise state files\n')
+            return False
+        if connected:
+            # input ports up and ready :-)
+            # switch on input and leave function
+            pd.client_socket('input ' + state['input'], quiet=True)
+            return True
+        else:
+            time.sleep(interval)
+    # time is exhausted and input ports are down :-(
+    # leave function without any connection made
+    print(f'\n(startaudio) time out restoring input \'{input}\''
+                                    ', ports not available')
+    return True
 
 
 def get_state():
     """set initial state state as last saved or as user determined"""
 
     state = gc.state
-
     if gc.config['use_state_init']:
         state_init = gc.state_init
         for setting in state_init:
@@ -192,9 +192,11 @@ def main(run_level):
         # restoring previous state
         init_state_settings(state)
         # restoring inputs
-        init_inputs(state)
-        # some info
-        pd.show()
+        if init_inputs(state):
+            # some info
+            # if input is wrong will make input gain retrieval brake
+            # and so show() would spit some garbage
+            pd.show()
 
 
 if __name__ == '__main__':
@@ -207,6 +209,5 @@ if __name__ == '__main__':
     if run_level in ['core', 'clients', 'all']:
         print(f'\n(startaudio) starting runlevel {run_level}')
         main(run_level)
-
     else:
         print(__doc__)
