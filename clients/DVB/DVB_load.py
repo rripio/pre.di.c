@@ -51,11 +51,6 @@ config = gc.get_yaml(folder + config_filename)
 def start():
     """loads mplayer and jack loop"""
 
-    # create jack loop for connections
-    # The jack_loop module will keep the loop alive, so we need to thread it.
-    jloop = mp.Process( target = pd.jack_loop, args=('dvb_loop',) )
-    jloop.start()
-
     # starts mplayer DVB:
     dvb_fifo = folder + config["fifo_filename"]
     command = f'{config["start_command"]} -input file={dvb_fifo}'

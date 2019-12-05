@@ -96,12 +96,7 @@ def predic_vol_loop():
 
 
 def start():
-    """loads mpd and jack loop"""
-
-    # create jack loop for connections
-    # The jack_loop function will keep the loop alive, so we need to thread it
-    jloop = mp.Process(target = pd.jack_loop, args=('mpd_loop',) )
-    jloop.start()
+    """loads mpd"""
 
     # starts MPD
     print('(mpd_load.py) starting mpd')

@@ -8,7 +8,7 @@ quiet=true
 # profiles
 
 [dvb]
-ao=jack:name=mplayer_dvb:port=dvb_loop
+ao=jack:name=mplayer_dvb:noconnect
 af=volume=0
 
 [cdda]
