@@ -29,7 +29,6 @@ use it with 'start' and 'stop' as options"""
 import sys
 import os
 import subprocess as sp
-import multiprocessing as mp
 
 import getconfigs as gc
 import predic as pd

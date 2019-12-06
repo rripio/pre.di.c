@@ -29,7 +29,6 @@ import time
 import os
 import subprocess as sp
 import contextlib as cl
-import multiprocessing as mp
 
 import yaml
 import numpy as np
