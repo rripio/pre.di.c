@@ -20,7 +20,13 @@ beep_options: ''
 use_state_init: true
 # when changing inputs use associated xo
 use_input_xo: true
-# jack audio ports
+# do not connect inputs on start
+connect_inputs: false
+
+
+
+## jack audio ports
+
 # input selector will connect sources to this ports
 audio_ports: brutefir:input-0 brutefir:input-1
 # jack monitor ports. Assign '' to not set

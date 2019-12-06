@@ -191,12 +191,13 @@ def main(run_level):
         state = get_state()
         # restoring previous state
         init_state_settings(state)
-        # restoring inputs
-        if init_inputs(state):
-            # some info
-            # if input is wrong will make input gain retrieval brake
-            # and so show() would spit some garbage
-            pd.show()
+        # restoring inputs if config mandates so
+        if gc.config['connect_inputs']:
+            if init_inputs(state):
+                # some info
+                # if input is wrong will make input gain retrieval brake
+                # and so show() would spit some garbage
+                pd.show()
 
 
 if __name__ == '__main__':
