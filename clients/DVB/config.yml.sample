@@ -12,3 +12,8 @@ stop_command: pkill -f /usr/bin/mplayer
 # commands FIFO filename
 # option -input file={dvb_fifo} is added in program
 fifo_filename: DVB_fifo
+
+# play preset on start
+# set preset as "restore" for last played channel
+play_on_start: false
+preset: 6

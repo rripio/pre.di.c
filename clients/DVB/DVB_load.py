@@ -54,6 +54,8 @@ def start():
     dvb_fifo = folder + config["fifo_filename"]
     command = f'{config["start_command"]} -input file={dvb_fifo}'
     sp.Popen(command.split())
+    if config["play_on_start"]:
+        sp.Popen(f'{folder}/DVB_command.py {config["preset"]}'.split())
 
 
 def stop():
