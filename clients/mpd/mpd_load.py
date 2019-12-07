@@ -118,13 +118,11 @@ def start():
         # no 'song' in status if there is no playlist
         if 'song' in status:
             song = status['song']
-            print(song)
             # no 'elapsed' in status if song stoppped
             if 'elapsed' in status:
                 elapsed = status['elapsed']
             else:
                 elapsed = 0
-                print(elapsed)
             restore = True
         else:
             restore = False
