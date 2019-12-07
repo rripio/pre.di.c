@@ -34,7 +34,6 @@ Starts pre.di.c audio system
 import sys
 import os
 import time
-import shlex
 import subprocess as sp
 
 import jack
