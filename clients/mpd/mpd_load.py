@@ -100,31 +100,64 @@ def start():
 
     # starts MPD
     print('(mpd_load.py) starting mpd')
-    try:
-        sp.Popen(mpd_conf["start_command"].split())
-    except:
+    sp.Popen(mpd_conf["start_command"].split())
+    if pd.wait4result(
+            f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
+                                                                 'OK MPD'):
+        print('(mpd_load.py) mpd started :-)')
+    else:
         print('(mpd_load.py) mpd loading failed')
         return
 
+    # ping mpd to create jack ports
+    try:
+        mpd_client = connect_mpd()
+        status = mpd_client.status()
+        # check if there's a playlist loaded and if any \
+        # get relevant status data
+        # no 'song' in status if there is no playlist
+        if 'song' in status:
+            song = status['song']
+            print(song)
+            # no 'elapsed' in status if song stoppped
+            if 'elapsed' in status:
+                elapsed = status['elapsed']
+            else:
+                elapsed = 0
+                print(elapsed)
+            restore = True
+        else:
+            restore = False
+
+        # path to silence dummy file relative to base music directory
+        silence_path = "mpd_silence.wav"
+        # load silence file, plays it a bit, delete it from playlist, \
+        # and restore the play pointer to previous state
+        mpd_client.addid(silence_path, 0)
+        mpd_client.play(0)
+        time.sleep(gc.config['command_delay'])
+        mpd_client.delete(0)
+        mpd_client.pause()
+        if restore:
+            mpd_client.seek(song, elapsed)
+        mpd_client.close()
+        # disconnect mpd_ports
+        pd.client_socket('noinput')
+    except:
+        print('(mpd_load.py) problems with mpd ping routine')
+
     # volume linked to mpd (optional)
     if mpd_conf['volume_linked']:
-        print('(mpd_load.py) waiting for mpd')
-        if pd.wait4result(
-                f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
-                                                                 'OK MPD'):
-            print('(mpd_load.py) mpd started :-)')
-            try:
-                mpdloop = mp.Process( target = mpd_vol_loop )
-                mpdloop.start()
-            except:
-                print('(mpd_load.py) mpd socket loop broke')
-            try:
-                predicloop = mp.Process( target = predic_vol_loop )
-                predicloop.start()
-            except:
-                print('(mpd_load.py) predic socket loop broke')
-        else:
-            print('(mpd_load.py) client_mpd didn\'t start')
+        try:
+            mpdloop = mp.Process( target = mpd_vol_loop )
+            mpdloop.start()
+        except:
+            print('(mpd_load.py) mpd socket loop broke')
+        try:
+            predicloop = mp.Process( target = predic_vol_loop )
+            predicloop.start()
+        except:
+            print('(mpd_load.py) predic socket loop broke')
 
 
 def stop():
