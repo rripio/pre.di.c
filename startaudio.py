@@ -151,7 +151,7 @@ def init_inputs(state):
     # leave function without any connection made
     print(f'\n(startaudio) time out restoring input \'{input}\''
                                     ', ports not available')
-    return True
+    return False
 
 
 def get_state():
