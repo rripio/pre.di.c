@@ -30,6 +30,13 @@ import init
 import getconfigs as gc
 
 
+def write_state(state):
+    """writes state to state file"""
+
+    with open(init.state_path, 'w') as f:
+        yaml.dump(state, f, default_flow_style=False)
+
+
 async def handle_commands(reader, writer):
 
     state = gc.state
@@ -42,6 +49,14 @@ async def handle_commands(reader, writer):
             # echo state to client as YAML string
             writer.write(yaml.dump(state,
                                     default_flow_style=False).encode())
+            writer.write(b'OK\n')
+            await writer.drain()
+            if gc.config['server_output'] == 2:
+                print('(server) closing connection...')
+
+        elif data.rstrip('\r\n') == 'save':
+            # writes state to state file
+            write_state(state)
             writer.write(b'OK\n')
             await writer.drain()
             if gc.config['server_output'] == 2:
@@ -70,8 +85,7 @@ async def handle_commands(reader, writer):
 
             try:
                 # writes state file
-                with open(init.state_path, 'w') as f:
-                    yaml.dump(state, f, default_flow_style=False)
+                write_state(state)
                 # print warnings
                 if len(warnings) > 0:
                     print('Warnings:')
