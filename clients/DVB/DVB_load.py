@@ -36,22 +36,17 @@ import predic as pd
 
 # initialize
 
-# filenames
-config_filename = 'config.yml'
-
-# get program folder for subsequent aux files finding
-# allways put a slash after directories
-folder = f'{os.path.dirname(sys.argv[0])}/'
-
 # get config
+config_filename = 'config.yml'
+folder = f'{os.path.dirname(sys.argv[0])}/'
 config = gc.get_yaml(folder + config_filename)
+dvb_fifo = folder + config["fifo_filename"]
 
 
 def start():
     """loads mplayer and jack loop"""
 
     # starts mplayer DVB:
-    dvb_fifo = folder + config["fifo_filename"]
     command = f'{config["start_command"]} -input file={dvb_fifo}'
     sp.Popen(command.split())
     if config["play_on_start"]:
