@@ -91,10 +91,16 @@ def client_socket(data, quiet=True):
             print(f'(client) unexpected error: {sys.exc_info()[0]}')
 
 
-def get_state():
+def read_state():
     """retrieve state dictionary from server"""
 
     return yaml.safe_load(client_socket('status').decode().replace('OK\n', ''))
+    
+    
+def write_state():
+    """ask server to write state to state file"""
+    
+    client_socket('save')
 
 
 def wait4result(command, answer,
