@@ -75,12 +75,12 @@ def predic_vol_loop():
     """loop: reads predic volume, sets mpd volume"""
 
     interval = gc.config['command_delay'] / 10
-    predic_level = pd.get_state()['level']
+    predic_level = pd.read_state()['level']
     mpd_gain_min = init.gain_max - mpd_conf['slider_range']
     while True:
         # check level changes in pre.di.c
         predic_level_old = predic_level
-        predic_level = pd.get_state()['level']
+        predic_level = pd.read_state()['level']
         if predic_level != predic_level_old:
             # update mpd "fake volume"
             predic_gain = predic_level + gc.speaker['ref_level_gain']
