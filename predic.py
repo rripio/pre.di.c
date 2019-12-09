@@ -31,6 +31,7 @@ import subprocess as sp
 import contextlib as cl
 
 import yaml
+import jack
 import numpy as np
 
 import init
@@ -103,9 +104,7 @@ def write_state():
     client_socket('save')
 
 
-def wait4result(command, answer,
-                tmax=5,
-                interval = gc.config['command_delay'] / 10):
+def wait4result(command, answer, tmax=5, interval=0.1):
     """looks for chain "answer" in "command" output"""
 
     time_start = time.time()
@@ -130,6 +129,32 @@ def wait4result(command, answer,
                     f' in output of command: {command}')
         return False
 
+
+def wait4source(source, tmax=5, interval=0.1):
+    """wait for source jack ports to be up"""
+    
+    time_start = time.time()
+    jc = jack.Client('tmp')
+    while (time.time() - time_start) < tmax:
+        try:
+            connected = True
+            for port_name in gc.inputs[source]['in_ports']:
+                connected = connected and jc.get_ports(port_name)
+        except KeyError:
+            print(f'\nincorrect input \'{source}\''
+                            '\n please revise state files\n')
+            return False
+        if connected:
+            # input ports up and ready :-)
+            return True
+        else:
+            time.sleep(interval)
+    # time is exhausted and input ports are down :-(
+    # leave function without any connection made
+    print(f'\ntime out restoring input \'{source}\''
+                                    ', ports not available')
+    return False
+    
 
 def calc_gain(level, input):
     """calculates gain from level, reference gain, and input gain"""

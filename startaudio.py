@@ -51,7 +51,9 @@ def init_jack():
     jack = sp.Popen(
                 f'{gc.config["jack_command"]} -r {gc.speaker["fs"]}'.split())
     # waiting for jackd:
-    if pd.wait4result('jack_lsp', 'system'):
+    tmax = gc.config['command_delay'] * 5
+    interval = gc.config['command_delay'] * 0.1
+    if pd.wait4result('jack_lsp', 'system', tmax, interval):
         print('\n(startaudio) jack started :-)')
     else:
         print('\n(startaudio) error starting jack')
@@ -68,8 +70,10 @@ def init_brutefir():
     brutefir = sp.Popen(
                 f'{gc.config["brutefir_command"]} brutefir_config'.split())
     # waiting for brutefir
+    tmax = gc.config['command_delay'] * 5
+    interval = gc.config['command_delay'] * 0.1
     if  pd.wait4result('echo "quit" | nc localhost 3000 2>/dev/null',
-                                                            'Welcome'):
+                                                'Welcome', tmax, interval):
         print('\n(startaudio) brutefir started :-)')
     else:
         print('\n(startaudio) error starting brutefir')
@@ -87,15 +91,29 @@ def init_server():
         stopaudio.main('all')
         sys.exit()
     # waiting for server
-    if pd.wait4result('echo ping| nc localhost 9999 2>/dev/null', 'OK'):
+    tmax = gc.config['command_delay'] * 5
+    interval = gc.config['command_delay'] * 0.1
+    if pd.wait4result('echo ping| nc localhost 9999 2>/dev/null', 'OK',
+                                                            tmax, interval):
         print('\n(startaudio) server started :-)')
     else:
         print('\n(startaudio) server not accesible Bye :-/')
         pd.stop_all()
 
 
+def set_initial_state():
+    """set initial state state as last saved or as user determined"""
+
+    state = gc.state
+    if gc.config['use_state_init']:
+        state_init = gc.state_init
+        for setting in state_init:
+            state[setting] = state_init[setting]
+    return state
+
+
 def init_state_settings(state):
-    """restore audio settings as stored in state.yaml
+    """restore audio settings as stored in state.yaml except input, 
 and takes care of options to reset some of them"""
 
     # it is assumed that command name and setting name are the same
@@ -121,62 +139,47 @@ and takes care of options to reset some of them"""
 
 
 def init_inputs(state):
-    """restore selected input as stored in state.ini"""
+    """restore selected input as stored in state.yml"""
 
-    input = state['input']
-    print(f'\n(startaudio) restoring input: {input}')
+    source = state['input']
+    print(f'\n(startaudio) restoring input: {source}')
     # wait for input ports to be up
-    time_start = time.time()
     tmax = gc.config['command_delay'] * 5
     interval = gc.config['command_delay'] * 0.1
-    # make a jack client and tried to connect it to input ports
-    jc = jack.Client('tmp')
-    while (time.time() - time_start) < tmax:
-        connected = False
-        try:
-            for port_name in gc.inputs[input]['in_ports']:
-                connected = connected and jc.get_ports(port_name)
-        except KeyError:
-            print(f'\n(startaudio) incorrect input \'{input}\''
-                            '\n(startaudio) please revise state files\n')
-            return False
-        if connected:
-            # input ports up and ready :-)
-            # switch on input and leave function
-            pd.client_socket('input ' + state['input'], quiet=True)
-            return True
-        else:
-            time.sleep(interval)
-    # time is exhausted and input ports are down :-(
-    # leave function without any connection made
-    print(f'\n(startaudio) time out restoring input \'{input}\''
-                                    ', ports not available')
-    return False
-
-
-def get_state():
-    """set initial state state as last saved or as user determined"""
-
-    state = gc.state
-    if gc.config['use_state_init']:
-        state_init = gc.state_init
-        for setting in state_init:
-            state[setting] = state_init[setting]
-    return state
+    if pd.wait4source(source, tmax, interval):
+        # input ports up and ready :-)
+        # switch on input and leave function
+        pd.client_socket('input ' + state["input"], quiet=True)
+        return True
+    else:
+        time.sleep(interval)
+        return False
 
 
 def main(run_level):
     """main loading function"""
 
-    # Jack, Brutefir, Server
+    # jack, brutefir, server
     if run_level in ['core', 'all']:
         # load basic audio kernel
         init_jack()
         init_brutefir()
         init_server()
-        # inboard players
+    # inboard players
     if run_level in ['clients', 'all']:
-        # launch external clients, sources and clients
+        # getting operating state
+        # do it before launching clients \
+        # so they get the correct setting from state file if needed
+        state = set_initial_state()
+        # restoring previous state
+        init_state_settings(state)
+        # restore input in order to write it to state file \
+        # for use of clients if config ask for it
+        if gc.config['connect_inputs']:
+            # just refresh state file
+            # won't connect if client's ports aren't ready
+            pd.client_socket('input ' + state["input"], quiet=True)
+       # launch external clients, sources and clients
         print('\n(startaudio): starting clients...')
         clients_start = pd.read_clients('start')
         for client in clients_start:
@@ -186,17 +189,11 @@ def main(run_level):
                 print(f'pid {p.pid:4}: {client}')
             except:
                 print(f'problem launching client {client}')
-        # getting operating state
-        state = get_state()
-        # restoring previous state
-        init_state_settings(state)
         # restoring inputs if config mandates so
         if gc.config['connect_inputs']:
-            if init_inputs(state):
-                # some info
-                # if input is wrong will make input gain retrieval brake
-                # and so show() would spit some garbage
-                pd.show()
+            init_inputs(state)
+        # some info
+        pd.show()
 
 
 if __name__ == '__main__':

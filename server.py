@@ -30,19 +30,19 @@ import init
 import getconfigs as gc
 
 
-def write_state(state):
-    """writes state to state file"""
-
-    with open(init.state_path, 'w') as f:
-        yaml.dump(state, f, default_flow_style=False)
-
-
 async def handle_commands(reader, writer):
 
     state = gc.state
     rawdata = await reader.read(100)
     data = rawdata.decode()
     addr = writer.get_extra_info('peername')
+
+    def write_state(state):
+        """writes state to state file"""
+
+        with open(init.state_path, 'w') as f:
+            yaml.dump(state, f, default_flow_style=False)
+
 
     try:
         if data.rstrip('\r\n') == 'status':
