@@ -189,7 +189,7 @@ def proccess_commands(
         return state
 
 
-    def disconnect_inputs(state=state):
+    def disconnect_inputs(throw_it, state=state):
 
         try:
             tmp = jack.Client('tmp')
