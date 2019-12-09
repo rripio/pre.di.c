@@ -20,7 +20,7 @@ beep_options: ''
 use_state_init: true
 # when changing inputs use associated xo
 use_input_xo: true
-# do not connect inputs on start
+# connect inputs on start
 connect_inputs: false
 
 
