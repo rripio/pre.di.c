@@ -9,11 +9,18 @@ start_command: /usr/bin/mplayer -profile dvb
 # mplayer kill command line:
 stop_command: pkill -f /usr/bin/mplayer
 
+# DVB input in ~/pre.di.c/inputs.yml
+DVB_input: tdt
+
+# play preset on start
+# set preset as "restore" for last played channel
+play_on_start: true
+preset: 6
+
+# ancillary filenames
+state_filename: 'state.yml'
+presets_filename: 'presets.yml'
 # commands FIFO filename
 # option -input file={dvb_fifo} is added in program
 fifo_filename: DVB_fifo
 
-# play preset on start
-# set preset as "restore" for last played channel
-play_on_start: false
-preset: 6

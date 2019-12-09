@@ -31,7 +31,6 @@ import os
 import subprocess as sp
 
 import getconfigs as gc
-import predic as pd
 
 
 # initialize
