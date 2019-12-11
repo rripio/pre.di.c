@@ -14,8 +14,6 @@ loudspeaker: example_1_way
 
 # delay between commands (seconds)
 command_delay: 1
-# "beep" command options to indicate software load
-beep_options: ''
 # use fixed initial state, instead of last saved state
 use_state_init: true
 # when changing inputs use associated xo
