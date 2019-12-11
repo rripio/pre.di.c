@@ -22,7 +22,11 @@
 # You should have received a copy of the GNU General Public License
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
-"""selects DVB channels"""
+"""selects DVB channels
+Usage: DVB_command.py [preset ['startaudio']]
+
+The 'startaudio' flag omit jack connection when switching channels
+for use when launchong DVB client on pre.di.c start"""
 
 
 import sys
@@ -83,7 +87,7 @@ def select_preset(preset, preset_dict=presets):
     return False
 
 
-def change_radio(selected, preset_dict=presets, state=state):
+def change_radio(selected, startflag = False, preset_dict=presets, state=state):
     """ process channel options """
 
     # list of presets, discarding those white in presets.yml
@@ -116,18 +120,20 @@ def change_radio(selected, preset_dict=presets, state=state):
         if selected != state['actual']:
             state['previous'] = state['actual']
         state['actual'] = selected
-        # check selected input and reconnect to DVB if selected
-        selected_input = pd.read_state()['input']
-        if config['DVB_input'] == selected_input:
-            tmax = gc.config['command_delay'] * 10
-            interval = gc.config['command_delay'] * 0.1
-            # wait for disconnection of previous channel
-            time.sleep(gc.config['command_delay'])
-            # try to connect for newly connected ports
-            if pd.wait4source(selected_input, tmax, interval):
-                # input ports up and ready :-)
-                # switch on input
-                pd.client_socket('input ' + selected_input, quiet=True)
+        # if starting predic give startaudio command on input switching
+        if not startflag:
+            # check selected input and reconnect to DVB if selected
+            selected_input = pd.read_state()['input']
+            if config['DVB_input'] == selected_input:
+                tmax = gc.config['command_delay'] * 10
+                interval = gc.config['command_delay'] * 0.1
+                # wait for disconnection of previous channel
+                time.sleep(gc.config['command_delay'])
+                # try to connect for newly connected ports
+                if pd.wait4source(selected_input, tmax, interval):
+                    # input ports up and ready :-)
+                    # switch on input
+                    pd.client_socket('input ' + selected_input, quiet=True)
     else:
         state['actual'] = state_old['actual']
         state['previous'] = state_old['previous']
@@ -137,7 +143,17 @@ def change_radio(selected, preset_dict=presets, state=state):
 
 
 if sys.argv[1:]:
-    new_state = change_radio(sys.argv[1])
+    selected = sys.argv[1]
+    if sys.argv[2:]:
+        startflag = sys.argv[2]
+        if startflag == 'startaudio':
+            startflag = True
+        else:
+            startflag = False 
+    else:
+        startflag = False
+    new_state = change_radio(selected, startflag)
+
     with open(state_path, 'w') as f:
         yaml.dump(new_state, f, default_flow_style=False)
 else:

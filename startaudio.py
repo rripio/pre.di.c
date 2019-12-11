@@ -144,7 +144,7 @@ def init_inputs(state):
     source = state['input']
     print(f'\n(startaudio) restoring input: {source}')
     # wait for input ports to be up
-    tmax = gc.config['command_delay'] * 10
+    tmax = gc.config['command_delay'] * 15
     interval = gc.config['command_delay'] * 0.1
     if pd.wait4source(source, tmax, interval):
         # input ports up and ready :-)
