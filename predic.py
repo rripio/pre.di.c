@@ -135,20 +135,24 @@ def wait4source(source, tmax=5, interval=0.1):
     
     time_start = time.time()
     jc = jack.Client('tmp')
+    source_ports = gc.inputs[source]['in_ports']
+    # get base name of ports for up ports query
+    source_ports_name = source_ports[1].split(':',1)[0]
     while (time.time() - time_start) < tmax:
         try:
-            connected = True
-            for port_name in gc.inputs[source]['in_ports']:
-                connected = connected and jc.get_ports(port_name)
+            # names of up source ports at this very moment as a generator
+            up_ports = (port.name for port in
+                            jc.get_ports(source_ports_name, is_output=True))
+            # compare sets and if identical, input ports are up and ready :-)
+            if (set(source_ports) == set(up_ports)):
+            # go on
+                return True
+            else:
+               time.sleep(interval)
         except KeyError:
             print(f'\nincorrect input \'{source}\''
                             '\n please revise state files\n')
             return False
-        if connected:
-            # input ports up and ready :-)
-            return True
-        else:
-            time.sleep(interval)
     # time is exhausted and input ports are down :-(
     # leave function without any connection made
     print(f'\ntime out restoring input \'{source}\''
