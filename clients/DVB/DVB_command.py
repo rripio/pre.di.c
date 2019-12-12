@@ -87,7 +87,8 @@ def select_preset(preset, preset_dict=presets):
     return False
 
 
-def change_radio(selected, startflag = False, preset_dict=presets, state=state):
+def change_radio(selected, startflag = False,
+                                        preset_dict=presets, state=state):
     """ process channel options """
 
     # list of presets, discarding those white in presets.yml
