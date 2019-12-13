@@ -63,9 +63,9 @@ def unplug_sources(jack_client, out_ports):
         print('error disconnecting outputs')
 
 
-def do_change_input(input_name, in_ports, out_ports):
-    """'in_ports':   list [L,R] of jack capture ports of chosen source
-'out_ports':  list of ports in 'audio_ports' variable"""
+def do_change_input(input_name, source_ports, out_ports):
+    """'source_ports':   list [L,R] of jack output ports of chosen source
+'out_ports':  list of input ports in 'audio_ports' variable"""
 
     monitor_ports = gc.config['monitors_ports'].split()
     # switch
@@ -73,17 +73,17 @@ def do_change_input(input_name, in_ports, out_ports):
         # jack.attach('tmp')
         tmp = jack.Client('tmp')
         unplug_sources(tmp, out_ports)
-        for i in range(len(in_ports)):
+        for i in range(len(source_ports)):
             # audio inputs
             try:
-                tmp.connect(in_ports[i], out_ports[i])
+                tmp.connect(source_ports[i], out_ports[i])
             except:
-                warnings.append(f'error connecting {in_ports[i]}'
+                warnings.append(f'error connecting {source_ports[i]}'
                                             f' <--> {out_ports[i]}')
            # monitor inputs
             try:
                 if monitor_ports:
-                    tmp.connect(in_ports[i], monitor_ports[i])
+                    tmp.connect(source_ports[i], monitor_ports[i])
             except:
                 warnings.append('error connecting monitors')
         tmp.close()
@@ -165,7 +165,7 @@ def proccess_commands(
                 raise
             elif input in gc.inputs:
                 if do_change_input (input,
-                        gc.inputs[state['input']]['in_ports'],
+                        gc.inputs[state['input']]['source_ports'],
                         audio_ports.split()):
                         # input change went OK
                     state = change_gain(gain)

@@ -4,9 +4,9 @@
 
 #   gain: float(dB)         # gain shift of input
 
-#   in_ports:               # jack input ports
-#       - input_jack_port_1
-#       - input_jack_port_2
+#   source_ports:               # jack source ports
+#       - source_jack_port_1
+#       - source_jack_port_2
 
 #   xo: filter_set_name     # name of crossover filter set to be 
                             # activated automatically when the input
@@ -14,28 +14,28 @@
 
 a:
     gain: 0.0
-    in_ports:
+    source_ports:
         - system:capture_1
         - system:capture_2
     xo: mp
 
 #mpd:
 #    gain: 0
-#    in_ports:
+#    source_ports:
 #        - mpd_loop:output_1
 #        - mpd_loop:output_2
 #    xo: mp
 #
 #net:
 #    gain: 0
-#    in_ports:
+#    source_ports:
 #        - net:from_slave_1
 #        - net:from_slave_2
 #    xo: mp
 #
 #tdt:
 #    gain: 0
-#    in_ports:
+#    source_ports:
 #        - dvb_loop:output_1
 #        - dvb_loop:output_2
 #    xo: mp
