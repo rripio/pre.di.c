@@ -44,13 +44,13 @@ except:
     print('Failed to load target files')
     sys.exit(-1)
 # audio ports
-audio_ports = gc.config['audio_ports']
+audio_ports = gc.config['audio_ports'].split()
 # warnings
 warnings = []
 
 
 def unplug_sources(jack_client, out_ports):
-    """disconnect sources from predic inputs and monitor inputs"""
+    """disconnect sources from predic inputs"""
 
     try:
         sources_L = jack_client.get_all_connections(out_ports[0])
@@ -67,7 +67,6 @@ def do_change_input(input_name, source_ports, out_ports):
     """'source_ports':   list [L,R] of jack output ports of chosen source
 'out_ports':  list of input ports in 'audio_ports' variable"""
 
-    monitor_ports = gc.config['monitors_ports'].split()
     # switch
     try:
         # jack.attach('tmp')
@@ -80,12 +79,6 @@ def do_change_input(input_name, source_ports, out_ports):
             except:
                 warnings.append(f'error connecting {source_ports[i]}'
                                             f' <--> {out_ports[i]}')
-           # monitor inputs
-            try:
-                if monitor_ports:
-                    tmp.connect(source_ports[i], monitor_ports[i])
-            except:
-                warnings.append('error connecting monitors')
         tmp.close()
     except:
         # on exception returns False
@@ -166,7 +159,7 @@ def proccess_commands(
             elif input in gc.inputs:
                 if do_change_input (input,
                         gc.inputs[state['input']]['source_ports'],
-                        audio_ports.split()):
+                        audio_ports):
                         # input change went OK
                     state = change_gain(gain)
                     # change xo if configured so
@@ -193,7 +186,7 @@ def proccess_commands(
 
         try:
             tmp = jack.Client('tmp')
-            unplug_sources(tmp, audio_ports.split())
+            unplug_sources(tmp, audio_ports)
             tmp.close()
         except:
             warnings.append('Something went wrong when disconnecting inputs')

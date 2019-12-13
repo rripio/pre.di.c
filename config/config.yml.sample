@@ -27,9 +27,6 @@ connect_inputs: false
 
 # input selector will connect sources to this ports
 audio_ports: brutefir:input-0 brutefir:input-1
-# jack monitor ports. Assign '' to not set
-# input selector will also connect sources to this ports
-monitors_ports: ''
 
 
 
