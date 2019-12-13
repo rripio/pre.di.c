@@ -49,8 +49,8 @@ audio_ports = gc.config['audio_ports']
 warnings = []
 
 
-def unplug_sources_of(jack_client, out_ports):
-    """disconnect clients from predic inputs and monitor inputs"""
+def unplug_sources(jack_client, out_ports):
+    """disconnect sources from predic inputs and monitor inputs"""
 
     try:
         sources_L = jack_client.get_all_connections(out_ports[0])
@@ -72,7 +72,7 @@ def do_change_input(input_name, in_ports, out_ports):
     try:
         # jack.attach('tmp')
         tmp = jack.Client('tmp')
-        unplug_sources_of(tmp, out_ports)
+        unplug_sources(tmp, out_ports)
         for i in range(len(in_ports)):
             # audio inputs
             try:
@@ -193,7 +193,7 @@ def proccess_commands(
 
         try:
             tmp = jack.Client('tmp')
-            unplug_sources_of(tmp, audio_ports.split())
+            unplug_sources(tmp, audio_ports.split())
             tmp.close()
         except:
             warnings.append('Something went wrong when disconnecting inputs')
