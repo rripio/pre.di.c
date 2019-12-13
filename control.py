@@ -49,8 +49,8 @@ audio_ports = gc.config['audio_ports'].split()
 warnings = []
 
 
-def unplug_sources(jack_client, out_ports):
-    """disconnect sources from predic inputs"""
+def disconnect_inputs(jack_client, out_ports):
+    """disconnect sources from predic audio ports"""
 
     try:
         sources_L = jack_client.get_all_connections(out_ports[0])
@@ -60,7 +60,7 @@ def unplug_sources(jack_client, out_ports):
         for source in sources_R:
             jack_client.disconnect(source.name, out_ports[1])
     except:
-        print('error disconnecting outputs')
+        print('error disconnecting inputs')
 
 
 def do_change_input(input_name, source_ports, out_ports):
@@ -71,14 +71,14 @@ def do_change_input(input_name, source_ports, out_ports):
     try:
         # jack.attach('tmp')
         tmp = jack.Client('tmp')
-        unplug_sources(tmp, out_ports)
+        disconnect_inputs(tmp, out_ports)
         for i in range(len(source_ports)):
             # audio inputs
             try:
                 tmp.connect(source_ports[i], out_ports[i])
             except:
                 warnings.append(f'error connecting {source_ports[i]}'
-                                            f' <--> {out_ports[i]}')
+                                                f' <--> {out_ports[i]}')
         tmp.close()
     except:
         # on exception returns False
@@ -136,6 +136,23 @@ def proccess_commands(
 
     ## internal functions for actions
 
+    def show(throw_it):
+
+        state = pd.show_file()
+        return(state)
+
+
+    def noinput(throw_it, state=state):
+
+        try:
+            tmp = jack.Client('tmp')
+            disconnect_inputs(tmp, audio_ports)
+            tmp.close()
+        except:
+            warnings.append('Something went wrong when disconnecting inputs')
+        return state
+
+
     def change_target(throw_it):
 
         try:
@@ -144,11 +161,6 @@ def proccess_commands(
         except:
             warnings.append('Something went wrong when changing target state')
 
-
-    def show(throw_it):
-
-        state = pd.show_file()
-        return(state)
 
     def change_input(input, state=state):
 
@@ -179,17 +191,6 @@ def proccess_commands(
             state['input']  = state_old['input']
             state['xo'] = state_old['xo']
             warnings.append('Something went wrong when changing input state')
-        return state
-
-
-    def disconnect_inputs(throw_it, state=state):
-
-        try:
-            tmp = jack.Client('tmp')
-            unplug_sources(tmp, audio_ports)
-            tmp.close()
-        except:
-            warnings.append('Something went wrong when disconnecting inputs')
         return state
 
 
@@ -571,10 +572,10 @@ def proccess_commands(
 
     try:
         state = {
-            'target':           change_target,
             'show':             show,
+            'noinput':          noinput,
+            'target':           change_target,
             'input':            change_input,
-            'noinput':          disconnect_inputs,
             'xo':               change_xovers,
             'drc':              change_drc,
             'polarity':         change_polarity,
