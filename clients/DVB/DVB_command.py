@@ -25,8 +25,8 @@
 """selects DVB channels
 Usage: DVB_command.py [preset ['startaudio']]
 
-The 'startaudio' flag omit jack connection when switching channels
-for use when launchong DVB client on pre.di.c start"""
+The 'startaudio' flag omits jack connection when switching channels
+for use when launching DVB client on pre.di.c start"""
 
 
 import sys
