@@ -171,7 +171,7 @@ def proccess_commands(
 
         state['input'] = input
         try:
-            if input == None:
+            if input is None:
                 raise
             elif input in gc.inputs:
                 if do_change_input (
