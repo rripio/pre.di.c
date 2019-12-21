@@ -48,7 +48,7 @@ def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
 
     client = mpd.MPDClient()
     client.connect(mpd_host, mpd_port)
-    if mpd_passwd:
+    if mpd_passwd is not None:
         client.password(mpd_passwd)
     return client
 
