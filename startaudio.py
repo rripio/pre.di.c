@@ -75,7 +75,7 @@ def init_brutefir():
     # waiting for brutefir
     tmax = gc.config['command_delay'] * 5
     interval = gc.config['command_delay'] * 0.1
-    if  pd.wait4result(
+    if pd.wait4result(
             'echo "quit" | nc localhost 3000 2>/dev/null',
             'Welcome', tmax, interval):
         print('\n(startaudio) brutefir started :-)')
