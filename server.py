@@ -79,7 +79,7 @@ async def handle_commands(reader, writer):
             try:
                 if gc.config['server_output'] in [1, 2]:
                     print(f'Command: {data}')
-            except:
+            except Exception:
                 pass
 
             try:
@@ -95,12 +95,12 @@ async def handle_commands(reader, writer):
                 else:
                     writer.write(b'OK\n')
                     await writer.drain()
-            except:
+            except Exception:
                 writer.write(b'ACK\n')
                 await writer.drain()
     except ConnectionResetError:
         print('(server) still no connection...')
-    except:
+    except Exception:
         print('(server) An exception occured...')
     finally:
         writer.close()

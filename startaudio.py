@@ -90,7 +90,7 @@ def init_server():
     print('\n(startaudio) starting server\n')
     try:
         control = sp.Popen(f'python3 {init.main_folder}server.py'.split())
-    except:
+    except Exception:
         print('\n(startaudio) server didn\'t load')
         stopaudio.main('all')
         sys.exit()
@@ -159,7 +159,7 @@ def init_inputs(state):
         time.sleep(gc.config['command_delay'] * 2)
         try:
             pd.client_socket('input ' + source, quiet=True)
-        except:
+        except Exception:
             print(f'\n(startaudio) error connecting source')
         return True
     else:
@@ -197,7 +197,7 @@ def main(run_level):
                 command_path = f'{init.clients_folder}{client}'
                 p=sp.Popen(command_path.split())
                 print(f'pid {p.pid:4}: {client}')
-            except:
+            except Exception:
                 print(f'problem launching client {client}')
         # restoring inputs if config mandates so
         if gc.config['connect_inputs']:

@@ -98,7 +98,7 @@ try:
         'bass_mag_curves'     : np.loadtxt(data_folder + bass_mag_curves),
         'bass_pha_curves'     : np.loadtxt(data_folder + bass_pha_curves)
         }
-except:
+except Exception:
     print('Failed to load EQ files')
     sys.exit(-1)
 

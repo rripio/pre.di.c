@@ -70,6 +70,6 @@ try:
     inputs = get_yaml(init.inputs_path)
     state = get_yaml(init.state_path)
     state_init = get_yaml(init.state_init_path)
-except:
+except Exception:
     print('\n(getconfigs) Error: some config file failed to load')
     sys.exit()

@@ -55,7 +55,7 @@ def main(run_level):
         for command in clients_stop:
             try:
                 Popen(f'{init.clients_folder}{command}'.split())
-            except:
+            except Exception:
                 print(f'problem stopping client "{client}":\n\t{err}')
     if run_level in ['core', 'all']:
         # controlserver

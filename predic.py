@@ -91,7 +91,7 @@ def client_socket(data, quiet=True):
             s.send(data.encode())
             # return raw bytes server answer
             return s.recv(256)
-        except:
+        except Exception:
             print(f'(client) unexpected error: {sys.exc_info()[0]}')
 
 
@@ -125,7 +125,7 @@ def wait4result(command, answer, tmax=5, interval=0.1):
                         f'command: {command}'
                         )
                 return True
-        except:
+        except Exception:
             pass
         time.sleep(interval)
     else:

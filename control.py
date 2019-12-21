@@ -41,7 +41,7 @@ try:
         'target_mag'          : np.loadtxt(gc.target_mag_path),
         'target_pha'          : np.loadtxt(gc.target_pha_path)
         }
-except:
+except Exception:
     print('Failed to load target files')
     sys.exit(-1)
 
@@ -62,7 +62,7 @@ def disconnect_inputs(jack_client, out_ports):
             jack_client.disconnect(source.name, out_ports[0])
         for source in sources_R:
             jack_client.disconnect(source.name, out_ports[1])
-    except:
+    except Exception:
         print('error disconnecting inputs')
 
 
@@ -80,12 +80,12 @@ def do_change_input(input_name, source_ports, out_ports):
             # audio inputs
             try:
                 tmp.connect(source_ports[i], out_ports[i])
-            except:
+            except Exception:
                 warnings.append(
                     f'error connecting {source_ports[i]} <--> {out_ports[i]}'
                     )
         tmp.close()
-    except:
+    except Exception:
         # on exception returns False
         warnings.append(f'error changing to input "{input_name}"')
         tmp.close()
@@ -104,7 +104,7 @@ def bf_cli(command):
             s.send(command.encode())
             if gc.config['server_output'] == 2:
                 print('command sent to brutefir')
-        except:
+        except Exception:
             warnings.append('Brutefir error')
 
 
@@ -153,7 +153,7 @@ def proccess_commands(
             tmp = jack.Client('tmp')
             disconnect_inputs(tmp, audio_ports)
             tmp.close()
-        except:
+        except Exception:
             warnings.append('Something went wrong when disconnecting inputs')
         return state
 
@@ -163,7 +163,7 @@ def proccess_commands(
         try:
             (target['target_mag'], target['target_pha']) = pd.get_target()
             state = change_gain(gain)
-        except:
+        except Exception:
             warnings.append('Something went wrong when changing target state')
 
 
@@ -194,7 +194,7 @@ def proccess_commands(
                     f'bad name: input has to be in {list(gc.inputs)}'
                     )
                 return state
-        except:
+        except Exception:
             state['input']  = state_old['input']
             state['xo'] = state_old['xo']
             warnings.append('Something went wrong when changing input state')
@@ -216,7 +216,7 @@ def proccess_commands(
                     'bad name: XO has to be in '
                     f'{list(gc.speaker["XO"]["sets"])}'
                     )
-        except:
+        except Exception:
             state['xo'] = state_old['xo']
             warnings.append('Something went wrong when changing XO state')
         return state
@@ -244,7 +244,7 @@ def proccess_commands(
                         'bad name: DRC has to be in '
                         f'{list(gc.speaker["DRC"]["sets"])}'
                         )
-            except:
+            except Exception:
                 state['drc'] = state_old['drc']
                 warnings.append('Something went wrong when changing DRC state')
         return state
@@ -261,7 +261,7 @@ def proccess_commands(
             state['polarity'] = polarity
             try:
                 state = change_gain(gain)
-            except:
+            except Exception:
                 state['polarity'] = state_old['polarity']
                 warnings.append(
                     'Something went wrong when changing polarity state')
@@ -286,7 +286,7 @@ def proccess_commands(
                 elif state['midside']=='off':
                     bf_cli('cfia 0 0 m1 ; cfia 0 1 m0 '
                             '; cfia 1 0 m0 ; cfia 1 1 m1')
-            except:
+            except Exception:
                 state['midside'] = state_old['midside']
                 warnings.append('Something went wrong when changing '
                                 'midside state')
@@ -303,7 +303,7 @@ def proccess_commands(
             state['mute'] = mute
             try:
                 state = change_gain(gain)
-            except:
+            except Exception:
                 state['mute'] = state_old['mute']
                 warnings.append(
                     'Something went wrong '
@@ -322,7 +322,7 @@ def proccess_commands(
             state['solo'] = solo
             try:
                 state = change_gain(gain)
-            except:
+            except Exception:
                 state['solo'] = state_old['solo']
                 warnings.append('Something went wrong '
                                 'when changing solo state')
@@ -338,7 +338,7 @@ def proccess_commands(
             state['loudness'] = loudness
             try:
                 state = change_gain(gain)
-            except:
+            except Exception:
                 state['loudness'] = state_old['loudness']
                 warnings.append(
                     'Something went wrong when changing loudness state'
@@ -369,7 +369,7 @@ def proccess_commands(
                     )
                 warnings.append('loudness reference level clamped')
             state = change_gain(gain)
-        except:
+        except Exception:
             state['loudness_ref'] = state_old['loudness_ref']
             warnings.append(
                 'Something went wrong when changing loudness_ref state'
@@ -393,7 +393,7 @@ def proccess_commands(
                     )
                 warnings.append('treble clamped')
             state = change_gain(gain)
-        except:
+        except Exception:
             state['treble'] = state_old['treble']
             warnings.append('Something went wrong when changing treble state')
         return state
@@ -412,7 +412,7 @@ def proccess_commands(
                     )
                 warnings.append('bass clamped')
             state = change_gain(gain)
-        except:
+        except Exception:
             state['bass'] = state_old['bass']
             warnings.append('Something went wrong when changing bass state')
         return state
@@ -437,7 +437,7 @@ def proccess_commands(
                     )
                 warnings.append('balance clamped')
             state = change_gain(gain)
-        except:
+        except Exception:
             state['balance'] = state_old['balance']
             warnings.append('Something went wrong when changing balance state')
         return state
@@ -450,7 +450,7 @@ def proccess_commands(
             state['level'] = (float(level) + state['level'] * add)
             gain = pd.calc_gain(state['level'], state['input'])
             state = change_gain(gain)
-        except:
+        except Exception:
             state['level'] = state_old['level']
             warnings.append(
                 f'Something went wrong when changing {command} state'
@@ -630,7 +630,7 @@ def proccess_commands(
             }[command](arg)
     except KeyError:
         warnings.append(f"Unknown command '{command}'")
-    except:
+    except Exception:
         warnings.append(f"Problems in command '{command}'")
 
     # return a dictionary of predic state
