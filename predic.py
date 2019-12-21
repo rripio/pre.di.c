@@ -118,7 +118,7 @@ def wait4result(command, answer, tmax=5, interval=0.1):
     while elapsed() < tmax:
         try:
             if answer in sp.check_output(
-                            command, shell=True, universal_newlines=True):
+                    command, shell=True, universal_newlines=True):
                 if gc.config['server_output'] in [1, 2]:
                     print(
                         f'\nfound string "{answer}" in output of '
