@@ -29,6 +29,7 @@ from subprocess import Popen
 
 import getconfigs as gc
 
+
 ## user configuration
 
 netjack_path = '/usr/bin/jack_load netmanager'

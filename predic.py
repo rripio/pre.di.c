@@ -55,8 +55,10 @@ def read_clients(phase):
     with open (clients_list_path) as clients_file:
         clients_dict = yaml.safe_load(clients_file)
         # init a list of client actions
-        clients = [clients_dict[i][phase]
-                for i in clients_dict if phase in clients_dict[i]]
+        clients = [
+            clients_dict[i][phase]
+            for i in clients_dict if phase in clients_dict[i]
+            ]
     return clients
 
 
@@ -73,7 +75,8 @@ def client_socket(data, quiet=True):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
         try:
-            if not quiet: print(f'Connecting to {server}, port {str(port)}...')
+            if not quiet:
+                print(f'Connecting to {server}, port {str(port)}...')
             s.connect((server,port))
         except socket.gaierror as e:
             print(f'Address-related error connecting to server: {e}')
@@ -114,19 +117,23 @@ def wait4result(command, answer, tmax=5, interval=0.1):
 
     while elapsed() < tmax:
         try:
-            if answer in sp.check_output(command, shell=True,
-                        universal_newlines=True):
+            if answer in sp.check_output(
+                            command, shell=True, universal_newlines=True):
                 if gc.config['server_output'] in [1, 2]:
-                    print(f'\nfound string "{answer}" in output of '
-                                                    f'command: {command}')
+                    print(
+                        f'\nfound string "{answer}" in output of '
+                        f'command: {command}'
+                        )
                 return True
         except:
             pass
         time.sleep(interval)
     else:
         if gc.config['server_output'] in [1, 2]:
-            print(f'\ntime out >{tmax}s waiting for string "{answer}"'
-                    f' in output of command: {command}')
+            print(
+                f'\ntime out >{tmax}s waiting for string "{answer}"'
+                f' in output of command: {command}'
+                )
         return False
 
 
@@ -141,8 +148,10 @@ def wait4source(source, tmax=5, interval=0.1):
     while (time.time() - time_start) < tmax:
         try:
             # names of up source ports at this very moment as a generator
-            up_ports = (port.name for port in
-                            jc.get_ports(source_ports_name, is_output=True))
+            up_ports = (
+                port.name for port in
+                jc.get_ports(source_ports_name, is_output=True)
+                )
             # compare sets and if identical, input ports are up and ready :-)
             if (set(source_ports) == set(up_ports)):
             # go on
@@ -150,13 +159,14 @@ def wait4source(source, tmax=5, interval=0.1):
             else:
                time.sleep(interval)
         except KeyError:
-            print(f'\nincorrect input \'{source}\''
-                            '\n please revise state files\n')
+            print(
+                f'\nincorrect input \'{source}\''
+                '\n please revise state files\n'
+                )
             return False
     # time is exhausted and input ports are down :-(
     # leave function without any connection made
-    print(f'\ntime out restoring input \'{source}\''
-                                    ', ports not available')
+    print(f'\ntime out restoring input \'{source}\', ports not available')
     return False
     
 
@@ -164,21 +174,21 @@ def calc_gain(level, input):
     """calculates gain from level, reference gain, and input gain"""
 
     input_gain = calc_input_gain(input)
-    gain = (level + gc.speaker['ref_level_gain'] + input_gain)
+    gain = level + gc.speaker['ref_level_gain'] + input_gain
     return gain
 
 
 def calc_level(gain, input):
 
     input_gain = calc_input_gain(input)
-    level = (gain - gc.speaker['ref_level_gain'] - input_gain)
+    level = gain - gc.speaker['ref_level_gain'] - input_gain
     return level
 
 
 def calc_headroom(gain, balance, eq_mag):
     """calculates headroom from gain and equalizer"""
 
-    headroom = ( init.gain_max - gain - np.max(eq_mag) - abs(balance))
+    headroom = init.gain_max - gain - np.max(eq_mag) - abs(balance)
     return headroom
 
 

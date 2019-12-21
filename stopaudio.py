@@ -24,6 +24,7 @@
 
 """
 Stops pre.di.c audio system
+
     Usage:
     stopaudio.py [ core | clients | all ]   (default 'all')
     core: jack, brutefir, server
@@ -39,6 +40,7 @@ from subprocess import Popen
 import init
 import getconfigs as gc
 import predic as pd
+
 
 fnull = open(os.devnull, 'w')
 

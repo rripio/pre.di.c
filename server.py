@@ -23,6 +23,7 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 import asyncio
+
 import yaml
 
 import control
@@ -47,8 +48,7 @@ async def handle_commands(reader, writer):
     try:
         if data.rstrip('\r\n') == 'status':
             # echo state to client as YAML string
-            writer.write(yaml.dump(state,
-                                    default_flow_style=False).encode())
+            writer.write(yaml.dump(state, default_flow_style=False).encode())
             writer.write(b'OK\n')
             await writer.drain()
             if gc.config['server_output'] == 2:
@@ -73,8 +73,7 @@ async def handle_commands(reader, writer):
             # command received in 'data', \
             # then send command to control.py, \
             # that answers with state dict
-            (state, warnings) = (control.proccess_commands
-                                            (data, state))
+            (state, warnings) = control.proccess_commands(data, state)
             # a try block avoids blocking of state file writing \
             # when the terminal that launched startaudio.py is closed
             try:
@@ -112,7 +111,8 @@ async def main():
     server = await asyncio.start_server(
                 handle_commands,
                 gc.config['control_address'],
-                gc.config['control_port'])
+                gc.config['control_port']
+                )
     addr = server.sockets[0].getsockname()
     if gc.config['server_output'] in [1, 2]:
         print(f'(server) listening on address {addr}')

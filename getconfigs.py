@@ -21,6 +21,7 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
+
 import yaml
 
 import init
@@ -37,17 +38,27 @@ def get_yaml(filepath):
 def get_speaker(config):
     """returns speaker dictionary from yaml speaker config file"""
 
-    full_path = ( init.loudspeakers_folder
-                + config['loudspeaker']
-                + '/' + init.speaker_filename )
+    full_path = (
+        init.loudspeakers_folder
+        + config['loudspeaker']
+        + '/' + init.speaker_filename
+        )
 
     with open(full_path) as configfile:
         config_dict = yaml.safe_load(configfile)
 
-    target_mag_path = (init.loudspeakers_folder + config['loudspeaker']
-                        + '/' + config_dict['target_mag_curve'])
-    target_pha_path = (init.loudspeakers_folder + config['loudspeaker']
-                        + '/' + config_dict['target_pha_curve'])
+    target_mag_path = (
+        init.loudspeakers_folder
+        + config['loudspeaker']
+        + '/'
+        + config_dict['target_mag_curve']
+        )
+    target_pha_path = (
+        init.loudspeakers_folder
+        + config['loudspeaker']
+        + '/'
+        + config_dict['target_pha_curve']
+        )
 
     return (config_dict, target_mag_path, target_pha_path)
 

@@ -25,6 +25,7 @@ import socket
 import sys
 import jack
 import math as m
+
 import numpy as np
 
 import init
@@ -43,8 +44,10 @@ try:
 except:
     print('Failed to load target files')
     sys.exit(-1)
+
 # audio ports
 audio_ports = gc.config['audio_ports'].split()
+
 # warnings
 warnings = []
 
@@ -65,7 +68,8 @@ def disconnect_inputs(jack_client, out_ports):
 
 def do_change_input(input_name, source_ports, out_ports):
     """'source_ports':   list [L,R] of jack output ports of chosen source
-'out_ports':  list of input ports in 'audio_ports' variable"""
+    'out_ports':  list of input ports in 'audio_ports' variable
+    """
 
     # switch
     try:
@@ -77,8 +81,9 @@ def do_change_input(input_name, source_ports, out_ports):
             try:
                 tmp.connect(source_ports[i], out_ports[i])
             except:
-                warnings.append(f'error connecting {source_ports[i]}'
-                                                f' <--> {out_ports[i]}')
+                warnings.append(
+                    f'error connecting {source_ports[i]} <--> {out_ports[i]}'
+                    )
         tmp.close()
     except:
         # on exception returns False
@@ -169,7 +174,8 @@ def proccess_commands(
             if input == None:
                 raise
             elif input in gc.inputs:
-                if do_change_input (input,
+                if do_change_input (
+                        input,
                         gc.inputs[state['input']]['source_ports'],
                         audio_ports):
                         # input change went OK
@@ -184,8 +190,9 @@ def proccess_commands(
                     state['xo'] = state_old['xo']
             else:
                 state['input'] = state_old['input']
-                warnings.append('bad name: input has to be in '
-                                f'{list(gc.inputs)}')
+                warnings.append(
+                    f'bad name: input has to be in {list(gc.inputs)}'
+                    )
                 return state
         except:
             state['input']  = state_old['input']
@@ -205,8 +212,10 @@ def proccess_commands(
                     bf_cli(f'cfc "{filters[i]}" "{coeffs[i]}"')
             else:
                 state['xo'] = state_old['xo']
-                warnings.append('bad name: XO has to be in '
-                                f'{list(gc.speaker["XO"]["sets"])}')
+                warnings.append(
+                    'bad name: XO has to be in '
+                    f'{list(gc.speaker["XO"]["sets"])}'
+                    )
         except:
             state['xo'] = state_old['xo']
             warnings.append('Something went wrong when changing XO state')
@@ -231,8 +240,10 @@ def proccess_commands(
                         bf_cli(f'cfc "{filters[i]}" "{coeffs[i]}"')
                 else:
                     state['drc'] = state_old['drc']
-                    warnings.append('bad name: DRC has to be in '
-                                    f'{list(gc.speaker["DRC"]["sets"])}')
+                    warnings.append(
+                        'bad name: DRC has to be in '
+                        f'{list(gc.speaker["DRC"]["sets"])}'
+                        )
             except:
                 state['drc'] = state_old['drc']
                 warnings.append('Something went wrong when changing DRC state')
@@ -253,7 +264,7 @@ def proccess_commands(
             except:
                 state['polarity'] = state_old['polarity']
                 warnings.append(
-                        'Something went wrong when changing polarity state')
+                    'Something went wrong when changing polarity state')
         else:
             state['polarity'] = state_old['polarity']
             warnings.append(f'bad option: polarity has to be in {options}')
@@ -294,8 +305,10 @@ def proccess_commands(
                 state = change_gain(gain)
             except:
                 state['mute'] = state_old['mute']
-                warnings.append('Something went wrong '
-                                'when changing mute state')
+                warnings.append(
+                    'Something went wrong '
+                    'when changing mute state'
+                    )
         else:
             state['mute'] = state_old['mute']
             warnings.append(f'bad option: mute has to be in {options}')
@@ -327,12 +340,14 @@ def proccess_commands(
                 state = change_gain(gain)
             except:
                 state['loudness'] = state_old['loudness']
-                warnings.append('Something went wrong when changing '
-                                                        'loudness state')
+                warnings.append(
+                    'Something went wrong when changing loudness state'
+                    )
         else:
             state['mute'] = state_old['mute']
-            warnings.append('bad loudness option: '
-                                'has to be "on" or "off"')
+            warnings.append(
+                'bad loudness option: has to be "on" or "off"'
+                )
         return state
 
 
@@ -340,19 +355,25 @@ def proccess_commands(
 
         try:
             state['loudness_ref'] = (float(loudness_ref)
-                                    + state['loudness_ref'] * add)
+                                     + state['loudness_ref'] * add
+                                     )
             # clamp loudness_ref value
             if abs(state['loudness_ref']) > init.loudness_ref_variation:
-                state['loudness_ref'] = m.copysign(init.loudness_ref_variation,
-                                                            state['loudness_ref'])
-                warnings.append('loudness reference level must be in the '
-                                    f'+-{init.loudness_ref_variation} interval')
+                state['loudness_ref'] = m.copysign(
+                                            init.loudness_ref_variation,
+                                            state['loudness_ref']
+                                            )
+                warnings.append(
+                    'loudness reference level must be in the '
+                    f'+-{init.loudness_ref_variation} interval'
+                    )
                 warnings.append('loudness reference level clamped')
             state = change_gain(gain)
         except:
             state['loudness_ref'] = state_old['loudness_ref']
-            warnings.append('Something went wrong when changing '
-                                                    'loudness_ref state')
+            warnings.append(
+                'Something went wrong when changing loudness_ref state'
+                )
         return state
 
 
@@ -363,9 +384,13 @@ def proccess_commands(
                                     + state['treble'] * add)
             # clamp treble value
             if m.fabs(state['treble']) > init.tone_variation:
-                state['treble'] = m.copysign(init.tone_variation, state['treble'])
-                warnings.append('treble must be in the '
-                                        f'+-{init.tone_variation} interval')
+                state['treble'] = m.copysign(
+                                    init.tone_variation, state['treble']
+                                    )
+                warnings.append(
+                    'treble must be in the '
+                    f'+-{init.tone_variation} interval'
+                    )
                 warnings.append('treble clamped')
             state = change_gain(gain)
         except:
@@ -377,13 +402,14 @@ def proccess_commands(
     def change_bass(bass, state=state, add=add):
 
         try:
-            state['bass'] = (float(bass)
-                                    + state['bass'] * add)
+            state['bass'] = float(bass) + state['bass'] * add
             # clamp bass value
             if m.fabs(state['bass']) > init.tone_variation:
                 state['bass'] = m.copysign(init.tone_variation, state['bass'])
-                warnings.append('bass must be in the '
-                                        f'+-{init.tone_variation} interval')
+                warnings.append(
+                    'bass must be in the '
+                    f'+-{init.tone_variation} interval'
+                    )
                 warnings.append('bass clamped')
             state = change_gain(gain)
         except:
@@ -402,10 +428,13 @@ def proccess_commands(
             # deviation of the L channel then goes symmetrical
             if m.fabs(state['balance']) > init.balance_variation:
                 state['balance'] = m.copysign(
-                        init.balance_variation ,state['balance'])
-                warnings.append('balance must be in the '
-                                        f'+-{init.balance_variation}'
-                                        ' interval')
+                                        init.balance_variation,
+                                        state['balance']
+                                        )
+                warnings.append(
+                    'balance must be in the '
+                    f'+-{init.balance_variation} interval'
+                    )
                 warnings.append('balance clamped')
             state = change_gain(gain)
         except:
@@ -423,8 +452,9 @@ def proccess_commands(
             state = change_gain(gain)
         except:
             state['level'] = state_old['level']
-            warnings.append('Something went wrong when changing %s state'
-                                                                % command)
+            warnings.append(
+                f'Something went wrong when changing {command} state'
+                )
         return state
 
 
@@ -438,13 +468,11 @@ def proccess_commands(
         # math domain error are +6165 dB and -6472 dB
         if gain > init.gain_max:
             gain = init.gain_max
-            warnings.append('max. gain must be less than '
-                                    f'{init.gain_max} dB')
+            warnings.append(f'max. gain must be less than {init.gain_max} dB')
             warnings.append('gain clamped')
         if gain < init.gain_min:
             gain = init.gain_min
-            warnings.append('min. gain must be more than '
-                                    f'{init.gain_min} dB')
+            warnings.append(f'min. gain must be more than {init.gain_min} dB')
             warnings.append('gain clamped')
 
 
@@ -476,9 +504,11 @@ def proccess_commands(
             # increasing 'level' decreases boost
             # increasing 'loudness_ref' increases boost
             if state['loudness'] == 'on':
-                loudness_i = (loudness_null_i
-                                    - state['level']
-                                    + state['loudness_ref'])
+                loudness_i = (
+                    loudness_null_i
+                    - state['level']
+                    + state['loudness_ref']
+                    )
             else:
                 # all zeros curve
                 loudness_i = loudness_null_i
@@ -526,17 +556,25 @@ def proccess_commands(
             # then channel gains are the product of \
             # gain, polarity, mute and solo
             m_mute = {'on': 0, 'off': 1}[state['mute']]
-            m_polarity_l = {'+': 1, '-': -1,
-                             '+-': 1, '-+': -1}[state['polarity']]
-            m_polarity_r = {'+': 1, '-': -1,
-                             '+-': -1, '-+': 1}[state['polarity']]
+            m_polarity_l = {
+                '+': 1, '-': -1, '+-': 1, '-+': -1
+                }[state['polarity']]
+            m_polarity_r = {
+                '+': 1, '-': -1, '+-': -1, '-+': 1
+                }[state['polarity']]
             m_solo_l  = {'off': 1, 'l': 1, 'r': 0}[state['solo']]
             m_solo_r  = {'off': 1, 'l': 0, 'r': 1}[state['solo']]
             m_gain = lambda x: m.pow(10, x/20) * m_mute
-            m_gain_l = (m_gain(bf_atten_dB_l)
-                            * m_polarity_l * m_solo_l)
-            m_gain_r = (m_gain(bf_atten_dB_r)
-                            * m_polarity_r * m_solo_r)
+            m_gain_l = (
+                m_gain(bf_atten_dB_l)
+                * m_polarity_l
+                * m_solo_l
+                )
+            m_gain_r = (
+                m_gain(bf_atten_dB_r)
+                * m_polarity_r
+                * m_solo_r
+                )
             # commit final gain change
             bf_cli(f'cffa 2 0 m{str(m_gain_l)} ; cffa 3 1 m{str(m_gain_r)}')
 

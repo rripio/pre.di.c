@@ -23,7 +23,9 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 """start and stop mplayer for DVB tasks
-use it with 'start' and 'stop' as options"""
+
+use it with 'start' and 'stop' as options
+"""
 
 
 import sys

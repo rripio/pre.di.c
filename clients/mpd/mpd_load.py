@@ -62,10 +62,11 @@ def mpd_vol_loop():
         mpd_client.idle('mixer')
         mpd_vol = int(mpd_client.status()['volume'])
         # update pre.di.c level
-        predic_level = round((mpd_vol / 100
-                            * mpd_conf['slider_range'])
-                            + mpd_gain_min
-                            - gc.speaker['ref_level_gain'])
+        predic_level = round(
+            (mpd_vol / 100 * mpd_conf['slider_range'])
+            + mpd_gain_min
+            - gc.speaker['ref_level_gain']
+            )
         pd.client_socket("level " + str(predic_level), quiet=True)
     mpd_client.close()
     mpd_client.disconnect()
@@ -84,8 +85,10 @@ def predic_vol_loop():
         if predic_level != predic_level_old:
             # update mpd "fake volume"
             predic_gain = predic_level + gc.speaker['ref_level_gain']
-            mpd_vol = round((predic_gain - mpd_gain_min)
-                                    * 100 / mpd_conf['slider_range'])
+            mpd_vol = round(
+                (predic_gain - mpd_gain_min)
+                * 100 / mpd_conf['slider_range']
+                )
             # minimal mpd volume
             if mpd_vol < 0:
                 mpd_vol = 0
@@ -103,7 +106,7 @@ def start():
     sp.Popen(mpd_conf["start_command"].split())
     if pd.wait4result(
             f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
-                                                                 'OK MPD'):
+            'OK MPD'):
         print('(mpd_load.py) mpd started :-)')
     else:
         print('(mpd_load.py) mpd loading failed')

@@ -24,6 +24,7 @@
 
 """
 Starts pre.di.c audio system
+
     Usage:
     startaudio.py [ core | clients | all ]   (default 'all')
     core: jack, brutefir, server
@@ -49,7 +50,8 @@ def init_jack():
 
     print('\n(startaudio) starting jack\n')
     jack = sp.Popen(
-                f'{gc.config["jack_command"]} -r {gc.speaker["fs"]}'.split())
+        f'{gc.config["jack_command"]} -r {gc.speaker["fs"]}'.split()
+        )
     # waiting for jackd:
     tmax = gc.config['command_delay'] * 5
     interval = gc.config['command_delay'] * 0.1
@@ -68,12 +70,14 @@ def init_brutefir():
     os.chdir(init.loudspeakers_folder + gc.config['loudspeaker'])
     print(f'\n(startaudio) starting brutefir on {os.getcwd()}')
     brutefir = sp.Popen(
-                f'{gc.config["brutefir_command"]} brutefir_config'.split())
+        f'{gc.config["brutefir_command"]} brutefir_config'.split()
+        )
     # waiting for brutefir
     tmax = gc.config['command_delay'] * 5
     interval = gc.config['command_delay'] * 0.1
-    if  pd.wait4result('echo "quit" | nc localhost 3000 2>/dev/null',
-                                                'Welcome', tmax, interval):
+    if  pd.wait4result(
+            'echo "quit" | nc localhost 3000 2>/dev/null',
+            'Welcome', tmax, interval):
         print('\n(startaudio) brutefir started :-)')
     else:
         print('\n(startaudio) error starting brutefir')
@@ -93,8 +97,9 @@ def init_server():
     # waiting for server
     tmax = gc.config['command_delay'] * 5
     interval = gc.config['command_delay'] * 0.1
-    if pd.wait4result('echo ping| nc localhost 9999 2>/dev/null', 'OK',
-                                                            tmax, interval):
+    if pd.wait4result(
+            'echo ping| nc localhost 9999 2>/dev/null',
+            'OK', tmax, interval):
         print('\n(startaudio) server started :-)')
     else:
         print('\n(startaudio) server not accesible Bye :-/')

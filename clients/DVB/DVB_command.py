@@ -23,10 +23,11 @@
 # along with pre.di.c.  If not, see <https://www.gnu.org/licenses/>.
 
 """selects DVB channels
-Usage: DVB_command.py [preset ['startaudio']]
 
-The 'startaudio' flag omits jack connection when switching channels
-for use when launching DVB client on pre.di.c start"""
+    Usage: DVB_command.py [preset ['startaudio']]
+
+    The 'startaudio' flag omits jack connection when switching channels
+    for use when launching DVB client on pre.di.c start"""
 
 
 import sys
@@ -59,9 +60,11 @@ def select_channel(channel_name, channel_gain):
     """ sets channel in mplayer """
 
     try:
-        command = (f"loadfile dvb://{channel_name}\n"
-                    f"af_cmdline volume {channel_gain}\n"
-                    'get_property volume\n')
+        command = (
+            f"loadfile dvb://{channel_name}\n"
+            f"af_cmdline volume {channel_gain}\n"
+            'get_property volume\n'
+            )
         with open(dvb_fifo, 'w') as f:
             f.write(command)
         return True
@@ -87,24 +90,27 @@ def select_preset(preset, preset_dict=presets):
     return False
 
 
-def change_radio(selected, startflag = False,
-                                        preset_dict=presets, state=state):
+def change_radio(
+    selected, startflag = False, preset_dict=presets, state=state):
     """ process channel options """
 
     # list of presets, discarding those white in presets.yml
     state_old = state
     presets = sorted(
-            [str(preset) for preset in preset_dict if preset_dict[preset]])
+            [str(preset) for preset in preset_dict if preset_dict[preset]]
+            )
     # command arguments
     options = ['next', 'prev', 'restore', 'back']
     if selected in options:
         # 'next|prev' to walk through preset list
         if selected == 'next':
-            selected = presets[ (presets.index(state['actual']) + 1)
-                                                            % len(presets) ]
+            selected = presets[
+                (presets.index(state['actual']) + 1) % len(presets)
+                ]
         elif selected == 'prev':
-            selected = presets[ (presets.index(state['actual']) - 1)
-                                                            % len(presets) ]
+            selected = presets[
+                (presets.index(state['actual']) - 1) % len(presets)
+                ]
         # last used preset, that is, 'actual':
         elif selected == 'restore':
             selected = state['actual']
@@ -113,8 +119,10 @@ def change_radio(selected, startflag = False,
             selected = state['previous']
     # direct preset selection
     elif not selected in presets:
-        print(f'(DVB_command) option must be in {options} or be an '
-                                                         'integer preset')
+        print(
+            f'(DVB_command) option must be in {options} '
+            'or be an integer preset'
+            )
         return
     # actual canal switch
     if select_preset(selected):
@@ -138,8 +146,7 @@ def change_radio(selected, startflag = False,
     else:
         state['actual'] = state_old['actual']
         state['previous'] = state_old['previous']
-        print('(DVB_command) Something went wrong '
-                                    'when changing radio state')
+        print('(DVB_command) Something went wrong when changing radio state')
     return state
 
 
