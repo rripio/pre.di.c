@@ -564,7 +564,7 @@ def proccess_commands(
                 }[state['polarity']]
             m_solo_l  = {'off': 1, 'l': 1, 'r': 0}[state['solo']]
             m_solo_r  = {'off': 1, 'l': 0, 'r': 1}[state['solo']]
-            m_gain = lambda x: m.pow(10, x/20) * m_mute
+            def m_gain(x): return m.pow(10, x/20) * m_mute
             m_gain_l = (
                 m_gain(bf_atten_dB_l)
                 * m_polarity_l
