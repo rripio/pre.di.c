@@ -4,6 +4,9 @@ idle=true
 slave=true
 nolirc=true
 quiet=true
+# use this to avoid clogging the logs in case of tuning AC3 audio stations
+# tuning indications will dissapear though
+#really-quiet=true
 
 # profiles
 
