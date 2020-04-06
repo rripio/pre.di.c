@@ -278,14 +278,20 @@ def proccess_commands(
             state['midside'] = midside
             try:
                 if state['midside']=='mid':
-                    bf_cli('cfia 0 0 m0.5 ; cfia 0 1 m0.5 '
-                            '; cfia 1 0 m0.5 ; cfia 1 1 m0.5')
+                    bf_cli( 'cffa "f.eq.L" "f.vol.L" m0.5 ; '
+                            'cffa "f.eq.L" "f.vol.R" m0.5 ; '
+                            'cffa "f.eq.R" "f.vol.L" m0.5 ; '
+                            'cffa "f.eq.R" "f.vol.R" m0.5')
                 elif state['midside']=='side':
-                    bf_cli('cfia 0 0 m0.5 ; cfia 0 1 m-0.5 '
-                            '; cfia 1 0 m0.5 ; cfia 1 1 m-0.5')
+                    bf_cli( 'cffa "f.eq.L" "f.vol.L" m0.5  ; '
+                            'cffa "f.eq.L" "f.vol.R" m-0.5 ; '
+                            'cffa "f.eq.R" "f.vol.L" m0.5  ; '
+                            'cffa "f.eq.R" "f.vol.R" m-0.5')
                 elif state['midside']=='off':
-                    bf_cli('cfia 0 0 m1 ; cfia 0 1 m0 '
-                            '; cfia 1 0 m0 ; cfia 1 1 m1')
+                    bf_cli( 'cffa "f.eq.L" "f.vol.L" m1 ; '
+                            'cffa "f.eq.L" "f.vol.R" m0 ; '
+                            'cffa "f.eq.R" "f.vol.L" m0 ; '
+                            'cffa "f.eq.R" "f.vol.R" m1')
             except Exception:
                 state['midside'] = state_old['midside']
                 warnings.append('Something went wrong when changing '
@@ -576,7 +582,8 @@ def proccess_commands(
                 * m_solo_r
                 )
             # commit final gain change
-            bf_cli(f'cffa 2 0 m{str(m_gain_l)} ; cffa 3 1 m{str(m_gain_r)}')
+            bf_cli(f'cfia "f.vol.L" "L" m{str(m_gain_l)} ; '
+                   f'cfia "f.vol.R" "R" m{str(m_gain_r)}')
 
 
         # backs up actual gain
