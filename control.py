@@ -136,7 +136,7 @@ def proccess_commands(
     if len(full_command) > 2:
         add = (True if full_command[2] == 'add' else False)
     # initializes gain since it is calculated from level
-    gain = pd.calc_gain(state['level'], state['input'])
+    gain = pd.calc_gain(state['level'])
 
 
     ## internal functions for actions
@@ -454,7 +454,7 @@ def proccess_commands(
         # level clamp is comissioned to change_gain()
         try:
             state['level'] = (float(level) + state['level'] * add)
-            gain = pd.calc_gain(state['level'], state['input'])
+            gain = pd.calc_gain(state['level'])
             state = change_gain(gain)
         except Exception:
             state['level'] = state_old['level']
@@ -472,10 +472,7 @@ def proccess_commands(
         # clamp gain value
         # just for information, numerical bounds before math range or \
         # math domain error are +6165 dB and -6472 dB
-        if gain > init.gain_max:
-            gain = init.gain_max
-            warnings.append(f'max. gain must be less than {init.gain_max} dB')
-            warnings.append('gain clamped')
+        # max gain is clamped downstream when calculating headroom
         if gain < init.gain_min:
             gain = init.gain_min
             warnings.append(f'min. gain must be more than {init.gain_min} dB')
@@ -551,7 +548,7 @@ def proccess_commands(
             return eq_mag, eq_pha
 
 
-        def commit_gain():
+        def commit_gain(gain):
 
             bf_atten_dB_l = gain
             bf_atten_dB_r = gain
@@ -586,8 +583,6 @@ def proccess_commands(
                    f'cfia "f.vol.R" "R" m{str(m_gain_r)}')
 
 
-        # backs up actual gain
-        gain_old = gain
         # EQ curves: loudness + treble + bass
         l_mag,      l_pha      = change_loudness()
         t_mag,      t_pha      = change_treble()
@@ -597,14 +592,14 @@ def proccess_commands(
         eq_pha = target['target_pha'] + l_pha + t_pha + b_pha
         # calculate headroom
         headroom = pd.calc_headroom(gain, state['balance'], eq_mag)
-        # moves headroom to accomodate input gain. It can lead to clipping \
+        # adds input gain. It can lead to clipping \
         # because assumes equal dynamic range between sources
-        headroom += pd.calc_input_gain(state['input'])
+        real_gain = gain + pd.calc_input_gain(state['input'])
         # if enough headroom commit changes
         if headroom >= 0:
-            commit_gain()
+            commit_gain(real_gain)
             change_eq()
-            state['level'] = pd.calc_level(gain, state['input'])
+            state['level'] = pd.calc_level(gain)
         # if not enough headroom tries lowering gain
         else:
             change_gain(gain + headroom)

@@ -99,11 +99,11 @@ def read_state():
     """retrieve state dictionary from server"""
 
     return yaml.safe_load(client_socket('status').decode().replace('OK\n', ''))
-    
-    
+
+
 def write_state():
     """ask server to write state to state file"""
-    
+
     client_socket('save')
 
 
@@ -139,7 +139,7 @@ def wait4result(command, answer, tmax=5, interval=0.1):
 
 def wait4source(source, tmax=5, interval=0.1):
     """wait for source jack ports to be up"""
-    
+
     time_start = time.time()
     jc = jack.Client('tmp')
     source_ports = gc.inputs[source]['source_ports']
@@ -168,20 +168,18 @@ def wait4source(source, tmax=5, interval=0.1):
     # leave function without any connection made
     print(f'\ntime out restoring input \'{source}\', ports not available')
     return False
-    
 
-def calc_gain(level, input):
+
+def calc_gain(level):
     """calculates gain from level, reference gain, and input gain"""
 
-    input_gain = calc_input_gain(input)
-    gain = level + gc.speaker['ref_level_gain'] + input_gain
+    gain = level + gc.speaker['ref_level_gain']
     return gain
 
 
-def calc_level(gain, input):
+def calc_level(gain):
 
-    input_gain = calc_input_gain(input)
-    level = gain - gc.speaker['ref_level_gain'] - input_gain
+    level = gain - gc.speaker['ref_level_gain']
     return level
 
 
@@ -211,9 +209,9 @@ def get_target():
 def show(throw_it=None, state=gc.state):
     """shows a status report"""
 
-    gain = calc_gain(gc.state['level'] , gc.state['input'])
-    headroom = calc_headroom(gain, gc.state['balance'], get_target()[0])
     input_gain = calc_input_gain(gc.state['input'])
+    gain = calc_gain(gc.state['level']) + input_gain
+    headroom = calc_headroom(gain, gc.state['balance'], get_target()[0])
 
     print()
     print(f"Loudspeaker: {gc.config['loudspeaker']}")
