@@ -467,18 +467,6 @@ def proccess_commands(
     def change_gain(gain, state=state):
         """change_gain, aka 'the volume machine' :-)"""
 
-        # gain command send its str argument directly
-        gain = float(gain)
-        # clamp gain value
-        # just for information, numerical bounds before math range or \
-        # math domain error are +6165 dB and -6472 dB
-        # max gain is clamped downstream when calculating headroom
-        if gain < init.gain_min:
-            gain = init.gain_min
-            warnings.append(f'min. gain must be more than {init.gain_min} dB')
-            warnings.append('gain clamped')
-
-
         def change_eq():
 
             eq_str = ''
@@ -583,6 +571,16 @@ def proccess_commands(
                    f'cfia "f.vol.R" "R" m{str(m_gain_r)}')
 
 
+        # gain command send its str argument directly
+        gain = float(gain)
+        # clamp gain value
+        # just for information, numerical bounds before math range or \
+        # math domain error are +6165 dB and -6472 dB
+        # max gain is clamped downstream when calculating headroom
+        if gain < init.gain_min:
+            gain = init.gain_min
+            warnings.append(f'min. gain must be more than {init.gain_min} dB')
+            warnings.append('gain clamped')
         # EQ curves: loudness + treble + bass
         l_mag,      l_pha      = change_loudness()
         t_mag,      t_pha      = change_treble()
