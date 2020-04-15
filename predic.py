@@ -142,7 +142,7 @@ def wait4source(source, tmax=5, interval=0.1):
 
     time_start = time.time()
     jc = jack.Client('tmp')
-    source_ports = gc.inputs[source]['source_ports']
+    source_ports = gc.inputs[source]['source_ports'].split()
     # get base name of ports for up ports query
     source_ports_name = source_ports[1].split(':',1)[0]
     while (time.time() - time_start) < tmax:

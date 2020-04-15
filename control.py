@@ -176,7 +176,7 @@ def proccess_commands(
             elif input in gc.inputs:
                 if do_change_input (
                         input,
-                        gc.inputs[state['input']]['source_ports'],
+                        gc.inputs[state['input']]['source_ports'].split(),
                         audio_ports):
                         # input change went OK
                     state = change_gain(gain)
