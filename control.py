@@ -45,44 +45,45 @@ except Exception:
     print('Failed to load target files')
     sys.exit(-1)
 
-# audio ports
-audio_ports = gc.config['audio_ports'].split()
-
-# warnings
 warnings = []
 
 
-def disconnect_outputs(jack_client, out_ports):
+def disconnect_outputs(jack_client):
     """disconnect sources from predic audio ports"""
 
     try:
-        for port in out_ports:
-            sources = jack_client.get_all_connections(port)
-            for source in sources:
-                jack_client.disconnect(source.name, port)
+        for port_group in gc.config['audio_ports']:
+            for port in port_group:
+                sources = jack_client.get_all_connections(port)
+                for source in sources:
+                    jack_client.disconnect(source.name, port)
     except Exception:
         print('error disconnecting inputs')
 
 
-def do_change_input(input_name, source_ports, out_ports):
+def do_change_input(input_name, source_ports):
     """'source_ports':   list [L,R] of jack output ports of chosen source
-    'out_ports':  list of input ports in 'audio_ports' variable
     """
 
     # switch
     try:
         # jack.attach('tmp')
         tmp = jack.Client('tmp')
-        disconnect_outputs(tmp, out_ports)
-        for i in range(len(source_ports)):
-            # audio inputs
-            try:
-                tmp.connect(source_ports[i], out_ports[i])
-            except Exception:
-                warnings.append(
-                    f'error connecting {source_ports[i]} <--> {out_ports[i]}'
-                    )
-        tmp.close()
+        disconnect_outputs(tmp)
+        for ports_group in gc.config['audio_ports']:
+            # make no more than possible connections,
+            # i.e., minimum of input or output ports
+            num_ports=min(len(ports_group), len(source_ports))
+            for i in range(num_ports):
+                # audio inputs
+                try:
+                    tmp.connect(source_ports[i], ports_group[i])
+                except Exception:
+                    warnings.append(
+                        f'error connecting {source_ports[i]} <--> '
+                        f'{ports_group[i]}'
+                        )
+            tmp.close()
     except Exception:
         # on exception returns False
         warnings.append(f'error changing to input "{input_name}"')
@@ -149,7 +150,7 @@ def proccess_commands(
 
         try:
             tmp = jack.Client('tmp')
-            disconnect_outputs(tmp, audio_ports)
+            disconnect_outputs(tmp)
             tmp.close()
         except Exception:
             warnings.append('Something went wrong when disconnecting inputs')
@@ -174,8 +175,7 @@ def proccess_commands(
             elif input in gc.inputs:
                 if do_change_input (
                         input,
-                        gc.inputs[state['input']]['source_ports'].split(),
-                        audio_ports):
+                        gc.inputs[state['input']]['source_ports']):
                         # input change went OK
                     state = change_gain(gain)
                     # change xo if configured so

@@ -26,7 +26,9 @@ connect_inputs: false
 ## jack audio ports
 
 # input selector will connect sources to this ports
-audio_ports: brutefir:input-0 brutefir:input-1
+# each group of ports is a space separated string
+audio_ports:
+    - brutefir:input-0 brutefir:input-1
 
 
 

@@ -73,3 +73,17 @@ try:
 except Exception:
     print('\n(getconfigs) Error: some config file failed to load')
     sys.exit()
+    
+# some processing of data for downstream easyer use
+# while retaining upstream ease of writing in config files
+
+# audio ports
+# turn string space separated enumerations into a lists
+for i in range(len(config['audio_ports'])):
+    config['audio_ports'][i]=config['audio_ports'][i].split()
+
+# source ports
+# turn string space separated enumerations into a lists
+for input in inputs:
+    inputs[input]['source_ports']=inputs[input]['source_ports'].split()
+

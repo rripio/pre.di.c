@@ -142,7 +142,7 @@ def wait4source(source, tmax=5, interval=0.1):
 
     time_start = time.time()
     jc = jack.Client('tmp')
-    source_ports = gc.inputs[source]['source_ports'].split()
+    source_ports = gc.inputs[source]['source_ports']
     # get base name of ports for up ports query
     source_ports_name = source_ports[1].split(':',1)[0]
     while (time.time() - time_start) < tmax:
@@ -198,7 +198,7 @@ def calc_input_gain(input):
 def get_target():
     """reads target file from disk"""
 
-    # reload target, so we can change it for testing
+    # reload target, so we can change it for testing,
     # overwriting the target files outside predic
     target_mag = np.loadtxt(gc.target_mag_path)
     target_pha = np.loadtxt(gc.target_pha_path)
