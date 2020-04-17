@@ -26,6 +26,7 @@ import yaml
 
 import init
 
+
 def get_yaml(filepath):
     """returns dictionary from yaml config file"""
 
@@ -35,47 +36,28 @@ def get_yaml(filepath):
     return config_dict
 
 
-def get_speaker(config):
-    """returns speaker dictionary from yaml speaker config file"""
-
-    full_path = (
-        init.loudspeakers_folder
-        + config['loudspeaker']
-        + '/' + init.speaker_filename
-        )
-
-    with open(full_path) as configfile:
-        config_dict = yaml.safe_load(configfile)
-
-    target_mag_path = (
-        init.loudspeakers_folder
-        + config['loudspeaker']
-        + '/'
-        + config_dict['target_mag_curve']
-        )
-    target_pha_path = (
-        init.loudspeakers_folder
-        + config['loudspeaker']
-        + '/'
-        + config_dict['target_pha_curve']
-        )
-
-    return (config_dict, target_mag_path, target_pha_path)
-
-
 # dictionaries
 try:
     config = get_yaml(init.config_path)
-    (speaker, target_mag_path, target_pha_path) = get_speaker(config)
     inputs = get_yaml(init.inputs_path)
     state = get_yaml(init.state_path)
     state_init = get_yaml(init.state_init_path)
+    
+    # after knowing which speaker config to load, load it
+    loudspeaker_path = (init.loudspeakers_folder + config['loudspeaker']) 
+    speaker = get_yaml(loudspeaker_path + '/' + init.speaker_filename)
+    
 except Exception:
     print('\n(getconfigs) Error: some config file failed to load')
     sys.exit()
     
+
 # some processing of data for downstream easyer use
 # while retaining upstream ease of writing in config files
+
+# target curves paths
+target_mag_path = loudspeaker_path + '/' + speaker['target_mag_curve']
+target_pha_path = loudspeaker_path + '/' + speaker['target_pha_curve']
 
 # audio ports
 # turn string space separated enumerations into a lists

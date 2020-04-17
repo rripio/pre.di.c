@@ -26,8 +26,6 @@ import sys
 import jack
 import math as m
 
-import numpy as np
-
 import init
 import getconfigs as gc
 import predic as pd
@@ -37,10 +35,8 @@ import predic as pd
 
 # target curves
 try:
-    target = {
-        'target_mag'          : np.loadtxt(gc.target_mag_path),
-        'target_pha'          : np.loadtxt(gc.target_pha_path)
-        }
+    target = dict.fromkeys(['mag', 'pha'])
+    (target['mag'], target['pha']) = pd.get_target()
 except Exception:
     print('Failed to load target files')
     sys.exit(-1)
@@ -160,7 +156,7 @@ def proccess_commands(
     def change_target(throw_it):
 
         try:
-            (target['target_mag'], target['target_pha']) = pd.get_target()
+            (target['mag'], target['pha']) = pd.get_target()
             state = change_gain(gain)
         except Exception:
             warnings.append('Something went wrong when changing target state')
@@ -584,8 +580,8 @@ def proccess_commands(
         t_mag,      t_pha      = change_treble()
         b_mag,      b_pha      = change_bass()
         # compose EQ curves with target
-        eq_mag = target['target_mag'] + l_mag + t_mag + b_mag
-        eq_pha = target['target_pha'] + l_pha + t_pha + b_pha
+        eq_mag = target['mag'] + l_mag + t_mag + b_mag
+        eq_pha = target['pha'] + l_pha + t_pha + b_pha
         # calculate headroom
         headroom = pd.calc_headroom(gain, state['balance'], eq_mag)
         # adds input gain. It can lead to clipping \
