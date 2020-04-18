@@ -16,4 +16,6 @@
 #netjack:
 #    start:  netjack_load.py
 
+#stream_loop:
+#    start:  stream_loop.py start
 

@@ -23,15 +23,17 @@
 """miscellanea of utility functions for use in predic scripts"""
 
 
+import os
 import socket
 import sys
 import time
-import os
-import subprocess as sp
 import contextlib as cl
+import multiprocessing as mp
+import subprocess as sp
 
-import yaml
+
 import jack
+import yaml
 import numpy as np
 
 import init
@@ -168,6 +170,64 @@ def wait4source(source, tmax=5, interval=0.1):
     # leave function without any connection made
     print(f'\ntime out restoring input \'{source}\', ports not available')
     return False
+
+
+def jack_loop(clientname):
+    """creates a jack loop with given 'clientname'"""
+    # CREDITS:
+    # https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
+
+    # the jack module instance for our looping ports
+    client = jack.Client(name=clientname, no_start_server=True)
+
+    if client.status.name_not_unique:
+        client.close()
+        print( f'(predic.jack_loop) \'{clientname}\''
+                            'already exists in JACK, nothing done.' )
+        return
+
+    # will use the multiprocessing.Event mechanism to keep this alive
+    event = mp.Event()
+
+    # this sets the actual loop that copies frames from our capture \
+    # to our playback ports
+    @client.set_process_callback
+    def process(frames):
+        assert len(client.inports) == len(client.outports)
+        assert frames == client.blocksize
+        for i, o in zip(client.inports, client.outports):
+            o.get_buffer()[:] = i.get_buffer()
+
+    # if jack shutdowns, will trigger on 'event' so that the below \
+    # 'whith client' will break.
+    @client.set_shutdown_callback
+    def shutdown(status, reason):
+        print('(predic.jack_loop) JACK shutdown!')
+        print('(predic.jack_loop) JACK status:', status)
+        print('(predic.jack_loop) JACK reason:', reason)
+        # this triggers an event so that the below 'with client' \
+        # will terminate
+        event.set()
+
+    # create the ports
+    for n in 1, 2:
+        client.inports.register(f'input_{n}')
+        client.outports.register(f'output_{n}')
+    # client.activate() not needed, see below
+
+    # this is the keeping trick
+    with client:
+        # when entering this with-statement, client.activate() is called
+        # this tells the JACK server that we are ready to roll
+        # our above process() callback will start running now
+
+        print( f'(predic.jack_loop) running {clientname}' )
+        try:
+            event.wait()
+        except KeyboardInterrupt:
+            print('\n(predic.jack_loop) Interrupted by user')
+        except:
+            print('\n(predic.jack_loop)  Terminated')
 
 
 def calc_gain(level):
