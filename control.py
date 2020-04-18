@@ -63,7 +63,6 @@ def do_change_input(input_name, source_ports):
 
     # switch
     try:
-        # jack.attach('tmp')
         tmp = jack.Client('tmp')
         disconnect_outputs(tmp)
         for ports_group in gc.config['audio_ports']:
@@ -79,7 +78,7 @@ def do_change_input(input_name, source_ports):
                         f'error connecting {source_ports[i]} <--> '
                         f'{ports_group[i]}'
                         )
-            tmp.close()
+        tmp.close()
     except Exception:
         # on exception returns False
         warnings.append(f'error changing to input "{input_name}"')
