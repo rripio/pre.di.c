@@ -23,7 +23,6 @@
 """miscellanea of utility functions for use in predic scripts"""
 
 
-import os
 import socket
 import sys
 import time
@@ -37,17 +36,10 @@ import yaml
 import numpy as np
 
 import init
-import stopaudio
 import getconfigs as gc
 
 
-def stop_all():
-    """ stops all audio and the current script """
-
-    stopaudio.main('all')
-    sys.exit()
-
-
+# used on startaudio.py and stopaudio.py
 def read_clients(phase):
     """reads list of programs to start/stop from config/clients.yml file
     phase: <'start'|'stop'> phase of client activation or deactivation"""
@@ -101,12 +93,6 @@ def read_state():
     """retrieve state dictionary from server"""
 
     return yaml.safe_load(client_socket('status').decode().replace('OK\n', ''))
-
-
-def write_state():
-    """ask server to write state to state file"""
-
-    client_socket('save')
 
 
 def wait4result(command, answer, tmax=5, interval=0.1):

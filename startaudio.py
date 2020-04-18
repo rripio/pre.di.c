@@ -45,6 +45,13 @@ import predic as pd
 import getconfigs as gc
 
 
+def stop_all():
+    """ stops all audio and the current script """
+
+    stopaudio.main('all')
+    sys.exit()
+
+
 def init_jack():
     """loads jack server"""
 
@@ -59,7 +66,7 @@ def init_jack():
         print('\n(startaudio) jack started :-)')
     else:
         print('\n(startaudio) error starting jack')
-        pd.stop_all()
+        stop_all()
 
 
 def init_brutefir():
@@ -81,7 +88,7 @@ def init_brutefir():
         print('\n(startaudio) brutefir started :-)')
     else:
         print('\n(startaudio) error starting brutefir')
-        pd.stop_all()
+        stop_all()
 
 
 def init_server():
@@ -103,7 +110,7 @@ def init_server():
         print('\n(startaudio) server started :-)')
     else:
         print('\n(startaudio) server not accesible Bye :-/')
-        pd.stop_all()
+        stop_all()
 
 
 def set_initial_state():
