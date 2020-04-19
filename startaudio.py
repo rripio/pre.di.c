@@ -190,12 +190,11 @@ def main(run_level):
         state = set_initial_state()
         # restoring previous state
         init_state_settings(state)
-        # restore input in order to write it to state file \
-        # for use of clients if config ask for it
+        # write input to state file for use of clients if config ask for it
         if gc.config['connect_inputs']:
             # just refresh state file
-            # won't connect, since client's ports aren't ready
-            pd.client_socket('input ' + state["input"], quiet=True)
+            gc.state["input"] = state["input"]
+            pd.client_socket('save', quiet=True)
        # launch external clients, sources and clients
         print('\n(startaudio): starting clients...')
         clients_start = pd.read_clients('start')
