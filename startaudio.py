@@ -194,7 +194,7 @@ def main(run_level):
         # for use of clients if config ask for it
         if gc.config['connect_inputs']:
             # just refresh state file
-            # won't connect if client's ports aren't ready
+            # won't connect, since client's ports aren't ready
             pd.client_socket('input ' + state["input"], quiet=True)
        # launch external clients, sources and clients
         print('\n(startaudio): starting clients...')
