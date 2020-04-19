@@ -41,66 +41,6 @@ except Exception:
     print('Failed to load target files')
     sys.exit(-1)
 
-warnings = []
-
-
-def disconnect_outputs(jack_client):
-    """disconnect sources from predic audio ports"""
-
-    try:
-        for port_group in gc.config['audio_ports']:
-            for port in port_group:
-                sources = jack_client.get_all_connections(port)
-                for source in sources:
-                    jack_client.disconnect(source.name, port)
-    except Exception:
-        print('error disconnecting inputs')
-
-
-def do_change_input(input_name, source_ports):
-    """'source_ports':   list [L,R] of jack output ports of chosen source
-    """
-
-    # switch
-    try:
-        tmp = jack.Client('tmp')
-        disconnect_outputs(tmp)
-        for ports_group in gc.config['audio_ports']:
-            # make no more than possible connections,
-            # i.e., minimum of input or output ports
-            num_ports=min(len(ports_group), len(source_ports))
-            for i in range(num_ports):
-                # audio inputs
-                try:
-                    tmp.connect(source_ports[i], ports_group[i])
-                except Exception:
-                    warnings.append(
-                        f'error connecting {source_ports[i]} <--> '
-                        f'{ports_group[i]}'
-                        )
-        tmp.close()
-    except Exception:
-        # on exception returns False
-        warnings.append(f'error changing to input "{input_name}"')
-        tmp.close()
-        return False
-    return True
-
-
-def bf_cli(command):
-    """send commands to brutefir"""
-
-    global warnings
-    with socket.socket() as s:
-        try:
-            s.connect((gc.config['bfcli_address'], gc.config['bfcli_port']))
-            command = f'{command}; quit\n'
-            s.send(command.encode())
-            if gc.config['server_output'] == 2:
-                print('command sent to brutefir')
-        except Exception:
-            warnings.append('Brutefir error')
-
 
 # main function for command proccessing
 def proccess_commands(
@@ -133,6 +73,35 @@ def proccess_commands(
     gain = pd.calc_gain(state['level'])
 
 
+    ## auxiliary functions
+
+    def disconnect_outputs(jack_client):
+        """disconnect sources from predic audio ports"""
+
+        try:
+            for port_group in gc.config['audio_ports']:
+                for port in port_group:
+                    sources = jack_client.get_all_connections(port)
+                    for source in sources:
+                        jack_client.disconnect(source.name, port)
+        except Exception:
+            print('error disconnecting inputs')
+
+
+    def bf_cli(command):
+        """send commands to brutefir"""
+
+        with socket.socket() as s:
+            try:
+                s.connect((gc.config['bfcli_address'], gc.config['bfcli_port']))
+                command = f'{command}; quit\n'
+                s.send(command.encode())
+                if gc.config['server_output'] == 2:
+                    print('command sent to brutefir')
+            except Exception:
+                warnings.append('Brutefir error')
+
+
     ## internal functions for actions
 
     def show(throw_it):
@@ -162,6 +131,36 @@ def proccess_commands(
 
 
     def change_input(input, state=state):
+
+        def do_change_input(input_name, source_ports):
+            """'source_ports': list [L,R] of jack output ports of chosen source
+            """
+
+            # switch
+            try:
+                tmp = jack.Client('tmp')
+                disconnect_outputs(tmp)
+                for ports_group in gc.config['audio_ports']:
+                    # make no more than possible connections,
+                    # i.e., minimum of input or output ports
+                    num_ports=min(len(ports_group), len(source_ports))
+                    for i in range(num_ports):
+                        # audio inputs
+                        try:
+                            tmp.connect(source_ports[i], ports_group[i])
+                        except Exception:
+                            warnings.append(
+                                f'error connecting {source_ports[i]} <--> '
+                                f'{ports_group[i]}'
+                                )
+                tmp.close()
+            except Exception:
+                # on exception returns False
+                warnings.append(f'error changing to input "{input_name}"')
+                tmp.close()
+                return False
+            return True
+
 
         state['input'] = input
         try:
