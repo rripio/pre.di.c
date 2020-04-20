@@ -22,8 +22,8 @@
 
 import sys
 
-import numpy as np
 import yaml
+import numpy as np
 
 import base
 
