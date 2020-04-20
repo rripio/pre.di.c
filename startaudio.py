@@ -39,8 +39,8 @@ import subprocess as sp
 
 import jack
 
-import stopaudio
 import base
+import stopaudio
 import predic as pd
 import getconfigs as gc
 
