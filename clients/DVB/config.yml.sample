@@ -18,8 +18,8 @@ play_on_start: true
 preset: 6
 
 # ancillary filenames
-state_filename: 'state.yml'
-presets_filename: 'presets.yml'
+state_filename: state.yml
+presets_filename: presets.yml
 # commands FIFO filename
 # option -input file={dvb_fifo} is added in program
 fifo_filename: DVB_fifo
