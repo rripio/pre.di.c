@@ -44,12 +44,12 @@ control_address: 0.0.0.0
 control_port: 9999
 
 # jack
-# omit fs (managed in initaudio.py, taken from loudspeaker config)
+# omit fs (managed in startaudio.py, taken from loudspeaker config)
 jack_command: /usr/bin/jackd --silent -R -P 90 -dalsa -p1024 -n 3 -d hw:0,0
 
 # brutefir
 # for options see https://www.ludd.ltu.se/~torger/brutefir.html#config
-# omit config file (managed in initaudio.py, taken from loudspeaker config)
+# omit config file (managed in startaudio.py, taken from loudspeaker config)
 brutefir_command: /usr/bin/brutefir
 # cli address and port
 bfcli_address: 127.0.0.1
