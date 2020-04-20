@@ -35,7 +35,7 @@ import predic as pd
 
 # main function for command proccessing
 def proccess_commands(
-        full_command, state=init.state, curves=base.curves, target = init.target):
+        full_command, state=init.state, curves=init.curves, target = init.target):
     """proccesses commands for predic control"""
 
     # normally write state, but there are exceptions

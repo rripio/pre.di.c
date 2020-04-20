@@ -87,20 +87,5 @@ gain_max = 0
 # min allowed digital gain (dB)
 gain_min = -100
 
-# curves
-try:
-    curves = {
-        'frequencies'         : np.loadtxt(data_folder + frequencies),
-        'loudness_mag_curves' : np.loadtxt(data_folder + loudness_mag_curves),
-        'loudness_pha_curves' : np.loadtxt(data_folder + loudness_pha_curves),
-        'treble_mag_curves'   : np.loadtxt(data_folder + treble_mag_curves),
-        'treble_pha_curves'   : np.loadtxt(data_folder + treble_pha_curves),
-        'bass_mag_curves'     : np.loadtxt(data_folder + bass_mag_curves),
-        'bass_pha_curves'     : np.loadtxt(data_folder + bass_pha_curves)
-        }
-except Exception:
-    print('Failed to load EQ files')
-    sys.exit(-1)
-
 # we still don't know the loudspeaker name, so speaker_path \
 # is built downstream

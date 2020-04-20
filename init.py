@@ -66,6 +66,29 @@ except Exception:
     sys.exit(-1)
 
 
+# EQ curves
+try:
+    curves = {
+        'frequencies'         : np.loadtxt(base.data_folder
+                                    + base.frequencies),
+        'loudness_mag_curves' : np.loadtxt(base.data_folder
+                                    + base.loudness_mag_curves),
+        'loudness_pha_curves' : np.loadtxt(base.data_folder
+                                    + base.loudness_pha_curves),
+        'treble_mag_curves'   : np.loadtxt(base.data_folder
+                                    + base.treble_mag_curves),
+        'treble_pha_curves'   : np.loadtxt(base.data_folder
+                                    + base.treble_pha_curves),
+        'bass_mag_curves'     : np.loadtxt(base.data_folder
+                                    + base.bass_mag_curves),
+        'bass_pha_curves'     : np.loadtxt(base.data_folder
+                                    + base.bass_pha_curves)
+        }
+except Exception:
+    print('Failed to load EQ files')
+    sys.exit(-1)
+
+
 # some processing of data for downstream easyer use
 # while retaining upstream ease of writing in config files
 
