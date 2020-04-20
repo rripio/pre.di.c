@@ -29,13 +29,13 @@ import math as m
 import numpy as np
 
 import base
-import getconfigs as gc
+import init
 import predic as pd
 
 
 # main function for command proccessing
 def proccess_commands(
-        full_command, state=gc.state, curves=base.curves, target = gc.target):
+        full_command, state=init.state, curves=base.curves, target = init.target):
     """proccesses commands for predic control"""
 
     # normally write state, but there are exceptions
@@ -70,7 +70,7 @@ def proccess_commands(
         """disconnect sources from predic audio ports"""
 
         try:
-            for port_group in gc.config['audio_ports']:
+            for port_group in init.config['audio_ports']:
                 for port in port_group:
                     sources = jack_client.get_all_connections(port)
                     for source in sources:
@@ -84,10 +84,11 @@ def proccess_commands(
 
         with socket.socket() as s:
             try:
-                s.connect((gc.config['bfcli_address'], gc.config['bfcli_port']))
+                s.connect((init.config['bfcli_address'],
+                    init.config['bfcli_port']))
                 command = f'{command}; quit\n'
                 s.send(command.encode())
-                if gc.config['server_output'] == 2:
+                if init.config['server_output'] == 2:
                     print('command sent to brutefir')
             except Exception:
                 warnings.append('Brutefir error')
@@ -115,8 +116,8 @@ def proccess_commands(
     def change_target(throw_it):
 
         try:
-            gc.target['mag'] = np.loadtxt(gc.target_mag_path)
-            gc.target['pha'] = np.loadtxt(gc.target_pha_path)
+            init.target['mag'] = np.loadtxt(init.target_mag_path)
+            init.target['pha'] = np.loadtxt(init.target_pha_path)
             state = change_gain(gain)
         except Exception:
             warnings.append('Something went wrong when changing target state')
@@ -132,7 +133,7 @@ def proccess_commands(
             try:
                 tmp = jack.Client('tmp')
                 disconnect_outputs(tmp)
-                for ports_group in gc.config['audio_ports']:
+                for ports_group in init.config['audio_ports']:
                     # make no more than possible connections,
                     # i.e., minimum of input or output ports
                     num_ports=min(len(ports_group), len(source_ports))
@@ -158,15 +159,15 @@ def proccess_commands(
         try:
             if input is None:
                 raise
-            elif input in gc.inputs:
+            elif input in init.inputs:
                 if do_change_input (
                         input,
-                        gc.inputs[state['input']]['source_ports']):
+                        init.inputs[state['input']]['source_ports']):
                         # input change went OK
                     state = change_gain(gain)
                     # change xo if configured so
-                    if gc.config['use_input_xo']:
-                        state['xo'] = gc.inputs[input]['xo']
+                    if init.config['use_input_xo']:
+                        state['xo'] = init.inputs[input]['xo']
                         state = change_xovers(state['xo'])
                 else:
                     warnings.append(f'Error changing to input {input}')
@@ -175,7 +176,7 @@ def proccess_commands(
             else:
                 state['input'] = state_old['input']
                 warnings.append(
-                    f'bad name: input has to be in {list(gc.inputs)}'
+                    f'bad name: input has to be in {list(init.inputs)}'
                     )
                 return state
         except Exception:
@@ -189,16 +190,16 @@ def proccess_commands(
 
         state['xo'] = XO_set
         try:
-            if XO_set in gc.speaker['XO']['sets']:
-                coeffs = gc.speaker['XO']['sets'][XO_set]
-                filters = gc.speaker['XO']['filters']
+            if XO_set in init.speaker['XO']['sets']:
+                coeffs = init.speaker['XO']['sets'][XO_set]
+                filters = init.speaker['XO']['filters']
                 for i in range(len(filters)):
                     bf_cli(f'cfc "{filters[i]}" "{coeffs[i]}"')
             else:
                 state['xo'] = state_old['xo']
                 warnings.append(
                     'bad name: XO has to be in '
-                    f'{list(gc.speaker["XO"]["sets"])}'
+                    f'{list(init.speaker["XO"]["sets"])}'
                     )
         except Exception:
             state['xo'] = state_old['xo']
@@ -212,21 +213,21 @@ def proccess_commands(
         # if drc 'none' coefficient -1 is set, so latency and CPU usage \
         # are improved
         if drc == 'none':
-            filters = gc.speaker['DRC']['filters']
+            filters = init.speaker['DRC']['filters']
             for i in range(len(filters)):
                 bf_cli(f'cfc "{filters[i]}" -1')
         else:
             try:
-                if drc in gc.speaker['DRC']['sets']:
-                    coeffs = gc.speaker['DRC']['sets'][drc]
-                    filters = gc.speaker['DRC']['filters']
+                if drc in init.speaker['DRC']['sets']:
+                    coeffs = init.speaker['DRC']['sets'][drc]
+                    filters = init.speaker['DRC']['filters']
                     for i in range(len(filters)):
                         bf_cli(f'cfc "{filters[i]}" "{coeffs[i]}"')
                 else:
                     state['drc'] = state_old['drc']
                     warnings.append(
                         'bad name: DRC has to be in '
-                        f'{list(gc.speaker["DRC"]["sets"])}'
+                        f'{list(init.speaker["DRC"]["sets"])}'
                         )
             except Exception:
                 state['drc'] = state_old['drc']
@@ -570,8 +571,8 @@ def proccess_commands(
         t_mag,      t_pha      = change_treble()
         b_mag,      b_pha      = change_bass()
         # compose EQ curves with target
-        eq_mag = gc.target['mag'] + l_mag + t_mag + b_mag
-        eq_pha = gc.target['pha'] + l_pha + t_pha + b_pha
+        eq_mag = init.target['mag'] + l_mag + t_mag + b_mag
+        eq_pha = init.target['pha'] + l_pha + t_pha + b_pha
         # calculate headroom
         headroom = pd.calc_headroom(gain, state['balance'], eq_mag)
         # adds input gain. It can lead to clipping \

@@ -40,9 +40,9 @@ import subprocess as sp
 import jack
 
 import base
+import init
 import stopaudio
 import predic as pd
-import getconfigs as gc
 
 
 def stop_all():
@@ -57,11 +57,11 @@ def init_jack():
 
     print('\n(startaudio) starting jack\n')
     jack = sp.Popen(
-        f'{gc.config["jack_command"]} -r {gc.speaker["fs"]}'.split()
+        f'{init.config["jack_command"]} -r {init.speaker["fs"]}'.split()
         )
     # waiting for jackd:
-    tmax = gc.config['command_delay'] * 5
-    interval = gc.config['command_delay'] * 0.1
+    tmax = init.config['command_delay'] * 5
+    interval = init.config['command_delay'] * 0.1
     if pd.wait4result('jack_lsp', 'system', tmax, interval):
         print('\n(startaudio) jack started :-)')
     else:
@@ -74,14 +74,14 @@ def init_brutefir():
 
     # cd to brutefir config folder so filter paths are relative to this \
     # folder in brutefir_config
-    os.chdir(base.loudspeakers_folder + gc.config['loudspeaker'])
+    os.chdir(base.loudspeakers_folder + init.config['loudspeaker'])
     print(f'\n(startaudio) starting brutefir on {os.getcwd()}')
     brutefir = sp.Popen(
-        f'{gc.config["brutefir_command"]} brutefir_config'.split()
+        f'{init.config["brutefir_command"]} brutefir_config'.split()
         )
     # waiting for brutefir
-    tmax = gc.config['command_delay'] * 5
-    interval = gc.config['command_delay'] * 0.1
+    tmax = init.config['command_delay'] * 5
+    interval = init.config['command_delay'] * 0.1
     if pd.wait4result(
             'echo "quit" | nc localhost 3000 2>/dev/null',
             'Welcome', tmax, interval):
@@ -102,8 +102,8 @@ def init_server():
         stopaudio.main('all')
         sys.exit()
     # waiting for server
-    tmax = gc.config['command_delay'] * 5
-    interval = gc.config['command_delay'] * 0.1
+    tmax = init.config['command_delay'] * 5
+    interval = init.config['command_delay'] * 0.1
     if pd.wait4result(
             'echo ping| nc localhost 9999 2>/dev/null',
             'OK', tmax, interval):
@@ -116,9 +116,9 @@ def init_server():
 def set_initial_state():
     """set initial state state as last saved or as user determined"""
 
-    state = gc.state
-    if gc.config['use_state_init']:
-        state_init = gc.state_init
+    state = init.state
+    if init.config['use_state_init']:
+        state_init = init.state_init
         for setting in state_init:
             state[setting] = state_init[setting]
     return state
@@ -156,14 +156,14 @@ def init_inputs(state):
     source = state['input']
     print(f'\n(startaudio) restoring input: {source}')
     # wait for input ports to be up
-    tmax = gc.config['command_delay'] * 15
-    interval = gc.config['command_delay'] * 0.5
+    tmax = init.config['command_delay'] * 15
+    interval = init.config['command_delay'] * 0.5
     if pd.wait4source(source, tmax, interval):
         # input ports up and ready :-)
         # switch on input and leave function
         # some clients (mpd) seems to need some extra time after
         # ports detection for whatever reason
-        time.sleep(gc.config['command_delay'] * 2)
+        time.sleep(init.config['command_delay'] * 2)
         try:
             pd.client_socket('input ' + source, quiet=True)
         except Exception:
@@ -191,9 +191,9 @@ def main(run_level):
         # restoring previous state
         init_state_settings(state)
         # write input to state file for use of clients if config ask for it
-        if gc.config['connect_inputs']:
+        if init.config['connect_inputs']:
             # just refresh state file
-            gc.state["input"] = state["input"]
+            init.state["input"] = state["input"]
             pd.client_socket('save', quiet=True)
        # launch external clients, sources and clients
         print('\n(startaudio): starting clients...')
@@ -206,7 +206,7 @@ def main(run_level):
             except Exception:
                 print(f'problem launching client {client}')
         # restoring inputs if config mandates so
-        if gc.config['connect_inputs']:
+        if init.config['connect_inputs']:
             init_inputs(state)
         # some info
         pd.show()

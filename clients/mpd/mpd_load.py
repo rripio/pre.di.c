@@ -35,8 +35,8 @@ import multiprocessing as mp
 import mpd
 
 import base
+import init
 import predic as pd
-import getconfigs as gc
 
 
 ## user config
@@ -65,7 +65,7 @@ def mpd_vol_loop():
         predic_level = round(
             (mpd_vol / 100 * mpd_conf['slider_range'])
             + mpd_gain_min
-            - gc.speaker['ref_level_gain']
+            - init.speaker['ref_level_gain']
             )
         pd.client_socket("level " + str(predic_level), quiet=True)
     mpd_client.close()
@@ -75,7 +75,7 @@ def mpd_vol_loop():
 def predic_vol_loop():
     """loop: reads predic volume, sets mpd volume"""
 
-    interval = gc.config['command_delay'] / 10
+    interval = init.config['command_delay'] / 10
     predic_level = pd.read_state()['level']
     mpd_gain_min = base.gain_max - mpd_conf['slider_range']
     while True:
@@ -84,7 +84,7 @@ def predic_vol_loop():
         predic_level = pd.read_state()['level']
         if predic_level != predic_level_old:
             # update mpd "fake volume"
-            predic_gain = predic_level + gc.speaker['ref_level_gain']
+            predic_gain = predic_level + init.speaker['ref_level_gain']
             mpd_vol = round(
                 (predic_gain - mpd_gain_min)
                 * 100 / mpd_conf['slider_range']
@@ -136,7 +136,7 @@ def start():
         # and restore the play pointer to previous state
         mpd_client.addid(silence_path, 0)
         mpd_client.play(0)
-        time.sleep(gc.config['command_delay'])
+        time.sleep(init.config['command_delay'])
         mpd_client.delete(0)
         mpd_client.pause()
         if restore:
@@ -170,7 +170,7 @@ def stop():
 
 if sys.argv[1:]:
     dir = os.path.dirname(os.path.realpath(__file__))
-    mpd_conf = gc.get_yaml(f'{dir}/{config_filename}')
+    mpd_conf = init.get_yaml(f'{dir}/{config_filename}')
     try:
         option = {
             'start' : start,

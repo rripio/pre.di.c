@@ -27,8 +27,6 @@
 import time
 from subprocess import Popen
 
-import getconfigs as gc
-
 
 ## user configuration
 

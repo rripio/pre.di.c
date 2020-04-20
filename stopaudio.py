@@ -38,7 +38,6 @@ import time
 from subprocess import Popen
 
 import base
-import getconfigs as gc
 import predic as pd
 
 

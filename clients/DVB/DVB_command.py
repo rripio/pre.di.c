@@ -36,7 +36,7 @@ import time
 
 import yaml
 
-import getconfigs as gc
+import init
 import predic as pd
 
 
@@ -45,7 +45,7 @@ folder = f'{os.path.dirname(sys.argv[0])}/'
 
 # get config
 config_filename = 'config.yml'
-config = gc.get_yaml(folder + config_filename)
+config = init.get_yaml(folder + config_filename)
 
 # paths
 state_path = folder + config["state_filename"]
@@ -53,8 +53,8 @@ presets_path = folder + config["presets_filename"]
 dvb_fifo = folder + config["fifo_filename"]
 
 # get dictionaries
-state = gc.get_yaml(state_path)
-presets = gc.get_yaml(presets_path)
+state = init.get_yaml(state_path)
+presets = init.get_yaml(presets_path)
 
 def select_channel(channel_name, channel_gain):
     """ sets channel in mplayer """
@@ -134,10 +134,10 @@ def change_radio(
             # check selected input and reconnect to DVB if selected
             selected_input = pd.read_state()['input']
             if config['DVB_input'] == selected_input:
-                tmax = gc.config['command_delay'] * 10
-                interval = gc.config['command_delay'] * 0.1
+                tmax = init.config['command_delay'] * 10
+                interval = init.config['command_delay'] * 0.1
                 # wait for disconnection of previous channel
-                time.sleep(gc.config['command_delay'])
+                time.sleep(init.config['command_delay'])
                 # try to connect for newly connected ports
                 if pd.wait4source(selected_input, tmax, interval):
                     # input ports up and ready :-)

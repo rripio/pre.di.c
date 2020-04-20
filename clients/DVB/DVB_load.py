@@ -32,7 +32,7 @@ import sys
 import os
 import subprocess as sp
 
-import getconfigs as gc
+import init
 
 
 # initialize
@@ -40,7 +40,7 @@ import getconfigs as gc
 # get config
 config_filename = 'config.yml'
 folder = f'{os.path.dirname(sys.argv[0])}/'
-config = gc.get_yaml(folder + config_filename)
+config = init.get_yaml(folder + config_filename)
 dvb_fifo = folder + config["fifo_filename"]
 
 

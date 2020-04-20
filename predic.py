@@ -36,7 +36,7 @@ import yaml
 import numpy as np
 
 import base
-import getconfigs as gc
+import init
 
 
 # used on startaudio.py and stopaudio.py
@@ -64,7 +64,7 @@ def client_socket(data, quiet=True):
         return b'ACK\n'
 
     server = 'localhost'
-    port = gc.config['control_port']
+    port = init.config['control_port']
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
@@ -107,7 +107,7 @@ def wait4result(command, answer, tmax=5, interval=0.1):
         try:
             if answer in sp.check_output(
                     command, shell=True, universal_newlines=True):
-                if gc.config['server_output'] in [1, 2]:
+                if init.config['server_output'] in [1, 2]:
                     print(
                         f'\nfound string "{answer}" in output of '
                         f'command: {command}'
@@ -117,7 +117,7 @@ def wait4result(command, answer, tmax=5, interval=0.1):
             pass
         time.sleep(interval)
     else:
-        if gc.config['server_output'] in [1, 2]:
+        if init.config['server_output'] in [1, 2]:
             print(
                 f'\ntime out >{tmax}s waiting for string "{answer}"'
                 f' in output of command: {command}'
@@ -130,7 +130,7 @@ def wait4source(source, tmax=5, interval=0.1):
 
     time_start = time.time()
     jc = jack.Client('tmp')
-    source_ports = gc.inputs[source]['source_ports']
+    source_ports = init.inputs[source]['source_ports']
     # get base name of ports for up ports query
     source_ports_name = source_ports[1].split(':',1)[0]
     while (time.time() - time_start) < tmax:
@@ -219,13 +219,13 @@ def jack_loop(clientname):
 def calc_gain(level):
     """calculates gain from level, reference gain, and input gain"""
 
-    gain = level + gc.speaker['ref_level_gain']
+    gain = level + init.speaker['ref_level_gain']
     return gain
 
 
 def calc_level(gain):
 
-    level = gain - gc.speaker['ref_level_gain']
+    level = gain - init.speaker['ref_level_gain']
     return level
 
 
@@ -238,42 +238,42 @@ def calc_headroom(gain, balance, eq_mag):
 
 def calc_input_gain(input):
 
-    return (gc.inputs[input]['gain'])
+    return (init.inputs[input]['gain'])
 
 
-def show(throw_it=None, state=gc.state):
+def show(throw_it=None, state=init.state):
     """shows a status report"""
 
-    input_gain = calc_input_gain(gc.state['input'])
-    gain = calc_gain(gc.state['level']) + input_gain
-    headroom = calc_headroom(gain, gc.state['balance'], gc.target['mag'])
+    input_gain = calc_input_gain(init.state['input'])
+    gain = calc_gain(init.state['level']) + input_gain
+    headroom = calc_headroom(gain, init.state['balance'], init.target['mag'])
 
     print()
-    print(f"Loudspeaker: {gc.config['loudspeaker']}")
+    print(f"Loudspeaker: {init.config['loudspeaker']}")
     print()
-    print(f"fs             {gc.speaker['fs']:6}")
-    print(f"Ref level gain {gc.speaker['ref_level_gain']: 6.1f}")
+    print(f"fs             {init.speaker['fs']:6}")
+    print(f"Ref level gain {init.speaker['ref_level_gain']: 6.1f}")
 
     print()
-    print(f"Level          {gc.state['level']: 6.1f}")
-    print(f"Mute           {gc.state['mute']:>6s}")
-    print(f"Solo           {gc.state['solo']:>6s}")
-    print(f"Balance        {gc.state['balance']: 6.1f}")
-    print(f"Polarity       {gc.state['polarity']:>6s}")
-    print(f"Midside        {gc.state['midside']:>6s}")
+    print(f"Level          {init.state['level']: 6.1f}")
+    print(f"Mute           {init.state['mute']:>6s}")
+    print(f"Solo           {init.state['solo']:>6s}")
+    print(f"Balance        {init.state['balance']: 6.1f}")
+    print(f"Polarity       {init.state['polarity']:>6s}")
+    print(f"Midside        {init.state['midside']:>6s}")
 
     print()
-    print(f"Bass           {gc.state['bass']: 6.1f}")
-    print(f"Treble         {gc.state['treble']: 6.1f}")
-    print(f"Loudness       {gc.state['loudness']:>6s}")
-    print(f"Loudness ref   {gc.state['loudness_ref']: 6.1f}")
+    print(f"Bass           {init.state['bass']: 6.1f}")
+    print(f"Treble         {init.state['treble']: 6.1f}")
+    print(f"Loudness       {init.state['loudness']:>6s}")
+    print(f"Loudness ref   {init.state['loudness_ref']: 6.1f}")
 
     print()
-    print(f"Crossover set  {gc.state['xo']:>6s}")
-    print(f"DRC set        {gc.state['drc']:>6s}")
+    print(f"Crossover set  {init.state['xo']:>6s}")
+    print(f"DRC set        {init.state['drc']:>6s}")
 
     print()
-    print(f"Input          {gc.state['input']:>6s}")
+    print(f"Input          {init.state['input']:>6s}")
     print(f'Input gain     {input_gain: 6.1f}')
 
     print()
@@ -284,7 +284,7 @@ def show(throw_it=None, state=gc.state):
 
     return state
 
-def show_file(throw_it=None, state=gc.state):
+def show_file(throw_it=None, state=init.state):
     """writes a status report to temp file"""
 
     with open('/tmp/predic', 'w') as f:

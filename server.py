@@ -28,12 +28,12 @@ import yaml
 
 import base
 import control
-import getconfigs as gc
+import init
 
 
 async def handle_commands(reader, writer):
 
-    state = gc.state
+    state = init.state
     rawdata = await reader.read(100)
     data = rawdata.decode()
     addr = writer.get_extra_info('peername')
@@ -51,7 +51,7 @@ async def handle_commands(reader, writer):
             writer.write(yaml.dump(state, default_flow_style=False).encode())
             writer.write(b'OK\n')
             await writer.drain()
-            if gc.config['server_output'] == 2:
+            if init.config['server_output'] == 2:
                 print('(server) closing connection...')
 
         elif data.rstrip('\r\n') == 'save':
@@ -59,14 +59,14 @@ async def handle_commands(reader, writer):
             write_state(state)
             writer.write(b'OK\n')
             await writer.drain()
-            if gc.config['server_output'] == 2:
+            if init.config['server_output'] == 2:
                 print('(server) closing connection...')
 
         elif data.rstrip('\r\n') == 'ping':
             # just answers OK
             writer.write(b'OK\n')
             await writer.drain()
-            if gc.config['server_output'] == 2:
+            if init.config['server_output'] == 2:
                 print('(server) closing connection...')
 
         else:
@@ -77,7 +77,7 @@ async def handle_commands(reader, writer):
             # a try block avoids blocking of state file writing \
             # when the terminal that launched startaudio.py is closed
             try:
-                if gc.config['server_output'] in [1, 2]:
+                if init.config['server_output'] in [1, 2]:
                     print(f'Command: {data}')
             except Exception:
                 pass
@@ -110,11 +110,11 @@ async def main():
 
     server = await asyncio.start_server(
                 handle_commands,
-                gc.config['control_address'],
-                gc.config['control_port']
+                init.config['control_address'],
+                init.config['control_port']
                 )
     addr = server.sockets[0].getsockname()
-    if gc.config['server_output'] in [1, 2]:
+    if init.config['server_output'] in [1, 2]:
         print(f'(server) listening on address {addr}')
     await server.serve_forever()
 
