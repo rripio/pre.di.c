@@ -27,7 +27,7 @@ import asyncio
 import yaml
 
 import control
-import init
+import base
 import getconfigs as gc
 
 
@@ -41,7 +41,7 @@ async def handle_commands(reader, writer):
     def write_state(state):
         """writes state to state file"""
 
-        with open(init.state_path, 'w') as f:
+        with open(base.state_path, 'w') as f:
             yaml.dump(state, f, default_flow_style=False)
 
 

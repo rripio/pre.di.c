@@ -37,7 +37,7 @@ import os
 import time
 from subprocess import Popen
 
-import init
+import base
 import getconfigs as gc
 import predic as pd
 
@@ -54,7 +54,7 @@ def main(run_level):
         clients_stop = pd.read_clients('stop')
         for command in clients_stop:
             try:
-                Popen(f'{init.clients_folder}{command}'.split())
+                Popen(f'{base.clients_folder}{command}'.split())
             except Exception:
                 print(f'problem stopping client "{client}":\n\t{err}')
     if run_level in ['core', 'all']:

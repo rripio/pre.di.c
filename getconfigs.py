@@ -22,9 +22,10 @@
 
 import sys
 
+import numpy as np
 import yaml
 
-import init
+import base
 
 
 def get_yaml(filepath):
@@ -37,27 +38,36 @@ def get_yaml(filepath):
 
 
 # dictionaries
+#try:
+config = get_yaml(base.config_path)
+inputs = get_yaml(base.inputs_path)
+state = get_yaml(base.state_path)
+state_init = get_yaml(base.state_init_path)
+
+# after knowing which speaker config to load, load it
+loudspeaker_path = (base.loudspeakers_folder + config['loudspeaker']) 
+speaker = get_yaml(loudspeaker_path + '/' + base.speaker_filename)
+    
+#except Exception:
+#    print('\n(getconfigs) Error: some config file failed to load')
+#    sys.exit()
+
+
+# target curves
+target_mag_path = loudspeaker_path + '/' + speaker['target_mag_curve']
+target_pha_path = loudspeaker_path + '/' + speaker['target_pha_curve']
+
 try:
-    config = get_yaml(init.config_path)
-    inputs = get_yaml(init.inputs_path)
-    state = get_yaml(init.state_path)
-    state_init = get_yaml(init.state_init_path)
-    
-    # after knowing which speaker config to load, load it
-    loudspeaker_path = (init.loudspeakers_folder + config['loudspeaker']) 
-    speaker = get_yaml(loudspeaker_path + '/' + init.speaker_filename)
-    
+    target = dict.fromkeys(['mag', 'pha'])
+    target['mag'] = np.loadtxt(target_mag_path)
+    target['pha'] = np.loadtxt(target_pha_path)
 except Exception:
-    print('\n(getconfigs) Error: some config file failed to load')
-    sys.exit()
-    
+    print('Failed to load target files')
+    sys.exit(-1)
+
 
 # some processing of data for downstream easyer use
 # while retaining upstream ease of writing in config files
-
-# target curves paths
-target_mag_path = loudspeaker_path + '/' + speaker['target_mag_curve']
-target_pha_path = loudspeaker_path + '/' + speaker['target_pha_curve']
 
 # audio ports
 # turn string space separated enumerations into a lists

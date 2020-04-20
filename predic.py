@@ -35,7 +35,7 @@ import jack
 import yaml
 import numpy as np
 
-import init
+import base
 import getconfigs as gc
 
 
@@ -44,7 +44,7 @@ def read_clients(phase):
     """reads list of programs to start/stop from config/clients.yml file
     phase: <'start'|'stop'> phase of client activation or deactivation"""
 
-    clients_list_path = init.clients_path
+    clients_list_path = base.clients_path
 
     with open (clients_list_path) as clients_file:
         clients_dict = yaml.safe_load(clients_file)
@@ -232,7 +232,7 @@ def calc_level(gain):
 def calc_headroom(gain, balance, eq_mag):
     """calculates headroom from gain and equalizer"""
 
-    headroom = init.gain_max - gain - np.max(eq_mag) - abs(balance)
+    headroom = base.gain_max - gain - np.max(eq_mag) - abs(balance)
     return headroom
 
 
@@ -241,23 +241,12 @@ def calc_input_gain(input):
     return (gc.inputs[input]['gain'])
 
 
-def get_target():
-    """reads target file from disk"""
-
-    # reload target, so we can change it for testing,
-    # overwriting the target files outside predic
-    target_mag = np.loadtxt(gc.target_mag_path)
-    target_pha = np.loadtxt(gc.target_pha_path)
-
-    return target_mag, target_pha
-
-
 def show(throw_it=None, state=gc.state):
     """shows a status report"""
 
     input_gain = calc_input_gain(gc.state['input'])
     gain = calc_gain(gc.state['level']) + input_gain
-    headroom = calc_headroom(gain, gc.state['balance'], get_target()[0])
+    headroom = calc_headroom(gain, gc.state['balance'], gc.target['mag'])
 
     print()
     print(f"Loudspeaker: {gc.config['loudspeaker']}")

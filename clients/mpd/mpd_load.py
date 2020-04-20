@@ -34,7 +34,7 @@ import multiprocessing as mp
 
 import mpd
 
-import init
+import base
 import predic as pd
 import getconfigs as gc
 
@@ -57,7 +57,7 @@ def mpd_vol_loop():
     """loop: reads mpd volume, sets predic volume"""
 
     mpd_client = connect_mpd()
-    mpd_gain_min = init.gain_max - mpd_conf['slider_range']
+    mpd_gain_min = base.gain_max - mpd_conf['slider_range']
     while True:
         mpd_client.idle('mixer')
         mpd_vol = int(mpd_client.status()['volume'])
@@ -77,7 +77,7 @@ def predic_vol_loop():
 
     interval = gc.config['command_delay'] / 10
     predic_level = pd.read_state()['level']
-    mpd_gain_min = init.gain_max - mpd_conf['slider_range']
+    mpd_gain_min = base.gain_max - mpd_conf['slider_range']
     while True:
         # check level changes in pre.di.c
         predic_level_old = predic_level

@@ -40,7 +40,7 @@ import subprocess as sp
 import jack
 
 import stopaudio
-import init
+import base
 import predic as pd
 import getconfigs as gc
 
@@ -74,7 +74,7 @@ def init_brutefir():
 
     # cd to brutefir config folder so filter paths are relative to this \
     # folder in brutefir_config
-    os.chdir(init.loudspeakers_folder + gc.config['loudspeaker'])
+    os.chdir(base.loudspeakers_folder + gc.config['loudspeaker'])
     print(f'\n(startaudio) starting brutefir on {os.getcwd()}')
     brutefir = sp.Popen(
         f'{gc.config["brutefir_command"]} brutefir_config'.split()
@@ -96,7 +96,7 @@ def init_server():
 
     print('\n(startaudio) starting server\n')
     try:
-        control = sp.Popen(f'python3 {init.main_folder}server.py'.split())
+        control = sp.Popen(f'python3 {base.main_folder}server.py'.split())
     except Exception:
         print('\n(startaudio) server didn\'t load')
         stopaudio.main('all')
@@ -200,7 +200,7 @@ def main(run_level):
         clients_start = pd.read_clients('start')
         for client in clients_start:
             try:
-                command_path = f'{init.clients_folder}{client}'
+                command_path = f'{base.clients_folder}{client}'
                 p=sp.Popen(command_path.split())
                 print(f'pid {p.pid:4}: {client}')
             except Exception:

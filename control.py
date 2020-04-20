@@ -26,25 +26,16 @@ import sys
 import jack
 import math as m
 
-import init
+import numpy as np
+
+import base
 import getconfigs as gc
 import predic as pd
 
 
-## initialize
-
-# target curves
-try:
-    target = dict.fromkeys(['mag', 'pha'])
-    (target['mag'], target['pha']) = pd.get_target()
-except Exception:
-    print('Failed to load target files')
-    sys.exit(-1)
-
-
 # main function for command proccessing
 def proccess_commands(
-        full_command, state=gc.state, curves=init.curves, target = target):
+        full_command, state=gc.state, curves=base.curves, target = gc.target):
     """proccesses commands for predic control"""
 
     # normally write state, but there are exceptions
@@ -124,7 +115,8 @@ def proccess_commands(
     def change_target(throw_it):
 
         try:
-            (target['mag'], target['pha']) = pd.get_target()
+            gc.target['mag'] = np.loadtxt(gc.target_mag_path)
+            gc.target['pha'] = np.loadtxt(gc.target_pha_path)
             state = change_gain(gain)
         except Exception:
             warnings.append('Something went wrong when changing target state')
@@ -356,14 +348,14 @@ def proccess_commands(
                                      + state['loudness_ref'] * add
                                      )
             # clamp loudness_ref value
-            if abs(state['loudness_ref']) > init.loudness_ref_variation:
+            if abs(state['loudness_ref']) > base.loudness_ref_variation:
                 state['loudness_ref'] = m.copysign(
-                                            init.loudness_ref_variation,
+                                            base.loudness_ref_variation,
                                             state['loudness_ref']
                                             )
                 warnings.append(
                     'loudness reference level must be in the '
-                    f'+-{init.loudness_ref_variation} interval'
+                    f'+-{base.loudness_ref_variation} interval'
                     )
                 warnings.append('loudness reference level clamped')
             state = change_gain(gain)
@@ -381,13 +373,13 @@ def proccess_commands(
             state['treble'] = (float(treble)
                                     + state['treble'] * add)
             # clamp treble value
-            if m.fabs(state['treble']) > init.tone_variation:
+            if m.fabs(state['treble']) > base.tone_variation:
                 state['treble'] = m.copysign(
-                                    init.tone_variation, state['treble']
+                                    base.tone_variation, state['treble']
                                     )
                 warnings.append(
                     'treble must be in the '
-                    f'+-{init.tone_variation} interval'
+                    f'+-{base.tone_variation} interval'
                     )
                 warnings.append('treble clamped')
             state = change_gain(gain)
@@ -402,11 +394,11 @@ def proccess_commands(
         try:
             state['bass'] = float(bass) + state['bass'] * add
             # clamp bass value
-            if m.fabs(state['bass']) > init.tone_variation:
-                state['bass'] = m.copysign(init.tone_variation, state['bass'])
+            if m.fabs(state['bass']) > base.tone_variation:
+                state['bass'] = m.copysign(base.tone_variation, state['bass'])
                 warnings.append(
                     'bass must be in the '
-                    f'+-{init.tone_variation} interval'
+                    f'+-{base.tone_variation} interval'
                     )
                 warnings.append('bass clamped')
             state = change_gain(gain)
@@ -424,14 +416,14 @@ def proccess_commands(
             # clamp balance value
             # 'balance' means deviation from 0 in R channel
             # deviation of the L channel then goes symmetrical
-            if m.fabs(state['balance']) > init.balance_variation:
+            if m.fabs(state['balance']) > base.balance_variation:
                 state['balance'] = m.copysign(
-                                        init.balance_variation,
+                                        base.balance_variation,
                                         state['balance']
                                         )
                 warnings.append(
                     'balance must be in the '
-                    f'+-{init.balance_variation} interval'
+                    f'+-{base.balance_variation} interval'
                     )
                 warnings.append('balance clamped')
             state = change_gain(gain)
@@ -479,9 +471,9 @@ def proccess_commands(
         def change_loudness():
 
             # index of max loudness tones boost
-            loudness_max_i = (init.loudness_SPLmax - init.loudness_SPLmin)
+            loudness_max_i = (base.loudness_SPLmax - base.loudness_SPLmin)
             # index of all zeros curve
-            loudness_null_i = (init.loudness_SPLmax - init.loudness_SPLref)
+            loudness_null_i = (base.loudness_SPLmax - base.loudness_SPLref)
             # set curve index
             # higher index means higher boost
             # increasing 'level' decreases boost
@@ -510,7 +502,7 @@ def proccess_commands(
 
         def change_treble():
 
-            treble_i = init.tone_variation - state['treble']
+            treble_i = base.tone_variation - state['treble']
             # force integer
             treble_i = int(round(treble_i))
             eq_mag = curves['treble_mag_curves'][:,treble_i]
@@ -520,7 +512,7 @@ def proccess_commands(
 
         def change_bass():
 
-            bass_i = init.tone_variation - state['bass']
+            bass_i = base.tone_variation - state['bass']
             # force integer
             bass_i = int(round(bass_i))
             eq_mag = curves['bass_mag_curves'][:,bass_i]
@@ -569,17 +561,17 @@ def proccess_commands(
         # just for information, numerical bounds before math range or \
         # math domain error are +6165 dB and -6472 dB
         # max gain is clamped downstream when calculating headroom
-        if gain < init.gain_min:
-            gain = init.gain_min
-            warnings.append(f'min. gain must be more than {init.gain_min} dB')
+        if gain < base.gain_min:
+            gain = base.gain_min
+            warnings.append(f'min. gain must be more than {base.gain_min} dB')
             warnings.append('gain clamped')
         # EQ curves: loudness + treble + bass
         l_mag,      l_pha      = change_loudness()
         t_mag,      t_pha      = change_treble()
         b_mag,      b_pha      = change_bass()
         # compose EQ curves with target
-        eq_mag = target['mag'] + l_mag + t_mag + b_mag
-        eq_pha = target['pha'] + l_pha + t_pha + b_pha
+        eq_mag = gc.target['mag'] + l_mag + t_mag + b_mag
+        eq_pha = gc.target['pha'] + l_pha + t_pha + b_pha
         # calculate headroom
         headroom = pd.calc_headroom(gain, state['balance'], eq_mag)
         # adds input gain. It can lead to clipping \
