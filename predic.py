@@ -140,8 +140,9 @@ def wait4source(source, tmax=5, interval=0.1):
                 port.name for port in
                 jc.get_ports(source_ports_name, is_output=True)
                 )
-            # compare sets and if identical, input ports are up and ready :-)
-            if (set(source_ports) == set(up_ports)):
+            # compare sets and, if used source ports are among up source ports,
+            # then input ports are up and ready :-)
+            if (set(source_ports).issubset(set(up_ports))):
             # go on
                 return True
             else:
