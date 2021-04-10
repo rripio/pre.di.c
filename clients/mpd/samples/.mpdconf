@@ -2,7 +2,6 @@
 
 music_directory                     "~/music"
 playlist_directory                  "~/playlists"
-db_file                             "~/.mpd/database"
 log_file                            "~/.mpd/log"
 pid_file                            "~/.mpd/pid"
 state_file                          "~/.mpd/mpd_state"
@@ -27,6 +26,12 @@ bind_to_address                     "0.0.0.0"       # only local network
 
 ## database
 
+database {
+  plugin "simple"
+  path "~/.mpd/database"
+  cache_directory "~/.mpd/cache"
+}
+
 auto_update                         "yes"
 # auto_update_depth                   "3"
 follow_outside_symlinks             "no"
@@ -35,97 +40,20 @@ follow_inside_symlinks              "no"
 
 ## neighbor plugins
 
-# UPnP
 neighbors {
-    plugin "upnp"
+    plugin "udisks"
 }
 
 ## input plugins
 
-# open URLs
-input {
-    plugin "curl"
-}
-# open CD's
-input {
-    plugin "cdio_paranoia"
-}
-
 
 ## Decoders (see active ones with 'mpd --version'
 
-#decoder {
-#    plugin "mad"
-#    enabled "no"
-#    }
 decoder {
     plugin "mpg123"
     enabled "no"
     }
-#decoder {
-#    plugin "vorbis"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "oggflac"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "flac"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "opus"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "sndfile"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "audiofile"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "faad"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "mpcdec"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "wavpack"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "modplug"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "sidplay"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "wildmidi"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "fluidsynth"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "adplug"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "gme"
-#    enabled "no"
-#    }
-#decoder {
-#    plugin "pcm"
-#    enabled "no"
-#    }
+
 
 ## Decoders (see active ones with 'mpd --version'
 
@@ -133,6 +61,7 @@ input {
     plugin "tidal"
     enabled "no"
     }
+
 input {
     plugin "qobuz"
     enabled "no"
@@ -146,9 +75,8 @@ audio_output {
     type            "jack"
     name            "mpd_jack"
     client_name     "mpd_jack"
-    source_ports    "left,right"
-#    format          "*:*:6"
-    destination_ports "brutefir:input-0,brutefir:input-1"
+    source_ports    "L,R,C,LS,RS"
+    auto_destination_ports "no"
     mixer_type      "null"
     enabled         "yes"
     always_on       "yes"
@@ -157,15 +85,15 @@ audio_output {
 
 ## resampling
 
-#resampler {
-#    plugin  "soxr"
-#    quality "high"
-#}
-
 resampler {
     plugin  "soxr"
-    quality "very high"
+    quality "high"
 }
+
+#resampler {
+#    plugin  "soxr"
+#    quality "very high"
+#}
 
 #resampler {
 #    plugin  "libsamplerate"

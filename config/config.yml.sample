@@ -29,6 +29,7 @@ connect_inputs: false
 # each group of ports is a space separated string
 audio_ports:
     - brutefir:input-0 brutefir:input-1
+#    - stream_loop:input_1 stream_loop:input_2
 
 
 
@@ -45,7 +46,7 @@ control_port: 9999
 
 # jack
 # omit fs (managed in startaudio.py, taken from loudspeaker config)
-jack_command: /usr/bin/jackd --silent -R -P 90 -dalsa -p1024 -n 3 -d hw:0,0
+jack_command: /usr/bin/jackd --silent -R -P 90 -dalsa -p2048 -n 3 -d hw:USB,0
 
 # brutefir
 # for options see https://www.ludd.ltu.se/~torger/brutefir.html#config
