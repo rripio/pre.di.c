@@ -77,6 +77,7 @@ audio_output {
     client_name     "mpd_jack"
     source_ports    "L,R,C,LS,RS"
     auto_destination_ports "no"
+    destination_ports "brutefir:input-0,brutefir:input-1"
     mixer_type      "null"
     enabled         "yes"
     always_on       "yes"
