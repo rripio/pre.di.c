@@ -8,6 +8,8 @@ quiet=true
 # tuning indications will dissapear though
 #really-quiet=true
 
+channels=5
+
 # profiles
 
 [dvb]
