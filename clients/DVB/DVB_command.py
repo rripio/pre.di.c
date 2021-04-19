@@ -124,7 +124,7 @@ def change_radio(
             'or be an integer preset'
             )
         return
-    # actual canal switch
+    # actual channel switch
     if select_preset(selected):
         if selected != state['actual']:
             state['previous'] = state['actual']
