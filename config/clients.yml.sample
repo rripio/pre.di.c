@@ -1,6 +1,6 @@
 # client start/stop scripts listed in this file are launched on start and stop
 #
-# names refer to any kind of executable with paths relative to folder \
+# names refer to any kind of executable with paths relative to folder
 # 'clients' or its subfolders, and corresponding options, if any
 
 
