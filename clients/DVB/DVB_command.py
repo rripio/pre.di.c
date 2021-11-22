@@ -25,7 +25,15 @@
 """selects DVB channels
 
     Usage: DVB_command.py [preset ['startaudio']]
-
+    
+    preset must be one of the integer presets in presets.yml or one of
+    this options: 'next', 'prev', 'restore', 'back'
+    
+    next:       next preset number in numerical order
+    prev:       previous preset number in numerical order
+    restore:    last played preset
+    back:       preset played before last
+    
     The 'startaudio' flag omits jack connection when switching channels
     for use when launching DVB client on pre.di.c start"""
 
