@@ -45,7 +45,7 @@ dvb_fifo = folder + config["fifo_filename"]
 
 
 def start():
-    """loads mplayer and jack loop"""
+    """loads mplayer"""
 
     # starts mplayer DVB:
     command = f'{config["start_command"]} -input file={dvb_fifo}'
