@@ -8,8 +8,8 @@
 begin tdt 
     begin  
          prog = irexec
-         button = KEY_NUMERIC_STOP
-         config = echo stop > ~/pre.di.c/clients/DVB/dvb_fifo
+         button = KEY_STOP
+         config = /bin/echo stop > ~/pre.di.c/clients/DVB/dvb_fifo
          flags = quit
     end
 	begin
