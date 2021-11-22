@@ -134,6 +134,11 @@ begin
     config = ~/bin/control "input a"
 end
 begin
+    button = KEY_VIDEO
+    prog = irexec
+    config = ~/bin/control "input net"
+end
+begin
     mode = mpd
     button = KEY_AUDIO
     prog = irexec
@@ -145,16 +150,12 @@ begin
     prog = irexec
     config = ~/bin/control "input tdt"
 end
-#begin
-#    mode = cdda
-#    button = KEY_EPG
-#    prog = irexec
-#    config = ~/bin/control "input cdda"
-#end
-#begin
-#    mode = external
-#    button = TV
-#end
+begin
+    mode = cdda
+    button = KEY_EPG
+    prog = irexec
+    config = ~/bin/control "input cd"
+end
 
 
 # modes
@@ -169,8 +170,5 @@ include ~/.config/lirc/cddarc
 
 # mplayer tdt
 # mode tdt
-include ~/.config/lirc/tdtrc
+include ~/.config/lirc/DVBrc
 
-# external inputs
-# mode external
-#include ~/.config/lirc/externalrc
