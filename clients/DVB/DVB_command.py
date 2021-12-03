@@ -69,6 +69,7 @@ def select_channel(channel_name, channel_gain):
 
     try:
         command = (
+            f"stop\n"
             f"loadfile dvb://{channel_name}\n"
             f"af_cmdline volume {channel_gain}\n"
             'get_property volume\n'
