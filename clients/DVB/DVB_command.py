@@ -87,9 +87,9 @@ def change_radio(
 
     # list of presets, discarding those white in presets.yml
     state_old = state
-    presets = sorted(
-            [str(preset) for preset in preset_dict if preset_dict[preset]]
-            )
+    presets = list(map(str,sorted(
+            [preset for preset in preset_dict if preset_dict[preset]]
+            )))
     # command arguments
     options = ['next', 'prev', 'restore', 'back']
     if selected in options:
