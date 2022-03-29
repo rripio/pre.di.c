@@ -9,12 +9,12 @@
     Usage: DVB_command.py [preset ['startaudio']]
 
     preset must be one of the integer presets in presets.yml or one of
-    this options: 'next', 'prev', 'restore', 'back'
+    this options: 'forth', 'back', 'last', 'previous'
 
-    next:       next preset number in numerical order
-    prev:       previous preset number in numerical order
-    restore:    last played preset
-    back:       preset played before last
+    forth:      next preset number in numerical order
+    back:       previous preset number in numerical order
+    last:       last played preset
+    previous:   preset played before last
 
     The 'startaudio' flag omits jack connection when switching channels
     for use when launching DVB client on pre.di.c start"""
@@ -91,22 +91,22 @@ def change_radio(
             [preset for preset in preset_dict if preset_dict[preset]]
             )))
     # command arguments
-    options = ['next', 'prev', 'restore', 'back']
+    options = ['forth', 'back', 'last', 'previous']
     if selected in options:
-        # 'next|prev' to walk through preset list
-        if selected == 'next':
+        # 'forth|back' to walk through preset list
+        if selected == 'forth':
             selected = presets[
                 (presets.index(state['actual']) + 1) % len(presets)
                 ]
-        elif selected == 'prev':
+        elif selected == 'back':
             selected = presets[
                 (presets.index(state['actual']) - 1) % len(presets)
                 ]
         # last used preset, that is, 'actual':
-        elif selected == 'restore':
+        elif selected == 'last':
             selected = state['actual']
         # previously used preset, that is, 'previous':
-        elif selected == 'back':
+        elif selected == 'previous':
             selected = state['previous']
     # direct preset selection
     elif not selected in presets:
