@@ -13,7 +13,7 @@ stop_command: pkill -f /usr/bin/mplayer
 DVB_input: tdt
 
 # play preset on start
-# set preset as "restore" for last played channel
+# set preset as "last" for last played channel
 play_on_start: true
 preset: 6
 
