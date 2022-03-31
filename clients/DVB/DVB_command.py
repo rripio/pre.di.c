@@ -9,7 +9,7 @@
     Usage: DVB_command.py [preset ['startaudio']]
 
     preset must be one of the integer presets in presets.yml or one of
-    this options: 'forth', 'back', 'last', 'previous'
+    these options: 'forth', 'back', 'last', 'previous'
 
     forth:      next preset number in numerical order
     back:       previous preset number in numerical order
