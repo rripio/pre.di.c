@@ -108,7 +108,7 @@ def change_radio(
         # previously used preset, that is, 'previous':
         elif selected == 'previous':
             selected = state['previous']
-    # direct preset selection
+    # wrong preset selection
     elif not selected in presets:
         print(
             f'(DVB_command) option must be in {options} '
@@ -138,7 +138,9 @@ def change_radio(
         state['actual'] = state_old['actual']
         state['previous'] = state_old['previous']
         print('(DVB_command) Something went wrong when changing radio state')
-    return state
+    # write state
+    with open(state_path, 'w') as f:
+        yaml.dump(state, f, default_flow_style=False)
 
 
 if sys.argv[1:]:
@@ -148,12 +150,10 @@ if sys.argv[1:]:
         if startflag == 'startaudio':
             startflag = True
         else:
-            startflag = False 
+            startflag = False
     else:
         startflag = False
-    new_state = change_radio(selected, startflag)
+    change_radio(selected, startflag)
 
-    with open(state_path, 'w') as f:
-        yaml.dump(new_state, f, default_flow_style=False)
 else:
     print(__doc__)
