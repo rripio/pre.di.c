@@ -6,7 +6,7 @@
 
 """selects DVB channels
 
-    Usage: DVB_command.py [preset ['startaudio']]
+    Usage: DVB_command.py [preset [startaudio]]
 
     preset must be one of the integer presets in presets.yml or one of
     these options: 'forth', 'back', 'last', 'previous'
