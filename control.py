@@ -85,6 +85,7 @@ def proccess_commands(
 
 
     def noinput(throw_it, state=state):
+        """convenience command that make disconnect_outputs() externally available"""
 
         try:
             tmp = jack.Client('tmp')
