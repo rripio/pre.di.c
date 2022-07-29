@@ -8,12 +8,19 @@ import sys
 import numpy as np
 
 
+## base folder and path 
+
+# main folder is the folder this very module is run from
+# always put a slash after a folder name
+main_folder = os.path.dirname(__file__) + '/'
+
+# set PYTHONPATH for clients launched as subprocesses
+os.putenv('PYTHONPATH',main_folder)
+
+
 ## customizable initial values
 
 # folders
-# main folder is the folder this very module is run from
-# allways put a slash after a folder name
-main_folder = os.path.dirname(__file__) + '/'
 bin_folder = main_folder
 config_folder = main_folder + 'config/'
 data_folder = main_folder + 'data/'
