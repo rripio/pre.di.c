@@ -87,8 +87,12 @@ def wait4result(command, answer, tmax=5, interval=0.1):
 
     while elapsed() < tmax:
         try:
+            if init.config['server_output'] in [0, 1] :
+                output={"stderr": sp.DEVNULL}
+            else :
+                output={}
             if answer in sp.check_output(
-                    command, shell=True, universal_newlines=True):
+                    command, shell=True, universal_newlines=True, **output):
                 if init.config['server_output'] in [1, 2]:
                     print(
                         f'\nfound string "{answer}" in output of '
