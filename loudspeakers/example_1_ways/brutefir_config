@@ -38,14 +38,14 @@ logic:
 
 # I/O
 
-input "L", "R" {
+input "i.L", "i.R" {
 	# initially without connection
 	device: "jack" { };
 	sample: "AUTO";
 	channels: 2/0,1;
 };
 
-output "fr.L", "fr.R" {
+output "o.fr.L", "o.fr.R" {
 	# mapping of 2 outputs
 	device: "jack" { ports:
 	"system:playback_1"/"fr.L", "system:playback_2"/"fr.R";
@@ -142,13 +142,13 @@ coeff "c.xo.lp.fr.R" {
 #VOL
 
 filter "f.vol.L" {
-  from_inputs:  "L";
+  from_inputs:  "i.L";
   to_filters:   "f.eq.L", "f.eq.R";
   coeff:        -1;
 };
 
 filter "f.vol.R" {
-  from_inputs:  "R";
+  from_inputs:  "i.R";
   to_filters:   "f.eq.L", "f.eq.R";
   coeff:        -1;
 };
@@ -171,29 +171,29 @@ filter "f.eq.R" {
 
 filter "f.drc.L" {
   from_filters: "f.eq.L";
-	to_filters:   "f.fr.L";
+	to_filters:   "f.xo.L.fr";
 	coeff:        -1;
 };
 
 filter "f.drc.R" {
   from_filters: "f.eq.R";
-	to_filters:   "f.fr.R";
+	to_filters:   "f.xo.R.fr";
     # starts without DRC EQ
 	coeff:        -1;
 };
 
 # XO
 
-filter "f.fr.L" {
+filter "f.xo.L.fr" {
 	from_filters: "f.drc.L";
-	to_outputs:   "fr.L"/0.0/1;
+	to_outputs:   "o.fr.L"/0.0/1;
     # starts with mp XO-EQ
 	coeff:        "c.xo.mp.fr.L";
 };
 
-filter "f.fr.R" {
+filter "f.xo.R.fr" {
 	from_filters: "f.drc.R";
-	to_outputs:   "fr.R"/0.0/1;
+	to_outputs:   "o.fr.R"/0.0/1;
     # starts with mp XO-EQ
 	coeff:        "c.xo.mp.fr.R";
 };

@@ -535,8 +535,8 @@ def proccess_commands(
                 * m_solo_r
                 )
             # commit final gain change
-            bf_cli(f'cfia "f.vol.L" "L" m{str(m_gain_l)} ; '
-                   f'cfia "f.vol.R" "R" m{str(m_gain_r)}')
+            bf_cli(f'cfia "f.vol.L" "i.L" m{str(m_gain_l)} ; '
+                   f'cfia "f.vol.R" "i.R" m{str(m_gain_r)}')
 
 
         # gain command send its str argument directly

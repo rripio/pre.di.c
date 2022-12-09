@@ -38,21 +38,21 @@ logic:
 
 # I/O
 
-input "L", "R" {
+input "i.L", "i.R" {
 	# initially without connection
 	device: "jack" { };
 	sample: "AUTO";
 	channels: 2/0,1;
 };
 
-output "fr.L", "fr.R" {
-	# mapping of 4 outputs
+output "o.L.w", "o.R.w", "o.L.m", "o.R.m", "o.L.t", "o.R.t" {
+	# mapping of 6 outputs
     # woofers on 0,1 outputs in order to not fry
     # tweeters by accident
 	device: "jack" { ports:
-	"system:playback_1"/"w.L", "system:playback_2"/"w.R";
-	"system:playback_3"/"m.L", "system:playback_4"/"m.R";
-	"system:playback_5"/"t.L", "system:playback_6"/"t.R";
+	"system:playback_1"/"o.L.w", "system:playback_2"/"o.R.w";
+	"system:playback_3"/"o.L.m", "system:playback_4"/"o.R.m";
+	"system:playback_5"/"o.L.t", "system:playback_6"/"o.R.t";
 	};
 	sample:   "AUTO";
 	channels: 6/0,1,2,3,4,5;
@@ -202,13 +202,13 @@ coeff "c.xo.lp.w.R" {
 #VOL
 
 filter "f.vol.L" {
-  from_inputs:  "L";
+  from_inputs:  "i.L";
   to_filters:   "f.eq.L", "f.eq.R";
   coeff:        -1;
 };
 
 filter "f.vol.R" {
-  from_inputs:  "R";
+  from_inputs:  "i.R";
   to_filters:   "f.eq.L", "f.eq.R";
   coeff:        -1;
 };
@@ -231,57 +231,57 @@ filter "f.eq.R" {
 
 filter "f.drc.L" {
   from_filters: "f.eq.L";
-	to_filters:   "f.t.L","f.m.L","f.w.L";
+	to_filters:   "f.xo.L.t","f.xo.L.m","f.xo.L.w";
 	coeff:        -1;
 };
 
 filter "f.drc.R" {
   from_filters: "f.eq.R";
-	to_filters:   "f.t.R","f.m.R","f.w.R";
+	to_filters:   "f.xo.R.t","f.xo.R.m","f.xo.R.w";
     # starts without DRC EQ
 	coeff:        -1;
 };
 
 # XO
 
-filter "f.t.L" {
+filter "f.xo.L.t" {
 	from_filters: "f.drc.L";
-	to_outputs:   "t.L"/0.0/1;
+	to_outputs:   "o.L.t"/0.0/1;
     # starts with mp XO-EQ
 	coeff:        "c.xo.mp.t.L";
 };
 
-filter "f.t.R" {
+filter "f.xo.R.t" {
 	from_filters: "f.drc.R";
-	to_outputs:   "t.R"/0.0/1;
+	to_outputs:   "o.R.t"/0.0/1;
     # starts with mp XO-EQ
 	coeff:        "c.xo.mp.t.R";
 };
 
 filter "f.m.L" {
 	from_filters: "f.drc.L";
-	to_outputs:   "m.L"/0.0/1;
+	to_outputs:   "o.L.m"/0.0/1;
     # starts with mp XO-EQ
 	coeff:        "c.xo.mp.m.L";
 };
 
 filter "f.m.R" {
 	from_filters: "f.drc.R";
-	to_outputs:   "m.R"/0.0/1;
+	to_outputs:   "o.R.m"/0.0/1;
     # starts with mp XO-EQ
 	coeff:        "c.xo.mp.m.R";
 };
 
-filter "f.w.L" {
+filter "f.xo.L.w" {
 	from_filters: "f.drc.L";
-	to_outputs:   "w.L"/0.0/1;
+	to_outputs:   "o.L.w"/0.0/1;
     # starts with mp XO-EQ
 	coeff:        "c.xo.mp.w.L";
 };
 
-filter "f.w.R" {
+filter "f.xo.R.w" {
 	from_filters: "f.drc.R";
-	to_outputs:   "w.R"/0.0/1;
+	to_outputs:   "o.R.w"/0.0/1;
     # starts with mp XO-EQ
 	coeff:        "c.xo.mp.w.R";
 };
