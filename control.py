@@ -17,7 +17,8 @@ import predic as pd
 
 # main function for command proccessing
 def proccess_commands(
-        full_command, state=init.state, curves=init.curves, target = init.target):
+        full_command, state=init.state, 
+        curves=init.curves, target = init.target):
     """proccesses commands for predic control"""
 
     # normally write state, but there are exceptions
@@ -85,7 +86,8 @@ def proccess_commands(
 
 
     def noinput(throw_it, state=state):
-        """convenience command that make disconnect_outputs() externally available"""
+        """convenience command that make disconnect_outputs() 
+        externally available"""
 
         try:
             tmp = jack.Client('tmp')
@@ -193,9 +195,9 @@ def proccess_commands(
     def change_drc(drc, state=state):
 
         state['drc'] = drc
-        # if drc 'none' coefficient -1 is set, so latency and CPU usage \
+        # if drc 'off' coefficient -1 is set, so latency and CPU usage \
         # are improved
-        if drc == 'none':
+        if drc == 'off':
             filters = init.speaker['DRC']['filters']
             for i in range(len(filters)):
                 bf_cli(f'cfc "{filters[i]}" -1')
@@ -211,6 +213,7 @@ def proccess_commands(
                     warnings.append(
                         'bad name: DRC has to be in '
                         f'{list(init.speaker["DRC"]["sets"])}'
+                        ' or \'off\''
                         )
             except Exception:
                 state['drc'] = state_old['drc']
@@ -219,60 +222,131 @@ def proccess_commands(
 
 
     # following funtions prepares their corresponding actions to be performed \
-    # by the change_gain() function
+    # by the change_mixer() function
 
 
-    def change_polarity(polarity, state=state):
-
-        options = ['+', '-', '+-', '-+']
-        if polarity in options:
-            state['polarity'] = polarity
+    def change_channels(channels, state=state):
+        
+        options = ['off', 'flip', 'l', 'r']
+        if channels in options:
+            state['channels'] = channels
             try:
-                state = change_gain(gain)
+                state = change_mixer()
             except Exception:
-                state['polarity'] = state_old['polarity']
+                state['channels'] = state_old['channels']
                 warnings.append(
-                    'Something went wrong when changing polarity state')
+                    'Something went wrong when changing channels state')
         else:
-            state['polarity'] = state_old['polarity']
-            warnings.append(f'bad option: polarity has to be in {options}')
+            state['channels'] = state_old['channels']
+            warnings.append(f'bad option: channels has to be in {options}')
         return state
+        
 
+    def change_polarity_inv(polarity_inv, state=state):
+        
+        options = ['off', 'on']
+        if polarity_inv in options:
+            state['polarity_inv'] = polarity_inv
+            try:
+                state = change_mixer()
+            except Exception:
+                state['polarity_inv'] = state_old['polarity_inv']
+                warnings.append(
+                    'Something went wrong when changing polarity_inv state')
+        else:
+            state['polarity_inv'] = state_old['polarity_inv']
+            warnings.append(f'bad option: polarity_inv has to be in {options}')
+        return state
+        
+
+    def change_polarity_flip(polarity_flip, state=state):
+        
+        options = ['off', 'on']
+        if polarity_flip in options:
+            state['polarity_flip'] = polarity_flip
+            try:
+                state = change_mixer()
+            except Exception:
+                state['polarity_flip'] = state_old['polarity_flip']
+                warnings.append(
+                    'Something went wrong when changing polarity_flip state')
+        else:
+            state['polarity_flip'] = state_old['polarity_flip']
+            warnings.append(f'bad option: polarity_flip has to be in {options}')
+        return state
+        
 
     def change_midside(midside, state=state):
 
-        options = ['mid', 'side', 'off']
+        options = ['off', 'mid', 'side']
         if midside in options:
             state['midside'] = midside
             try:
-                if state['midside']=='mid':
-                    bf_cli( 'cffa "f.eq.L" "f.vol.L" m0.5 ; '
-                            'cffa "f.eq.L" "f.vol.R" m0.5 ; '
-                            'cffa "f.eq.R" "f.vol.L" m0.5 ; '
-                            'cffa "f.eq.R" "f.vol.R" m0.5')
-                elif state['midside']=='side':
-                    bf_cli( 'cffa "f.eq.L" "f.vol.L" m0.5  ; '
-                            'cffa "f.eq.L" "f.vol.R" m-0.5 ; '
-                            'cffa "f.eq.R" "f.vol.L" m0.5  ; '
-                            'cffa "f.eq.R" "f.vol.R" m-0.5')
-                elif state['midside']=='off':
-                    bf_cli( 'cffa "f.eq.L" "f.vol.L" m1 ; '
-                            'cffa "f.eq.L" "f.vol.R" m0 ; '
-                            'cffa "f.eq.R" "f.vol.L" m0 ; '
-                            'cffa "f.eq.R" "f.vol.R" m1')
+                state = change_mixer()
             except Exception:
                 state['midside'] = state_old['midside']
-                warnings.append('Something went wrong when changing '
-                                'midside state')
+                warnings.append(
+                    'Something went wrong when changing midside state')
         else:
             state['midside'] = state_old['midside']
             warnings.append(f'bad option: midside has to be in {options}')
         return state
 
 
+    def change_solo(solo, state=state):
+
+        options = ['off', 'l', 'r']
+        if solo in options:
+            state['solo'] = solo
+            try:
+                state = change_mixer()
+            except Exception:
+                state['solo'] = state_old['solo']
+                warnings.append('Something went wrong '
+                                'when changing solo state')
+        else:
+            state['solo'] = state_old['solo']
+            warnings.append(f'bad option: solo has to be in {options}')
+        return state
+    
+    
+    # and here the change_mix function itself
+
+    def change_mixer(state=state):
+    
+        mixer = np.identity(2)
+        
+        match state['channels']:
+            case 'flip':    mixer = np.array([[0,1],[1,0]])
+            case 'l':       mixer = np.array([[1,1],[0,0]])
+            case 'r':       mixer = np.array([[0,0],[1,1]])
+
+        match state['midside']:
+            case 'mid':     mixer = mixer @ np.array([[0.5,0.5],[0.5,0.5]])
+            case 'side':    mixer = mixer @ np.array([[0.5,0.5],[-0.5,-0.5]])
+
+        if state['polarity_inv'] == 'on':
+            mixer = mixer @ np.array([[-1,0],[0,-1]])
+
+        if state['polarity_flip'] == 'on':
+            mixer = mixer @ np.array([[1,0],[0,-1]])
+
+        match state['solo']:
+            case 'l':       mixer = mixer * np.array([[1,0],[1,0]])
+            case 'r':       mixer = mixer * np.array([[0,1],[0,1]])
+
+        bf_cli( f'cffa "f.eq.L" "f.vol.L" m{mixer[0,0]} ; '
+                f'cffa "f.eq.R" "f.vol.L" m{mixer[0,1]} ; '
+                f'cffa "f.eq.L" "f.vol.R" m{mixer[1,0]} ; '
+                f'cffa "f.eq.R" "f.vol.R" m{mixer[1,1]}')
+    
+    
+    # following funtions prepares their corresponding actions to be performed \
+    # by the change_gain() function
+
     def change_mute(mute, state=state):
 
-        options = ['on', 'off']
+        options = ['off', 'on']
         if mute in options:
             state['mute'] = mute
             try:
@@ -289,26 +363,9 @@ def proccess_commands(
         return state
 
 
-    def change_solo(solo, state=state):
-
-        options = ['off', 'l', 'r']
-        if solo in options:
-            state['solo'] = solo
-            try:
-                state = change_gain(gain)
-            except Exception:
-                state['solo'] = state_old['solo']
-                warnings.append('Something went wrong '
-                                'when changing solo state')
-        else:
-            state['solo'] = state_old['solo']
-            warnings.append(f'bad option: solo has to be in {options}')
-        return state
-
-
     def change_loudness(loudness, state=state):
 
-        if loudness in ['on', 'off']:
+        if loudness in ['off', 'on']:
             state['loudness'] = loudness
             try:
                 state = change_gain(gain)
@@ -432,6 +489,8 @@ def proccess_commands(
         return state
 
 
+    # and here the change_mix function itself
+
     def change_gain(gain, state=state):
         """change_gain, aka 'the volume machine' :-)"""
 
@@ -511,29 +570,13 @@ def proccess_commands(
             # add balance dB gains
             bf_atten_dB_l = bf_atten_dB_l - state['balance']
             bf_atten_dB_r = bf_atten_dB_r + state['balance']
-            # from dB to multiplier to implement easily polarity and mute
+            # from dB to multiplier to implement mute easily
             # then channel gains are the product of \
-            # gain, polarity, mute and solo
+            # gain and mute
             m_mute = {'on': 0, 'off': 1}[state['mute']]
-            m_polarity_l = {
-                '+': 1, '-': -1, '+-': 1, '-+': -1
-                }[state['polarity']]
-            m_polarity_r = {
-                '+': 1, '-': -1, '+-': -1, '-+': 1
-                }[state['polarity']]
-            m_solo_l  = {'off': 1, 'l': 1, 'r': 0}[state['solo']]
-            m_solo_r  = {'off': 1, 'l': 0, 'r': 1}[state['solo']]
             def m_gain(x): return m.pow(10, x/20) * m_mute
-            m_gain_l = (
-                m_gain(bf_atten_dB_l)
-                * m_polarity_l
-                * m_solo_l
-                )
-            m_gain_r = (
-                m_gain(bf_atten_dB_r)
-                * m_polarity_r
-                * m_solo_r
-                )
+            m_gain_l = m_gain(bf_atten_dB_l)
+            m_gain_r = m_gain(bf_atten_dB_r)
             # commit final gain change
             bf_cli(f'cfia "f.vol.L" "i.L" m{str(m_gain_l)} ; '
                    f'cfia "f.vol.R" "i.R" m{str(m_gain_r)}')
@@ -578,28 +621,32 @@ def proccess_commands(
 
     try:
         state = {
-            'show':             show,
-            'noinput':          noinput,
-            'target':           change_target,
-            'input':            change_input,
-            'xo':               change_xovers,
-            'drc':              change_drc,
-            'polarity':         change_polarity,
-            'midside':          change_midside,
-            'mute':             change_mute,
-            'solo':             change_solo,
-            'loudness':         change_loudness,
-            'loudness_ref':     change_loudness_ref,
-            'treble':           change_treble,
-            'bass':             change_bass,
-            'balance':          change_balance,
-            'level':            change_level,
-            'gain':             change_gain
+            'show':             show,                   #
+            'noinput':          noinput,                #
+            'target':           change_target,          #
+            'input':            change_input,           #[input]
+            'xo':               change_xovers,          #[XO_set]
+            'drc':              change_drc,             #['off',drc]
+
+            'channels':         change_channels,        #['off','flip','l','r']
+            'polarity_inv':     change_polarity_inv,    #['off','on']
+            'polarity_flip':    change_polarity_flip,   #['off','on']
+            'midside':          change_midside,         #['off','mid','side']
+            'solo':             change_solo,            #['off','l','r']
+
+            'mute':             change_mute,            #['off','on']
+            'loudness':         change_loudness,        #['off','on']
+            'loudness_ref':     change_loudness_ref,    #[loudness_ref]
+            'treble':           change_treble,          #[treble]
+            'bass':             change_bass,            #[bass]
+            'balance':          change_balance,         #[balance]
+            'level':            change_level,           #[level]
+            'gain':             change_gain             #[gain]
             }[command](arg)
     except KeyError:
         warnings.append(f"Unknown command '{command}'")
-    except Exception:
-        warnings.append(f"Problems in command '{command}'")
+    except Exception as e:
+        print(f"Problems in command '{command}': ", e)
 
     # return a dictionary of predic state
     return (state, warnings)
