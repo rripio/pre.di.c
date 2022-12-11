@@ -13,6 +13,7 @@ import numpy as np
 # folders
 # main folder is the folder this very module is run from
 # allways put a slash after a folder name
+
 main_folder = os.path.dirname(__file__) + '/'
 bin_folder = main_folder
 config_folder = main_folder + 'config/'
