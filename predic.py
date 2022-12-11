@@ -99,8 +99,9 @@ def wait4result(command, answer, tmax=5, interval=0.1):
                         f'command: {command}'
                         )
                 return True
-        except Exception:
-            pass
+        except Exception as e:
+            if init.config['server_output'] in [2] :
+                print(e)
         time.sleep(interval)
     else:
         if init.config['server_output'] in [1, 2]:
@@ -199,8 +200,8 @@ def jack_loop(clientname):
             event.wait()
         except KeyboardInterrupt:
             print('\n(predic.jack_loop) Interrupted by user')
-        except:
-            print('\n(predic.jack_loop)  Terminated')
+        except Exception as e:
+            print('\n(predic.jack_loop)  Terminated: ', e)
 
 
 def calc_gain(level):

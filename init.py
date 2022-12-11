@@ -43,8 +43,8 @@ try:
     target = dict.fromkeys(['mag', 'pha'])
     target['mag'] = np.loadtxt(target_mag_path)
     target['pha'] = np.loadtxt(target_pha_path)
-except Exception:
-    print('Failed to load target files')
+except Exception as e:
+    print('Failed to load target files: ', e)
     sys.exit(-1)
 
 
@@ -66,8 +66,8 @@ try:
         'bass_pha_curves'     : np.loadtxt(base.data_folder
                                     + base.bass_pha_curves)
         }
-except Exception:
-    print('Failed to load EQ files')
+except Exception as e:
+    print('Failed to load EQ files: ', e)
     sys.exit(-1)
 
 

@@ -58,8 +58,8 @@ def proccess_commands(
                     sources = jack_client.get_all_connections(port)
                     for source in sources:
                         jack_client.disconnect(source.name, port)
-        except Exception:
-            print('error disconnecting inputs')
+        except Exception as e:
+            print('error disconnecting inputs: ', e)
 
 
     def bf_cli(command):
@@ -73,8 +73,8 @@ def proccess_commands(
                 s.send(command.encode())
                 if init.config['server_output'] == 2:
                     print('command sent to brutefir')
-            except Exception:
-                warnings.append('Brutefir error')
+            except Exception as e:
+                warnings.append('Brutefir error: ', e)
 
 
     ## internal functions for actions
@@ -93,8 +93,8 @@ def proccess_commands(
             tmp = jack.Client('tmp')
             disconnect_outputs(tmp)
             tmp.close()
-        except Exception:
-            warnings.append('Something went wrong when disconnecting inputs')
+        except Exception as e:
+            warnings.append('Exception when disconnecting inputs: ', e)
         return state
 
 
@@ -104,8 +104,8 @@ def proccess_commands(
             init.target['mag'] = np.loadtxt(init.target_mag_path)
             init.target['pha'] = np.loadtxt(init.target_pha_path)
             state = change_gain(gain)
-        except Exception:
-            warnings.append('Something went wrong when changing target state')
+        except Exception as e:
+            warnings.append('Exception when changing target state: ', e)
 
 
     def change_input(input, state=state):
@@ -126,15 +126,15 @@ def proccess_commands(
                         # audio inputs
                         try:
                             tmp.connect(source_ports[i], ports_group[i])
-                        except Exception:
+                        except Exception as e:
                             warnings.append(
                                 f'error connecting {source_ports[i]} <--> '
-                                f'{ports_group[i]}'
+                                f'{ports_group[i]}: ', e
                                 )
                 tmp.close()
-            except Exception:
+            except Exception as e:
                 # on exception returns False
-                warnings.append(f'error changing to input "{input_name}"')
+                warnings.append(f'error changing to input "{input_name}": ', e)
                 tmp.close()
                 return False
             return True
@@ -164,10 +164,10 @@ def proccess_commands(
                     f'bad name: input has to be in {list(init.inputs)}'
                     )
                 return state
-        except Exception:
+        except Exception as e:
             state['input']  = state_old['input']
             state['xo'] = state_old['xo']
-            warnings.append('Something went wrong when changing input state')
+            warnings.append('Exception when changing input state: ', e)
         return state
 
 
@@ -186,9 +186,9 @@ def proccess_commands(
                     'bad name: XO has to be in '
                     f'{list(init.speaker["XO"]["sets"])}'
                     )
-        except Exception:
+        except Exception as e:
             state['xo'] = state_old['xo']
-            warnings.append('Something went wrong when changing XO state')
+            warnings.append('Exception when changing XO state: ', e)
         return state
 
 
@@ -215,9 +215,9 @@ def proccess_commands(
                         f'{list(init.speaker["DRC"]["sets"])}'
                         ' or \'off\''
                         )
-            except Exception:
+            except Exception as e:
                 state['drc'] = state_old['drc']
-                warnings.append('Something went wrong when changing DRC state')
+                warnings.append('Exception when changing DRC state: ', e)
         return state
 
 
@@ -232,10 +232,9 @@ def proccess_commands(
             state['channels'] = channels
             try:
                 state = change_mixer()
-            except Exception:
+            except Exception as e:
                 state['channels'] = state_old['channels']
-                warnings.append(
-                    'Something went wrong when changing channels state')
+                warnings.append('Exception when changing channels state: ', e)
         else:
             state['channels'] = state_old['channels']
             warnings.append(f'bad option: channels has to be in {options}')
@@ -249,10 +248,11 @@ def proccess_commands(
             state['polarity_inv'] = polarity_inv
             try:
                 state = change_mixer()
-            except Exception:
+            except Exception as e:
                 state['polarity_inv'] = state_old['polarity_inv']
                 warnings.append(
-                    'Something went wrong when changing polarity_inv state')
+                    'Exception when changing polarity_inv state: ', e
+                    )
         else:
             state['polarity_inv'] = state_old['polarity_inv']
             warnings.append(f'bad option: polarity_inv has to be in {options}')
@@ -266,10 +266,11 @@ def proccess_commands(
             state['polarity_flip'] = polarity_flip
             try:
                 state = change_mixer()
-            except Exception:
+            except Exception as e:
                 state['polarity_flip'] = state_old['polarity_flip']
                 warnings.append(
-                    'Something went wrong when changing polarity_flip state')
+                    'Exception when changing polarity_flip state: ', e
+                    )
         else:
             state['polarity_flip'] = state_old['polarity_flip']
             warnings.append(f'bad option: polarity_flip has to be in {options}')
@@ -283,10 +284,9 @@ def proccess_commands(
             state['midside'] = midside
             try:
                 state = change_mixer()
-            except Exception:
+            except Exception as e:
                 state['midside'] = state_old['midside']
-                warnings.append(
-                    'Something went wrong when changing midside state')
+                warnings.append('Exception when changing midside state: ', e)
         else:
             state['midside'] = state_old['midside']
             warnings.append(f'bad option: midside has to be in {options}')
@@ -300,10 +300,9 @@ def proccess_commands(
             state['solo'] = solo
             try:
                 state = change_mixer()
-            except Exception:
+            except Exception as e:
                 state['solo'] = state_old['solo']
-                warnings.append('Something went wrong '
-                                'when changing solo state')
+                warnings.append('Exception when changing solo state: ', e)
         else:
             state['solo'] = state_old['solo']
             warnings.append(f'bad option: solo has to be in {options}')
@@ -351,12 +350,9 @@ def proccess_commands(
             state['mute'] = mute
             try:
                 state = change_gain(gain)
-            except Exception:
+            except Exception as e:
                 state['mute'] = state_old['mute']
-                warnings.append(
-                    'Something went wrong '
-                    'when changing mute state'
-                    )
+                warnings.append('Exception when changing mute state: ', e)
         else:
             state['mute'] = state_old['mute']
             warnings.append(f'bad option: mute has to be in {options}')
@@ -369,11 +365,9 @@ def proccess_commands(
             state['loudness'] = loudness
             try:
                 state = change_gain(gain)
-            except Exception:
+            except Exception as e:
                 state['loudness'] = state_old['loudness']
-                warnings.append(
-                    'Something went wrong when changing loudness state'
-                    )
+                warnings.append('Exception when changing loudness state: ', e)
         else:
             state['mute'] = state_old['mute']
             warnings.append(
@@ -400,11 +394,9 @@ def proccess_commands(
                     )
                 warnings.append('loudness reference level clamped')
             state = change_gain(gain)
-        except Exception:
+        except Exception as e:
             state['loudness_ref'] = state_old['loudness_ref']
-            warnings.append(
-                'Something went wrong when changing loudness_ref state'
-                )
+            warnings.append('Exception when changing loudness_ref state: ', e)
         return state
 
 
@@ -424,9 +416,9 @@ def proccess_commands(
                     )
                 warnings.append('treble clamped')
             state = change_gain(gain)
-        except Exception:
+        except Exception as e:
             state['treble'] = state_old['treble']
-            warnings.append('Something went wrong when changing treble state')
+            warnings.append('Exception when changing treble state: ', e)
         return state
 
 
@@ -443,9 +435,9 @@ def proccess_commands(
                     )
                 warnings.append('bass clamped')
             state = change_gain(gain)
-        except Exception:
+        except Exception as e:
             state['bass'] = state_old['bass']
-            warnings.append('Something went wrong when changing bass state')
+            warnings.append('Exception when changing bass state: ', e)
         return state
 
 
@@ -468,9 +460,9 @@ def proccess_commands(
                     )
                 warnings.append('balance clamped')
             state = change_gain(gain)
-        except Exception:
+        except Exception as e:
             state['balance'] = state_old['balance']
-            warnings.append('Something went wrong when changing balance state')
+            warnings.append('Exception when changing balance state: ', e)
         return state
 
 
@@ -481,11 +473,9 @@ def proccess_commands(
             state['level'] = (float(level) + state['level'] * add)
             gain = pd.calc_gain(state['level'])
             state = change_gain(gain)
-        except Exception:
+        except Exception as e:
             state['level'] = state_old['level']
-            warnings.append(
-                f'Something went wrong when changing {command} state'
-                )
+            warnings.append(f'Exception when changing {command} state: ', e)
         return state
 
 
