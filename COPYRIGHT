@@ -1,6 +1,7 @@
-This file is part of pre.di.c
-pre.di.c, a preamp and digital crossover
-Copyright (C) 2018-2022 Roberto Ripio
+This file, as all the files in this repository, 
+is part of pre.di.c, a preamp and digital crossover
+
+Copyright (C) Roberto Ripio
 
 pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro
 Copyright (C) 2006-2011 Roberto Ripio
