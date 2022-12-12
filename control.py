@@ -309,7 +309,7 @@ def proccess_commands(
         return state
     
     
-    # and here the change_mix function itself
+    # and here the change_mixer function itself
 
     def change_mixer(state=state):
     
@@ -479,7 +479,7 @@ def proccess_commands(
         return state
 
 
-    # and here the change_mix function itself
+    # and here the change_gain function itself
 
     def change_gain(gain, state=state):
         """change_gain, aka 'the volume machine' :-)"""
