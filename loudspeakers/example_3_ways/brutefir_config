@@ -1,5 +1,6 @@
-## general settings
+### general settings
 
+# overrides defaults in ~/.brutefir_defaults
 
 
 sampling_rate:     48000;
@@ -13,6 +14,13 @@ monitor_rate:      true;
 powersave:         -80;
 lock_memory:       true;
 show_progress:     false;
+
+
+
+### predic mandatory structure
+
+# Do not change this part
+
 
 
 logic:
@@ -45,6 +53,63 @@ input "i.L", "i.R" {
 	channels: 2/0,1;
 };
 
+
+## coeffs
+
+
+# EQ & loudness (generated)
+
+coeff "c.eq" {
+	filename: "dirac pulse";
+	shared_mem: true;
+    # enough for smooth EQ curve
+	blocks: 1;
+};
+
+
+## filters
+
+
+#VOL
+
+filter "f.vol.L" {
+  from_inputs:  "i.L";
+  to_filters:   "f.eq.L", "f.eq.R";
+  coeff:        -1;
+};
+
+filter "f.vol.R" {
+  from_inputs:  "i.R";
+  to_filters:   "f.eq.L", "f.eq.R";
+  coeff:        -1;
+};
+
+#EQ
+
+filter "f.eq.L" {
+	from_filters: "f.vol.L"//1,"f.vol.R"//0;
+	to_filters:   "f.drc.L";
+	coeff:        "c.eq";
+};
+
+filter "f.eq.R" {
+	from_filters: "f.vol.L"//0,"f.vol.R"//1;
+	to_filters:   "f.drc.R";
+	coeff:        "c.eq";
+};
+
+# ---> end of predic mandatory structure
+
+
+
+### loudspeaker specific configuration
+
+# configure your loudspeaker from here
+
+
+
+# I/O
+
 output "o.L.w", "o.R.w", "o.L.m", "o.R.m", "o.L.t", "o.R.t" {
 	# mapping of 6 outputs
     # woofers on 0,1 outputs in order to not fry
@@ -63,19 +128,71 @@ output "o.L.w", "o.R.w", "o.L.m", "o.R.m", "o.L.t", "o.R.t" {
 };
 
 
+## filters
+
+
+# DRC
+
+filter "f.drc.L" {
+  from_filters: "f.eq.L";
+	to_filters:   "f.xo.L.t","f.xo.L.m","f.xo.L.w";
+	coeff:        -1;
+};
+
+filter "f.drc.R" {
+  from_filters: "f.eq.R";
+	to_filters:   "f.xo.R.t","f.xo.R.m","f.xo.R.w";
+    # starts without DRC EQ
+	coeff:        -1;
+};
+
+# XO
+
+filter "f.xo.L.t" {
+	from_filters: "f.drc.L";
+	to_outputs:   "o.L.t"/0.0/1;
+    # starts with mp XO-EQ
+	coeff:        "c.xo.mp.t.L";
+};
+
+filter "f.xo.R.t" {
+	from_filters: "f.drc.R";
+	to_outputs:   "o.R.t"/0.0/1;
+    # starts with mp XO-EQ
+	coeff:        "c.xo.mp.t.R";
+};
+
+filter "f.m.L" {
+	from_filters: "f.drc.L";
+	to_outputs:   "o.L.m"/0.0/1;
+    # starts with mp XO-EQ
+	coeff:        "c.xo.mp.m.L";
+};
+
+filter "f.m.R" {
+	from_filters: "f.drc.R";
+	to_outputs:   "o.R.m"/0.0/1;
+    # starts with mp XO-EQ
+	coeff:        "c.xo.mp.m.R";
+};
+
+filter "f.xo.L.w" {
+	from_filters: "f.drc.L";
+	to_outputs:   "o.L.w"/0.0/1;
+    # starts with mp XO-EQ
+	coeff:        "c.xo.mp.w.L";
+};
+
+filter "f.xo.R.w" {
+	from_filters: "f.drc.R";
+	to_outputs:   "o.R.w"/0.0/1;
+    # starts with mp XO-EQ
+	coeff:        "c.xo.mp.w.R";
+};
+
 
 ## coeffs
 
-
-
-# EQ & loudness (generated)
-
-coeff "c.eq" {
-	filename: "dirac pulse";
-	shared_mem: true;
-    # enough for smooth EQ curve
-	blocks: 1;
-};
 
 # DRC
 
@@ -107,7 +224,7 @@ coeff "c.drc.2.R" {
 	attenuation: 0;
 };
 
-# XO-EQ
+# XO
 
 coeff "c.xo.mp.t.L" {
 	filename:    "xo-mp-t-L.pcm";
@@ -191,97 +308,4 @@ coeff "c.xo.lp.w.R" {
 	format:      "FLOAT_LE";
 	shared_mem:  false;
 	attenuation: 0;
-};
-
-
-
-## filters
-
-
-
-#VOL
-
-filter "f.vol.L" {
-  from_inputs:  "i.L";
-  to_filters:   "f.eq.L", "f.eq.R";
-  coeff:        -1;
-};
-
-filter "f.vol.R" {
-  from_inputs:  "i.R";
-  to_filters:   "f.eq.L", "f.eq.R";
-  coeff:        -1;
-};
-
-#EQ
-
-filter "f.eq.L" {
-	from_filters: "f.vol.L"//1,"f.vol.R"//0;
-	to_filters:   "f.drc.L";
-	coeff:        "c.eq";
-};
-
-filter "f.eq.R" {
-	from_filters: "f.vol.L"//0,"f.vol.R"//1;
-	to_filters:   "f.drc.R";
-	coeff:        "c.eq";
-};
-
-# DRC
-
-filter "f.drc.L" {
-  from_filters: "f.eq.L";
-	to_filters:   "f.xo.L.t","f.xo.L.m","f.xo.L.w";
-	coeff:        -1;
-};
-
-filter "f.drc.R" {
-  from_filters: "f.eq.R";
-	to_filters:   "f.xo.R.t","f.xo.R.m","f.xo.R.w";
-    # starts without DRC EQ
-	coeff:        -1;
-};
-
-# XO
-
-filter "f.xo.L.t" {
-	from_filters: "f.drc.L";
-	to_outputs:   "o.L.t"/0.0/1;
-    # starts with mp XO-EQ
-	coeff:        "c.xo.mp.t.L";
-};
-
-filter "f.xo.R.t" {
-	from_filters: "f.drc.R";
-	to_outputs:   "o.R.t"/0.0/1;
-    # starts with mp XO-EQ
-	coeff:        "c.xo.mp.t.R";
-};
-
-filter "f.m.L" {
-	from_filters: "f.drc.L";
-	to_outputs:   "o.L.m"/0.0/1;
-    # starts with mp XO-EQ
-	coeff:        "c.xo.mp.m.L";
-};
-
-filter "f.m.R" {
-	from_filters: "f.drc.R";
-	to_outputs:   "o.R.m"/0.0/1;
-    # starts with mp XO-EQ
-	coeff:        "c.xo.mp.m.R";
-};
-
-filter "f.xo.L.w" {
-	from_filters: "f.drc.L";
-	to_outputs:   "o.L.w"/0.0/1;
-    # starts with mp XO-EQ
-	coeff:        "c.xo.mp.w.L";
-};
-
-filter "f.xo.R.w" {
-	from_filters: "f.drc.R";
-	to_outputs:   "o.R.w"/0.0/1;
-    # starts with mp XO-EQ
-	coeff:        "c.xo.mp.w.R";
 };
