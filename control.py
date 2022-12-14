@@ -59,7 +59,7 @@ def proccess_commands(
                     for source in sources:
                         jack_client.disconnect(source.name, port)
         except Exception as e:
-            print('error disconnecting inputs: ', e)
+            print('error disconnecting sources: ', e)
 
 
     def bf_cli(command):
@@ -85,7 +85,7 @@ def proccess_commands(
         return(state)
 
 
-    def noinput(throw_it, state=state):
+    def nosource(throw_it, state=state):
         """convenience command that make disconnect_outputs() 
         externally available"""
 
@@ -94,7 +94,7 @@ def proccess_commands(
             disconnect_outputs(tmp)
             tmp.close()
         except Exception as e:
-            warnings.append('Exception when disconnecting inputs: ', e)
+            warnings.append('Exception when disconnecting sources: ', e)
         return state
 
 
@@ -108,9 +108,9 @@ def proccess_commands(
             warnings.append('Exception when changing target state: ', e)
 
 
-    def change_input(input, state=state):
+    def change_source(source, state=state):
 
-        def do_change_input(input_name, source_ports):
+        def do_change_source(source_name, source_ports):
             """'source_ports': list [L,R] of jack output ports of chosen source
             """
 
@@ -123,7 +123,7 @@ def proccess_commands(
                     # i.e., minimum of input or output ports
                     num_ports=min(len(ports_group), len(source_ports))
                     for i in range(num_ports):
-                        # audio inputs
+                        # audio sources
                         try:
                             tmp.connect(source_ports[i], ports_group[i])
                         except Exception as e:
@@ -134,40 +134,40 @@ def proccess_commands(
                 tmp.close()
             except Exception as e:
                 # on exception returns False
-                warnings.append(f'error changing to input "{input_name}": ', e)
+                warnings.append(f'error changing to source "{source_name}": ', e)
                 tmp.close()
                 return False
             return True
 
 
-        state['input'] = input
+        state['source'] = source
         try:
-            if input is None:
+            if source is None:
                 raise
-            elif input in init.inputs:
-                if do_change_input (
-                        input,
-                        init.inputs[state['input']]['source_ports']):
-                        # input change went OK
+            elif source in init.sources:
+                if do_change_source (
+                        source,
+                        init.sources[state['source']]['source_ports']):
+                        # source change went OK
                     state = change_gain(gain)
                     # change xo if configured so
-                    if init.config['use_input_xo']:
-                        state['xo'] = init.inputs[input]['xo']
+                    if init.config['use_source_xo']:
+                        state['xo'] = init.sources[source]['xo']
                         state = change_xovers(state['xo'])
                 else:
-                    warnings.append(f'Error changing to input {input}')
-                    state['input']  = state_old['input']
+                    warnings.append(f'Error changing to source {source}')
+                    state['source']  = state_old['source']
                     state['xo'] = state_old['xo']
             else:
-                state['input'] = state_old['input']
+                state['source'] = state_old['source']
                 warnings.append(
-                    f'bad name: input has to be in {list(init.inputs)}'
+                    f'bad name: source has to be in {list(init.sources)}'
                     )
                 return state
         except Exception as e:
-            state['input']  = state_old['input']
+            state['source']  = state_old['source']
             state['xo'] = state_old['xo']
-            warnings.append('Exception when changing input state: ', e)
+            warnings.append('Exception when changing source state: ', e)
         return state
 
 
@@ -591,9 +591,9 @@ def proccess_commands(
         eq_pha = init.target['pha'] + l_pha + t_pha + b_pha
         # calculate headroom
         headroom = pd.calc_headroom(gain, state['balance'], eq_mag)
-        # adds input gain. It can lead to clipping \
+        # adds source gain. It can lead to clipping \
         # because assumes equal dynamic range between sources
-        real_gain = gain + pd.calc_input_gain(state['input'])
+        real_gain = gain + pd.calc_source_gain(state['source'])
         # if enough headroom commit changes
         if headroom >= 0:
             commit_gain(real_gain)
@@ -612,9 +612,9 @@ def proccess_commands(
     try:
         state = {
             'show':             show,                   #
-            'noinput':          noinput,                #
+            'nosource':         nosource,               #
             'target':           change_target,          #
-            'input':            change_input,           #[input]
+            'source':           change_source,          #[source]
             'xo':               change_xovers,          #[XO_set]
             'drc':              change_drc,             #['off',drc]
 

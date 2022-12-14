@@ -22,7 +22,7 @@ def get_yaml(filepath):
 # dictionaries
 #try:
 config = get_yaml(base.config_path)
-inputs = get_yaml(base.inputs_path)
+sources = get_yaml(base.sources_path)
 state = get_yaml(base.state_path)
 state_init = get_yaml(base.state_init_path)
 
@@ -81,6 +81,6 @@ for i in range(len(config['audio_ports'])):
 
 # source ports
 # turn string space separated enumerations into a lists
-for input in inputs:
-    inputs[input]['source_ports']=inputs[input]['source_ports'].split()
+for source in sources:
+    sources[source]['source_ports']=sources[source]['source_ports'].split()
 

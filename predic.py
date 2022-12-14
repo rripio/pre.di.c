@@ -117,7 +117,7 @@ def wait4source(source, tmax=5, interval=0.1):
 
     time_start = time.time()
     jc = jack.Client('tmp')
-    source_ports = init.inputs[source]['source_ports']
+    source_ports = init.sources[source]['source_ports']
     # get base name of ports for up ports query
     source_ports_name = source_ports[1].split(':',1)[0]
     while (time.time() - time_start) < tmax:
@@ -128,7 +128,7 @@ def wait4source(source, tmax=5, interval=0.1):
                 jc.get_ports(source_ports_name, is_output=True)
                 )
             # compare sets and, if used source ports are among up source ports,
-            # then input ports are up and ready :-)
+            # then source ports are up and ready :-)
             if (set(source_ports).issubset(set(up_ports))):
             # go on
                 return True
@@ -136,13 +136,13 @@ def wait4source(source, tmax=5, interval=0.1):
                time.sleep(interval)
         except KeyError:
             print(
-                f'\nincorrect input \'{source}\''
+                f'\nincorrect source \'{source}\''
                 '\n please revise state files\n'
                 )
             return False
-    # time is exhausted and input ports are down :-(
+    # time is exhausted and source ports are down :-(
     # leave function without any connection made
-    print(f'\ntime out restoring input \'{source}\', ports not available')
+    print(f'\ntime out restoring source \'{source}\', ports not available')
     return False
 
 
@@ -205,7 +205,7 @@ def jack_loop(clientname):
 
 
 def calc_gain(level):
-    """calculates gain from level, reference gain, and input gain"""
+    """calculates gain from level and reference gain"""
 
     gain = level + init.speaker['ref_level_gain']
     return gain
@@ -224,16 +224,16 @@ def calc_headroom(gain, balance, eq_mag):
     return headroom
 
 
-def calc_input_gain(input):
+def calc_source_gain(source):
 
-    return (init.inputs[input]['gain'])
+    return (init.sources[source]['gain'])
 
 
 def show(throw_it=None, state=init.state):
     """shows a status report"""
 
-    input_gain = calc_input_gain(init.state['input'])
-    gain = calc_gain(init.state['level']) + input_gain
+    source_gain = calc_source_gain(init.state['source'])
+    gain = calc_gain(init.state['level']) + source_gain
     headroom = calc_headroom(gain, init.state['balance'], init.target['mag'])
 
     print()
@@ -265,8 +265,8 @@ def show(throw_it=None, state=init.state):
     print(f"DRC set             {init.state['drc']:>6s}")
 
     print()
-    print(f"Input               {init.state['input']:>6s}")
-    print(f'Input gain          {input_gain: 6.1f}')
+    print(f"Source               {init.state['source']:>6s}")
+    print(f'Source gain          {source_gain: 6.1f}')
 
     print()
     print(f"Gain                {gain: 6.1f}")

@@ -107,13 +107,13 @@ def set_initial_state():
 
 
 def init_state_settings(state):
-    """restore audio settings as stored in state.yaml except input, 
+    """restore audio settings as stored in state.yaml except source, 
 and takes care of options to reset some of them"""
 
     # it is assumed that command name and setting name are the same
     #
-    # input associated xo will prevail if use_input_xo is set \
-    # because init_inputs function is executed after this one
+    # source associated xo will prevail if use_source_xo is set \
+    # because init_sources function is executed after this one
 
     for setting in [
             'xo',
@@ -134,22 +134,22 @@ and takes care of options to reset some of them"""
         pd.client_socket(f'{setting} {state[setting]}')
 
 
-def init_inputs(state):
-    """restore selected input as stored in state.yml"""
+def init_sources(state):
+    """restore selected source as stored in state.yml"""
 
-    source = state['input']
-    print(f'\n(startaudio) restoring input: {source}')
-    # wait for input ports to be up
+    source = state['source']
+    print(f'\n(startaudio) restoring source: {source}')
+    # wait for source ports to be up
     tmax = init.config['command_delay'] * 15
     interval = init.config['command_delay'] * 0.5
     if pd.wait4source(source, tmax, interval):
-        # input ports up and ready :-)
-        # switch on input and leave function
+        # source ports up and ready :-)
+        # switch on source and leave function
         # some clients (mpd) seems to need some extra time after
         # ports detection for whatever reason
         time.sleep(init.config['command_delay'] * 2)
         try:
-            pd.client_socket('input ' + source, quiet=True)
+            pd.client_socket('source ' + source, quiet=True)
         except Exception as e:
             print('\n(startaudio) error connecting source: ', e)
         return True
@@ -174,10 +174,10 @@ def main(run_level):
         state = set_initial_state()
         # restoring previous state
         init_state_settings(state)
-        # write input to state file for use of clients if config ask for it
-        if init.config['connect_inputs']:
+        # write source to state file for use of clients if config ask for it
+        if init.config['connect_sources']:
             # just refresh state file
-            init.state["input"] = state["input"]
+            init.state['source'] = state['source']
             pd.client_socket('save', quiet=True)
        # launch external clients, sources and clients
         print('\n(startaudio): starting clients...')
@@ -189,9 +189,9 @@ def main(run_level):
                 print(f'pid {p.pid:4}: {client}')
             except Exception as e:
                 print(f'problem launching client {client}: ', e)
-        # restoring inputs if config mandates so
-        if init.config['connect_inputs']:
-            init_inputs(state)
+        # restoring sources if config mandates so
+        if init.config['connect_sources']:
+            init_sources(state)
         # some info
         pd.show()
 

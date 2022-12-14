@@ -16,16 +16,16 @@ loudspeaker: example_1_way
 command_delay: 1
 # use fixed initial state, instead of last saved state
 use_state_init: true
-# when changing inputs use associated xo
-use_input_xo: true
-# connect inputs on start
-connect_inputs: false
+# when changing sources use associated xo
+use_source_xo: true
+# connect sources on start
+connect_sources: false
 
 
 
 ## jack audio ports
 
-# input selector will connect sources to this ports
+# source selector will connect sources to this ports
 # each group of ports is a space separated string
 audio_ports:
     - brutefir:input-0 brutefir:input-1

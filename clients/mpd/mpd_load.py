@@ -125,7 +125,7 @@ def start():
             mpd_client.seek(song, elapsed)
         mpd_client.close()
         # disconnect mpd_ports
-        pd.client_socket('noinput')
+        pd.client_socket('nosource')
     except:
         print('(mpd_load.py) problems with mpd ping routine')
 

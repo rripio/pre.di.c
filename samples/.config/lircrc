@@ -126,35 +126,35 @@ begin
 end
 
 
-# inputs
+# sources
 
 begin
     button = KEY_TV
     prog = irexec
-    config = ~/bin/control "input a"
+    config = ~/bin/control "source a"
 end
 begin
     button = KEY_VIDEO
     prog = irexec
-    config = ~/bin/control "input net"
+    config = ~/bin/control "source net"
 end
 begin
     mode = mpd
     button = KEY_AUDIO
     prog = irexec
-    config = ~/bin/control "input mpd"
+    config = ~/bin/control "source mpd"
 end
 begin
     mode = tdt
     button = KEY_RADIO
     prog = irexec
-    config = ~/bin/control "input tdt"
+    config = ~/bin/control "source tdt"
 end
 begin
     mode = cdda
     button = KEY_EPG
     prog = irexec
-    config = ~/bin/control "input cd"
+    config = ~/bin/control "source cd"
 end
 
 

@@ -1,15 +1,15 @@
-# inputs configuration
+# sources configuration
 
-# input_name:
+# source_name:
 
-## gain shift of input
+## gain shift of source
 #   gain: float(dB)
 
 ## jack source ports
 #   source_ports: source_jack_port_1 source_jack_port_2
 
 ## name of crossover filter set to be activated automatically
-## when the input is selected
+## when the source is selected
 #   xo: filter_set_name
 
 

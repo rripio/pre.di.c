@@ -1,7 +1,7 @@
 balance: 0.0
 bass: 0.0
 drc: 'off'
-input: a
+source: a
 channels: 'off'
 level: -28.0
 loudness: 'on'

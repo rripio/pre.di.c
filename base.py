@@ -26,7 +26,7 @@ pids_folder = main_folder + 'run/'
 config_filename = 'config.yml'
 state_filename = 'state.yml'
 state_init_filename = 'state_init.yml'
-inputs_filename = 'inputs.yml'
+sources_filename = 'sources.yml'
 clients_filename = 'clients.yml'
 speaker_filename = 'speaker.yml'
 
@@ -37,7 +37,7 @@ speaker_filename = 'speaker.yml'
 config_path = config_folder + config_filename
 state_path = config_folder + state_filename
 state_init_path = config_folder + state_init_filename
-inputs_path = config_folder + inputs_filename
+sources_path = config_folder + sources_filename
 clients_path = config_folder + clients_filename
 
 
