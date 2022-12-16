@@ -1,0 +1,4 @@
+#!/bin/sh
+
+control mute on
+status |grep "muted"

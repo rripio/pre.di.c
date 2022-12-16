@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# jack inputs
+
+jack_lsp -c
+
+exit

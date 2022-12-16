@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# jack active input
+
+jack_lsp -c |egrep -A 1 ^brutefir:input|egrep \ {3}
