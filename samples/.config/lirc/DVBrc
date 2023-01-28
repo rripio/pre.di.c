@@ -1,0 +1,75 @@
+## lirc include config file
+
+
+
+# mplayer tdt
+
+# mode tdt
+begin tdt 
+    begin  
+         prog = irexec
+         button = KEY_STOP
+         config = /bin/echo stop > ~/pre.di.c/clients/DVB/dvb_fifo
+         flags = quit
+    end
+	begin
+		prog = irexec
+		button = KEY_PREVIOUSSONG
+		config = ~/pre.di.c/clients/DVB/DVB_command.py back
+	end
+	begin
+		prog = irexec
+		button = KEY_NEXTSONG
+		config = ~/pre.di.c/clients/DVB/DVB_command.py forth
+	end
+	begin
+		prog = irexec
+		button = KEY_PLAY
+		config = ~/pre.di.c/clients/DVB/DVB_command.py last
+	end
+	begin
+		prog = irexec
+		button = KEY_NUMERIC_1
+		config = ~/pre.di.c/clients/DVB/DVB_command.py 1
+	end
+	begin
+		prog = irexec
+		button = KEY_NUMERIC_2
+		config = ~/pre.di.c/clients/DVB/DVB_command.py 2
+	end
+	begin
+		prog = irexec
+		button = KEY_NUMERIC_3
+		config = ~/pre.di.c/clients/DVB/DVB_command.py 3
+	end
+	begin
+		prog = irexec
+		button = KEY_NUMERIC_4
+		config = ~/pre.di.c/clients/DVB/DVB_command.py 4
+	end
+	begin
+		prog = irexec
+		button = KEY_NUMERIC_5
+		config = ~/pre.di.c/clients/DVB/DVB_command.py 5
+	end
+	begin
+		prog = irexec
+		button = KEY_NUMERIC_6
+		config = ~/pre.di.c/clients/DVB/DVB_command.py 6
+	end
+	begin
+		prog = irexec
+		button = KEY_NUMERIC_7
+		config = ~/pre.di.c/clients/DVB/DVB_command.py 7
+	end
+	begin
+		prog = irexec
+		button = KEY_NUMERIC_8
+		config = ~/pre.di.c/clients/DVB/DVB_command.py 8
+	end
+	begin
+		prog = irexec
+		button = KEY_NUMERIC_9
+		config = ~/pre.di.c/clients/DVB/DVB_command.py 9
+	end
+end tdt

@@ -21,10 +21,9 @@ import subprocess as sp
 
 import jack
 
-import base
 import init
 import stopaudio
-import predic as pd
+import pdlib as pd
 
 
 def stop_all():
@@ -51,34 +50,37 @@ def init_jack():
         stop_all()
 
 
-def init_brutefir():
-    """loads brutefir"""
-
-    # cd to brutefir config folder so filter paths are relative to this \
-    # folder in brutefir_config
-    os.chdir(base.loudspeakers_folder + init.config['loudspeaker'])
-    print(f'\n(startaudio) starting brutefir on {os.getcwd()}')
-    brutefir = sp.Popen(
-        f'{init.config["brutefir_command"]} brutefir_config'.split()
+def init_camilladsp():
+    """loads camilladsp"""
+    
+    # cd to louspeaker folder so filter paths are relative to this \
+    # folder in speaker.yml config file
+    os.chdir(init.loudspeaker_path)
+    print(f'\n(startaudio) starting camilladsp on {os.getcwd()}')
+    camilladsp = sp.Popen(
+        f'{init.config["camilladsp_command"]} -m \
+        -p {init.config["websocket_port"]} \
+        {init.camilladsp_path}'.split()
         )
-    # waiting for brutefir
+
+    # waiting for camilladsp
+    # test for input jack ports to be up
     tmax = init.config['command_delay'] * 5
     interval = init.config['command_delay'] * 0.1
-    if pd.wait4result(
-            'echo "quit" | nc localhost 3000 2>/dev/null',
-            'Welcome', tmax, interval):
-        print('\n(startaudio) brutefir started :-)')
+    ports = ['cpal_client_in:in_0', 'cpal_client_in:in_1']
+    if pd.wait4ports(ports, tmax, interval):
+        print('\n(startaudio) camilladsp started :-)')
     else:
-        print('\n(startaudio) error starting brutefir')
-        stop_all()
-
-
+        print('\n(startaudio) error starting camilladsp')
+        stop_all()   
+    
+    
 def init_server():
     """loads server"""
 
     print('\n(startaudio) starting server\n')
     try:
-        control = sp.Popen(f'python3 {base.main_folder}server.py'.split())
+        control = sp.Popen(f'python3 {init.main_folder}/server.py'.split())
     except Exception as e:
         print('\n(startaudio) server didn\'t load: ', e)
         stopaudio.main('all')
@@ -96,12 +98,11 @@ def init_server():
 
 
 def set_initial_state():
-    """set initial state state as last saved or as user determined"""
+    """set initial state state as last saved or user determined"""
 
     state = init.state
     if init.config['use_state_init']:
-        state_init = init.state_init
-        for setting in state_init:
+        for setting in init.state_init:
             state[setting] = state_init[setting]
     return state
 
@@ -112,29 +113,34 @@ and takes care of options to reset some of them"""
 
     # it is assumed that command name and setting name are the same
     #
-    # source associated xo will prevail if use_source_xo is set \
-    # because init_sources function is executed after this one
+    # source associated phase_EQ will prevail if use_source_phase_EQ is set \
+    # because init_source function is executed after this one
 
-    for setting in [
-            'xo',
+    for setting in (
             'drc',
+            'drc_set',
+            'phase_eq',
             'channels',
-            'polarity_inv',
+            'channels_flip',
+            'polarity',
             'polarity_flip',
-            'midside',
+            'stereo',
             'solo',
             'mute',
             'loudness',
             'loudness_ref',
+            'tones',
             'treble',
             'bass',
+            'eq',
+            'eq_filter',
             'balance',
             'level'
-            ]:
+            ):
         pd.client_socket(f'{setting} {state[setting]}')
 
 
-def init_sources(state):
+def init_source(state):
     """restore selected source as stored in state.yml"""
 
     source = state['source']
@@ -145,29 +151,26 @@ def init_sources(state):
     if pd.wait4source(source, tmax, interval):
         # source ports up and ready :-)
         # switch on source and leave function
-        # some clients (mpd) seems to need some extra time after
-        # ports detection for whatever reason
-        time.sleep(init.config['command_delay'] * 2)
-        try:
-            pd.client_socket('source ' + source, quiet=True)
-        except Exception as e:
-            print('\n(startaudio) error connecting source: ', e)
-        return True
+        if init.sources[source]['wait_on_start']:
+            # some clients (namely mpd) seems to need some extra time after \
+            # ports detection for whatever reason
+            time.sleep(init.config['command_delay'] * 2)
+        pd.client_socket('source ' + source, quiet=True)
     else:
-        return False
+        print(f'\n(startaudio) could not connect {source} ports')
 
 
 def main(run_level):
     """main loading function"""
 
-    # jack, brutefir, server
-    if run_level in ['core', 'all']:
+    # jack, brutefir, camilladsp, server
+    if run_level in {'core', 'all'}:
         # load basic audio kernel
         init_jack()
-        init_brutefir()
+        init_camilladsp()
         init_server()
     # inboard players
-    if run_level in ['clients', 'all']:
+    if run_level in {'clients', 'all'}:
         # getting operating state
         # do it before launching clients \
         # so they get the correct setting from state file if needed
@@ -175,23 +178,24 @@ def main(run_level):
         # restoring previous state
         init_state_settings(state)
         # write source to state file for use of clients if config ask for it
-        if init.config['connect_sources']:
+        if state['sources'] == 'on':
             # just refresh state file
             init.state['source'] = state['source']
             pd.client_socket('save', quiet=True)
        # launch external clients, sources and clients
         print('\n(startaudio): starting clients...')
-        clients_start = pd.read_clients('start')
-        for client in clients_start:
+        for client in pd.read_clients('start'):
             try:
-                command_path = f'{base.clients_folder}{client}'
+                command_path = f'{init.clients_folder}/{client}'
                 p=sp.Popen(command_path.split())
                 print(f'pid {p.pid:4}: {client}')
             except Exception as e:
-                print(f'problem launching client {client}: ', e)
+                print(f'\n(startaudio) problem launching client {client}: ', e)
         # restoring sources if config mandates so
-        if init.config['connect_sources']:
-            init_sources(state)
+        if state['sources'] == 'on':
+            init_source(state)
+        else:
+            pd.client_socket('sources off', quiet=True)
         # some info
         pd.show()
 
@@ -203,7 +207,7 @@ if __name__ == '__main__':
         run_level = sys.argv[1]
     else:
         run_level = 'all'
-    if run_level in ['core', 'clients', 'all']:
+    if run_level in {'core', 'clients', 'all'}:
         print(f'\n(startaudio) starting runlevel {run_level}')
         main(run_level)
     else:

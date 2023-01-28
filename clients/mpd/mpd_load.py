@@ -16,9 +16,9 @@ import multiprocessing as mp
 
 import mpd
 
-import base
+import baseconfig as base
 import init
-import predic as pd
+import pdlib as pd
 
 
 ## user config
@@ -98,7 +98,7 @@ def start():
     try:
         mpd_client = connect_mpd()
         status = mpd_client.status()
-        # check if there's a playlist loaded and if any \
+        # check if there's a playlist loaded and, if any, \
         # get relevant status data
         # no 'song' in status if there is no playlist
         if 'song' in status:
@@ -124,8 +124,6 @@ def start():
         if restore:
             mpd_client.seek(song, elapsed)
         mpd_client.close()
-        # disconnect mpd_ports
-        pd.client_socket('nosource')
     except:
         print('(mpd_load.py) problems with mpd ping routine')
 

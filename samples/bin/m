@@ -1,0 +1,4 @@
+#!/bin/sh
+
+control mute toggle
+status |grep mute

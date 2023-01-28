@@ -67,6 +67,12 @@ input {
     enabled "no"
     }
 
+input {
+    plugin "cdio_paranoia"
+    enabled "yes"
+    }
+
+
 
 ## outputs
 
@@ -75,10 +81,14 @@ audio_output {
     type            "jack"
     name            "mpd_jack"
     client_name     "mpd_jack"
-    source_ports    "L,R,C,LS,RS"
+    #source_ports    "L,R,C,LS,RS"
+    source_ports    "L,R"
     auto_destination_ports "no"
-    destination_ports "brutefir:input-0,brutefir:input-1"
+#    destination_ports "brutefir:input-0,brutefir:input-1"
+#    destination_ports "cpal_client_in:in_0 cpal_client_in:in_1"
+#    destination_ports "system:playback_1,system:playback_2"
     mixer_type      "null"
+#    mixer_type      "software"
     enabled         "yes"
     always_on       "yes"
 }
@@ -86,25 +96,31 @@ audio_output {
 
 ## resampling
 
-resampler {
-    plugin  "soxr"
-    quality "high"
-}
+# resampler {
+#     plugin  "soxr"
+#     quality "medium"
+#     threads "0"
+# }
+
+# resampler {
+#     plugin  "soxr"
+#     quality "high"
+# }
 
 #resampler {
 #    plugin  "soxr"
 #    quality "very high"
 #}
 
-#resampler {
-#    plugin  "libsamplerate"
-#    type Best Sinc Interpolator"
-#}
+resampler {
+   plugin  "libsamplerate"
+   type "Fastest Sinc Interpolator"
+}
 
-#resampler {
+# resampler {
 #    plugin  "libsamplerate"
 #    type "Medium Sinc Interpolator"
-#}
+# }
 
 
 ## replay gain

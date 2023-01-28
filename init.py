@@ -2,12 +2,13 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
+import os
 import sys
 
 import yaml
 import numpy as np
 
-import base
+import baseconfig as base
 
 
 def get_yaml(filepath):
@@ -19,56 +20,45 @@ def get_yaml(filepath):
     return config_dict
 
 
+# paths
+
+# main folder is the folder this very module is run from
+main_folder = os.path.dirname(__file__)
+
+config_folder = f'{main_folder}/{base.config_folder}'
+clients_folder = f'{main_folder}/{base.clients_folder}'
+loudspeakers_folder= f'{main_folder}/{base.loudspeakers_folder}'
+
+config_path= f'{config_folder}/{base.config_filename}'
+state_path = f'{config_folder}/{base.state_filename}'
+state_init_path = f'{config_folder}/{base.state_init_filename}'
+sources_path = f'{config_folder}/{base.sources_filename}'
+clients_path = f'{config_folder}/{base.clients_filename}'
+eq_path = f'{config_folder}/{base.eq_filename}'
+camilladsp_path = f'{config_folder}/{base.camilladsp_filename}'
+
+# we still don't know the loudspeaker name, so speaker_path \
+# is built downstream
+
+
 # dictionaries
-#try:
-config = get_yaml(base.config_path)
-sources = get_yaml(base.sources_path)
-state = get_yaml(base.state_path)
-state_init = get_yaml(base.state_init_path)
-
-# after knowing which speaker config to load, load it
-loudspeaker_path = (base.loudspeakers_folder + config['loudspeaker']) 
-speaker = get_yaml(loudspeaker_path + '/' + base.speaker_filename)
-    
-#except Exception:
-#    print('\n(getconfigs) Error: some config file failed to load')
-#    sys.exit()
-
-
-# target curves
-target_mag_path = loudspeaker_path + '/' + speaker['target_mag_curve']
-target_pha_path = loudspeaker_path + '/' + speaker['target_pha_curve']
 
 try:
-    target = dict.fromkeys(['mag', 'pha'])
-    target['mag'] = np.loadtxt(target_mag_path)
-    target['pha'] = np.loadtxt(target_pha_path)
-except Exception as e:
-    print('Failed to load target files: ', e)
-    sys.exit(-1)
 
+    config = get_yaml(config_path)
+    sources = get_yaml(sources_path)
+    state = get_yaml(state_path)
+    state_init = get_yaml(state_init_path)
+    eq = get_yaml(eq_path)
 
-# EQ curves
-try:
-    curves = {
-        'frequencies'         : np.loadtxt(base.data_folder
-                                    + base.frequencies),
-        'loudness_mag_curves' : np.loadtxt(base.data_folder
-                                    + base.loudness_mag_curves),
-        'loudness_pha_curves' : np.loadtxt(base.data_folder
-                                    + base.loudness_pha_curves),
-        'treble_mag_curves'   : np.loadtxt(base.data_folder
-                                    + base.treble_mag_curves),
-        'treble_pha_curves'   : np.loadtxt(base.data_folder
-                                    + base.treble_pha_curves),
-        'bass_mag_curves'     : np.loadtxt(base.data_folder
-                                    + base.bass_mag_curves),
-        'bass_pha_curves'     : np.loadtxt(base.data_folder
-                                    + base.bass_pha_curves)
-        }
+    # after knowing which speaker config to load, load it
+    loudspeaker_path = f'{loudspeakers_folder}/{config["loudspeaker"]}' 
+    speaker = get_yaml(loudspeaker_path + '/' + base.loudspeaker_filename)
+    drc = get_yaml(loudspeaker_path + '/' + base.drc_filename)
+
 except Exception as e:
-    print('Failed to load EQ files: ', e)
-    sys.exit(-1)
+   print(f'\nError getting configurations: {e}')
+   sys.exit()
 
 
 # some processing of data for downstream easyer use

@@ -8,7 +8,6 @@ import asyncio
 
 import yaml
 
-import base
 import control
 import init
 
@@ -23,7 +22,7 @@ async def handle_commands(reader, writer):
     def write_state(state):
         """writes state to state file"""
 
-        with open(base.state_path, 'w') as f:
+        with open(init.state_path, 'w') as f:
             yaml.dump(state, f, default_flow_style=False)
 
 
@@ -33,7 +32,7 @@ async def handle_commands(reader, writer):
             writer.write(yaml.dump(state, default_flow_style=False).encode())
             writer.write(b'OK\n')
             await writer.drain()
-            if init.config['server_output'] == 2:
+            if init.config['verbose'] == 2:
                 print('(server) closing connection...')
 
         elif data.rstrip('\r\n') == 'save':
@@ -41,46 +40,36 @@ async def handle_commands(reader, writer):
             write_state(state)
             writer.write(b'OK\n')
             await writer.drain()
-            if init.config['server_output'] == 2:
+            if init.config['verbose'] == 2:
                 print('(server) closing connection...')
 
         elif data.rstrip('\r\n') == 'ping':
             # just answers OK
             writer.write(b'OK\n')
             await writer.drain()
-            if init.config['server_output'] == 2:
+            if init.config['verbose'] == 2:
                 print('(server) closing connection...')
 
         else:
             # command received in 'data', \
             # then send command to control.py, \
             # that answers with state dict
-            (state, warnings) = control.proccess_commands(data, state)
+            (state) = control.proccess_commands(data, state)
             # a try block avoids blocking of state file writing \
             # when the terminal that launched startaudio.py is closed
             try:
-                if init.config['server_output'] in [1, 2]:
+                if init.config['verbose'] in [1, 2]:
                     print(f'Command: {data}')
-            except Exception:
-                pass
+            except Exception as e:
+                print(f'(server) Exception: {e}')
 
             try:
                 # writes state file
                 write_state(state)
-                # print warnings
-                if len(warnings) > 0:
-                    print('Warnings:')
-                    for warning in warnings:
-                        print('\t', warning)
-                    writer.write(b'ACK\n')
-                    await writer.drain()
-                else:
-                    writer.write(b'OK\n')
-                    await writer.drain()
-            except Exception as e:
-                writer.write(b'ACK\n', 
-                             'An error occurred when writing state file: ', e)
+                writer.write(b'OK\n')
                 await writer.drain()
+            except Exception as e:
+                print('An error occurred when writing state file: ', e)
     except ConnectionResetError:
         print('(server) still no connection...')
     except Exception as e:
@@ -97,7 +86,7 @@ async def main():
                 init.config['control_port']
                 )
     addr = server.sockets[0].getsockname()
-    if init.config['server_output'] in [1, 2]:
+    if init.config['verbose'] in [1, 2]:
         print(f'(server) listening on address {addr}')
     await server.serve_forever()
 

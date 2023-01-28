@@ -1,0 +1,5 @@
+#!/bin/sh
+
+~/pre.di.c/clients/DVB/DVB_command.py $1
+
+exit

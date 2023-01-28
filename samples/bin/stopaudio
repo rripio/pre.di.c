@@ -1,0 +1,5 @@
+#!/bin/sh
+
+python3 ~/pre.di.c/stopaudio.py $1 &
+
+exit

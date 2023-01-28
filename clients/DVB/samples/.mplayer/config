@@ -8,14 +8,11 @@ quiet=true
 # tuning indications will dissapear though
 #really-quiet=true
 
-channels=5
 
-# profiles
+# audio options
 
-[dvb]
-ao=jack:name=mplayer_dvb:noconnect
+channels=2
+# af=resample=48000:1:2
+af=lavcresample=48000:16:1:10
 af=volume=0
-
-[cdda]
-ao=jack:name=mplayer_cdda:noconnect
-
+ao=jack:name=mplayer_dvb:noconnect

@@ -19,8 +19,8 @@ import os
 import time
 from subprocess import Popen
 
-import base
-import predic as pd
+import init
+import pdlib as pd
 
 
 fnull = open(os.devnull, 'w')
@@ -29,22 +29,21 @@ fnull = open(os.devnull, 'w')
 def main(run_level):
     """main stop function"""
 
-    if run_level in ['clients', 'all']:
+    if run_level in {'clients', 'all'}:
         # stop external scripts, sources and clients
         print('(stopaudio) stopping clients')
-        clients_stop = pd.read_clients('stop')
-        for command in clients_stop:
+        for command in pd.read_clients('stop'):
             try:
-                Popen(f'{base.clients_folder}{command}'.split())
+                Popen(f'{init.clients_folder}/{command}'.split())
             except Exception:
-                print(f'problem stopping client "{client}":\n\t{err}')
-    if run_level in ['core', 'all']:
+                print(f'problem stopping client "{command}":\n\t{err}')
+    if run_level in {'core', 'all'}:
         # controlserver
         print('(stopaudio) stopping server')
         Popen ('pkill -f server.py'.split(), stdout=fnull, stderr=fnull)
-        # brutefir
-        print('(stopaudio) stopping brutefir')
-        Popen ('pkill -f brutefir'.split(), stdout=fnull, stderr=fnull)
+        # camilladsp
+        print('(stopaudio) stopping camilladsp')
+        Popen ('pkill -f camilladsp'.split(), stdout=fnull, stderr=fnull)
         # jack
         print('(stopaudio) stopping jackd')
         Popen ('pkill -f jackd'.split(), stdout=fnull, stderr=fnull)
@@ -55,7 +54,7 @@ if __name__ == '__main__':
     run_level = 'all'
     if sys.argv[1:]:
         run_level = sys.argv[1]
-    if run_level in ['core', 'clients', 'all']:
+    if run_level in {'core', 'clients', 'all'}:
         print('(stopaudio) stopping', run_level)
         main(run_level)
     else:

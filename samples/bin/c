@@ -1,0 +1,6 @@
+#!/bin/sh
+
+echo
+cat ~/pre.di.c/clients/DVB/state.yml
+echo
+

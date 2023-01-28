@@ -1,0 +1,309 @@
+# This file is part of pre.di.c
+# pre.di.c, a preamp and digital crossover
+# Copyright (C) Roberto Ripio
+
+"""miscellanea of utility functions for use in predic scripts"""
+
+
+import socket
+import sys
+import time
+import contextlib as cl
+import multiprocessing as mp
+import subprocess as sp
+import math as m
+
+
+import jack
+import yaml
+import numpy as np
+
+import baseconfig as base
+import init
+
+
+# used on startaudio.py and stopaudio.py
+def read_clients(phase):
+    """reads list of programs to start/stop from config/clients.yml file
+    phase: <'start'|'stop'> phase of client activation or deactivation"""
+
+    clients_list_path = init.clients_path
+
+    with open (clients_list_path) as clients_file:
+        clients_dict = yaml.safe_load(clients_file)
+        # init a list of client actions
+        clients = [
+            clients_dict[i][phase]
+            for i in clients_dict if phase in clients_dict[i]
+            ]
+    return clients
+
+
+def client_socket(data, quiet=True):
+    """makes a socket for talking to the server"""
+
+    # avoid void command to reach server and get processed due to encoding
+    if data == '':
+        return b'ACK\n'
+
+    server = 'localhost'
+    port = init.config['control_port']
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+
+        try:
+            if not quiet:
+                print(f'Connecting to {server}, port {str(port)}...')
+            s.connect((server,port))
+        except socket.gaierror as e:
+            print(f'Address-related error connecting to server: {e}')
+            sys.exit(-1)
+        except socket.error as e:
+            print(f'Connection error: {e}')
+            sys.exit(-1)
+        if not quiet:
+            print('Connected')
+        try:
+            # if a parameter is passed it is send to server
+            s.send(data.encode())
+            # return raw bytes server answer
+            return s.recv(2048)
+        except Exception:
+            print(f'(client) unexpected error: {sys.exc_info()[0]}')
+
+
+def read_state():
+    """retrieve state dictionary from file.
+    to be used by clients"""
+    # """retrieve state dictionary from server
+    # to be used by clients"""
+
+    return yaml.safe_load(client_socket('status').decode().replace('OK\n', ''))
+
+
+def wait4result(command, answer, tmax=5, interval=0.1):
+    """looks for chain "answer" in "command" output"""
+
+    time_start = time.time()
+
+    def elapsed():
+        return time.time() - time_start
+
+    while elapsed() < tmax:
+        try:
+            if init.config['verbose'] in {0, 1} :
+                output={"stderr": sp.DEVNULL}
+            else :
+                output={}
+            if answer in sp.check_output(
+                    command, shell=True, universal_newlines=True, **output):
+                if init.config['verbose'] in {1, 2}:
+                    print(
+                        f'\nfound string "{answer}" in output of '
+                        f'command: {command}'
+                        )
+                return True
+        except Exception as e:
+            if init.config['verbose'] in {2} :
+                print(e)
+        time.sleep(interval)
+    else:
+        if init.config['verbose'] in {1, 2}:
+            print(
+                f'\ntime out >{tmax}s waiting for string "{answer}"'
+                f' in output of command: {command}'
+                )
+        return False
+
+
+def wait4source(source, tmax=5, interval=0.1):
+    """wait for source jack ports to be up"""
+
+    source_ports = init.sources[source]['source_ports']
+    if wait4ports(source_ports, tmax, interval):
+        return True
+    else:
+        return False
+
+
+def wait4ports(ports, tmax=5, interval=0.1):
+    """wait for jack ports to be up"""
+    
+    time_start = time.time()
+    jc = jack.Client('tmp')
+
+    ports_name = ports[1].split(':',1)[0]
+    while (time.time() - time_start) < tmax:
+        # names of up source ports at this very moment as a generator
+        up_ports = (
+            port.name for port in
+            jc.get_ports(ports_name, is_output=False)
+            )
+        # compare sets and, if used source ports are among up source ports,
+        # then source ports are up and ready :-)
+        if set(ports) == set(up_ports):
+            # go on
+            return True
+        else:
+            time.sleep(interval)
+    # time is exhausted and source ports are down :-(
+    # leave function without any connection made
+    return False
+   
+
+
+def jack_loop(clientname):
+    """creates a jack loop with given 'clientname'"""
+    # CREDITS:
+    # https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
+
+    # the jack module instance for our looping ports
+    client = jack.Client(name=clientname, no_start_server=True)
+
+    if client.status.name_not_unique:
+        client.close()
+        print( f'(predic.jack_loop) \'{clientname}\''
+                            'already exists in JACK, nothing done.' )
+        return
+
+    # will use the multiprocessing.Event mechanism to keep this alive
+    event = mp.Event()
+
+    # this sets the actual loop that copies frames from our capture \
+    # to our playback ports
+    @client.set_process_callback
+    def process(frames):
+        assert len(client.inports) == len(client.outports)
+        assert frames == client.blocksize
+        for i, o in zip(client.inports, client.outports):
+            o.get_buffer()[:] = i.get_buffer()
+
+    # if jack shutdowns, will trigger on 'event' so that the below \
+    # 'whith client' will break.
+    @client.set_shutdown_callback
+    def shutdown(status, reason):
+        print('(predic.jack_loop) JACK shutdown!')
+        print('(predic.jack_loop) JACK status:', status)
+        print('(predic.jack_loop) JACK reason:', reason)
+        # this triggers an event so that the below 'with client' \
+        # will terminate
+        event.set()
+
+    # create the ports
+    for n in (1, 2):
+        client.inports.register(f'input_{n}')
+        client.outports.register(f'output_{n}')
+    # client.activate() not needed, see below
+
+    # this is the keeping trick
+    with client:
+        # when entering this with-statement, client.activate() is called
+        # this tells the JACK server that we are ready to roll
+        # our above process() callback will start running now
+
+        print( f'(predic.jack_loop) running {clientname}' )
+        try:
+            event.wait()
+        except KeyboardInterrupt:
+            print('\n(predic.jack_loop) Interrupted by user')
+        except Exception as e:
+            print('\n(predic.jack_loop)  Terminated: ', e)
+
+
+def gain_dB(x):
+    return 20 * m.log10(x)
+    """calculates gain in dB from gain multiplier"""
+
+def calc_gain(level):
+    """calculates gain from level and reference gain"""
+
+    gain = level + init.speaker['ref_level_gain']
+    return gain
+
+
+def calc_level(gain):
+
+    level = gain - init.speaker['ref_level_gain']
+    return level
+
+
+def calc_headroom(gain, state):
+    """calculates headroom from gain and equalizer"""
+
+    tones = {'off': 0, 'on': 1}[state['tones']]
+    headroom = (base.gain_max
+                - gain
+                - np.clip(state['bass'], 0 , None) * tones
+                - np.clip(state['treble'], 0 , None) * tones
+                - abs(state['balance'])
+                )
+    return headroom
+
+
+def calc_source_gain(source):
+
+    return init.sources[source]['gain']
+
+
+def show(throw_it=None, state=init.state):
+    """shows a status report"""
+
+    source_gain = calc_source_gain(state['source'])
+    gain = calc_gain(state['level']) + source_gain
+    headroom = calc_headroom(gain, state)
+    source_headroom = headroom - source_gain
+
+    print()
+    print(f"Loudspeaker:        {init.config['loudspeaker']:>10s}")
+    print()
+    print(f"fs                  {init.speaker['fs']: 10d}")
+    print(f"Reference level     {init.speaker['ref_level_gain']: 10.1f}")
+
+    print()
+    print(f"Mute                {state['mute']:>10s}")
+    print(f"Level               {state['level']: 10.1f}")
+    print(f"Balance             {state['balance']: 10.1f}")
+
+    print()
+    print(f"Channels            {state['channels']:>10s}")
+    print(f"Channels flip       {state['channels_flip']:>10s}")
+    print(f"Polarity            {state['polarity']:>10s}")
+    print(f"Polarity flip       {state['polarity_flip']:>10s}")
+    print(f"Stereo              {state['stereo']:>10s}")
+    print(f"Solo                {state['solo']:>10s}")
+
+    print()
+    print(f"Tones               {state['tones']:>10s}")
+    print(f"Bass                {state['bass']: 10.1f}")
+    print(f"Treble              {state['treble']: 10.1f}")
+    print(f"Loudness            {state['loudness']:>10s}")
+    print(f"Loudness reference  {state['loudness_ref']: 10.1f}")
+
+    print()
+    print(f"DRC                 {state['drc']:>10s}")
+    print(f"DRC set             {state['drc_set']:>10s}")
+    print(f"Phase equalizer     {state['phase_eq']:>10s}")
+    print(f"EQ                  {state['eq']:>10s}")
+    print(f"EQ filter           {state['eq_filter']:>10s}")
+
+    print()
+    print(f"Sources             {state['sources']:>10s}")
+    print(f"Source              {state['source']:>10s}")
+    print(f'Source gain         {source_gain: 10.1f}')
+    print(f'Source headroom     {source_headroom: 10.1f}')
+
+    print()
+    print(f"Gain                {gain: 10.1f}")
+    print(f"Headroom            {headroom: 10.1f}")
+
+    print('\n')
+
+    return state
+
+def show_file(throw_it=None, state=init.state):
+    """writes a status report to temp file"""
+
+    with open('/tmp/predic', 'w') as f:
+        with cl.redirect_stdout(f):
+            state = show()
+    return state

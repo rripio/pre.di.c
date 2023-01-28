@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# client.py level $1
+control level $1 add
+status |grep 'level'

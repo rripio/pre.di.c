@@ -1,0 +1,4 @@
+#!/bin/bash
+
+control source $1
+status |grep "source"

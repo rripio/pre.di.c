@@ -1,0 +1,120 @@
+## lirc include config file
+
+
+# drc and EQ
+
+# DRC red button
+
+begin
+    mode = drc
+    button = KEY_RED
+end
+
+begin drc
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_1
+        config = ~/bin/control 'drc_set 1'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_2
+        config = ~/bin/control 'drc_set 2'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_3
+        config = ~/bin/control 'drc_set 3'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_TEXT
+        config = ~/bin/control 'drc on'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_0
+        config = ~/bin/control 'drc off'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_SUBTITLE
+        config = ~/bin/control 'drc toggle'
+        flags = quit
+    end
+
+end drc
+
+
+# EQ green button
+
+begin
+    mode = eq
+    button = KEY_GREEN
+end
+
+begin eq
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_1
+        config = ~/bin/control 'eq_filter 1'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_2
+        config = ~/bin/control 'eq_filter 2'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_3
+        config = ~/bin/control 'eq_filter 3'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_TEXT
+        config = ~/bin/control 'eq on'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_0
+        config = ~/bin/control 'eq off'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_SUBTITLE
+        config = ~/bin/control 'eq toggle'
+        flags = quit
+    end
+
+end eq
+
+# Phase EQ yellow button
+
+begin
+    prog = irexec
+    button = KEY_YELLOW
+    config = ~/bin/control 'phase_eq toggle'
+end
+

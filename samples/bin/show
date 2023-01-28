@@ -1,0 +1,5 @@
+#!/bin/sh
+
+control show
+cat /tmp/predic
+rm /tmp/predic

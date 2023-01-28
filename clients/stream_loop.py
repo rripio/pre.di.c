@@ -10,7 +10,7 @@ import sys
 import subprocess as sp
 import multiprocessing as mp
 
-import predic as pd
+import pdlib as pd
 
 def start():
 

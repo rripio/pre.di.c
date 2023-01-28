@@ -27,7 +27,7 @@ import time
 import yaml
 
 import init
-import predic as pd
+import pdlib as pd
 
 
 # where am I? here you have all files

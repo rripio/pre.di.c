@@ -1,10 +1,45 @@
 ## lirc main config file
 
+# modes
 
+# mixer
+include ~/.config/lirc/mixerrc
 
 # EQ and XO
+include ~/.config/lirc/eqrc
 
-include ~/.config/lirc/eqxorc
+# music player daemon
+include ~/.config/lirc/mpdrc
+
+# mplayer tdt
+include ~/.config/lirc/DVBrc
+
+begin loudness_ref
+
+    begin
+        prog = irexec
+        button = KEY_UP
+        config = ~/bin/control 'loudness_ref +1 add'
+        repeat = 1
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_DOWN
+        config = ~/bin/control 'loudness_ref -1 add'
+        repeat = 1
+        flags = quit
+    end
+
+    begin
+        button = KEY_EXIT
+        flags = mode
+#        button = KEY_MENU
+#        flags = quit
+    end
+
+end loudness_ref
 
 
 # Starts in mpd mode
@@ -20,7 +55,7 @@ end
 begin
 	prog = irexec
 	button = KEY_POWER2
-	config = ~/bin/startaudio
+	config = ~/bin/restartaudio
 end
 begin
 	prog = irexec
@@ -33,96 +68,90 @@ end
 
 begin
      prog = irexec
-     button = KEY_MUTE
-	 config = ~/bin/control 'mute on'
-	 config = ~/bin/control 'mute off'
+     button = KEY_OK
+	 config = ~/bin/control 'mute toggle'
 end
+
 begin
     prog = irexec
     button = KEY_PREVIOUS
-	config = ~/bin/control 'loudness on'
-	config = ~/bin/control 'loudness off'
-end
-begin
-    mode = tones
-    button = KEY_MENU
+	config = ~/bin/control 'loudness toggle'
 end
 
-begin tones
-    begin
-        prog = irexec
-        button = KEY_VOLUMEUP
-        config = ~/bin/control 'bass +1 add'
-        repeat = 1
-        delay = 1
-        flags = quit
-    end
-    begin
-        prog = irexec
-        button = KEY_VOLUMEDOWN
-		config = ~/bin/control 'bass -1 add'
-        repeat = 1
-        delay = 1
-        flags = quit
-    end
-    begin
-        prog = irexec
-        button = KEY_CHANNELUP
-		config = ~/bin/control 'treble +1 add'
-        repeat = 1
-        delay = 1
-        flags = quit
-    end
-    begin
-        prog = irexec
-        button = KEY_CHANNELDOWN
-		config = ~/bin/control 'treble -1 add'
-        repeat = 1
-        delay = 1
-        flags = quit
-    end
-    begin
-        flags = mode
-        button = KEY_EXIT
-    end
-end tones
+begin
+    prog = irexec
+    button = KEY_MUTE
+    config = ~/bin/control 'tones toggle'
+end
+
+begin
+    prog = irexec
+    button = KEY_VOLUMEUP
+    config = ~/bin/control 'bass +1 add'
+    repeat = 1
+    delay = 1
+end
+
+begin
+    prog = irexec
+    button = KEY_VOLUMEDOWN
+    config = ~/bin/control 'bass -1 add'
+    repeat = 1
+    delay = 1
+end
+
+begin
+    prog = irexec
+    button = KEY_CHANNELUP
+    config = ~/bin/control 'treble +1 add'
+    repeat = 1
+    delay = 1
+    flags = quit
+end
+
+begin
+    prog = irexec
+    button = KEY_CHANNELDOWN
+    config = ~/bin/control 'treble -1 add'
+    repeat = 1
+    delay = 1
+    flags = quit
+end
 
 
 # levels
 
 begin
     prog = irexec
-    button = KEY_CHANNELUP
-	config = ~/bin/control 'loudness +1 add'
-    repeat = 1
-    delay = 1
-end
-begin
-    prog = irexec
-    button = KEY_CHANNELDOWN
-	config = ~/bin/control 'loudness -1 add'
-    repeat = 1
-    delay = 1
-end
-begin
-    prog = irexec
-    button = KEY_VOLUMEUP
+    button = KEY_UP
 	config = ~/bin/control 'level +1 add'
-    repeat = 5
-#    delay = 1
+    repeat = 1
 end
+
 begin
     prog = irexec
-    button = KEY_VOLUMEDOWN
+    button = KEY_DOWN
 	config = ~/bin/control 'level -1 add'
     repeat = 1
-    delay = 1
 end
+
 begin
     prog = irexec
-    button = KEY_PREVIOUS
-	config = ~/bin/control 'loudness on'
-	config = ~/bin/control 'loudness off'
+    button = KEY_RIGHT
+	config = ~/bin/control 'balance +1 add'
+    repeat = 1
+end
+
+begin
+    prog = irexec
+    button = KEY_LEFT
+	config = ~/bin/control 'balance -1 add'
+    repeat = 1
+end
+
+begin
+    mode = loudness_ref
+    button = KEY_MENU
 end
 
 
@@ -146,29 +175,8 @@ begin
 end
 begin
     mode = tdt
-    button = KEY_RADIO
+    button = KEY_CAMERA
     prog = irexec
-    config = ~/bin/control "source tdt"
+    config = ~/bin/control "source dvb"
 end
-begin
-    mode = cdda
-    button = KEY_EPG
-    prog = irexec
-    config = ~/bin/control "source cd"
-end
-
-
-# modes
-
-# music player daemon
-# mode mpd
-include ~/.config/lirc/mpdrc
-
-# mplayer cdda
-# mode cdda
-include ~/.config/lirc/cddarc
-
-# mplayer tdt
-# mode tdt
-include ~/.config/lirc/DVBrc
 
