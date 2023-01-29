@@ -14,22 +14,24 @@ import init
 
 async def handle_commands(reader, writer):
 
-    state = init.state
     rawdata = await reader.read(100)
     data = rawdata.decode()
     addr = writer.get_extra_info('peername')
 
-    def write_state(state):
+    def write_state():
         """writes state to state file"""
 
         with open(init.state_path, 'w') as f:
-            yaml.dump(state, f, default_flow_style=False)
+            if init.state != None:
+                yaml.dump(init.state, f, default_flow_style=False)
+            else:
+                print('(server) corrupted null state')
 
 
     try:
         if data.rstrip('\r\n') == 'status':
             # echo state to client as YAML string
-            writer.write(yaml.dump(state, default_flow_style=False).encode())
+            writer.write(yaml.dump(init.state, default_flow_style=False).encode())
             writer.write(b'OK\n')
             await writer.drain()
             if init.config['verbose'] == 2:
@@ -37,7 +39,7 @@ async def handle_commands(reader, writer):
 
         elif data.rstrip('\r\n') == 'save':
             # writes state to state file
-            write_state(state)
+            write_state()
             writer.write(b'OK\n')
             await writer.drain()
             if init.config['verbose'] == 2:
@@ -54,7 +56,7 @@ async def handle_commands(reader, writer):
             # command received in 'data', \
             # then send command to control.py, \
             # that answers with state dict
-            (state) = control.proccess_commands(data, state)
+            control.proccess_commands(data)
             # a try block avoids blocking of state file writing \
             # when the terminal that launched startaudio.py is closed
             try:
@@ -65,15 +67,15 @@ async def handle_commands(reader, writer):
 
             try:
                 # writes state file
-                write_state(state)
+                write_state()
                 writer.write(b'OK\n')
                 await writer.drain()
             except Exception as e:
-                print('An error occurred when writing state file: ', e)
+                print('(server) An error occurred when writing state file: ', e)
     except ConnectionResetError:
         print('(server) still no connection...')
-    except Exception as e:
-        print('(server) An exception occurred: ', e)
+    # except Exception as e:
+    #     print('(server) An exception occurred: ', e)
     finally:
         writer.close()
 

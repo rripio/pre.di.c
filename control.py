@@ -48,7 +48,7 @@ class ClampWarning(Warning):
 
 
 # main function for command proccessing
-def proccess_commands(full_command, state=init.state):
+def proccess_commands(full_command):
     """proccesses commands for predic control"""
 
     # let camilladsp connection be visible
@@ -57,7 +57,7 @@ def proccess_commands(full_command, state=init.state):
     add = False
     # backup state to restore values in case of not enough headroom \
     # or error of any kind
-    state_old = state.copy()
+    state_old = init.state.copy()
 
     # strips command final characters and split command from arguments
     full_command = full_command.rstrip('\r\n').split()
@@ -73,7 +73,7 @@ def proccess_commands(full_command, state=init.state):
         add = (True if full_command[2] == 'add' else False)
 
     # initializes gain since it is calculated from level
-    gain = pd.calc_gain(state['level'])
+    gain = pd.calc_gain(init.state['level'])
 
 
     ## auxiliary functions
@@ -88,45 +88,43 @@ def proccess_commands(full_command, state=init.state):
                     jack_client.disconnect(source.name, port)
 
     
-    def toggle(command, state=state):
+    def toggle(command):
         """changes state of on/off commands"""
         
-        return {'off': 'on', 'on': 'off'}[state[command]]
+        return {'off': 'on', 'on': 'off'}[init.state[command]]
     
 
-    def do_command(command, arg, state=state):
+    def do_command(command, arg):
         
         if arg:
             try:
-                command(arg, state)
+                command(arg)
             except ClampWarning as w:
                 print(f"'{command.__name__}' value clamped: {w.clamp_value}")
             except OptionsError as e:
                 print(f"Bad option. Options has to be in : {list(e.options)}")
             except Exception as e:
-                state[command.__name__]  = state_old[command.__name__]
+                init.state[command.__name__]  = state_old[command.__name__]
                 print(f"Exception in command '{command.__name__}': ", e)
         else:
             print(f"Command '{command.__name__}' needs an option")
-        return state
     
     
     ## internal functions for actions
 
-    def show(state=state):
+    def show():
         """show status in a readable way"""
         
         pd.show_file()
-        return state
 
 
-    def mute(mute, state=state):
+    def mute(mute):
 
         options = {'off', 'on', 'toggle'}
         if mute in options:
             if mute == 'toggle':
                 mute = toggle('mute')
-            state['mute'] = mute
+            init.state['mute'] = mute
             match mute:
                 case 'off':
                     cdsp.set_mute(False)
@@ -134,43 +132,40 @@ def proccess_commands(full_command, state=init.state):
                     cdsp.set_mute(True)
         else:
             raise OptionsError(options)
-        return state
 
 
-    def level(level, state=state, add=add):
+    def level(level, add=add):
 
         # level clamp is comissioned to set_gain()
-        state['level'] = (float(level) + state['level'] * add)
-        gain = pd.calc_gain(state['level'])
-        state = set_gain(gain)
-        return state
+        init.state['level'] = (float(level) + init.state['level'] * add)
+        gain = pd.calc_gain(init.state['level'])
+        set_gain(gain)
 
 
-    def sources(sources, state=state):
+    def sources(sources):
 
         options = {'off', 'on', 'toggle'}
         if sources in options:
             if sources == 'toggle':
                 sources = toggle('sources')
-            state['sources'] = sources
+            init.state['sources'] = sources
             match sources:
                 case 'off':
                     tmp = jack.Client('tmp')
                     disconnect_sources(tmp)
                     tmp.close()
                 case 'on':
-                    source(state['source'])
+                    source(init.state['source'])
         else:
             raise OptionsError(options)
-        return state
 
 
-    def source(source, state=state):
+    def source(source):
 
         options = init.sources
         if source in options:
-            state['source'] = source
-            source_ports = init.sources[state['source']]['source_ports']
+            init.state['source'] = source
+            source_ports = init.sources[init.state['source']]['source_ports']
             # switch
             tmp = jack.Client('tmp')
             disconnect_sources(tmp)
@@ -183,132 +178,122 @@ def proccess_commands(full_command, state=init.state):
                     tmp.connect(source_ports[i], ports_group[i])
             tmp.close()
             # source change went OK
-            state = set_gain(gain)
+            set_gain(gain)
             # change phase_eq if configured so
             if init.config['use_source_phase_eq']:
                 phase_eq(init.sources[source]['phase_eq'])
         else:
             raise OptionsError(options)
-        return state
 
 
-    def drc(drc, state=state):
+    def drc(drc):
 
         options = {'off', 'on', 'toggle'}
         if drc in options:
             if drc == 'toggle':
                 drc = toggle('drc')
-            state['drc'] = drc
+            init.state['drc'] = drc
             set_pipeline()
         else:
             raise OptionsError(options)
-        return state
 
 
-    def drc_set(drc_set, state=state):
+    def drc_set(drc_set):
 
         options = init.drc
         if drc_set in options:
-            state['drc_set'] = drc_set
+            init.state['drc_set'] = drc_set
             set_pipeline()
         else:
             raise OptionsError(options)
-        return state
 
 
-    def phase_eq(phase_eq, state=state):
+    def phase_eq(phase_eq):
 
         options = {'off', 'on', 'toggle'}
         if phase_eq in options:
             if phase_eq == 'toggle':
                 phase_eq = toggle('phase_eq')
-            state['phase_eq'] = phase_eq
+            init.state['phase_eq'] = phase_eq
             set_pipeline()
         else:
             raise OptionsError(options)
-        return state
 
 
-    def channels(channels, state=state):
+    def channels(channels):
         
         options = {'lr', 'l', 'r'}
         if channels in options:
-            state['channels'] = channels
-            state = set_mixer()
+            init.state['channels'] = channels
+            set_mixer()
         else:
             raise OptionsError(options)
-        return state
         
 
-    def channels_flip(channels_flip, state=state):
+    def channels_flip(channels_flip):
         
         options = {'off', 'on', 'toggle'}
         if channels_flip in options:
             if channels_flip == 'toggle':
                 channels_flip = toggle('channels_flip')
-            state['channels_flip'] = channels_flip
-            state = set_mixer()
+            init.state['channels_flip'] = channels_flip
+            set_mixer()
         else:
             raise OptionsError(options)
-        return state
         
 
-    def polarity(polarity, state=state):
+    def polarity(polarity):
         
         options = {'off', 'on', 'toggle'}
         if polarity in options:
             if polarity == 'toggle':
                 polarity = toggle('polarity')
-            state['polarity'] = polarity
-            state = set_mixer()
+            init.state['polarity'] = polarity
+            set_mixer()
         else:
             raise OptionsError(options)
-        return state
         
 
-    def polarity_flip(polarity_flip, state=state):
+    def polarity_flip(polarity_flip):
         
         options = {'off', 'on', 'toggle'}
         if polarity_flip in options:
             if polarity_flip == 'toggle':
                 polarity_flip = toggle('polarity_flip')
-            state['polarity_flip'] = polarity_flip
-            state = set_mixer()
+            init.state['polarity_flip'] = polarity_flip
+            set_mixer()
         else:
             raise OptionsError(options)
-        return state
         
 
-    def stereo(stereo, state=state):
+    def stereo(stereo):
 
         options = {'normal', 'mid', 'side'}
         if stereo in options:
-            state['stereo'] = stereo
-            state = set_mixer()
+            init.state['stereo'] = stereo
+            set_mixer()
         else:
             raise OptionsError(options)
-        return state
 
 
-    def solo(solo, state=state):
+    def solo(solo):
 
         options = {'lr', 'l', 'r'}
         if solo in options:
-            state['solo'] = solo
-            state = set_mixer()
+            init.state['solo'] = solo
+            set_mixer()
         else:
             raise OptionsError(options)
-        return state
     
     
-    def loudness(loudness, state=state):
+    def loudness(loudness):
 
         options = {'off', 'on', 'toggle'}
         if loudness in options:
             if loudness == 'toggle':
                 loudness = toggle('loudness')
-            state['loudness'] = loudness
-            if state['loudness'] == 'off':
+            init.state['loudness'] = loudness
+            if init.state['loudness'] == 'off':
                 cdsp_config['pipeline'][0]['names'] = ["f.volume"]
                 cdsp_config['pipeline'][1]['names'] = ["f.volume"]
             else:
@@ -316,122 +301,114 @@ def proccess_commands(full_command, state=init.state):
                 cdsp_config['pipeline'][1]['names'] = ["f.loudness"]
         else:
             raise OptionsError(options)
-        return state
 
 
-    def loudness_ref(loudness_ref, state=state, add=add):
+    def loudness_ref(loudness_ref, add=add):
 
-        state['loudness_ref'] = (float(loudness_ref)
-                                    + state['loudness_ref'] * add
+        init.state['loudness_ref'] = (float(loudness_ref)
+                                    + init.state['loudness_ref'] * add
                                     )
         # clamp loudness_ref value
-        if abs(state['loudness_ref']) > base.loudness_ref_variation:
-            state['loudness_ref'] = m.copysign(
+        if abs(init.state['loudness_ref']) > base.loudness_ref_variation:
+            init.state['loudness_ref'] = m.copysign(
                                         base.loudness_ref_variation,
-                                        state['loudness_ref']
+                                        init.state['loudness_ref']
                                         )
-            raise ClampWarning(state['loudness_ref'])
+            raise ClampWarning(init.state['loudness_ref'])
         # set loudness reference_level as absolute gain
         cdsp_config['filters']['f.loudness']['parameters']['reference_level']=(
-            pd.calc_gain(state['loudness_ref']))
-        return state
+            pd.calc_gain(init.state['loudness_ref']))
 
 
-    def tones(tones, state=state):
+    def tones(tones):
 
         options = {'off', 'on', 'toggle'}
         if tones in options:
             if tones == 'toggle':
                 tones = toggle('tones')
-            state['tones'] = tones
+            init.state['tones'] = tones
             set_pipeline()
         else:
             raise OptionsError(options)
-        return state
 
 
     # following funtions prepares their corresponding actions to be performed \
     # by the set_gain() function
 
-    def treble(treble, state=state, add=add):
+    def treble(treble, add=add):
 
-        state['treble'] = (float(treble)
-                                + state['treble'] * add)
+        init.state['treble'] = (float(treble)
+                                + init.state['treble'] * add)
         # clamp treble value
-        if m.fabs(state['treble']) > base.tone_variation:
-            state['treble'] = m.copysign(base.tone_variation, state['treble'])
-            raise ClampWarning(state['treble'])
+        if m.fabs(init.state['treble']) > base.tone_variation:
+            init.state['treble'] = m.copysign(base.tone_variation, init.state['treble'])
+            raise ClampWarning(init.state['treble'])
         # set treble
         cdsp_config['filters']['f.treble']['parameters']['gain']=(
-            state['treble']
+            init.state['treble']
             )
-        state = set_gain(gain)
-        return state
+        set_gain(gain)
 
 
-    def bass(bass, state=state, add=add):
+    def bass(bass, add=add):
 
-        state['bass'] = float(bass) + state['bass'] * add
+        init.state['bass'] = float(bass) + init.state['bass'] * add
         # clamp bass value
-        if m.fabs(state['bass']) > base.tone_variation:
-            state['bass'] = m.copysign(base.tone_variation, state['bass'])
-            raise ClampWarning(state['bass'])
+        if m.fabs(init.state['bass']) > base.tone_variation:
+            init.state['bass'] = m.copysign(base.tone_variation, init.state['bass'])
+            raise ClampWarning(init.state['bass'])
         # set bass
         cdsp_config['filters']['f.bass']['parameters']['gain']=(
-            state['bass']
+            init.state['bass']
             )
-        state = set_gain(gain)
-        return state
+        set_gain(gain)
 
 
-    def eq(eq, state=state):
+    def eq(eq):
 
         options = {'off', 'on', 'toggle'}
         if eq in options:
             if eq == 'toggle':
                 eq = toggle('eq')
-            state['eq'] = eq
+            init.state['eq'] = eq
             set_pipeline()
         else:
             raise OptionsError(options)
-        return state
 
 
-    def eq_filter(eq_filter, state=state):
+    def eq_filter(eq_filter):
 
         options = init.eq
         if eq_filter in options:
-            state['eq_filter'] = eq_filter
+            init.state['eq_filter'] = eq_filter
             set_pipeline()
         else:
             raise OptionsError(options)
-        return state
 
 
-    def balance(balance, state=state, add=add):
+    def balance(balance, add=add):
 
-        state['balance'] = (float(balance)
-                                + state['balance'] * add)
+        init.state['balance'] = (float(balance)
+                                + init.state['balance'] * add)
         # clamp balance value
         # 'balance' means deviation from 0 in R channel
         # deviation of the L channel then goes symmetrical
-        if m.fabs(state['balance']) > base.balance_variation:
-            state['balance'] = m.copysign(
+        if m.fabs(init.state['balance']) > base.balance_variation:
+            init.state['balance'] = m.copysign(
                                     base.balance_variation,
-                                    state['balance']
+                                    init.state['balance']
                                     )
-            raise ClampWarning(state['balance'])
+            raise ClampWarning(init.state['balance'])
         # add balance dB gains
-        atten_dB_r = state['balance']
-        atten_dB_l = - (state['balance'])
+        atten_dB_r = init.state['balance']
+        atten_dB_l = - (init.state['balance'])
         cdsp_config['filters']['f.balance.L']['parameters']['gain']=(
             atten_dB_l
             )
         cdsp_config['filters']['f.balance.R']['parameters']['gain']=(
             atten_dB_r
             )
-        state = set_gain(gain)
-        return state
+        set_gain(gain)
 
 
     ## following funtions perform actual backend adjustments
@@ -439,46 +416,46 @@ def proccess_commands(full_command, state=init.state):
     def set_pipeline():
 
         pipeline_common = []
-        if state['tones'] == 'on':
+        if init.state['tones'] == 'on':
             pipeline_common.extend(['f.bass','f.treble'])
-        if state['phase_eq'] == 'on':
+        if init.state['phase_eq'] == 'on':
             pipeline_common.append('f.phase_eq')
-        if state['eq'] == 'on':
-            pipeline_common.extend(init.eq[state['eq_filter']]['pipeline'])
+        if init.state['eq'] == 'on':
+            pipeline_common.extend(init.eq[init.state['eq_filter']]['pipeline'])
         
         pipeline = [['f.balance.L'],['f.balance.R']]
         for channel in range(2):
             pipeline[channel].extend(pipeline_common)
-            if state['drc'] == 'on':
-                drc_channels = (init.drc[state['drc_set']]['channels'])
+            if init.state['drc'] == 'on':
+                drc_channels = (init.drc[init.state['drc_set']]['channels'])
                 pipeline[channel].extend(drc_channels[channel]['pipeline'])
 
         cdsp_config['pipeline'][3]['names'] = pipeline[0]
         cdsp_config['pipeline'][4]['names'] = pipeline[1]
 
 
-    def set_mixer(state=state):
+    def set_mixer():
     
         mixer = np.identity(2)
         
-        if state['channels_flip'] == 'on':
+        if init.state['channels_flip'] == 'on':
             mixer = np.array([[0,1],[1,0]])
 
-        match state['channels']:
+        match init.state['channels']:
             case 'l':       mixer = mixer @ np.array([[1,1],[0,0]])
             case 'r':       mixer = mixer @ np.array([[0,0],[1,1]])
 
-        match state['stereo']:
+        match init.state['stereo']:
             case 'mid':     mixer = mixer @ np.array([[0.5,0.5],[0.5,0.5]])
             case 'side':    mixer = mixer @ np.array([[0.5,0.5],[-0.5,-0.5]])
 
-        if state['polarity'] == 'on':
+        if init.state['polarity'] == 'on':
             mixer = mixer @ np.array([[-1,0],[0,-1]])
 
-        if state['polarity_flip'] == 'on':
+        if init.state['polarity_flip'] == 'on':
             mixer = mixer @ np.array([[1,0],[0,-1]])
 
-        match state['solo']:
+        match init.state['solo']:
             case 'l':       mixer = mixer * np.array([[1,0],[1,0]])
             case 'r':       mixer = mixer * np.array([[0,1],[0,1]])
 
@@ -517,7 +494,7 @@ def proccess_commands(full_command, state=init.state):
             print(f'mixer matrix : \n{mixer}\n')
     
 
-    def set_gain(gain, state=state):
+    def set_gain(gain):
         """set_gain, aka 'the volume machine' :-)"""
 
         # gain command send its str argument directly
@@ -531,20 +508,19 @@ def proccess_commands(full_command, state=init.state):
             print(f'min. gain must be more than {base.gain_min} dB')
             print('gain clamped')
         # calculate headroom
-        headroom = pd.calc_headroom(gain, state)
+        headroom = pd.calc_headroom(gain)
         # adds source gain. It can lead to clipping \
         # because assumes equal dynamic range between sources
-        real_gain = gain + pd.calc_source_gain(state['source'])
+        real_gain = gain + pd.calc_source_gain(init.state['source'])
         # if enough headroom commit changes
-        # since there is no state['gain'] we set state['level']
+        # since there is no init.state['gain'] we set init.state['level']
         if headroom >= 0:
             cdsp.set_volume(real_gain)
-            state['level'] = pd.calc_level(gain)
+            init.state['level'] = pd.calc_level(gain)
         # if not enough headroom tries lowering gain
         else:
             set_gain(gain + headroom)
             print('headroom hit, lowering gain...')
-        return state
 
 
     ## parse  commands and select corresponding actions
@@ -552,13 +528,13 @@ def proccess_commands(full_command, state=init.state):
     try:
         if command in {'show'}:
             # commands without options
-            state = {
+                {
                 'show':             show            #
                 }[command]()
 
         elif command in {'mute', 'level', 'gain'}:
             # commands that do not depend on camilladsp
-            state = do_command(
+            do_command(
                 {
                 'mute':             mute,           #['off','on','toggle']
                 'level':            level,          #[level] add
@@ -567,7 +543,7 @@ def proccess_commands(full_command, state=init.state):
 
         else:
             # commands that depend on camilladsp
-            state = do_command(
+            do_command(
                 {
                 'sources':          sources,        #['off','on','toggle']
                 'source':           source,         #[source]
@@ -599,8 +575,5 @@ def proccess_commands(full_command, state=init.state):
         print(f"Unknown command '{command}'")
     # except Exception as e:
     #     print(f"Problems in command '{command}': ", e)
-
-    # return a dictionary of predic state
-    return (state)
 
 # end of proccess_commands()

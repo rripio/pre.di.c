@@ -227,15 +227,15 @@ def calc_level(gain):
     return level
 
 
-def calc_headroom(gain, state):
+def calc_headroom(gain):
     """calculates headroom from gain and equalizer"""
 
-    tones = {'off': 0, 'on': 1}[state['tones']]
+    tones = {'off': 0, 'on': 1}[init.state['tones']]
     headroom = (base.gain_max
                 - gain
-                - np.clip(state['bass'], 0 , None) * tones
-                - np.clip(state['treble'], 0 , None) * tones
-                - abs(state['balance'])
+                - np.clip(init.state['bass'], 0 , None) * tones
+                - np.clip(init.state['treble'], 0 , None) * tones
+                - abs(init.state['balance'])
                 )
     return headroom
 
@@ -245,12 +245,12 @@ def calc_source_gain(source):
     return init.sources[source]['gain']
 
 
-def show(throw_it=None, state=init.state):
+def show(throw_it=None):
     """shows a status report"""
 
-    source_gain = calc_source_gain(state['source'])
-    gain = calc_gain(state['level']) + source_gain
-    headroom = calc_headroom(gain, state)
+    source_gain = calc_source_gain(init.state['source'])
+    gain = calc_gain(init.state['level']) + source_gain
+    headroom = calc_headroom(gain)
     source_headroom = headroom - source_gain
 
     print()
@@ -260,35 +260,35 @@ def show(throw_it=None, state=init.state):
     print(f"Reference level     {init.speaker['ref_level_gain']: 10.1f}")
 
     print()
-    print(f"Mute                {state['mute']:>10s}")
-    print(f"Level               {state['level']: 10.1f}")
-    print(f"Balance             {state['balance']: 10.1f}")
+    print(f"Mute                {init.state['mute']:>10s}")
+    print(f"Level               {init.state['level']: 10.1f}")
+    print(f"Balance             {init.state['balance']: 10.1f}")
 
     print()
-    print(f"Channels            {state['channels']:>10s}")
-    print(f"Channels flip       {state['channels_flip']:>10s}")
-    print(f"Polarity            {state['polarity']:>10s}")
-    print(f"Polarity flip       {state['polarity_flip']:>10s}")
-    print(f"Stereo              {state['stereo']:>10s}")
-    print(f"Solo                {state['solo']:>10s}")
+    print(f"Channels            {init.state['channels']:>10s}")
+    print(f"Channels flip       {init.state['channels_flip']:>10s}")
+    print(f"Polarity            {init.state['polarity']:>10s}")
+    print(f"Polarity flip       {init.state['polarity_flip']:>10s}")
+    print(f"Stereo              {init.state['stereo']:>10s}")
+    print(f"Solo                {init.state['solo']:>10s}")
 
     print()
-    print(f"Tones               {state['tones']:>10s}")
-    print(f"Bass                {state['bass']: 10.1f}")
-    print(f"Treble              {state['treble']: 10.1f}")
-    print(f"Loudness            {state['loudness']:>10s}")
-    print(f"Loudness reference  {state['loudness_ref']: 10.1f}")
+    print(f"Tones               {init.state['tones']:>10s}")
+    print(f"Bass                {init.state['bass']: 10.1f}")
+    print(f"Treble              {init.state['treble']: 10.1f}")
+    print(f"Loudness            {init.state['loudness']:>10s}")
+    print(f"Loudness reference  {init.state['loudness_ref']: 10.1f}")
 
     print()
-    print(f"DRC                 {state['drc']:>10s}")
-    print(f"DRC set             {state['drc_set']:>10s}")
-    print(f"Phase equalizer     {state['phase_eq']:>10s}")
-    print(f"EQ                  {state['eq']:>10s}")
-    print(f"EQ filter           {state['eq_filter']:>10s}")
+    print(f"DRC                 {init.state['drc']:>10s}")
+    print(f"DRC set             {init.state['drc_set']:>10s}")
+    print(f"Phase equalizer     {init.state['phase_eq']:>10s}")
+    print(f"EQ                  {init.state['eq']:>10s}")
+    print(f"EQ filter           {init.state['eq_filter']:>10s}")
 
     print()
-    print(f"Sources             {state['sources']:>10s}")
-    print(f"Source              {state['source']:>10s}")
+    print(f"Sources             {init.state['sources']:>10s}")
+    print(f"Source              {init.state['source']:>10s}")
     print(f'Source gain         {source_gain: 10.1f}')
     print(f'Source headroom     {source_headroom: 10.1f}')
 
@@ -298,12 +298,10 @@ def show(throw_it=None, state=init.state):
 
     print('\n')
 
-    return state
 
-def show_file(throw_it=None, state=init.state):
+def show_file(throw_it=None):
     """writes a status report to temp file"""
 
     with open('/tmp/predic', 'w') as f:
         with cl.redirect_stdout(f):
-            state = show()
-    return state
+            show()

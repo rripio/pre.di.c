@@ -103,7 +103,7 @@ def set_initial_state():
     state = init.state
     if init.config['use_state_init']:
         for setting in init.state_init:
-            state[setting] = state_init[setting]
+            state[setting] = init.state_init[setting]
     return state
 
 
