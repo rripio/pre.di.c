@@ -24,8 +24,10 @@ import init
 
 # used on startaudio.py and stopaudio.py
 def read_clients(phase):
-    """reads list of programs to start/stop from config/clients.yml file
-    phase: <'start'|'stop'> phase of client activation or deactivation"""
+    """
+    reads list of programs to start/stop from config/clients.yml file
+    phase: <'start'|'stop'> phase of client activation or deactivation
+    """
 
     clients_list_path = init.clients_path
 
@@ -40,7 +42,9 @@ def read_clients(phase):
 
 
 def client_socket(data, quiet=True):
-    """makes a socket for talking to the server"""
+    """
+    makes a socket for talking to the server
+    """
 
     # avoid void command to reach server and get processed due to encoding
     if data == '':
@@ -73,16 +77,17 @@ def client_socket(data, quiet=True):
 
 
 def read_state():
-    """retrieve state dictionary from file.
-    to be used by clients"""
-    # """retrieve state dictionary from server
-    # to be used by clients"""
+    """
+    retrieve state dictionary from server to be used by clients
+    """
 
     return yaml.safe_load(client_socket('status').decode().replace('OK\n', ''))
 
 
 def wait4result(command, answer, tmax=5, interval=0.1):
-    """looks for chain "answer" in "command" output"""
+    """
+    looks for chain "answer" in "command" output
+    """
 
     time_start = time.time()
 
@@ -117,7 +122,9 @@ def wait4result(command, answer, tmax=5, interval=0.1):
 
 
 def wait4source(source, tmax=5, interval=0.1):
-    """wait for source jack ports to be up"""
+    """
+    wait for source jack ports to be up
+    """
 
     source_ports = init.sources[source]['source_ports']
     if wait4ports(source_ports, tmax, interval):
@@ -127,7 +134,9 @@ def wait4source(source, tmax=5, interval=0.1):
 
 
 def wait4ports(ports, tmax=5, interval=0.1):
-    """wait for jack ports to be up"""
+    """
+    wait for jack ports to be up
+    """
     
     time_start = time.time()
     jc = jack.Client('tmp')
@@ -153,7 +162,10 @@ def wait4ports(ports, tmax=5, interval=0.1):
 
 
 def jack_loop(clientname):
-    """creates a jack loop with given 'clientname'"""
+    """
+    creates a jack loop with given 'clientname'
+    """
+    
     # CREDITS:
     # https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
 
@@ -212,23 +224,32 @@ def jack_loop(clientname):
 
 def gain_dB(x):
     return 20 * m.log10(x)
-    """calculates gain in dB from gain multiplier"""
+    """
+    calculates gain in dB from gain multiplier
+    """
 
 def calc_gain(level):
-    """calculates gain from level and reference gain"""
+    """
+    calculates gain from level and reference gain
+    """
 
     gain = level + init.speaker['ref_level_gain']
     return gain
 
 
 def calc_level(gain):
+    """
+    calculates level from gain and reference gain
+    """
 
     level = gain - init.speaker['ref_level_gain']
     return level
 
 
 def calc_headroom(gain):
-    """calculates headroom from gain and equalizer"""
+    """
+    calculates headroom from gain and equalizer
+    """
 
     tones = {'off': 0, 'on': 1}[init.state['tones']]
     headroom = (base.gain_max
@@ -241,12 +262,17 @@ def calc_headroom(gain):
 
 
 def calc_source_gain(source):
+    """
+    retrieves source gain shift
+    """
 
     return init.sources[source]['gain']
 
 
 def show(throw_it=None):
-    """shows a status report"""
+    """
+    shows a status report
+    """
 
     source_gain = calc_source_gain(init.state['source'])
     gain = calc_gain(init.state['level']) + source_gain
@@ -300,7 +326,9 @@ def show(throw_it=None):
 
 
 def show_file(throw_it=None):
-    """writes a status report to temp file"""
+    """
+    writes a status report to temp file
+    """
 
     with open('/tmp/predic', 'w') as f:
         with cl.redirect_stdout(f):

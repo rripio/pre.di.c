@@ -27,7 +27,9 @@ fnull = open(os.devnull, 'w')
 
 
 def main(run_level):
-    """main stop function"""
+    """
+    main stop function
+    """
 
     if run_level in {'clients', 'all'}:
         # stop external scripts, sources and clients

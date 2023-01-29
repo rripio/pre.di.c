@@ -19,7 +19,9 @@ async def handle_commands(reader, writer):
     addr = writer.get_extra_info('peername')
 
     def write_state():
-        """writes state to state file"""
+        """
+        writes state to state file
+        """
 
         with open(init.state_path, 'w') as f:
             if init.state != None:

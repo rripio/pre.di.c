@@ -27,14 +27,18 @@ import pdlib as pd
 
 
 def stop_all():
-    """ stops all audio and the current script """
+    """
+    stops all audio and the current script
+    """
 
     stopaudio.main('all')
     sys.exit()
 
 
 def init_jack():
-    """loads jack server"""
+    """
+    loads jack server
+    """
 
     print('\n(startaudio) starting jack\n')
     jack = sp.Popen(
@@ -51,7 +55,9 @@ def init_jack():
 
 
 def init_camilladsp():
-    """loads camilladsp"""
+    """
+    loads camilladsp
+    """
     
     # cd to louspeaker folder so filter paths are relative to this \
     # folder in speaker.yml config file
@@ -76,7 +82,9 @@ def init_camilladsp():
     
     
 def init_server():
-    """loads server"""
+    """
+    loads server
+    """
 
     print('\n(startaudio) starting server\n')
     try:
@@ -98,7 +106,9 @@ def init_server():
 
 
 def set_initial_state():
-    """set initial state state as last saved or user determined"""
+    """
+    set initial state state as last saved or user determined
+    """
 
     state = init.state
     if init.config['use_state_init']:
@@ -108,8 +118,10 @@ def set_initial_state():
 
 
 def init_state_settings(state):
-    """restore audio settings as stored in state.yaml except source, 
-and takes care of options to reset some of them"""
+    """
+    restore audio settings as stored in state.yaml except source, 
+    and takes care of options to reset some of them
+    """
 
     # it is assumed that command name and setting name are the same
     #
@@ -141,7 +153,9 @@ and takes care of options to reset some of them"""
 
 
 def init_source(state):
-    """restore selected source as stored in state.yml"""
+    """
+    restore selected source as stored in state.yml
+    """
 
     source = state['source']
     print(f'\n(startaudio) restoring source: {source}')
@@ -161,7 +175,9 @@ def init_source(state):
 
 
 def main(run_level):
-    """main loading function"""
+    """
+    main loading function
+    """
 
     # jack, brutefir, camilladsp, server
     if run_level in {'core', 'all'}:

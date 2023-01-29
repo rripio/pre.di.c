@@ -12,7 +12,9 @@ import baseconfig as base
 
 
 def get_yaml(filepath):
-    """returns dictionary from yaml config file"""
+    """
+    returns dictionary from yaml config file
+    """
 
     with open(filepath) as configfile:
         config_dict = yaml.safe_load(configfile)

@@ -36,7 +36,9 @@ cdsp_config['pipeline'].extend(init.speaker['pipeline'])
 
 
 class OptionsError(Exception):
-    """exception for options revealing"""
+    """
+    exception for options revealing
+    """
     
     def __init__(self, options):
         self.options = options
@@ -47,9 +49,10 @@ class ClampWarning(Warning):
         self.clamp_value = clamp_value
 
 
-# main function for command proccessing
 def proccess_commands(full_command):
-    """proccesses commands for predic control"""
+    """
+    procces commands for predic control
+    """
 
     # let camilladsp connection be visible
     global cdsp
@@ -79,7 +82,9 @@ def proccess_commands(full_command):
     ## auxiliary functions
 
     def disconnect_sources(jack_client):
-        """disconnect sources from predic audio ports"""
+        """
+        disconnect sources from predic audio ports
+        """
 
         for port_group in init.config['audio_ports']:
             for port in port_group:
@@ -89,7 +94,9 @@ def proccess_commands(full_command):
 
     
     def toggle(command):
-        """changes state of on/off commands"""
+        """
+        changes state of on/off commands
+        """
         
         return {'off': 'on', 'on': 'off'}[init.state[command]]
     
@@ -113,12 +120,17 @@ def proccess_commands(full_command):
     ## internal functions for actions
 
     def show():
-        """show status in a readable way"""
+        """
+        show status in a readable way
+        """
         
         pd.show_file()
 
 
     def mute(mute):
+        """
+        mute output
+        """
 
         options = {'off', 'on', 'toggle'}
         if mute in options:
@@ -135,6 +147,9 @@ def proccess_commands(full_command):
 
 
     def level(level, add=add):
+        """
+        change level (gain relative to reference_level)
+        """
 
         # level clamp is comissioned to set_gain()
         init.state['level'] = (float(level) + init.state['level'] * add)
@@ -143,6 +158,9 @@ def proccess_commands(full_command):
 
 
     def sources(sources):
+        """
+        toggle connection of sources
+        """
 
         options = {'off', 'on', 'toggle'}
         if sources in options:
@@ -161,6 +179,9 @@ def proccess_commands(full_command):
 
 
     def source(source):
+        """
+        change source
+        """
 
         options = init.sources
         if source in options:
@@ -187,6 +208,9 @@ def proccess_commands(full_command):
 
 
     def drc(drc):
+        """
+        toggle drc
+        """
 
         options = {'off', 'on', 'toggle'}
         if drc in options:
@@ -199,6 +223,9 @@ def proccess_commands(full_command):
 
 
     def drc_set(drc_set):
+        """
+        change drc filters
+        """
 
         options = init.drc
         if drc_set in options:
@@ -209,6 +236,9 @@ def proccess_commands(full_command):
 
 
     def phase_eq(phase_eq):
+        """
+        toggle phase equalizer
+        """
 
         options = {'off', 'on', 'toggle'}
         if phase_eq in options:
@@ -221,6 +251,9 @@ def proccess_commands(full_command):
 
 
     def channels(channels):
+        """
+        select input channels (mixed to both output channels)
+        """
         
         options = {'lr', 'l', 'r'}
         if channels in options:
@@ -231,6 +264,9 @@ def proccess_commands(full_command):
         
 
     def channels_flip(channels_flip):
+        """
+        toggle channels flip
+        """
         
         options = {'off', 'on', 'toggle'}
         if channels_flip in options:
@@ -243,6 +279,9 @@ def proccess_commands(full_command):
         
 
     def polarity(polarity):
+        """
+        toggle polarity inversion
+        """
         
         options = {'off', 'on', 'toggle'}
         if polarity in options:
@@ -255,6 +294,9 @@ def proccess_commands(full_command):
         
 
     def polarity_flip(polarity_flip):
+        """
+        toggle polarity flip (change polarity in one channel only)
+        """
         
         options = {'off', 'on', 'toggle'}
         if polarity_flip in options:
@@ -267,6 +309,9 @@ def proccess_commands(full_command):
         
 
     def stereo(stereo):
+        """
+        change mix to normal stereo, mono, or midside side
+        """
 
         options = {'normal', 'mid', 'side'}
         if stereo in options:
@@ -277,6 +322,9 @@ def proccess_commands(full_command):
 
 
     def solo(solo):
+        """
+        isolate output channels
+        """
 
         options = {'lr', 'l', 'r'}
         if solo in options:
@@ -287,6 +335,9 @@ def proccess_commands(full_command):
     
     
     def loudness(loudness):
+        """
+        toggle loudness
+        """
 
         options = {'off', 'on', 'toggle'}
         if loudness in options:
@@ -304,6 +355,9 @@ def proccess_commands(full_command):
 
 
     def loudness_ref(loudness_ref, add=add):
+        """
+        select loudness reference level (correction threshold level)
+        """
 
         init.state['loudness_ref'] = (float(loudness_ref)
                                     + init.state['loudness_ref'] * add
@@ -321,6 +375,9 @@ def proccess_commands(full_command):
 
 
     def tones(tones):
+        """
+        toggle tone controls
+        """
 
         options = {'off', 'on', 'toggle'}
         if tones in options:
@@ -336,6 +393,9 @@ def proccess_commands(full_command):
     # by the set_gain() function
 
     def treble(treble, add=add):
+        """
+        select treble level correction
+        """
 
         init.state['treble'] = (float(treble)
                                 + init.state['treble'] * add)
@@ -351,6 +411,9 @@ def proccess_commands(full_command):
 
 
     def bass(bass, add=add):
+        """
+        select bass level correction
+        """
 
         init.state['bass'] = float(bass) + init.state['bass'] * add
         # clamp bass value
@@ -365,6 +428,9 @@ def proccess_commands(full_command):
 
 
     def eq(eq):
+        """
+        toggle general equalizer (not linked to a particular speaker)
+        """
 
         options = {'off', 'on', 'toggle'}
         if eq in options:
@@ -377,6 +443,9 @@ def proccess_commands(full_command):
 
 
     def eq_filter(eq_filter):
+        """
+        select general equalizer filter
+        """
 
         options = init.eq
         if eq_filter in options:
@@ -387,12 +456,15 @@ def proccess_commands(full_command):
 
 
     def balance(balance, add=add):
+        """
+        select balance level
+        'balance' means deviation from 0 in R channel
+        deviation of the L channel then goes symmetrical
+        """
 
         init.state['balance'] = (float(balance)
                                 + init.state['balance'] * add)
         # clamp balance value
-        # 'balance' means deviation from 0 in R channel
-        # deviation of the L channel then goes symmetrical
         if m.fabs(init.state['balance']) > base.balance_variation:
             init.state['balance'] = m.copysign(
                                     base.balance_variation,
@@ -414,6 +486,9 @@ def proccess_commands(full_command):
     ## following funtions perform actual backend adjustments
 
     def set_pipeline():
+        """
+        set camilladsp pipeline from state settings
+        """
 
         pipeline_common = []
         if init.state['tones'] == 'on':
@@ -435,6 +510,9 @@ def proccess_commands(full_command):
 
 
     def set_mixer():
+        """
+        set general mixer in camilladsp from state settings
+        """
     
         mixer = np.identity(2)
         
@@ -495,7 +573,11 @@ def proccess_commands(full_command):
     
 
     def set_gain(gain):
-        """set_gain, aka 'the volume machine' :-)"""
+        """
+        set_gain, aka 'the volume machine' :-)
+        gain is calculated from level and clamped to avoid positive gain \
+        considering balance, tones and source gain shift
+        """
 
         # gain command send its str argument directly
         gain = float(gain)
