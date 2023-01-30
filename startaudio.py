@@ -71,7 +71,7 @@ def init_camilladsp():
 
     # waiting for camilladsp
     # test for input jack ports to be up
-    tmax = init.config['command_delay'] * 5
+    tmax = init.config['command_delay'] * 10
     interval = init.config['command_delay'] * 0.1
     ports = ['cpal_client_in:in_0', 'cpal_client_in:in_1']
     if pd.wait4ports(ports, tmax, interval):
