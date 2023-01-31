@@ -6,7 +6,9 @@ then
         STR="$STR $ARG"
     done
     echo $STR | nc 127.0.0.1 9999
-#    echo $STR | nc 127.0.0.1 9999 | > /dev/null
+    echo
 else
+    echo
     echo "Usage: ${0##*/} command [options]"
+    echo
 fi
