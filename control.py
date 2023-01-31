@@ -130,9 +130,6 @@ def level(level):
     """
     change level (gain relative to reference_level)
     """
-    # let flag add be accessible
-    global add
-    
     # level clamp is comissioned to set_gain()
     init.state['level'] = (float(level) + init.state['level'] * add)
     gain = pd.calc_gain(init.state['level'])
@@ -341,9 +338,6 @@ def loudness_ref(loudness_ref):
     select loudness reference level (correction threshold level)
     """
 
-    # let flag 'add' be accessible
-    global add
-    
     init.state['loudness_ref'] = (float(loudness_ref)
                                 + init.state['loudness_ref'] * add
                                 )
@@ -382,9 +376,6 @@ def treble(treble):
     select treble level correction
     """
 
-    # let flag 'add' be accessible
-    global add
-    
     init.state['treble'] = (float(treble)
                             + init.state['treble'] * add)
     # clamp treble value
@@ -403,9 +394,6 @@ def bass(bass):
     select bass level correction
     """
 
-    # let flag 'add' be accessible
-    global add
-    
     init.state['bass'] = float(bass) + init.state['bass'] * add
     # clamp bass value
     if m.fabs(init.state['bass']) > base.tone_variation:
@@ -453,9 +441,6 @@ def balance(balance):
     deviation of the L channel then goes symmetrical
     """
 
-    # let flag 'add' be accessible
-    global add
-    
     init.state['balance'] = (float(balance)
                             + init.state['balance'] * add)
     # clamp balance value
