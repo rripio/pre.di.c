@@ -145,7 +145,6 @@ def init_state_settings(state):
             'polarity',
             'polarity_flip',
             'solo',
-            'sources',
             'stereo',
             'tones',
             'treble'
