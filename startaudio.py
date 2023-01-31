@@ -99,7 +99,9 @@ def init_server():
     if pd.wait4result(
             'echo ping| nc localhost 9999 2>/dev/null',
             'OK', tmax, interval):
-        print('\n(startaudio) server started :-)')
+        # a linefeed is added at some unknown place, \
+        # so we provisionally take it out here
+        print('(startaudio) server started :-)')
     else:
         print('\n(startaudio) server not accesible Bye :-/')
         stop_all()
