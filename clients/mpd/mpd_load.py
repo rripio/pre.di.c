@@ -125,7 +125,7 @@ def start():
             mpd_client.seek(song, elapsed)
         mpd_client.close()
     except:
-        print('(mpd_load.py) problems with mpd ping routine')
+        print('\n(mpd_load.py) problems with mpd ping routine')
 
     # volume linked to mpd (optional)
     if mpd_conf['volume_linked']:
@@ -133,12 +133,12 @@ def start():
             mpdloop = mp.Process( target = mpd_vol_loop )
             mpdloop.start()
         except:
-            print('(mpd_load.py) mpd socket loop broke')
+            print('\n(mpd_load.py) mpd socket loop broke')
         try:
             predicloop = mp.Process( target = predic_vol_loop )
             predicloop.start()
         except:
-            print('(mpd_load.py) predic socket loop broke')
+            print('\n(mpd_load.py) predic socket loop broke')
 
 
 def stop():
@@ -157,6 +157,6 @@ if sys.argv[1:]:
             'stop'  : stop
             }[sys.argv[1]]()
     except KeyError:
-        print('mpd_load.py: bad option')
+        print('\n(mpd_load.py) bad option')
 else:
     print(__doc__)
