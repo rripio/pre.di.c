@@ -31,6 +31,7 @@ def start():
 
     # starts mplayer DVB:
     command = f'{config["start_command"]} -input file={dvb_fifo}'
+    print('\n(DVB_load.py) starting DVB')
     sp.Popen(command.split())
     if config["play_on_start"]:
         sp.Popen(
@@ -53,7 +54,7 @@ if sys.argv[1:]:
             'stop'  : stop
             }[sys.argv[1]]()
     except KeyError:
-        print('DVB.py: bad option')
+        print('\n(DVB_load.py) bad option')
 else:
     print(__doc__)
 

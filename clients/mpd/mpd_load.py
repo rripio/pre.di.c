@@ -84,14 +84,14 @@ def start():
     """loads mpd"""
 
     # starts MPD
-    print('(mpd_load.py) starting mpd')
+    print('\n(mpd_load.py) starting mpd')
     sp.Popen(mpd_conf["start_command"].split())
     if pd.wait4result(
             f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
             'OK MPD'):
-        print('(mpd_load.py) mpd started :-)')
+        print('\n(mpd_load.py) mpd started :-)')
     else:
-        print('(mpd_load.py) mpd loading failed')
+        print('\n(mpd_load.py) mpd loading failed')
         return
 
     # ping mpd to create jack ports

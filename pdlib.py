@@ -57,23 +57,23 @@ def client_socket(data, quiet=True):
 
         try:
             if not quiet:
-                print(f'Connecting to {server}, port {str(port)}...')
+                print(f'\n(lib) Connecting to {server}, port {str(port)}...')
             s.connect((server,port))
         except socket.gaierror as e:
-            print(f'Address-related error connecting to server: {e}')
+            print(f'\n(lib) Address-related error connecting to server: {e}')
             sys.exit(-1)
         except socket.error as e:
-            print(f'Connection error: {e}')
+            print(f'\n(lib) Connection error: {e}')
             sys.exit(-1)
         if not quiet:
-            print('Connected')
+            print('\n(lib) Connected')
         try:
             # if a parameter is passed it is send to server
             s.send(data.encode())
             # return raw bytes server answer
             return s.recv(2048)
         except Exception:
-            print(f'(client) unexpected error: {sys.exc_info()[0]}')
+            print(f'\n(lib) unexpected error: {sys.exc_info()[0]}')
 
 
 def read_state():
@@ -104,7 +104,7 @@ def wait4result(command, answer, tmax=5, interval=0.1):
                     command, shell=True, universal_newlines=True, **output):
                 if init.config['verbose'] in {1, 2}:
                     print(
-                        f'\nfound string "{answer}" in output of '
+                        f'\n(lib) found string "{answer}" in output of '
                         f'command: {command}'
                         )
                 return True
@@ -115,7 +115,7 @@ def wait4result(command, answer, tmax=5, interval=0.1):
     else:
         if init.config['verbose'] in {1, 2}:
             print(
-                f'\ntime out >{tmax}s waiting for string "{answer}"'
+                f'\n(lib) time out >{tmax}s waiting for string "{answer}"'
                 f' in output of command: {command}'
                 )
         return False
@@ -174,7 +174,7 @@ def jack_loop(clientname):
 
     if client.status.name_not_unique:
         client.close()
-        print( f'(predic.jack_loop) \'{clientname}\''
+        print( f'\n(lib) \'{clientname}\''
                             'already exists in JACK, nothing done.' )
         return
 
@@ -194,9 +194,9 @@ def jack_loop(clientname):
     # 'whith client' will break.
     @client.set_shutdown_callback
     def shutdown(status, reason):
-        print('(predic.jack_loop) JACK shutdown!')
-        print('(predic.jack_loop) JACK status:', status)
-        print('(predic.jack_loop) JACK reason:', reason)
+        print('\n(lib) JACK shutdown!')
+        print('(lib) JACK status:', status)
+        print('(lib) JACK reason:', reason)
         # this triggers an event so that the below 'with client' \
         # will terminate
         event.set()
@@ -213,13 +213,13 @@ def jack_loop(clientname):
         # this tells the JACK server that we are ready to roll
         # our above process() callback will start running now
 
-        print( f'(predic.jack_loop) running {clientname}' )
+        print( f'\n(lib) running {clientname}' )
         try:
             event.wait()
         except KeyboardInterrupt:
-            print('\n(predic.jack_loop) Interrupted by user')
+            print('\n(lib) Interrupted by user')
         except Exception as e:
-            print('\n(predic.jack_loop)  Terminated: ', e)
+            print('\n(lib) Terminated: ', e)
 
 
 def gain_dB(x):

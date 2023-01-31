@@ -59,7 +59,7 @@ try:
     drc = get_yaml(loudspeaker_path + '/' + base.drc_filename)
 
 except Exception as e:
-   print(f'\nError getting configurations: {e}')
+   print(f'\n(init) Error getting configurations: {e}')
    sys.exit()
 
 

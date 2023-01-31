@@ -27,7 +27,7 @@ async def handle_commands(reader, writer):
             if init.state != None:
                 yaml.dump(init.state, f, default_flow_style=False)
             else:
-                print('(server) corrupted null state')
+                print('\n(server) corrupted null state')
 
 
     try:
@@ -37,7 +37,7 @@ async def handle_commands(reader, writer):
             writer.write(b'OK\n')
             await writer.drain()
             if init.config['verbose'] == 2:
-                print('(server) closing connection...')
+                print('\n(server) closing connection...')
 
         elif data.rstrip('\r\n') == 'save':
             # writes state to state file
@@ -45,14 +45,14 @@ async def handle_commands(reader, writer):
             writer.write(b'OK\n')
             await writer.drain()
             if init.config['verbose'] == 2:
-                print('(server) closing connection...')
+                print('\n(server) closing connection...')
 
         elif data.rstrip('\r\n') == 'ping':
             # just answers OK
             writer.write(b'OK\n')
             await writer.drain()
             if init.config['verbose'] == 2:
-                print('(server) closing connection...')
+                print('\n(server) closing connection...')
 
         else:
             # command received in 'data', \
@@ -63,9 +63,9 @@ async def handle_commands(reader, writer):
             # when the terminal that launched startaudio.py is closed
             try:
                 if init.config['verbose'] in [1, 2]:
-                    print(f'Command: {data}')
+                    print(f'\n(server) Command: {data}')
             except Exception as e:
-                print(f'(server) Exception: {e}')
+                print(f'\n(server) Exception: {e}')
 
             try:
                 # writes state file
@@ -73,9 +73,9 @@ async def handle_commands(reader, writer):
                 writer.write(b'OK\n')
                 await writer.drain()
             except Exception as e:
-                print('(server) An error occurred when writing state file: ', e)
+                print('\n(server) An error occurred when writing state file: ', e)
     except ConnectionResetError:
-        print('(server) still no connection...')
+        print('\n(server) still no connection...')
     # except Exception as e:
     #     print('(server) An exception occurred: ', e)
     finally:
@@ -91,7 +91,7 @@ async def main():
                 )
     addr = server.sockets[0].getsockname()
     if init.config['verbose'] in [1, 2]:
-        print(f'(server) listening on address {addr}')
+        print(f'\n(server) listening on address {addr}')
     await server.serve_forever()
 
 
