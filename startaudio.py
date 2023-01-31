@@ -129,25 +129,26 @@ def init_state_settings(state):
     # because init_source function is executed after this one
 
     for setting in (
-            'drc',
-            'drc_set',
-            'phase_eq',
+            'balance',
+            'bass',
             'channels',
             'channels_flip',
-            'polarity',
-            'polarity_flip',
-            'stereo',
-            'solo',
-            'mute',
-            'loudness',
-            'loudness_ref',
-            'tones',
-            'treble',
-            'bass',
+            'drc',
+            'drc_set',
             'eq',
             'eq_filter',
-            'balance',
-            'level'
+            'level',
+            'loudness',
+            'loudness_ref',
+            'mute',
+            'phase_eq',
+            'polarity',
+            'polarity_flip',
+            'solo',
+            'sources',
+            'stereo',
+            'tones',
+            'treble'
             ):
         pd.client_socket(f'{setting} {state[setting]}')
 
