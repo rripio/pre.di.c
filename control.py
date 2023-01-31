@@ -52,7 +52,8 @@ class ClampWarning(Warning):
         self.clamp_value = clamp_value
 
 
-## auxiliary functions
+### auxiliary functions
+
 
 def disconnect_sources(jack_client):
     """
@@ -97,7 +98,11 @@ def do_command(command, arg):
         print(f"Command '{command.__name__}' needs an option")
 
 
-## internal functions for actions
+### internal functions for commands
+
+
+## commands without options
+
 
 def show():
     """
@@ -105,6 +110,25 @@ def show():
     """
     
     pd.show_file()
+
+
+## commands that do not depend on camilladsp config
+
+
+# numerical commands that accept 'add'
+
+
+def level(level):
+    """
+    change level (gain relative to reference_level)
+    """
+    # level clamp is comissioned to set_gain()
+    init.state['level'] = (float(level) + init.state['level'] * add)
+    gain = pd.calc_gain(init.state['level'])
+    set_gain(gain)
+
+
+# on/off commands
 
 
 def mute(mute):
@@ -126,35 +150,96 @@ def mute(mute):
         raise OptionsError(options)
 
 
-def level(level):
-    """
-    change level (gain relative to reference_level)
-    """
-    # level clamp is comissioned to set_gain()
-    init.state['level'] = (float(level) + init.state['level'] * add)
-    gain = pd.calc_gain(init.state['level'])
-    set_gain(gain)
+## commands that depend on camilladsp config
 
 
-def sources(sources):
+# numerical commands that accept 'add'
+
+
+def loudness_ref(loudness_ref):
     """
-    toggle connection of sources
+    select loudness reference level (correction threshold level)
     """
 
-    options = {'off', 'on', 'toggle'}
-    if sources in options:
-        if sources == 'toggle':
-            sources = toggle('sources')
-        init.state['sources'] = sources
-        match sources:
-            case 'off':
-                tmp = jack.Client('tmp')
-                disconnect_sources(tmp)
-                tmp.close()
-            case 'on':
-                source(init.state['source'])
-    else:
-        raise OptionsError(options)
+    init.state['loudness_ref'] = (float(loudness_ref)
+                                + init.state['loudness_ref'] * add
+                                )
+    # clamp loudness_ref value
+    if abs(init.state['loudness_ref']) > base.loudness_ref_variation:
+        init.state['loudness_ref'] = m.copysign(
+                                    base.loudness_ref_variation,
+                                    init.state['loudness_ref']
+                                    )
+        raise ClampWarning(init.state['loudness_ref'])
+    # set loudness reference_level as absolute gain
+    cdsp_config['filters']['f.loudness']['parameters']['reference_level']=(
+        pd.calc_gain(init.state['loudness_ref']))
+
+
+def bass(bass):
+    """
+    select bass level correction
+    """
+
+    init.state['bass'] = float(bass) + init.state['bass'] * add
+    # clamp bass value
+    if m.fabs(init.state['bass']) > base.tone_variation:
+        init.state['bass'] = m.copysign(base.tone_variation, init.state['bass'])
+        raise ClampWarning(init.state['bass'])
+    # set bass
+    cdsp_config['filters']['f.bass']['parameters']['gain']=(
+        init.state['bass']
+        )
+    set_gain(pd.calc_gain(init.state['level']))
+
+
+def treble(treble):
+    """
+    select treble level correction
+    """
+
+    init.state['treble'] = (float(treble)
+                            + init.state['treble'] * add)
+    # clamp treble value
+    if m.fabs(init.state['treble']) > base.tone_variation:
+        init.state['treble'] = m.copysign(base.tone_variation, init.state['treble'])
+        raise ClampWarning(init.state['treble'])
+    # set treble
+    cdsp_config['filters']['f.treble']['parameters']['gain']=(
+        init.state['treble']
+        )
+    set_gain(pd.calc_gain(init.state['level']))
+
+
+def balance(balance):
+    """
+    select balance level
+    'balance' means deviation from 0 in R channel
+    deviation of the L channel then goes symmetrical
+    """
+
+    init.state['balance'] = (float(balance)
+                            + init.state['balance'] * add)
+    # clamp balance value
+    if m.fabs(init.state['balance']) > base.balance_variation:
+        init.state['balance'] = m.copysign(
+                                base.balance_variation,
+                                init.state['balance']
+                                )
+        raise ClampWarning(init.state['balance'])
+    # add balance dB gains
+    atten_dB_r = init.state['balance']
+    atten_dB_l = - (init.state['balance'])
+    cdsp_config['filters']['f.balance.L']['parameters']['gain']=(
+        atten_dB_l
+        )
+    cdsp_config['filters']['f.balance.R']['parameters']['gain']=(
+        atten_dB_r
+        )
+    set_gain(pd.calc_gain(init.state['level']))
+
+
+# non numerical commands
 
 
 def source(source):
@@ -186,6 +271,74 @@ def source(source):
         raise OptionsError(options)
 
 
+def drc_set(drc_set):
+    """
+    change drc filters
+    """
+
+    options = init.drc
+    if drc_set in options:
+        init.state['drc_set'] = drc_set
+        set_pipeline()
+    else:
+        raise OptionsError(options)
+
+
+def eq_filter(eq_filter):
+    """
+    select general equalizer filter
+    """
+
+    options = init.eq
+    if eq_filter in options:
+        init.state['eq_filter'] = eq_filter
+        set_pipeline()
+    else:
+        raise OptionsError(options)
+
+
+def stereo(stereo):
+    """
+    change mix to normal stereo, mono, or midside side
+    """
+
+    options = {'normal', 'mid', 'side'}
+    if stereo in options:
+        init.state['stereo'] = stereo
+        set_mixer()
+    else:
+        raise OptionsError(options)
+
+
+def channels(channels):
+    """
+    select input channels (mixed to both output channels)
+    """
+    
+    options = {'lr', 'l', 'r'}
+    if channels in options:
+        init.state['channels'] = channels
+        set_mixer()
+    else:
+        raise OptionsError(options)
+    
+
+def solo(solo):
+    """
+    isolate output channels
+    """
+
+    options = {'lr', 'l', 'r'}
+    if solo in options:
+        init.state['solo'] = solo
+        set_mixer()
+    else:
+        raise OptionsError(options)
+
+
+# on/off commands
+
+
 def drc(drc):
     """
     toggle drc
@@ -196,19 +349,6 @@ def drc(drc):
         if drc == 'toggle':
             drc = toggle('drc')
         init.state['drc'] = drc
-        set_pipeline()
-    else:
-        raise OptionsError(options)
-
-
-def drc_set(drc_set):
-    """
-    change drc filters
-    """
-
-    options = init.drc
-    if drc_set in options:
-        init.state['drc_set'] = drc_set
         set_pipeline()
     else:
         raise OptionsError(options)
@@ -229,18 +369,76 @@ def phase_eq(phase_eq):
         raise OptionsError(options)
 
 
-def channels(channels):
+def loudness(loudness):
     """
-    select input channels (mixed to both output channels)
+    toggle loudness
     """
-    
-    options = {'lr', 'l', 'r'}
-    if channels in options:
-        init.state['channels'] = channels
-        set_mixer()
+
+    options = {'off', 'on', 'toggle'}
+    if loudness in options:
+        if loudness == 'toggle':
+            loudness = toggle('loudness')
+        init.state['loudness'] = loudness
+        if init.state['loudness'] == 'off':
+            cdsp_config['pipeline'][0]['names'] = ["f.volume"]
+            cdsp_config['pipeline'][1]['names'] = ["f.volume"]
+        else:
+            cdsp_config['pipeline'][0]['names'] = ["f.loudness"]
+            cdsp_config['pipeline'][1]['names'] = ["f.loudness"]
     else:
         raise OptionsError(options)
-    
+
+
+def tones(tones):
+    """
+    toggle tone controls
+    """
+
+    options = {'off', 'on', 'toggle'}
+    if tones in options:
+        if tones == 'toggle':
+            tones = toggle('tones')
+        init.state['tones'] = tones
+        set_pipeline()
+    else:
+        raise OptionsError(options)
+
+
+def eq(eq):
+    """
+    toggle general equalizer (not linked to a particular speaker)
+    """
+
+    options = {'off', 'on', 'toggle'}
+    if eq in options:
+        if eq == 'toggle':
+            eq = toggle('eq')
+        init.state['eq'] = eq
+        set_pipeline()
+    else:
+        raise OptionsError(options)
+
+
+def sources(sources):
+    """
+    toggle connection of sources
+    """
+
+    options = {'off', 'on', 'toggle'}
+    if sources in options:
+        if sources == 'toggle':
+            sources = toggle('sources')
+        init.state['sources'] = sources
+        match sources:
+            case 'off':
+                tmp = jack.Client('tmp')
+                disconnect_sources(tmp)
+                tmp.close()
+            case 'on':
+                source(init.state['source'])
+    else:
+        raise OptionsError(options)
+
 
 def channels_flip(channels_flip):
     """
@@ -287,182 +485,8 @@ def polarity_flip(polarity_flip):
         raise OptionsError(options)
     
 
-def stereo(stereo):
-    """
-    change mix to normal stereo, mono, or midside side
-    """
+### funtions that perform actual backend adjustments
 
-    options = {'normal', 'mid', 'side'}
-    if stereo in options:
-        init.state['stereo'] = stereo
-        set_mixer()
-    else:
-        raise OptionsError(options)
-
-
-def solo(solo):
-    """
-    isolate output channels
-    """
-
-    options = {'lr', 'l', 'r'}
-    if solo in options:
-        init.state['solo'] = solo
-        set_mixer()
-    else:
-        raise OptionsError(options)
-
-
-def loudness(loudness):
-    """
-    toggle loudness
-    """
-
-    options = {'off', 'on', 'toggle'}
-    if loudness in options:
-        if loudness == 'toggle':
-            loudness = toggle('loudness')
-        init.state['loudness'] = loudness
-        if init.state['loudness'] == 'off':
-            cdsp_config['pipeline'][0]['names'] = ["f.volume"]
-            cdsp_config['pipeline'][1]['names'] = ["f.volume"]
-        else:
-            cdsp_config['pipeline'][0]['names'] = ["f.loudness"]
-            cdsp_config['pipeline'][1]['names'] = ["f.loudness"]
-    else:
-        raise OptionsError(options)
-
-
-def loudness_ref(loudness_ref):
-    """
-    select loudness reference level (correction threshold level)
-    """
-
-    init.state['loudness_ref'] = (float(loudness_ref)
-                                + init.state['loudness_ref'] * add
-                                )
-    # clamp loudness_ref value
-    if abs(init.state['loudness_ref']) > base.loudness_ref_variation:
-        init.state['loudness_ref'] = m.copysign(
-                                    base.loudness_ref_variation,
-                                    init.state['loudness_ref']
-                                    )
-        raise ClampWarning(init.state['loudness_ref'])
-    # set loudness reference_level as absolute gain
-    cdsp_config['filters']['f.loudness']['parameters']['reference_level']=(
-        pd.calc_gain(init.state['loudness_ref']))
-
-
-def tones(tones):
-    """
-    toggle tone controls
-    """
-
-    options = {'off', 'on', 'toggle'}
-    if tones in options:
-        if tones == 'toggle':
-            tones = toggle('tones')
-        init.state['tones'] = tones
-        set_pipeline()
-    else:
-        raise OptionsError(options)
-
-
-# following funtions prepares their corresponding actions to be performed \
-# by the set_gain() function
-
-def treble(treble):
-    """
-    select treble level correction
-    """
-
-    init.state['treble'] = (float(treble)
-                            + init.state['treble'] * add)
-    # clamp treble value
-    if m.fabs(init.state['treble']) > base.tone_variation:
-        init.state['treble'] = m.copysign(base.tone_variation, init.state['treble'])
-        raise ClampWarning(init.state['treble'])
-    # set treble
-    cdsp_config['filters']['f.treble']['parameters']['gain']=(
-        init.state['treble']
-        )
-    set_gain(pd.calc_gain(init.state['level']))
-
-
-def bass(bass):
-    """
-    select bass level correction
-    """
-
-    init.state['bass'] = float(bass) + init.state['bass'] * add
-    # clamp bass value
-    if m.fabs(init.state['bass']) > base.tone_variation:
-        init.state['bass'] = m.copysign(base.tone_variation, init.state['bass'])
-        raise ClampWarning(init.state['bass'])
-    # set bass
-    cdsp_config['filters']['f.bass']['parameters']['gain']=(
-        init.state['bass']
-        )
-    set_gain(pd.calc_gain(init.state['level']))
-
-
-def eq(eq):
-    """
-    toggle general equalizer (not linked to a particular speaker)
-    """
-
-    options = {'off', 'on', 'toggle'}
-    if eq in options:
-        if eq == 'toggle':
-            eq = toggle('eq')
-        init.state['eq'] = eq
-        set_pipeline()
-    else:
-        raise OptionsError(options)
-
-
-def eq_filter(eq_filter):
-    """
-    select general equalizer filter
-    """
-
-    options = init.eq
-    if eq_filter in options:
-        init.state['eq_filter'] = eq_filter
-        set_pipeline()
-    else:
-        raise OptionsError(options)
-
-
-def balance(balance):
-    """
-    select balance level
-    'balance' means deviation from 0 in R channel
-    deviation of the L channel then goes symmetrical
-    """
-
-    init.state['balance'] = (float(balance)
-                            + init.state['balance'] * add)
-    # clamp balance value
-    if m.fabs(init.state['balance']) > base.balance_variation:
-        init.state['balance'] = m.copysign(
-                                base.balance_variation,
-                                init.state['balance']
-                                )
-        raise ClampWarning(init.state['balance'])
-    # add balance dB gains
-    atten_dB_r = init.state['balance']
-    atten_dB_l = - (init.state['balance'])
-    cdsp_config['filters']['f.balance.L']['parameters']['gain']=(
-        atten_dB_l
-        )
-    cdsp_config['filters']['f.balance.R']['parameters']['gain']=(
-        atten_dB_r
-        )
-    set_gain(pd.calc_gain(init.state['level']))
-
-
-## following funtions perform actual backend adjustments
 
 def set_pipeline():
     """
@@ -584,7 +608,8 @@ def set_gain(gain):
         print('headroom hit, lowering gain...')
 
 
-## main command proccessing function
+### main command proccessing function
+
 
 def proccess_commands(full_command):
     """
@@ -641,8 +666,8 @@ def proccess_commands(full_command):
             {
             # numerical commands that accept 'add'
             'loudness_ref':     loudness_ref,   #[loudness_ref] add
-            'treble':           treble,         #[treble] add
             'bass':             bass,           #[bass] add
+            'treble':           treble,         #[treble] add
             'balance':          balance,        #[balance] add
 
             # non numerical commands
