@@ -88,14 +88,17 @@ def do_command(command, arg):
         try:
             command(arg)
         except ClampWarning as w:
-            print(f"'{command.__name__}' value clamped: {w.clamp_value}")
+            print(f"\n(control) '{command.__name__}' value clamped: ",
+                  w.clamp_value)
         except OptionsError as e:
-            print(f"Bad option. Options has to be in : {list(e.options)}")
+            print("\n(control) Bad option. Options has to be in : ",
+                  list(e.options))
         except Exception as e:
             init.state[command.__name__]  = state_old[command.__name__]
-            print(f"Exception in command '{command.__name__}': ", e)
+            print(f"\n(control) Exception in command '{command.__name__}': ",
+                  e)
     else:
-        print(f"Command '{command.__name__}' needs an option")
+        print(f"\n(control) Command '{command.__name__}' needs an option")
 
 
 ### internal functions for commands
@@ -572,7 +575,7 @@ def set_mixer():
 
     # for debug
     if init.config['verbose'] in {1, 2}:
-        print(f'mixer matrix : \n{mixer}\n')
+        print(f'\n(control) mixer matrix : \n{mixer}\n')
 
 
 def set_gain(gain):
@@ -590,8 +593,8 @@ def set_gain(gain):
     # max gain is clamped downstream when calculating headroom
     if gain < base.gain_min:
         gain = base.gain_min
-        print(f'min. gain must be more than {base.gain_min} dB')
-        print('gain clamped')
+        print(f'\n(control) min. gain must be more than {base.gain_min} dB')
+        print('(control) gain clamped')
     # calculate headroom
     headroom = pd.calc_headroom(gain)
     # adds source gain. It can lead to clipping \
@@ -605,7 +608,7 @@ def set_gain(gain):
     # if not enough headroom tries lowering gain
     else:
         set_gain(gain + headroom)
-        print('headroom hit, lowering gain...')
+        print('\n(control) headroom hit, lowering gain...')
 
 
 ### main command proccessing function
@@ -694,6 +697,6 @@ def proccess_commands(full_command):
         cdsp.set_config(cdsp_config)
 
     except KeyError:
-        print(f"Unknown command '{command}'")
+        print(f"\n(control) Unknown command '{command}'")
 
 # end of proccess_commands()

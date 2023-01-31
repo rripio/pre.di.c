@@ -86,7 +86,7 @@ def init_server():
     loads server
     """
 
-    print('\n(startaudio) starting server\n')
+    print('\n(startaudio) starting server')
     try:
         control = sp.Popen(f'python3 {init.main_folder}/server.py'.split())
     except Exception as e:
@@ -99,9 +99,7 @@ def init_server():
     if pd.wait4result(
             'echo ping| nc localhost 9999 2>/dev/null',
             'OK', tmax, interval):
-        # a linefeed is added at some unknown place, \
-        # so we provisionally take it out here
-        print('(startaudio) server started :-)')
+        print('\n(startaudio) server started :-)')
     else:
         print('\n(startaudio) server not accesible Bye :-/')
         stop_all()
@@ -202,7 +200,9 @@ def main(run_level):
             init.state['source'] = state['source']
             pd.client_socket('save', quiet=True)
        # launch external clients, sources and clients
-        print('\n(startaudio): starting clients...')
+       # exceptionally we add a line feed at the end \
+       # since client load messages don't
+        print('\n(startaudio): starting clients...\n')
         for client in pd.read_clients('start'):
             try:
                 command_path = f'{init.clients_folder}/{client}'
