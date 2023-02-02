@@ -272,6 +272,12 @@ def source(source):
     """
     change source
     """
+    
+    
+    # allows changing flag
+    global clamp_gain
+    # reset clamp_gain to True when changing sources
+    clamp_gain = True
 
     options = init.sources
     if source in options:
