@@ -143,7 +143,8 @@ def level(level):
 
 def clamp(clamp):
     """
-    allows clamping gain
+    frees gain setting from clamping:
+    useful for playing  low level files
     """
     
     # allows changing flag
