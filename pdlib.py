@@ -152,11 +152,13 @@ def wait4ports(ports, tmax=5, interval=0.1):
         # then source ports are up and ready :-)
         if set(ports) == set(up_ports):
             # go on
+            jc.close()
             return True
         else:
             time.sleep(interval)
     # time is exhausted and source ports are down :-(
     # leave function without any connection made
+    jc.close()
     return False
    
 
