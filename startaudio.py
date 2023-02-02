@@ -214,8 +214,9 @@ def main(run_level):
             init_source(state)
         else:
             pd.client_socket('sources off', quiet=True)
-        # some info
-        pd.show()
+
+        pd.client_socket('save', quiet=True)    # save changes to file
+        print('\n(startaudio): pre.di.c started :-)')
 
 
 if __name__ == '__main__':

@@ -34,8 +34,15 @@ cdsp_config['filters'].update(init.speaker['filters'])
 cdsp_config['mixers'].update(init.speaker['mixers'])
 cdsp_config['pipeline'].extend(init.speaker['pipeline'])
 
-# control flag for switching to relative commands, visible all around
-add = False
+
+### flags
+
+
+add = False             # switch to relative commands
+clamp_gain = True       # allows gain clamp
+
+
+### exception definitions
 
 
 class OptionsError(Exception):
@@ -134,6 +141,25 @@ def level(level):
 # on/off commands
 
 
+def clamp(clamp):
+    """
+    allows clamping gain
+    """
+    
+    # allows changing flag
+    global clamp_gain
+
+    options = {'off', 'on', 'toggle'}
+    if clamp in options:
+        if clamp == 'toggle':
+            clamp = toggle('clamp')
+        clamp_gain = {'off': False, 'on': True}[clamp]
+        if clamp_gain:
+            level(init.state['level'])
+    else:
+        raise OptionsError(options)
+
+
 def mute(mute):
     """
     mute output
@@ -144,11 +170,7 @@ def mute(mute):
         if mute == 'toggle':
             mute = toggle('mute')
         init.state['mute'] = mute
-        match mute:
-            case 'off':
-                cdsp.set_mute(False)
-            case 'on':
-                cdsp.set_mute(True)
+        cdsp.set_mute({'off': False, 'on': True}[mute])
     else:
         raise OptionsError(options)
 
@@ -595,21 +617,23 @@ def set_gain(gain):
         gain = base.gain_min
         print(f'\n(control) min. gain must be more than {base.gain_min} dB')
         print('(control) gain clamped')
-    # calculate headroom
-    headroom = pd.calc_headroom(gain)
-    # adds source gain. It can lead to clipping \
-    # because assumes equal dynamic range between sources
-    real_gain = gain + pd.calc_source_gain(init.state['source'])
-    # if enough headroom commit changes
-    # since there is no init.state['gain'] we set init.state['level']
-    if headroom >= 0:
-        cdsp.set_volume(real_gain)
-        init.state['level'] = pd.calc_level(gain)
-    # if not enough headroom tries lowering gain
+    # calculate headroom and clamp gain if clamp_gain allows to do so
+    if clamp_gain:
+        headroom = pd.calc_headroom(gain)
+        # adds source gain. It can lead to clipping \
+        # because assumes equal dynamic range between sources
+        real_gain = gain + pd.calc_source_gain(init.state['source'])
+        # if enough headroom commit changes
+        # since there is no init.state['gain'] we set init.state['level']
+        if headroom >= 0:
+            cdsp.set_volume(real_gain)
+            init.state['level'] = pd.calc_level(gain)
+        # if not enough headroom tries lowering gain
+        else:
+            set_gain(gain + headroom)
+            print('\n(control) headroom hit, lowering gain...')
     else:
-        set_gain(gain + headroom)
-        print('\n(control) headroom hit, lowering gain...')
-
+        cdsp.set_volume(gain)
 
 ### main command proccessing function
 
@@ -652,12 +676,13 @@ def proccess_commands(full_command):
             }[command]()
 
         # commands that do not depend on camilladsp config
-        elif command in {'mute', 'level', 'gain'}:
+        elif command in {'clamp', 'mute', 'level', 'gain'}:
             do_command(
             {
             # numerical commands that accept 'add'
             'level':            level,          #[level] add
             # on/off commands
+            'clamp':            clamp,          #['off','on','toggle']
             'mute':             mute,           #['off','on','toggle']
             # special utility command
             'gain':             set_gain        #[gain]
