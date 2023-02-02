@@ -67,11 +67,10 @@ def disconnect_sources(jack_client):
     disconnect sources from predic audio ports
     """
 
-    for port_group in init.config['audio_ports']:
-        for port in port_group:
-            sources = jack_client.get_all_connections(port)
-            for source in sources:
-                jack_client.disconnect(source, port)
+    for ports_group in init.config['audio_ports']:
+        for in_port in ports_group:
+            for out_port in jack_client.get_all_connections(in_port):
+                jack_client.disconnect(out_port, in_port)
 
 
 def toggle(command):
@@ -100,10 +99,10 @@ def do_command(command, arg):
         except OptionsError as e:
             print("\n(control) Bad option. Options has to be in : ",
                   list(e.options))
-        except Exception as e:
-            init.state[command.__name__]  = state_old[command.__name__]
-            print(f"\n(control) Exception in command '{command.__name__}': ",
-                  e)
+        # except Exception as e:
+        #     init.state[command.__name__]  = state_old[command.__name__]
+        #     print(f"\n(control) Exception in command '{command.__name__}': ",
+        #           e)
     else:
         print(f"\n(control) Command '{command.__name__}' needs an option")
 
@@ -283,22 +282,33 @@ def source(source):
     if source in options:
         init.state['source'] = source
         source_ports = init.sources[init.state['source']]['source_ports']
-        # switch
         tmp = jack.Client('tmp')
-        disconnect_sources(tmp)
+
+        # check if ports are already connected
+        connected = False
         for ports_group in init.config['audio_ports']:
-            # make no more than possible connections,
-            # i.e., minimum of input or output ports
-            num_ports=min(len(ports_group), len(source_ports))
-            for i in range(num_ports):
-                # audio sources
-                tmp.connect(source_ports[i], ports_group[i])
-        tmp.close()
-        # source change went OK
-        set_gain(pd.calc_gain(init.state['level']))
-        # change phase_eq if configured so
-        if init.config['use_source_phase_eq']:
-            phase_eq(init.sources[source]['phase_eq'])
+            for audio_port in ports_group:
+                for port in tmp.get_all_connections(audio_port):
+                    connected = port.name in source_ports
+        if connected:
+            print('\n(control) source already selected')
+            tmp.close()
+            return
+        else:
+            disconnect_sources(tmp)
+            for ports_group in init.config['audio_ports']:
+                # make no more than possible connections,
+                # i.e., minimum of input or output ports
+                num_ports=min(len(ports_group), len(source_ports))
+                for i in range(num_ports):
+                    # audio sources
+                    tmp.connect(source_ports[i], ports_group[i])
+            tmp.close()
+            # source change went OK
+            set_gain(pd.calc_gain(init.state['level']))
+            # change phase_eq if configured so
+            if init.config['use_source_phase_eq']:
+                phase_eq(init.sources[source]['phase_eq'])
     else:
         raise OptionsError(options)
 
