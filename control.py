@@ -71,7 +71,7 @@ def disconnect_sources(jack_client):
         for port in port_group:
             sources = jack_client.get_all_connections(port)
             for source in sources:
-                jack_client.disconnect(source.name, port)
+                jack_client.disconnect(source, port)
 
 
 def toggle(command):
