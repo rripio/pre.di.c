@@ -4,7 +4,9 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-"""start netjack"""
+"""
+start netjack
+"""
 
 import time
 from subprocess import Popen

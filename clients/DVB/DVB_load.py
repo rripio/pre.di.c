@@ -4,7 +4,8 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-"""start and stop mplayer for DVB tasks
+"""
+start and stop mplayer for DVB tasks
 
 use it with 'start' and 'stop' as options
 """
@@ -27,7 +28,9 @@ dvb_fifo = folder + config["fifo_filename"]
 
 
 def start():
-    """loads mplayer"""
+    """
+    loads mplayer
+    """
 
     # starts mplayer DVB:
     command = f'{config["start_command"]} -input file={dvb_fifo}'
@@ -40,7 +43,9 @@ def start():
 
 
 def stop():
-    """kills mplayer and this script"""
+    """
+    kills mplayer and this script
+    """
 
     dir = os.path.dirname(os.path.realpath(__file__))
     sp.Popen(f'{config["stop_command"]}'.split())

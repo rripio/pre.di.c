@@ -4,7 +4,9 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-"""sets up loop ports in jack """
+"""
+sets up loop ports in jack
+"""
 
 import sys
 import subprocess as sp

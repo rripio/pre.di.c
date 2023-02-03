@@ -4,20 +4,22 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-"""selects DVB channels
+"""
+selects DVB channels
 
-    Usage: DVB_command.py [preset [startaudio]]
+Usage: DVB_command.py [preset [startaudio]]
 
-    preset must be one of the integer presets in presets.yml or one of
-    these options: 'forth', 'back', 'last', 'previous'
+preset must be one of the integer presets in presets.yml or one of
+these options: 'forth', 'back', 'last', 'previous'
 
-    forth:      next preset number in numerical order
-    back:       previous preset number in numerical order
-    last:       last played preset
-    previous:   preset played before last
+forth:      next preset number in numerical order
+back:       previous preset number in numerical order
+last:       last played preset
+previous:   preset played before last
 
-    The 'startaudio' flag omits jack connection when switching channels
-    for use when launching DVB client on pre.di.c start"""
+The 'startaudio' flag omits jack connection when switching channels
+for use when launching DVB client on pre.di.c start
+"""
 
 
 import sys
@@ -46,8 +48,11 @@ dvb_fifo = folder + config["fifo_filename"]
 state = init.get_yaml(state_path)
 presets = init.get_yaml(presets_path)
 
+
 def select_channel(channel_name, channel_gain):
-    """ sets channel in mplayer """
+    """
+    sets channel in mplayer
+    """
 
     try:
         command = (
@@ -64,7 +69,9 @@ def select_channel(channel_name, channel_gain):
 
 
 def select_preset(preset, preset_dict=presets):
-    """ selects preset from presets.yml """
+    """
+    selects preset from presets.yml
+    """
 
     # get channel name from preset number
     if preset.isdigit():
@@ -83,7 +90,9 @@ def select_preset(preset, preset_dict=presets):
 
 def change_radio(
     selected, startflag = False, preset_dict=presets, state=state):
-    """ process channel options """
+    """
+    process channel options
+    """
 
     # list of presets, discarding those white in presets.yml
     state_old = state

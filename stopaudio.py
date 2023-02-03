@@ -7,11 +7,11 @@
 """
 Stops pre.di.c audio system
 
-    Usage:
-    stopaudio.py [ core | clients | all ]   (default 'all')
-    core: jack, brutefir, server
-    clients: everything else (players and clients)
-    all: all of the above
+Usage:
+stopaudio.py [ core | clients | all ]   (default 'all')
+core: jack, brutefir, server
+clients: everything else (players and clients)
+all: all of the above
 """
 
 import sys

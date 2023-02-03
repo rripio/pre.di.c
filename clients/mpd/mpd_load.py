@@ -4,8 +4,11 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-"""start and stop mplayer for DVB tasks
-use it with 'start' and 'stop' as options"""
+"""
+start and stop mplayer for DVB tasks
+
+use it with 'start' and 'stop' as options
+"""
 
 import os
 import sys
@@ -26,7 +29,9 @@ config_filename = 'config.yml'
 
 
 def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
-    """Connect to mpd"""
+    """
+    Connect to mpd
+    """
 
     client = mpd.MPDClient()
     client.connect(mpd_host, mpd_port)
@@ -36,7 +41,9 @@ def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
 
 
 def mpd_vol_loop():
-    """loop: reads mpd volume, sets predic volume"""
+    """
+    loop: reads mpd volume, sets predic volume
+    """
 
     mpd_client = connect_mpd()
     mpd_gain_min = base.gain_max - mpd_conf['slider_range']
@@ -55,7 +62,9 @@ def mpd_vol_loop():
 
 
 def predic_vol_loop():
-    """loop: reads predic volume, sets mpd volume"""
+    """
+    loop: reads predic volume, sets mpd volume
+    """
 
     interval = init.config['command_delay'] / 10
     predic_level = pd.read_state()['level']
@@ -81,7 +90,9 @@ def predic_vol_loop():
 
 
 def start():
-    """loads mpd"""
+    """
+    loads mpd
+    """
 
     # starts MPD
     print('\n(mpd_load.py) starting mpd')
@@ -142,7 +153,9 @@ def start():
 
 
 def stop():
-    """kills mpd and this script"""
+    """
+    kills mpd and this script
+    """
 
     delay = init.config['command_delay']
     

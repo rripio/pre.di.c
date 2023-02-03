@@ -2,7 +2,9 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-"""miscellanea of utility functions for use in predic scripts"""
+"""
+miscellanea of utility functions for use in predic scripts
+"""
 
 
 import socket
