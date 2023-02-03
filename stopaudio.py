@@ -42,13 +42,13 @@ def main(run_level):
     if run_level in {'core', 'all'}:
         # controlserver
         print('(stopaudio) stopping server')
-        Popen ('pkill -f server.py'.split(), stdout=fnull, stderr=fnull)
+        Popen ('pkill -f server.py'.split())
         # camilladsp
         print('(stopaudio) stopping camilladsp')
-        Popen ('pkill -f camilladsp'.split(), stdout=fnull, stderr=fnull)
+        Popen ('pkill -f camilladsp'.split())
         # jack
         print('(stopaudio) stopping jackd')
-        Popen ('pkill -f jackd'.split(), stdout=fnull, stderr=fnull)
+        Popen ('pkill -f jackd'.split())
 
 
 if __name__ == '__main__':

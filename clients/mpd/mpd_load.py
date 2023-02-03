@@ -144,8 +144,11 @@ def start():
 def stop():
     """kills mpd and this script"""
 
+    delay = init.config['command_delay']
+    
     sp.Popen(mpd_conf["stop_command"].split())
     sp.Popen((f'pkill -f {dir}/mpd_load.py').split())
+    time.sleep(delay)
 
 
 if sys.argv[1:]:
