@@ -118,7 +118,7 @@ def show():
     show status in a readable way
     """
     
-    pd.show_file()
+    pd.show_file(clamp_gain)
 
 
 ## commands that do not depend on camilladsp config

@@ -271,7 +271,7 @@ def calc_source_gain(source):
     return init.sources[source]['gain']
 
 
-def show(throw_it=None):
+def show(clamp_gain):
     """
     shows a status report
     """
@@ -280,58 +280,60 @@ def show(throw_it=None):
     gain = calc_gain(init.state['level']) + source_gain
     headroom = calc_headroom(gain)
     source_headroom = headroom - source_gain
+    clamp_string = {False: 'off', True: 'on'}[clamp_gain]
 
     print()
-    print(f"Loudspeaker:        {init.config['loudspeaker']:>10s}")
+    print(f"Loudspeaker:        {init.config['loudspeaker']: >10s}")
     print()
     print(f"fs                  {init.speaker['fs']: 10d}")
     print(f"Reference level     {init.speaker['ref_level_gain']: 10.1f}")
 
     print()
-    print(f"Mute                {init.state['mute']:>10s}")
+    print(f"Mute                {init.state['mute']: >10s}")
     print(f"Level               {init.state['level']: 10.1f}")
     print(f"Balance             {init.state['balance']: 10.1f}")
 
     print()
-    print(f"Channels            {init.state['channels']:>10s}")
-    print(f"Channels flip       {init.state['channels_flip']:>10s}")
-    print(f"Polarity            {init.state['polarity']:>10s}")
-    print(f"Polarity flip       {init.state['polarity_flip']:>10s}")
-    print(f"Stereo              {init.state['stereo']:>10s}")
-    print(f"Solo                {init.state['solo']:>10s}")
+    print(f"Channels            {init.state['channels']: >10s}")
+    print(f"Channels flip       {init.state['channels_flip']: >10s}")
+    print(f"Polarity            {init.state['polarity']: >10s}")
+    print(f"Polarity flip       {init.state['polarity_flip']: >10s}")
+    print(f"Stereo              {init.state['stereo']: >10s}")
+    print(f"Solo                {init.state['solo']: >10s}")
 
     print()
-    print(f"Tones               {init.state['tones']:>10s}")
+    print(f"Tones               {init.state['tones']: >10s}")
     print(f"Bass                {init.state['bass']: 10.1f}")
     print(f"Treble              {init.state['treble']: 10.1f}")
-    print(f"Loudness            {init.state['loudness']:>10s}")
+    print(f"Loudness            {init.state['loudness']: >10s}")
     print(f"Loudness reference  {init.state['loudness_ref']: 10.1f}")
 
     print()
-    print(f"DRC                 {init.state['drc']:>10s}")
-    print(f"DRC set             {init.state['drc_set']:>10s}")
-    print(f"Phase equalizer     {init.state['phase_eq']:>10s}")
-    print(f"EQ                  {init.state['eq']:>10s}")
-    print(f"EQ filter           {init.state['eq_filter']:>10s}")
+    print(f"DRC                 {init.state['drc']: >10s}")
+    print(f"DRC set             {init.state['drc_set']: >10s}")
+    print(f"Phase equalizer     {init.state['phase_eq']: >10s}")
+    print(f"EQ                  {init.state['eq']: >10s}")
+    print(f"EQ filter           {init.state['eq_filter']: >10s}")
 
     print()
-    print(f"Sources             {init.state['sources']:>10s}")
-    print(f"Source              {init.state['source']:>10s}")
+    print(f"Sources             {init.state['sources']: >10s}")
+    print(f"Source              {init.state['source']: >10s}")
     print(f'Source gain         {source_gain: 10.1f}')
     print(f'Source headroom     {source_headroom: 10.1f}')
 
     print()
     print(f"Gain                {gain: 10.1f}")
     print(f"Headroom            {headroom: 10.1f}")
+    print(f"Clamp gain          {clamp_string: >10s}")
 
     print('\n')
 
 
-def show_file(throw_it=None):
+def show_file(clamp_gain):
     """
     writes a status report to temp file
     """
 
     with open('/tmp/predic', 'w') as f:
         with cl.redirect_stdout(f):
-            show()
+            show(clamp_gain)
