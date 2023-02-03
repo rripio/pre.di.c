@@ -99,10 +99,13 @@ def do_command(command, arg):
         except OptionsError as e:
             print("\n(control) Bad option. Options has to be in : ",
                   list(e.options))
-        # except Exception as e:
-        #     init.state[command.__name__]  = state_old[command.__name__]
-        #     print(f"\n(control) Exception in command '{command.__name__}': ",
-        #           e)
+        except ValueError as e:
+            print(f"\n(control) Command '{command.__name__}' ",
+                  f"needs a number: {e}")
+        except Exception as e:
+            init.state[command.__name__]  = state_old[command.__name__]
+            print(f"\n(control) Exception in command '{command.__name__}': ",
+                  e)
     else:
         print(f"\n(control) Command '{command.__name__}' needs an option")
 
