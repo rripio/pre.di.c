@@ -149,6 +149,7 @@ def init_state_settings(state):
             'tones',
             'treble'
             ):
+        print(f'{setting} {state[setting]}')
         pd.client_socket(f'{setting} {state[setting]}')
 
 
@@ -158,7 +159,7 @@ def init_source(state):
     """
 
     source = state['source']
-    print(f'\n(startaudio) restoring source: {source}')
+    print(f"\n(startaudio) restoring source '{source}'")
     # wait for source ports to be up
     tmax = init.config['command_delay'] * 15
     interval = init.config['command_delay'] * 0.5
@@ -171,7 +172,7 @@ def init_source(state):
             time.sleep(init.config['command_delay'] * 2)
         pd.client_socket('source ' + source, quiet=True)
     else:
-        print(f'\n(startaudio) could not connect {source} ports')
+        print(f"\n(startaudio) could not connect '{source}' ports")
 
 
 def main(run_level):
@@ -185,19 +186,26 @@ def main(run_level):
         init_jack()
         init_camilladsp()
         init_server()
+
     # inboard players
     if run_level in {'clients', 'all'}:
         # getting operating state
         # do it before launching clients \
         # so they get the correct setting from state file if needed
         state = set_initial_state()
+
         # restoring previous state
+        # exceptionally we add a line feed at the end \
+        # since sttings restoring messages don't
+        print('\n(startaudio): restoring previous settings:\n')
         init_state_settings(state)
+
         # write source to state file for use of clients if config ask for it
         if state['sources'] == 'on':
             # just refresh state file
             init.state['source'] = state['source']
             pd.client_socket('save', quiet=True)
+
        # launch external clients, sources and clients
        # exceptionally we add a line feed at the end \
        # since client load messages don't
@@ -208,7 +216,9 @@ def main(run_level):
                 p=sp.Popen(command_path.split())
                 print(f'pid {p.pid:4}: {client}')
             except Exception as e:
-                print(f'\n(startaudio) problem launching client {client}: ', e)
+                print(f"\n(startaudio) problem launching client '{client}': "
+                      , e)
+
         # restoring sources if config mandates so
         if state['sources'] == 'on':
             init_source(state)
