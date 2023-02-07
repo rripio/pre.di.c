@@ -285,13 +285,17 @@ def source(source):
     if source in options:
         init.state['source'] = source
         source_ports = init.sources[init.state['source']]['source_ports']
+        source_ports_len = len(source_ports)
         tmp = jack.Client('tmp')
 
         # check if ports are already connected
         connected = False
         for ports_group in init.config['audio_ports']:
-            for audio_port in ports_group:
-                for port in tmp.get_all_connections(audio_port):
+            # for audio_port in ports_group:
+            # get max number of possible connectios
+            num_ports=min(len(ports_group), source_ports_len)
+            for i in range(num_ports):
+                for port in tmp.get_all_connections(ports_group[i]):
                     connected = port.name in source_ports
         if connected:
             print('\n(control) source already selected')
@@ -302,7 +306,7 @@ def source(source):
             for ports_group in init.config['audio_ports']:
                 # make no more than possible connections,
                 # i.e., minimum of input or output ports
-                num_ports=min(len(ports_group), len(source_ports))
+                num_ports=min(len(ports_group), source_ports_len)
                 for i in range(num_ports):
                     # audio sources
                     tmp.connect(source_ports[i], ports_group[i])
@@ -424,12 +428,19 @@ def loudness(loudness):
         if loudness == 'toggle':
             loudness = toggle('loudness')
         init.state['loudness'] = loudness
+
+        # Put volume_filter filters after the mixer m.mixer
+        mixer_index = cdsp_config['pipeline'].index(
+            {'type': 'Mixer', 'name': 'm.mixer'}
+            )
+
         if init.state['loudness'] == 'off':
-            cdsp_config['pipeline'][0]['names'] = ["f.volume"]
-            cdsp_config['pipeline'][1]['names'] = ["f.volume"]
+            volume_filter = "f.volume"
         else:
-            cdsp_config['pipeline'][0]['names'] = ["f.loudness"]
-            cdsp_config['pipeline'][1]['names'] = ["f.loudness"]
+            volume_filter = "f.loudness"
+
+        cdsp_config['pipeline'][mixer_index + 1]['names'] = [volume_filter]
+        cdsp_config['pipeline'][mixer_index + 2]['names'] = [volume_filter]
     else:
         raise OptionsError(options)
 
@@ -553,8 +564,13 @@ def set_pipeline():
             drc_channels = (init.drc[init.state['drc_set']]['channels'])
             pipeline[channel].extend(drc_channels[channel]['pipeline'])
 
-    cdsp_config['pipeline'][3]['names'] = pipeline[0]
-    cdsp_config['pipeline'][4]['names'] = pipeline[1]
+    # Put selected filters after the volume or loudness filters, \
+    # taken their fixed positions after mixer m.mixer
+    mixer_index = cdsp_config['pipeline'].index(
+        {'type': 'Mixer', 'name': 'm.mixer'}
+        )
+    cdsp_config['pipeline'][mixer_index + 3]['names'] = pipeline[0]
+    cdsp_config['pipeline'][mixer_index + 4]['names'] = pipeline[1]
 
 
 def set_mixer():
