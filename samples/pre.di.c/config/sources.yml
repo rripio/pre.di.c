@@ -1,0 +1,42 @@
+# sources configuration
+
+# source_name:
+
+## gain shift of source
+#   gain: float(dB)
+
+## jack source ports
+#   source_ports: source_jack_port_1 source_jack_port_2
+
+## phase equalizer will be activated automatically when the source is selected \
+## if use_source_phase_eq: false in main config
+#   phase_eq: true
+
+## wait a bit before switching source on startup, after source ports are up
+## mpd needs this, maybe other clients also
+# wait_on_start: [true | false]
+
+
+a:
+    gain: 0
+    source_ports: system:capture_1 system:capture_2
+    phase_eq: 'on'
+    wait_on_start: false
+
+# mpd:
+#     gain: 0
+#     source_ports: mpd_jack:L mpd_jack:R mpd_jack:C mpd_jack:LS mpd_jack:RS
+#     phase_eq: 'on'
+#     wait_on_start: true
+# 
+# net:
+#     gain: 0
+#     source_ports: net:from_slave_1 net:from_slave_2
+#     phase_eq: 'on'
+#     wait_on_start: false
+# 
+# dvb:
+#     gain: 0
+#     source_ports: mplayer_dvb:out_0 mplayer_dvb:out_1
+#     phase_eq: 'on'
+#     wait_on_start: false

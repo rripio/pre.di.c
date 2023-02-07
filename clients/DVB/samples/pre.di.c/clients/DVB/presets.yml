@@ -1,0 +1,39 @@
+# DVB-T presets (radio or not)
+
+# please respect indentation when editing
+
+# preset numbers assigned to stations names as they appear in file
+# ~/.mplayer/channels.conf
+
+# gain: volume in dB added in mplayer
+
+1:
+    name: Radio Nacional de España(RTVE)
+    gain: 0.0
+2:
+    name: Radio Clasica HQ RNE(RTVE)
+    gain: 12.0
+3:
+    name: Radio3 HQ RNE(RTVE)
+    gain: 0.0
+4:
+    name: Radio Exterior RNE(RTVE)
+    gain: 0.0
+6:
+    name: SER(SER)
+    gain: 0.0
+5:
+    name: Radio 5 RNE(RTVE)
+    gain: 0.0
+7:
+    name: Kiss FM(Kiss FM)
+    gain: -3.0
+8:
+    name: ONDA CERO(A3MEDIA)
+    gain: 0.0
+9:
+    name: ONDA MADRID(RTVM)
+    gain: 0.0
+10:
+11:
+

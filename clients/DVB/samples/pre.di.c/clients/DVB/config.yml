@@ -1,0 +1,26 @@
+# DVB-T client config
+
+# please respect indentation when editing
+
+# mplayer start command line:
+# mplayer aditional options set in ~/.mplayer/config
+start_command: /usr/bin/mplayer
+
+# mplayer kill command line:
+stop_command: pkill -f /usr/bin/mplayer
+
+# DVB source name in ~/pre.di.c/sources.yml
+DVB_source: tdt
+
+# play preset on start
+# set preset as "last" for last played channel
+play_on_start: true
+preset: 6
+
+# ancillary filenames
+state_filename: state.yml
+presets_filename: presets.yml
+# commands FIFO filename
+# option -input file={dvb_fifo} is added in program
+fifo_filename: DVB_fifo
+

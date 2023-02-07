@@ -1,0 +1,22 @@
+# mpd client config
+
+# please respect indentation when editing
+
+# mpd start command line:
+#command: /usr/bin/chrt 90 /usr/bin/mpd
+start_command: /usr/bin/mpd
+
+# mpd kill command line:
+stop_command: pkill -f /usr/bin/mpd
+
+# port to connect to
+port: '6600'
+
+# link mpd and predic volumes
+volume_linked: true
+# mpd volume range (dB from 0% to 100%)
+# 100% is then mapped to pre.di.c gain_max
+# gain at 0% is then gain_max - slider_range
+# must be positive integer
+slider_range: 54
+

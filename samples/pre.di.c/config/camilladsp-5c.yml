@@ -1,0 +1,226 @@
+devices:
+
+    # fs is taken from loudspeaker config and overrides camilladsp.yml, \
+    # and is given in command line
+    # since this setting is mandatory, \
+    # it will be used only as information label
+    samplerate: 48000
+    
+    chunksize: 1024
+    silence_threshold: -80
+    silence_timeout: 10.0
+    capture:
+        type: Jack
+        channels: 5
+        device: "default"
+    playback:
+        type: Jack
+        channels: 2
+        device: "default"
+
+
+mixers:
+
+
+    # input mixer
+    # do not edit
+
+    m.input:
+        channels:
+            in: 5
+            out: 2
+        mapping:
+        -   dest: 0
+            mute: false
+            sources:
+            -   channel: 0
+                gain: 0
+                inverted: false
+                mute: false
+            -   channel: 2
+                gain: -3.01029996
+                inverted: false
+                mute: true
+            -   channel: 3
+                gain: -3.01029996
+                inverted: false
+                mute: true
+        -   dest: 1
+            mute: false
+            sources:
+            -   channel: 1
+                gain: 0
+                inverted: false
+                mute: false
+            -   channel: 2
+                gain: -3.01029996
+                inverted: false
+                mute: true
+            -   channel: 4
+                gain: -3.01029996
+                inverted: false
+                mute: true
+
+
+    # preamp mixer
+    # do not edit
+
+    m.mixer:
+        channels:
+            in: 2
+            out: 2
+        mapping:
+        -   dest: 0
+            mute: false
+            sources:
+            -   channel: 0
+                gain: 0
+                inverted: false
+                mute: false
+            -   channel: 1
+                gain: 0
+                inverted: false
+                mute: true
+        -   dest: 1
+            mute: false
+            sources:
+            -   channel: 0
+                gain: 0
+                inverted: false
+                mute: true
+            -   channel: 1
+                gain: 0
+                inverted: false
+                mute: false
+
+
+filters:
+
+    # preamp filters
+    # do not edit
+
+    f.volume:
+        type: Volume
+        parameters:
+            ramp_time: 100
+
+    f.loudness:
+        type: Loudness
+        parameters:
+            ramp_time: 100.0
+            reference_level: 0
+            # high_boost: 1.5
+            # low_boost: 10.0
+            high_boost: 3.0
+            low_boost: 20.0
+
+    f.balance.L:
+        type: Gain
+        parameters:
+            gain: 0
+            inverted: false
+            mute: false
+
+    f.balance.R:
+        type: Gain
+        parameters:
+            gain: 0
+            inverted: false
+            mute: false
+
+    f.bass:
+        type: Biquad
+        parameters:
+            type: Lowshelf
+            freq: 158
+            gain: 0
+            q: 0.5
+
+    f.treble:
+        type: Biquad
+        parameters:
+            type: Highshelf
+            freq: 2530
+            gain: 0
+            q: 0.5
+
+    f.dither:
+        type: Dither
+        parameters:
+            type: Shibata48
+            bits: 24
+
+    # optional FIR phase linearizing filter
+    # can be switched by pre.di.c but not changed
+    # this is a dummy container, do not change
+    # speaker config can overwrite this
+    f.phase_eq:
+        type: Conv
+
+
+pipeline:
+
+# preamp pipeline
+# do not edit
+
+# volume section
+-   type: Mixer
+    name: m.input
+
+-   type: Mixer
+    name: m.mixer
+
+-   type: Filter
+    channel: 0
+    names:
+    # switchable volume filters
+        -   f.volume
+        # -   f.loudness
+
+-   type: Filter
+    channel: 1
+    names:
+    # switchable volume filters
+        -   f.volume
+        # -   f.loudness
+
+# eq section
+-   type: Filter
+    channel: 0
+    names:
+    # permanent fixed length filters
+    -   f.balance.L
+
+    # switchable fixed length filters
+    # -   f.bass
+    # -   f.treble
+    # -   f.phase
+
+    # switchable variable length filters
+
+    # defined in eq.yml
+    # -   [ eq filter set ]
+
+    # defined in speaker.yml
+    # -   [ drc filter set, L channel ]
+
+-   type: Filter
+    channel: 1
+    names:
+    # permanent fixed length filters
+    -   f.balance.R
+
+    # switchable fixed length filters
+    # -   f.bass
+    # -   f.treble
+    # -   f.phase
+
+    # switchable variable length filters
+
+    # defined in eq.yml
+    # -   [ eq filter set ]
+
+    # defined in speaker.yml
+    # -   [ drc filter set, R channel ]
+
+

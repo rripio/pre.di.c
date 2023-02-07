@@ -1,0 +1,16 @@
+# EQ filters for recordings
+
+"1":
+    comment: dummy eq for classical
+    filters:
+        f.eq.1:
+            type: Conv
+    pipeline:
+    -   f.eq.1
+"2":
+    comment: dummy eq for pop
+    filters:
+        f.eq.2:
+            type: Conv
+    pipeline:
+    -   f.eq.2
