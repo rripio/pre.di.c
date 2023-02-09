@@ -120,8 +120,8 @@ def change_radio(
     # wrong preset selection
     elif not selected in presets:
         print(
-            f'(DVB_command) option must be in {options} '
-            'or be an existing integer preset'
+            f'\n(DVB_command)\noption must be in {options} '
+            f'\nor be one of these integer presets: {presets}\n'
             )
         return
     # actual channel switch
