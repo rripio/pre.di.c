@@ -129,15 +129,15 @@ def change_radio(
         if selected != state['actual']:
             state['previous'] = state['actual']
         state['actual'] = selected
-        # if starting predic give startaudio command on source switching
+        # if starting predic 'startaudio.py'  makes actual switching
         if not startflag:
             # check selected source and reconnect to DVB if selected
-            selected_source = pd.read_state()['source']
+            selected_source = init.state['source']
             if config['DVB_source'] == selected_source:
                 tmax = init.config['command_delay'] * 10
                 interval = init.config['command_delay'] * 0.1
                 # wait for disconnection of previous channel
-                time.sleep(init.config['command_delay'])
+                time.sleep(init.config['command_delay'] * 0.5)
                 # try to connect for newly connected ports
                 if pd.wait4source(selected_source, tmax, interval):
                     # source ports up and ready :-)
