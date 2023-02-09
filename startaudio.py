@@ -189,6 +189,10 @@ def main(run_level):
         init_camilladsp()
         init_server()
 
+    # save do_mute state, then disable muting temporarily
+    do_mute_save = init.config['do_mute']
+    init.config['do_mute'] = False
+
     # inboard players
     if run_level in {'clients', 'all'}:
         # getting operating state
@@ -220,6 +224,9 @@ def main(run_level):
             except Exception as e:
                 print(f"\n(startaudio) problem launching client '{client}': "
                       , e)
+
+        # restore do_mute state
+        init.config['do_mute'] = do_mute_save
 
         # restoring sources if config mandates so
         if state['sources'] == 'on':
