@@ -170,7 +170,9 @@ def init_source(state):
             # some clients (namely mpd) seems to need some extra time after \
             # ports detection for whatever reason
             time.sleep(init.config['command_delay'] * 2)
-        pd.client_socket('source ' + source, quiet=True)
+        
+        pd.client_socket('sources on', quiet=True)
+        # pd.client_socket('source ' + source, quiet=True)
     else:
         print(f"\n(startaudio) could not connect '{source}' ports")
 

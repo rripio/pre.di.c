@@ -14,6 +14,7 @@ import pdlib as pd
 
 from camilladsp import CamillaConnection
 
+
 # connect to camilladsp and get camilladsp config once
 cdsp = CamillaConnection("localhost", init.config['websocket_port'])
 cdsp.connect()
@@ -40,6 +41,10 @@ cdsp_config['pipeline'].extend(init.speaker['pipeline'])
 
 add = False             # switch to relative commands
 clamp_gain = True       # allows gain clamp
+do_mute = False         # mute during command
+
+# gets camilladsp setting for volume ramp, and use it for mute waiting
+ramp_time = cdsp_config['filters']['f.volume']['parameters']['ramp_time']/1000
 
 
 ### exception definitions
@@ -52,7 +57,7 @@ class OptionsError(Exception):
     
     def __init__(self, options):
         self.options = options
-        
+
 class ClampWarning(Warning):
     
     def __init__(self, clamp_value):
@@ -81,9 +86,29 @@ def toggle(command):
     return {'off': 'on', 'on': 'off'}[init.state[command]]
 
 
+def do_source(source_arg):
+    """
+    wrapper for source command, avoiding muting already selected sources
+    """
+
+    global do_mute
+
+    sources = init.sources
+    # sources check is done here, not in proper function
+    if source_arg in sources:
+    # check for already selected source
+        if init.state['source'] == source_arg:
+            print('\n(control) source already selected')
+        else:
+            do_mute = True
+            do_command(source, source_arg)
+    else:
+        print("\n(control) Source has to be in : ", list(sources))
+
+
 def do_command(command, arg):
     """
-    command wrapper
+    general command wrapper
     """
     
     # backup state to restore values in case of not enough headroom \
@@ -92,13 +117,18 @@ def do_command(command, arg):
 
     if arg:
         try:
+            if do_mute and init.config['do_mute']:
+                cdsp.set_mute(True)
+                # 2x volume ramp_time for security (estimated)
+                time.sleep(ramp_time*2)
+
             command(arg)
+
         except ClampWarning as w:
             print(f"\n(control) '{command.__name__}' value clamped: ",
                   w.clamp_value)
         except OptionsError as e:
-            print("\n(control) Bad option. Options has to be in : ",
-                  list(e.options))
+            print("\n(control) Options has to be in : ", list(e.options))
         except ValueError as e:
             print(f"\n(control) Command '{command.__name__}' ",
                   f"needs a number: {e}")
@@ -106,6 +136,13 @@ def do_command(command, arg):
             init.state[command.__name__]  = state_old[command.__name__]
             print(f"\n(control) Exception in command '{command.__name__}': ",
                   e)
+        finally:
+            if do_mute and init.config['do_mute']:
+                # 0.8x command_delay to give time for command to finish
+                # (estimated)
+                time.sleep(init.config['command_delay'] * 0.8)
+                mute(init.state['mute'])
+
     else:
         print(f"\n(control) Command '{command.__name__}' needs an option")
 
@@ -275,49 +312,36 @@ def source(source):
     change source
     """
     
-    
     # allows changing flag
     global clamp_gain
     # reset clamp_gain to True when changing sources
     clamp_gain = True
 
-    options = init.sources
-    if source in options:
-        init.state['source'] = source
-        source_ports = init.sources[init.state['source']]['source_ports']
-        source_ports_len = len(source_ports)
-        tmp = jack.Client('tmp')
+    # additional waiting after muting
+    time.sleep(init.config['command_delay'] * 0.2)
 
-        # check if ports are already connected
-        connected = False
-        for ports_group in init.config['audio_ports']:
-            # for audio_port in ports_group:
-            # get max number of possible connectios
-            num_ports=min(len(ports_group), source_ports_len)
-            for i in range(num_ports):
-                for port in tmp.get_all_connections(ports_group[i]):
-                    connected = port.name in source_ports
-        if connected:
-            print('\n(control) source already selected')
-            tmp.close()
-            return
-        else:
-            disconnect_sources(tmp)
-            for ports_group in init.config['audio_ports']:
-                # make no more than possible connections,
-                # i.e., minimum of input or output ports
-                num_ports=min(len(ports_group), source_ports_len)
-                for i in range(num_ports):
-                    # audio sources
-                    tmp.connect(source_ports[i], ports_group[i])
-            tmp.close()
-            # source change went OK
-            set_gain(pd.calc_gain(init.state['level']))
-            # change phase_eq if configured so
-            if init.config['use_source_phase_eq']:
-                phase_eq(init.sources[source]['phase_eq'])
-    else:
-        raise OptionsError(options)
+    init.state['source'] = source
+    source_ports = init.sources[init.state['source']]['source_ports']
+    source_ports_len = len(source_ports)
+    tmp = jack.Client('tmp')
+
+    disconnect_sources(tmp)
+    for ports_group in init.config['audio_ports']:
+        # make no more than possible connections,
+        # i.e., minimum of input or output ports
+        num_ports=min(len(ports_group), source_ports_len)
+        for i in range(num_ports):
+            # audio sources
+            tmp.connect(source_ports[i], ports_group[i])
+    tmp.close()
+    # source change went OK
+    set_gain(pd.calc_gain(init.state['level']))
+    # change phase_eq if configured so
+    if init.config['use_source_phase_eq']:
+        phase_eq(init.sources[source]['phase_eq'])
+
+    # additional waiting before unmuting
+    time.sleep(init.config['command_delay'] * 0.2)
 
 
 def drc_set(drc_set):
@@ -671,6 +695,7 @@ def set_gain(gain):
     else:
         cdsp.set_volume(gain)
 
+
 ### main command proccessing function
 
 
@@ -679,11 +704,13 @@ def proccess_commands(full_command):
     procces commands for predic control
     """
 
-    # let camilladsp connection be accessible
-    global cdsp
-    # let flag 'add' be accessible
+    global cdsp             # let camilladsp connection be accesible
+
     global add
+    global do_mute
+
     add = False
+    do_mute = False
     
     # strips command final characters and split command from arguments
     full_command = full_command.rstrip('\r\n').split()
@@ -706,12 +733,11 @@ def proccess_commands(full_command):
 
     try:
         # commands without options
-        if command in {'show'}:
-            {
-            'show':             show            #
-            }[command]()
+        if command == 'show':
+            show()                              #
 
-        # commands that do not depend on camilladsp config
+        ## commands that do not depend on camilladsp config
+
         elif command in {'clamp', 'mute', 'level', 'gain'}:
             do_command(
             {
@@ -724,8 +750,15 @@ def proccess_commands(full_command):
             'gain':             set_gain        #[gain]
             }[command], arg)
 
-        # commands that depend on camilladsp config
-        else:
+        ## commands that depend on camilladsp config
+
+        elif command == 'source':
+            # source                            #[source]
+            do_source(arg)
+            # dispatch config
+            cdsp.set_config(cdsp_config)
+
+        elif command in {'loudness_ref', 'bass', 'treble', 'balance'}:
             do_command(
             {
             # numerical commands that accept 'add'
@@ -733,9 +766,16 @@ def proccess_commands(full_command):
             'bass':             bass,           #[bass] add
             'treble':           treble,         #[treble] add
             'balance':          balance,        #[balance] add
+            }[command], arg)
+            # dispatch config
+            cdsp.set_config(cdsp_config)
 
+        else:
+            # these commands benefit for silencing switching noise
+            do_mute = True
+            do_command(
+            {
             # non numerical commands
-            'source':           source,         #[source]
             'drc_set':          drc_set,        #[drc_set]
             'eq_filter':        eq_filter,      #[eq_filter]
             'stereo':           stereo,         #['off','mid','side']
@@ -753,9 +793,8 @@ def proccess_commands(full_command):
             'polarity':         polarity,       #['off','on','toggle']
             'polarity_flip':    polarity_flip   #['off','on','toggle']
             }[command], arg)
-
-        # dispatch config
-        cdsp.set_config(cdsp_config)
+            # dispatch config
+            cdsp.set_config(cdsp_config)
 
     except KeyError:
         print(f"\n(control) Unknown command '{command}'")

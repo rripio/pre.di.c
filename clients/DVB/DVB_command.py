@@ -142,7 +142,7 @@ def change_radio(
                 if pd.wait4source(selected_source, tmax, interval):
                     # source ports up and ready :-)
                     # switch on source
-                    pd.client_socket('source ' + selected_source, quiet=True)
+                    pd.client_socket('sources on', quiet=True)
     else:
         state['actual'] = state_old['actual']
         state['previous'] = state_old['previous']
