@@ -155,8 +155,7 @@ def change_radio(
 if sys.argv[1:]:
     selected = sys.argv[1]
     if sys.argv[2:]:
-        startflag = sys.argv[2]
-        if startflag == 'startaudio':
+        if sys.argv[2] == 'startaudio':
             startflag = True
         else:
             startflag = False
