@@ -33,12 +33,12 @@ def main(run_level):
 
     if run_level in {'clients', 'all'}:
         # stop external scripts, sources and clients
-        print('(stopaudio) stopping clients')
+        print('\n(stopaudio) stopping clients')
         for command in pd.read_clients('stop'):
             try:
                 Popen(f'{init.clients_folder}/{command}'.split())
-            except Exception:
-                print(f'problem stopping client "{command}":\n\t{err}')
+            except Exception as e:
+                print(f'\n(stopaudio) problem stopping client "{command}": {e}\n')
     if run_level in {'core', 'all'}:
         # controlserver
         print('(stopaudio) stopping server')
