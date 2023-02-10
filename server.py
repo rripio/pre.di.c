@@ -33,7 +33,8 @@ async def handle_commands(reader, writer):
     try:
         if data.rstrip('\r\n') == 'status':
             # echo state to client as YAML string
-            writer.write(yaml.dump(init.state, default_flow_style=False).encode())
+            writer.write(yaml.dump(init.state, 
+                                   default_flow_style=False).encode())
             writer.write(b'OK\n')
             await writer.drain()
             if init.config['verbose'] == 2:
@@ -73,7 +74,8 @@ async def handle_commands(reader, writer):
                 writer.write(b'OK\n')
                 await writer.drain()
             except Exception as e:
-                print('\n(server) An error occurred when writing state file: ', e)
+                print('\n(server) An error occurred when writing state file: ',
+                      e)
     except ConnectionResetError:
         print('\n(server) still no connection...')
     # except Exception as e:
