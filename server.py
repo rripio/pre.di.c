@@ -66,7 +66,7 @@ async def handle_commands(reader, writer):
                 print('\n(server) closing connection...')
 
         elif data.rstrip('\r\n') == 'nostart':
-            # inhibits mute downstream
+            # restore mute state downstream
             init.config['do_mute'] = do_mute_save
             writer.write(b'OK\n')
             await writer.drain()
