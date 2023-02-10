@@ -11,6 +11,7 @@ import yaml
 import control
 import init
 
+# init.config['do_mute'] = False
 
 async def handle_commands(reader, writer):
 
@@ -60,14 +61,12 @@ async def handle_commands(reader, writer):
             # then send command to control.py, \
             # that answers with state dict
             control.proccess_commands(data)
+
+            if init.config['verbose'] in [1, 2]:
+                print(f'\n(server) Command: {data}')
+
             # a try block avoids blocking of state file writing \
             # when the terminal that launched startaudio.py is closed
-            try:
-                if init.config['verbose'] in [1, 2]:
-                    print(f'\n(server) Command: {data}')
-            except Exception as e:
-                print(f'\n(server) Exception: {e}')
-
             try:
                 # writes state file
                 write_state()
