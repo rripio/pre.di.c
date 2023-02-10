@@ -195,6 +195,9 @@ def main(run_level):
         # do it before launching clients \
         # so they get the correct setting from state file if needed
         state = set_initial_state()
+        
+        # activate start mode in server
+        pd.client_socket('start', quiet=True)
 
         # restoring previous state
         # exceptionally we add a line feed at the end \
@@ -227,8 +230,12 @@ def main(run_level):
         else:
             pd.client_socket('sources off', quiet=True)
 
-        pd.client_socket('save', quiet=True)    # save changes to file
+        # cancel start mode in server
+        pd.client_socket('nostart', quiet=True)
+        # save changes to file
+        pd.client_socket('save', quiet=True)
         print('\n(startaudio): pre.di.c started :-)')
+
 
 
 if __name__ == '__main__':

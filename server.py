@@ -11,7 +11,8 @@ import yaml
 import control
 import init
 
-# init.config['do_mute'] = False
+# save actual do_mute state, to restore it at the end
+do_mute_save = init.config['do_mute']
 
 async def handle_commands(reader, writer):
 
@@ -51,6 +52,22 @@ async def handle_commands(reader, writer):
 
         elif data.rstrip('\r\n') == 'ping':
             # just answers OK
+            writer.write(b'OK\n')
+            await writer.drain()
+            if init.config['verbose'] == 2:
+                print('\n(server) closing connection...')
+
+        elif data.rstrip('\r\n') == 'start':
+            # inhibits mute downstream
+            init.config['do_mute'] = False
+            writer.write(b'OK\n')
+            await writer.drain()
+            if init.config['verbose'] == 2:
+                print('\n(server) closing connection...')
+
+        elif data.rstrip('\r\n') == 'nostart':
+            # inhibits mute downstream
+            init.config['do_mute'] = do_mute_save
             writer.write(b'OK\n')
             await writer.drain()
             if init.config['verbose'] == 2:
