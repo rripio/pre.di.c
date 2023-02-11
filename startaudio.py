@@ -196,8 +196,8 @@ def main(run_level):
         # so they get the correct setting from state file if needed
         state = set_initial_state()
         
-        # activate start mode in server
-        pd.client_socket('start', quiet=True)
+        # activate command_unmute mode downstream
+        pd.client_socket('command_unmute', quiet=True)
 
         # restoring previous state
         # exceptionally we add a line feed at the end \
@@ -230,8 +230,10 @@ def main(run_level):
         else:
             pd.client_socket('sources off', quiet=True)
 
-        # cancel start mode in server
-        pd.client_socket('nostart', quiet=True)
+        # cancel command_unmute mode downstream \
+        # restoring config value
+        if init.config['do_mute']:
+            pd.client_socket('command_mute', quiet=True)
         # save changes to file
         pd.client_socket('save', quiet=True)
         print('\n(startaudio): pre.di.c started :-)')

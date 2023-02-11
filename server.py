@@ -11,9 +11,6 @@ import yaml
 import control
 import init
 
-# save actual do_mute state, to restore it at the end
-do_mute_save = init.config['do_mute']
-
 async def handle_commands(reader, writer):
 
     rawdata = await reader.read(100)
@@ -57,7 +54,7 @@ async def handle_commands(reader, writer):
             if init.config['verbose'] == 2:
                 print('\n(server) closing connection...')
 
-        elif data.rstrip('\r\n') == 'start':
+        elif data.rstrip('\r\n') == 'command_unmute':
             # inhibits mute downstream
             init.config['do_mute'] = False
             writer.write(b'OK\n')
@@ -65,9 +62,9 @@ async def handle_commands(reader, writer):
             if init.config['verbose'] == 2:
                 print('\n(server) closing connection...')
 
-        elif data.rstrip('\r\n') == 'nostart':
+        elif data.rstrip('\r\n') == 'command_mute':
             # restore mute state downstream
-            init.config['do_mute'] = do_mute_save
+            init.config['do_mute'] = True
             writer.write(b'OK\n')
             await writer.drain()
             if init.config['verbose'] == 2:
@@ -94,8 +91,8 @@ async def handle_commands(reader, writer):
                       e)
     except ConnectionResetError:
         print('\n(server) still no connection...')
-    # except Exception as e:
-    #     print('(server) An exception occurred: ', e)
+    except Exception as e:
+        print('(server) An exception occurred: ', e)
     finally:
         writer.close()
 
