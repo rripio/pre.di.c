@@ -32,6 +32,9 @@ import init
 import pdlib as pd
 
 
+# mute as soon as possible. this anticipates mute by 0.5 s aprox.
+pd.client_socket('mute on', quiet=True)
+
 # where am I? here you have all files
 folder = f'{os.path.dirname(sys.argv[0])}/'
 
@@ -126,11 +129,6 @@ def change_radio(
         return
     # actual channel switch
 
-    # mute as soon as possible. this saves 0.5 s aprox.
-    # save mute state
-    mute_save = init.state['mute']
-    pd.client_socket('mute on', quiet=True)
-    
     if select_preset(selected):
         if selected != state['actual']:
             state['previous'] = state['actual']
@@ -149,11 +147,14 @@ def change_radio(
                     # source ports up and ready :-)
                     # switch on source
                     pd.client_socket('sources on', quiet=True)
-                    pd.client_socket(f'mute {mute_save}', quiet=True)
     else:
         state['actual'] = state_old['actual']
         state['previous'] = state_old['previous']
         print('(DVB_command) Something went wrong when changing radio state')
+
+    # restore previous mute state
+    pd.client_socket(f"mute {init.state['mute']}", quiet=True)
+
     # write state
     with open(state_path, 'w') as f:
         yaml.dump(state, f, default_flow_style=False)
