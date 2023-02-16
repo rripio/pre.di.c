@@ -125,6 +125,12 @@ def change_radio(
             )
         return
     # actual channel switch
+
+    # mute as soon as possible. this saves 0.5 s aprox.
+    # save mute state
+    mute_save = init.state['mute']
+    pd.client_socket('mute on', quiet=True)
+    
     if select_preset(selected):
         if selected != state['actual']:
             state['previous'] = state['actual']
@@ -143,6 +149,7 @@ def change_radio(
                     # source ports up and ready :-)
                     # switch on source
                     pd.client_socket('sources on', quiet=True)
+                    pd.client_socket(f'mute {mute_save}', quiet=True)
     else:
         state['actual'] = state_old['actual']
         state['previous'] = state_old['previous']
