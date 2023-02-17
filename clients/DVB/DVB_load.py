@@ -15,7 +15,7 @@ import sys
 import os
 import subprocess as sp
 
-import init
+import pdlib as pd
 
 
 # initialize
@@ -23,7 +23,7 @@ import init
 # get config
 config_filename = 'config.yml'
 folder = f'{os.path.dirname(sys.argv[0])}/'
-config = init.get_yaml(folder + config_filename)
+config = pd.get_yaml(folder + config_filename)
 dvb_fifo = folder + config["fifo_filename"]
 
 

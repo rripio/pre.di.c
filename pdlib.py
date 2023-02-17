@@ -43,6 +43,17 @@ def read_clients(phase):
     return clients
 
 
+def get_yaml(filepath):
+    """
+    returns dictionary from yaml config file
+    """
+
+    with open(filepath) as configfile:
+        config_dict = yaml.safe_load(configfile)
+
+    return config_dict
+
+
 def client_socket(data, quiet=True):
     """
     makes a socket for talking to the server

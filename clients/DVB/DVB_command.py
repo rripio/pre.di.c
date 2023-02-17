@@ -40,7 +40,7 @@ folder = f'{os.path.dirname(sys.argv[0])}/'
 
 # get config
 config_filename = 'config.yml'
-config = init.get_yaml(folder + config_filename)
+config = pd.get_yaml(folder + config_filename)
 
 # paths
 state_path = folder + config["state_filename"]
@@ -48,8 +48,8 @@ presets_path = folder + config["presets_filename"]
 dvb_fifo = folder + config["fifo_filename"]
 
 # get dictionaries
-state = init.get_yaml(state_path)
-presets = init.get_yaml(presets_path)
+state = pd.get_yaml(state_path)
+presets = pd.get_yaml(presets_path)
 
 
 def select_channel(channel_name, channel_gain):

@@ -166,7 +166,7 @@ def stop():
 
 if sys.argv[1:]:
     dir = os.path.dirname(os.path.realpath(__file__))
-    mpd_conf = init.get_yaml(f'{dir}/{config_filename}')
+    mpd_conf = pd.get_yaml(f'{dir}/{config_filename}')
     try:
         option = {
             'start' : start,

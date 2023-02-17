@@ -11,7 +11,7 @@ import numpy as np
 import baseconfig as base
 
 
-def get_yaml(filepath):
+def get_configs(filepath):
     """
     returns dictionary from yaml config file
     """
@@ -47,16 +47,16 @@ camilladsp_path = f'{config_folder}/{base.camilladsp_filename}'
 
 try:
 
-    config = get_yaml(config_path)
-    sources = get_yaml(sources_path)
-    state = get_yaml(state_path)
-    state_init = get_yaml(state_init_path)
-    eq = get_yaml(eq_path)
+    config = get_configs(config_path)
+    sources = get_configs(sources_path)
+    state = get_configs(state_path)
+    state_init = get_configs(state_init_path)
+    eq = get_configs(eq_path)
 
     # after knowing which speaker config to load, load it
     loudspeaker_path = f'{loudspeakers_folder}/{config["loudspeaker"]}' 
-    speaker = get_yaml(loudspeaker_path + '/' + base.loudspeaker_filename)
-    drc = get_yaml(loudspeaker_path + '/' + base.drc_filename)
+    speaker = get_configs(loudspeaker_path + '/' + base.loudspeaker_filename)
+    drc = get_configs(loudspeaker_path + '/' + base.drc_filename)
 
 except Exception as e:
    print(f'\n(init) Error getting configurations: {e}')
