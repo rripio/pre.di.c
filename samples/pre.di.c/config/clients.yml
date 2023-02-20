@@ -19,3 +19,7 @@
 #stream_loop:
 #    start:  stream_loop.py start
 
+# zita-cd:
+#     start:  zita-cd start
+#     stop:   zita-cd stop
+
