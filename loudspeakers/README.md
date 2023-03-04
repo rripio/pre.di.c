@@ -2,9 +2,9 @@
 
 Container for specific loudspeaker configuration.
 
-Each loudspeaker set configured goes on its own folder. The name of that folder will be used in the config file to determine which loudspeakers to load.
+Each loudspeaker set configured goes on its own folder. The name of that folder will be used in the config file to determine which loudspeaker to load.
 
-Some example loudspeakers are provided, in the usual full range (_example_1_ways_), two ways (_example_2_ways_) and three ways (_example_3_ways_) configurations. They are intended to be used as templates for your personal setup
+Some example loudspeakers are provided, in the usual full range (_example_1_way_), two ways (_example_2_ways_) and three ways (_example_3_ways_) configurations. They are intended to be used as templates for your personal setup.
 
 #### example_1_way
 
@@ -12,7 +12,7 @@ This example can be used as a template for a full range setup.
 
 All impulse files provided are deltas that do not make any effective filtering, and are meant to be overwritten with the equalizing impulses of your choice.
 
-The given structure allows for 2 room correction filter sets. Speaker equalizer set are minimum phase, low delay FIR filters. Phase equalization filter is set up as a delta virtual filter, but there is provision in loudspeaker config file to set up a FIR filter for that purpose.
+The given structure allows for 2 room correction filter sets. The speaker equalizer set is made with minimum phase, low delay FIR filters. The phase equalization filter is set up as a delta virtual filter, but there is provision in loudspeaker config file to set up a FIR filter for that purpose.
 
 #### example_2_ways
 
