@@ -1,0 +1,83 @@
+comment: example 1 way
+# starting jack needs this although is it redundant with camilladsp config.
+# it serves also as information label.
+fs: 48000
+ref_level_gain: -12.0
+
+filters:
+
+    # optional FIR phase linearizing filter.
+    # do not change name.
+    f.phase_eq:
+        type: Conv
+
+    # the following filters are free in name and topology.
+    # they cannot be switched nor changed by pre.di.c.
+    
+    # target filters.
+    # convenience equalizer to adjust independently driver linearization
+    # and global frequency response.
+    
+    # xo filters.
+    # no crossover since it is a full range speaker.
+
+    # eq filters.
+    # driver linearization filters.
+    f.eq.fr.L:
+        type: Conv
+        parameters:
+            type: Raw
+            format: FLOAT32LE
+            filename: "xo-mp-fr-L.pcm"
+
+    f.eq.fr.R:
+        type: Conv
+        parameters:
+            type: Raw
+            format: FLOAT32LE
+            filename: "xo-mp-fr-R.pcm"
+
+mixers:
+
+    # mixer for ways splitting, loudspeaker specific.
+    # edit at your convenience.
+    m.xo:
+        channels:
+            in: 2
+            out: 2
+        mapping:
+        -   dest: 0
+            mute: false
+            sources:
+            -   channel: 0
+                gain: 0
+                inverted: false
+                mute: false
+        -   dest: 1
+            mute: false
+            sources:
+            -   channel: 1
+                gain: 0
+                inverted: false
+                mute: false
+
+pipeline:
+# here comes specific loudspeaker config.
+# edit the following pipeline segment at your convenience.
+
+-   type: Mixer
+    name: m.xo
+
+-   type: Filter
+    channel: 0
+    names:
+    # -   f.xo.fr
+    -   f.eq.fr.L
+    -   f.dither
+
+-   type: Filter
+    channel: 1
+    names:
+    # -   f.xo.fr
+    -   f.eq.fr.R
+    -   f.dither
