@@ -221,7 +221,7 @@ def calc_source_gain(source):
     return init.sources[source]['gain']
 
 
-def show(clamp_gain):
+def show():
     """
     shows a status report
     """
@@ -230,7 +230,6 @@ def show(clamp_gain):
     gain = calc_gain(init.state['level']) + source_gain
     headroom = calc_headroom(gain)
     source_headroom = headroom - source_gain
-    clamp_string = {False: 'off', True: 'on'}[clamp_gain]
 
     print()
     print(f"Loudspeaker:        {init.config['loudspeaker']: >10s}")
@@ -274,16 +273,16 @@ def show(clamp_gain):
     print()
     print(f"Gain                {gain: 10.1f}")
     print(f"Headroom            {headroom: 10.1f}")
-    print(f"Clamp gain          {clamp_string: >10s}")
+    print(f"Clamp gain          {init.state['clamp']: >10s}")
 
     print('\n')
 
 
-def show_file(clamp_gain):
+def show_file():
     """
     writes a status report to temp file
     """
 
     with open('/tmp/predic', 'w') as f:
         with cl.redirect_stdout(f):
-            show(clamp_gain)
+            show()

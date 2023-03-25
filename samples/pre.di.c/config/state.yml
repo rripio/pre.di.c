@@ -2,6 +2,7 @@ balance: 0.0
 bass: 0.0
 channels: lr
 channels_flip: 'off'
+clamp: 'on'
 drc: 'on'
 drc_set: '1'
 eq: 'off'

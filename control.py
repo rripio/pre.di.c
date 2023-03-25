@@ -40,7 +40,6 @@ cdsp_config['pipeline'].extend(init.speaker['pipeline'])
 
 
 add = False             # switch to relative commands
-clamp_gain = True       # allows gain clamp
 do_mute = False         # mute during command
 
 # gets camilladsp setting for volume ramp, and use it for mute waiting
@@ -158,7 +157,7 @@ def show():
     show status in a readable way
     """
     
-    pd.show_file(clamp_gain)
+    pd.show_file()
 
 
 ## commands that do not depend on camilladsp config
@@ -186,15 +185,12 @@ def clamp(clamp):
     useful for playing  low level files
     """
     
-    # allows changing flag
-    global clamp_gain
-
     options = {'off', 'on', 'toggle'}
     if clamp in options:
         if clamp == 'toggle':
             clamp = toggle('clamp')
-        clamp_gain = {'off': False, 'on': True}[clamp]
-        if clamp_gain:
+        init.state['clamp'] = clamp
+        if init.state['clamp'] == 'on':
             level(init.state['level'])
     else:
         raise OptionsError(options)
@@ -312,10 +308,8 @@ def source(source):
     change source
     """
     
-    # allows changing flag
-    global clamp_gain
-    # reset clamp_gain to True when changing sources
-    clamp_gain = True
+    # reset clamp to 'on' when changing sources
+    init.state['clamp']='on'
 
     # additional waiting after muting
     time.sleep(init.config['command_delay'] * 0.2)
@@ -678,7 +672,7 @@ def set_gain(gain):
         print(f'\n(control) min. gain must be more than {base.gain_min} dB')
         print('(control) gain clamped')
     # calculate headroom and clamp gain if clamp_gain allows to do so
-    if clamp_gain:
+    if init.state['clamp'] == 'on':
         headroom = pd.calc_headroom(gain)
         # adds source gain. It can lead to clipping \
         # because assumes equal dynamic range between sources

@@ -133,6 +133,7 @@ def init_state_settings(state):
             'bass',
             'channels',
             'channels_flip',
+            'clamp',
             'drc',
             'drc_set',
             'eq',
