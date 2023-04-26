@@ -72,8 +72,7 @@ async def handle_commands(reader, writer):
 
         else:
             # command received in 'data', \
-            # then send command to control.py, \
-            # that answers with state dict
+            # then send command to control.py
             control.proccess_commands(data)
 
             if init.config['verbose'] in [1, 2]:
