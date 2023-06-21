@@ -137,7 +137,7 @@ def change_radio(
         if not startflag:
             # check selected source and reconnect to DVB if selected
             selected_source = init.state['source']
-            if config['DVB_source'] == selected_source:
+            if selected_source == config['DVB_source']:
                 tmax = init.config['command_delay'] * 10
                 interval = init.config['command_delay'] * 0.1
                 # wait for disconnection of previous channel

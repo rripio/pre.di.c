@@ -17,7 +17,7 @@
 # wait_on_start: [true | false]
 
 
-a:
+analogue:
     gain: 0
     source_ports: system:capture_1 system:capture_2
     phase_eq: 'on'

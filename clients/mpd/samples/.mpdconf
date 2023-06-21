@@ -114,20 +114,20 @@ audio_output {
 #     threads "0"
 # }
 
-# resampler {
-#     plugin  "soxr"
-#     quality "high"
-# }
+resampler {
+    plugin  "soxr"
+    quality "high"
+}
 
 #resampler {
 #    plugin  "soxr"
 #    quality "very high"
 #}
 
-resampler {
-   plugin  "libsamplerate"
-   type "Fastest Sinc Interpolator"
-}
+# resampler {
+#    plugin  "libsamplerate"
+#    type "Fastest Sinc Interpolator"
+# }
 
 # resampler {
 #    plugin  "libsamplerate"
