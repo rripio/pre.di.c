@@ -174,7 +174,7 @@ begin
     config = ~/bin/control "source mpd"
 end
 begin
-    mode = tdt
+    mode = dvb
     button = KEY_CAMERA
     prog = irexec
     config = ~/bin/control "source dvb"

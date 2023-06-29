@@ -2,11 +2,11 @@
 
 
 
-# mplayer tdt
+# mplayer dvb
 
-# mode tdt
-begin tdt 
-    begin  
+# mode dvb
+begin dvb 
+    begin
          prog = irexec
          button = KEY_STOP
          config = /bin/echo stop > ~/pre.di.c/clients/DVB/dvb_fifo
@@ -72,4 +72,4 @@ begin tdt
 		button = KEY_NUMERIC_9
 		config = ~/pre.di.c/clients/DVB/DVB_command.py 9
 	end
-end tdt
+end dvb
