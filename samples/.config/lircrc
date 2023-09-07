@@ -3,16 +3,16 @@
 # modes
 
 # mixer
-include ~/.config/lirc/mixerrc
+include ~/.config/lirc/mixer.lirc
 
 # EQ and XO
-include ~/.config/lirc/eqrc
+include ~/.config/lirc/eq.lirc
 
 # music player daemon
-include ~/.config/lirc/mpdrc
+include ~/.config/lirc/mpd.lirc
 
 # mplayer tdt
-include ~/.config/lirc/DVBrc
+include ~/.config/lirc/DVB.lirc
 
 begin loudness_ref
 
@@ -57,10 +57,13 @@ begin
 	button = KEY_POWER2
 	config = ~/bin/restartaudio
 end
+
 begin
 	prog = irexec
     button = KEY_SELECT
+#	config = ~/bin/control 'sources on'
 	config = ~/bin/stopaudio
+
 end
 
 
@@ -160,7 +163,7 @@ end
 begin
     button = KEY_TV
     prog = irexec
-    config = ~/bin/control "source a"
+    config = ~/bin/control "source analog"
 end
 begin
     button = KEY_VIDEO
@@ -175,8 +178,18 @@ begin
 end
 begin
     mode = dvb
+    button = KEY_RADIO
+    prog = irexec
+    config = ~/bin/control "source tdt"
+end
+begin
     button = KEY_CAMERA
     prog = irexec
-    config = ~/bin/control "source dvb"
+    config = ~/bin/control "source spotify"
+end
+begin
+    button = KEY_EPG
+    prog = irexec
+    config = ~/bin/control "source cd"
 end
 

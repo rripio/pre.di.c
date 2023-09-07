@@ -110,11 +110,35 @@ begin eq
 
 end eq
 
+
 # Phase EQ yellow button
 
 begin
-    prog = irexec
+    mode = phase
     button = KEY_YELLOW
-    config = ~/bin/control 'phase_eq toggle'
 end
 
+begin phase
+
+    begin
+        prog = irexec
+        button = KEY_TEXT
+        config = ~/bin/control 'phase_eq on'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_0
+        config = ~/bin/control 'phase_eq off'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_SUBTITLE
+        config = ~/bin/control 'phase_eq toggle'
+        flags = quit
+    end
+
+end phase
