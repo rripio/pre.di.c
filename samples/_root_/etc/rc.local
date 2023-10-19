@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# prevents music HD from going to stand-by
+sudo sdparm --clear=STANDBY /dev/sda
+
+# starts audio system
+#su -l predic -c "/usr/bin/python3 /home/predic/pre.di.c/startaudio.py"
+runuser -l predic -c "/usr/bin/python3 /home/predic/pre.di.c/startaudio.py"
+
+# loads irexec remote command launcher
+#su -l predic -c "/usr/bin/irexec -d"
+runuser -l predic -c "/usr/bin/irexec -d"
+exit 0
