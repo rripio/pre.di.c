@@ -28,6 +28,11 @@ import time
 
 import yaml
 
+# add main pre.di.c folder to module search path
+folder = os.path.dirname(sys.argv[0])
+predic_dir = os.path.dirname(os.path.dirname(folder))
+sys.path.append(predic_dir)
+
 import init
 import pdlib as pd
 
@@ -35,17 +40,14 @@ import pdlib as pd
 # mute as soon as possible. this anticipates mute by 0.5 s aprox.
 pd.client_socket('mute on', quiet=True)
 
-# where am I? here you have all files
-folder = f'{os.path.dirname(sys.argv[0])}/'
-
 # get config
 config_filename = 'config.yml'
-config = pd.get_yaml(folder + config_filename)
+config = pd.get_yaml(f'{folder}/{config_filename}')
 
 # paths
-state_path = folder + config["state_filename"]
-presets_path = folder + config["presets_filename"]
-dvb_fifo = folder + config["fifo_filename"]
+state_path = f'{folder}/{config["state_filename"]}'
+presets_path = f'{folder}/{config["presets_filename"]}'
+dvb_fifo = f'{folder}/{config["fifo_filename"]}'
 
 # get dictionaries
 state = pd.get_yaml(state_path)

@@ -15,6 +15,11 @@ import sys
 import os
 import subprocess as sp
 
+# add main pre.di.c folder to module search path
+folder = os.path.dirname(sys.argv[0])
+predic_dir = os.path.dirname(os.path.dirname(folder))
+sys.path.append(predic_dir)
+
 import pdlib as pd
 
 
@@ -22,9 +27,8 @@ import pdlib as pd
 
 # get config
 config_filename = 'config.yml'
-folder = f'{os.path.dirname(sys.argv[0])}/'
-config = pd.get_yaml(folder + config_filename)
-dvb_fifo = folder + config["fifo_filename"]
+config = pd.get_yaml(f'{folder}/{config_filename}')
+dvb_fifo = f'{folder}/{config["fifo_filename"]}'
 
 
 def start():

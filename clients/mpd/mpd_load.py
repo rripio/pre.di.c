@@ -19,6 +19,11 @@ import multiprocessing as mp
 
 import mpd
 
+# add main pre.di.c folder to module search path
+folder = os.path.dirname(sys.argv[0])
+predic_dir = os.path.dirname(os.path.dirname(folder))
+sys.path.append(predic_dir)
+
 import baseconfig as base
 import init
 import pdlib as pd
