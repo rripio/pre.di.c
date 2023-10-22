@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# prevents music HD from going to stand-by
-sudo sdparm --clear=STANDBY /dev/sda
-
 # starts audio system
 #su -l predic -c "/usr/bin/python3 /home/predic/pre.di.c/startaudio.py"
 runuser -l predic -c "/usr/bin/python3 /home/predic/pre.di.c/startaudio.py"
