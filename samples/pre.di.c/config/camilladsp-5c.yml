@@ -40,11 +40,11 @@ mixers:
             -   channel: 2
                 gain: -3.01029996
                 inverted: false
-                mute: true
+                mute: false
             -   channel: 3
                 gain: -3.01029996
                 inverted: false
-                mute: true
+                mute: false
         -   dest: 1
             mute: false
             sources:
@@ -55,11 +55,11 @@ mixers:
             -   channel: 2
                 gain: -3.01029996
                 inverted: false
-                mute: true
+                mute: false
             -   channel: 4
                 gain: -3.01029996
                 inverted: false
-                mute: true
+                mute: false
 
 
     # preamp mixer
