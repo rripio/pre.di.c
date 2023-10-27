@@ -24,21 +24,23 @@ for use when launching DVB client on pre.di.c start
 
 import sys
 import os
-import time
-
-import yaml
 
 # add main pre.di.c folder to module search path
 folder = os.path.dirname(sys.argv[0])
 predic_dir = os.path.dirname(os.path.dirname(folder))
 sys.path.append(predic_dir)
 
-import init
 import pdlib as pd
 
-
-# mute as soon as possible. this anticipates mute by 0.5 s aprox.
+# mute as soon as possible
 pd.client_socket('mute on', quiet=True)
+
+
+import time
+
+import yaml
+
+import init
 
 # get config
 config_filename = 'config.yml'
