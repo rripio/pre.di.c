@@ -12,49 +12,49 @@ end
 
 begin mixer
 
-# stereo
-
-    begin
-        prog = irexec
-        button = KEY_NUMERIC_1
-        config = ~/bin/control 'stereo normal'
-        flags = quit
-    end
-
-    begin
-        prog = irexec
-        button = KEY_NUMERIC_2
-        config = ~/bin/control 'stereo mid'
-        flags = quit
-    end
-
-    begin
-        prog = irexec
-        button = KEY_NUMERIC_3
-        config = ~/bin/control 'stereo side'
-        flags = quit
-    end
-
 # channels
 
     begin
         prog = irexec
-        button = KEY_NUMERIC_4
+        button = KEY_NUMERIC_1
         config = ~/bin/control 'channels lr'
         flags = quit
     end
 
     begin
         prog = irexec
-        button = KEY_NUMERIC_5
+        button = KEY_NUMERIC_2
         config = ~/bin/control 'channels l'
         flags = quit
     end
 
     begin
         prog = irexec
-        button = KEY_NUMERIC_6
+        button = KEY_NUMERIC_3
         config = ~/bin/control 'channels r'
+        flags = quit
+    end
+
+# stereo
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_4
+        config = ~/bin/control 'stereo normal'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_5
+        config = ~/bin/control 'stereo mid'
+        flags = quit
+    end
+
+    begin
+        prog = irexec
+        button = KEY_NUMERIC_6
+        config = ~/bin/control 'stereo side'
         flags = quit
     end
 
