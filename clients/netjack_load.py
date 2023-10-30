@@ -8,15 +8,13 @@
 start netjack
 """
 
-import time
 from subprocess import Popen
 
 
-## user configuration
+# user configuration
 
 netjack_path = '/usr/bin/jack_load netmanager'
 
 
 print('\n(netjack_load.py) starting netjack\n')
 Popen(netjack_path.split())
-

@@ -71,7 +71,7 @@ def select_channel(channel_name, channel_gain):
         with open(dvb_fifo, 'w') as f:
             f.write(command)
         return True
-    except:
+    except Exception:
         return False
 
 
@@ -84,7 +84,7 @@ def select_preset(preset, preset_dict=presets):
     if preset.isdigit():
         preset = int(preset)
         if preset in preset_dict:
-            channel_name = preset_dict[preset]["name"].replace(' ','\ ')
+            channel_name = preset_dict[preset]["name"].replace(' ', r'\ ')
             channel_level = preset_dict[preset]["gain"]
         else:
             return False
@@ -96,14 +96,14 @@ def select_preset(preset, preset_dict=presets):
 
 
 def change_radio(
-    selected, startflag = False, preset_dict=presets, state=state):
+        selected, startflag=False, preset_dict=presets, state=state):
     """
     process channel options
     """
 
     # list of presets, discarding those white in presets.yml
     state_old = state
-    presets = list(map(str,sorted(
+    presets = list(map(str, sorted(
             [preset for preset in preset_dict if preset_dict[preset]]
             )))
     # command arguments
@@ -125,7 +125,7 @@ def change_radio(
         elif selected == 'previous':
             selected = state['previous']
     # wrong preset selection
-    elif not selected in presets:
+    elif selected not in presets:
         print(
             f'\n(DVB_command)\noption must be in {options} '
             f'\nor be one of these integer presets: {presets}\n'

@@ -32,7 +32,7 @@ def read_clients(phase):
 
     clients_list_path = init.clients_path
 
-    with open (clients_list_path) as clients_file:
+    with open(clients_list_path) as clients_file:
         clients_dict = yaml.safe_load(clients_file)
         # init a list of client actions
         clients = [
@@ -70,7 +70,7 @@ def client_socket(data, quiet=True):
         try:
             if not quiet:
                 print(f'\n(lib) Connecting to {server}, port {str(port)}...')
-            s.connect((server,port))
+            s.connect((server, port))
         except socket.gaierror as e:
             print(f'\n(lib) Address-related error connecting to server: {e}')
             sys.exit(-1)
@@ -108,10 +108,10 @@ def wait4result(command, answer, tmax=5, interval=0.1):
 
     while elapsed() < tmax:
         try:
-            if init.config['verbose'] in {0, 1} :
-                output={"stderr": sp.DEVNULL}
-            else :
-                output={}
+            if init.config['verbose'] in {0, 1}:
+                output = {"stderr": sp.DEVNULL}
+            else:
+                output = {}
             if answer in sp.check_output(
                     command, shell=True, universal_newlines=True, **output):
                 if init.config['verbose'] in {1, 2}:
@@ -121,7 +121,7 @@ def wait4result(command, answer, tmax=5, interval=0.1):
                         )
                 return True
         except Exception as e:
-            if init.config['verbose'] in {2} :
+            if init.config['verbose'] in {2}:
                 print(e)
         time.sleep(interval)
     else:
@@ -149,11 +149,11 @@ def wait4ports(ports, tmax=5, interval=0.1):
     """
     wait for jack ports to be up
     """
-    
+
     time_start = time.time()
     jc = jack.Client('tmp')
 
-    ports_name = ports[1].split(':',1)[0]
+    ports_name = ports[1].split(':', 1)[0]
     while (time.time() - time_start) < tmax:
         # names of up input ports at this very moment as a generator
         up_ports = (
@@ -172,13 +172,14 @@ def wait4ports(ports, tmax=5, interval=0.1):
     # leave function without any connection made
     jc.close()
     return False
-   
+
 
 def gain_dB(x):
     return 20 * m.log10(x)
     """
     calculates gain in dB from gain multiplier
     """
+
 
 def calc_gain(level):
     """
@@ -206,8 +207,8 @@ def calc_headroom(gain):
     tones = {'off': 0, 'on': 1}[init.state['tones']]
     headroom = (base.gain_max
                 - gain
-                - np.clip(init.state['bass'], 0 , None) * tones
-                - np.clip(init.state['treble'], 0 , None) * tones
+                - np.clip(init.state['bass'], 0, None) * tones
+                - np.clip(init.state['treble'], 0, None) * tones
                 - abs(init.state['balance'])
                 )
     return headroom

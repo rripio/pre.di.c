@@ -14,14 +14,12 @@ import multiprocessing as mp
 
 import jack
 
-import pdlib as pd
-
 
 def jack_loop(clientname):
     """
     creates a jack loop with given 'clientname'
     """
-    
+
     # CREDITS:
     # https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
 
@@ -30,8 +28,8 @@ def jack_loop(clientname):
 
     if client.status.name_not_unique:
         client.close()
-        print( f'\n(lib) \'{clientname}\''
-                            'already exists in JACK, nothing done.' )
+        print(f'\n(lib) \'{clientname}\''
+              'already exists in JACK, nothing done.')
         return
 
     # will use the multiprocessing.Event mechanism to keep this alive
@@ -69,7 +67,7 @@ def jack_loop(clientname):
         # this tells the JACK server that we are ready to roll
         # our above process() callback will start running now
 
-        print( f'\n(lib) running {clientname}' )
+        print(f'\n(lib) running {clientname}')
         try:
             event.wait()
         except KeyboardInterrupt:
@@ -82,7 +80,7 @@ def start():
 
     # create jack loop for connections
     # The jack_loop module will keep the loop alive, so we need to thread it.
-    jloop = mp.Process( target = jack_loop, args=('stream_loop',) )
+    jloop = mp.Process(target=jack_loop, args=('stream_loop',))
     jloop.start()
 
 
@@ -94,12 +92,10 @@ def stop():
 if sys.argv[1:]:
     try:
         option = {
-            'start' : start,
-            'stop'  : stop
+            'start': start,
+            'stop': stop
             }[sys.argv[1]]()
     except KeyError:
         print('stream_loop.py: bad option')
 else:
     print(__doc__)
-
-

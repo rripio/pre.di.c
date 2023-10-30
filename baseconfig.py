@@ -2,7 +2,7 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-## customizable initial values
+# customizable initial values
 
 # equalizer
 
@@ -21,7 +21,7 @@ gain_min = -100
 
 config_folder = 'config'
 clients_folder = 'clients'
-loudspeakers_folder ='loudspeakers'
+loudspeakers_folder = 'loudspeakers'
 
 # filenames
 

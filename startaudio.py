@@ -19,8 +19,6 @@ import os
 import time
 import subprocess as sp
 
-import jack
-
 import init
 import stopaudio
 import pdlib as pd
@@ -41,9 +39,7 @@ def init_jack():
     """
 
     print('\n(startaudio) starting jack\n')
-    jack = sp.Popen(
-        f'{init.config["jack_command"]} -r {init.speaker["fs"]}'.split()
-        )
+    sp.Popen(f'{init.config["jack_command"]} -r {init.speaker["fs"]}'.split())
     # waiting for jackd:
     tmax = init.config['command_delay'] * 5
     interval = init.config['command_delay'] * 0.1
@@ -58,16 +54,14 @@ def init_camilladsp():
     """
     loads camilladsp
     """
-    
+
     # cd to louspeaker folder so filter paths are relative to this \
     # folder in speaker.yml config file
     os.chdir(init.loudspeaker_path)
     print(f'\n(startaudio) starting camilladsp on {os.getcwd()}')
-    camilladsp = sp.Popen(
-        f'{init.config["camilladsp_command"]} -m \
-        -p {init.config["websocket_port"]} \
-        {init.camilladsp_path}'.split()
-        )
+    sp.Popen((f'{init.config["camilladsp_command"]} -m ' + 
+             f'-p {init.config["websocket_port"]} ' +
+             f'{init.camilladsp_path}').split())
 
     # waiting for camilladsp
     # test for input jack ports to be up
@@ -78,9 +72,9 @@ def init_camilladsp():
         print('\n(startaudio) camilladsp started :-)')
     else:
         print('\n(startaudio) error starting camilladsp')
-        stop_all()   
-    
-    
+        stop_all()
+
+
 def init_server():
     """
     loads server
@@ -88,7 +82,7 @@ def init_server():
 
     print('\n(startaudio) starting server')
     try:
-        control = sp.Popen(f'python3 {init.main_folder}/server.py'.split())
+        sp.Popen(f'python3 {init.main_folder}/server.py'.split())
     except Exception as e:
         print('\n(startaudio) server didn\'t load: ', e)
         stopaudio.main('all')
@@ -119,7 +113,7 @@ def set_initial_state():
 
 def init_state_settings(state):
     """
-    restore audio settings as stored in state.yaml except source, 
+    restore audio settings as stored in state.yaml except source,
     and takes care of options to reset some of them
     """
 
@@ -171,7 +165,7 @@ def init_source(state):
             # some clients (namely mpd) seems to need some extra time after \
             # ports detection for whatever reason
             time.sleep(init.config['command_delay'] * 2)
-        
+
         pd.client_socket('sources on', quiet=True)
         # pd.client_socket('source ' + source, quiet=True)
     else:
@@ -196,7 +190,7 @@ def main(run_level):
         # do it before launching clients \
         # so they get the correct setting from state file if needed
         state = set_initial_state()
-        
+
         # activate command_unmute mode downstream
         pd.client_socket('command_unmute', quiet=True)
 
@@ -212,18 +206,18 @@ def main(run_level):
             init.state['source'] = state['source']
             pd.client_socket('save', quiet=True)
 
-       # launch external clients, sources and clients
-       # exceptionally we add a line feed at the end \
-       # since client load messages don't
+        # launch external clients, sources and clients
+        # exceptionally we add a line feed at the end \
+        # since client load messages don't
         print('\n(startaudio): starting clients...\n')
         for client in pd.read_clients('start'):
             try:
                 command_path = f'{init.clients_folder}/{client}'
-                p=sp.Popen(command_path.split())
+                p = sp.Popen(command_path.split())
                 print(f'pid {p.pid:4}: {client}')
             except Exception as e:
-                print(f"\n(startaudio) problem launching client '{client}': "
-                      , e)
+                print(f"\n(startaudio) problem launching client '{client}':",
+                      e)
 
         # restoring sources if config mandates so
         if state['sources'] == 'on':
@@ -238,7 +232,6 @@ def main(run_level):
         # save changes to file
         pd.client_socket('save', quiet=True)
         print('\n(startaudio): pre.di.c started :-)')
-
 
 
 if __name__ == '__main__':

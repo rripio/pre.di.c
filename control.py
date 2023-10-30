@@ -36,7 +36,7 @@ cdsp_config['mixers'].update(init.speaker['mixers'])
 cdsp_config['pipeline'].extend(init.speaker['pipeline'])
 
 
-### flags
+# flags
 
 
 add = False             # switch to relative commands
@@ -46,24 +46,25 @@ do_mute = False         # mute during command
 ramp_time = cdsp_config['filters']['f.volume']['parameters']['ramp_time']/1000
 
 
-### exception definitions
+# exception definitions
 
 
 class OptionsError(Exception):
     """
     exception for options revealing
     """
-    
+
     def __init__(self, options):
         self.options = options
 
+
 class ClampWarning(Warning):
-    
+
     def __init__(self, clamp_value):
         self.clamp_value = clamp_value
 
 
-### auxiliary functions
+# auxiliary functions
 
 
 def disconnect_sources(jack_client):
@@ -81,7 +82,7 @@ def toggle(command):
     """
     changes state of on/off commands
     """
-    
+
     return {'off': 'on', 'on': 'off'}[init.state[command]]
 
 
@@ -95,7 +96,7 @@ def do_source(source_arg):
     sources = init.sources
     # sources check is done here, not in proper function
     if source_arg in sources:
-    # check for already selected source
+        # check for already selected source
         if init.state['source'] == source_arg:
             print('\n(control) source already selected')
         else:
@@ -109,7 +110,7 @@ def do_command(command, arg):
     """
     general command wrapper
     """
-    
+
     # backup state to restore values in case of not enough headroom \
     # or error of any kind
     state_old = init.state.copy()
@@ -132,7 +133,7 @@ def do_command(command, arg):
             print(f"\n(control) Command '{command.__name__}' ",
                   f"needs a number: {e}")
         except Exception as e:
-            init.state[command.__name__]  = state_old[command.__name__]
+            init.state[command.__name__] = state_old[command.__name__]
             print(f"\n(control) Exception in command '{command.__name__}': ",
                   e)
         finally:
@@ -146,21 +147,21 @@ def do_command(command, arg):
         print(f"\n(control) Command '{command.__name__}' needs an option")
 
 
-### internal functions for commands
+# internal functions for commands
 
 
-## commands without options
+# commands without options
 
 
 def show():
     """
     show status in a readable way
     """
-    
+
     pd.show_file()
 
 
-## commands that do not depend on camilladsp config
+# commands that do not depend on camilladsp config
 
 
 # numerical commands that accept 'add'
@@ -184,7 +185,7 @@ def clamp(clamp):
     frees gain setting from clamping:
     useful for playing  low level files
     """
-    
+
     options = {'off', 'on', 'toggle'}
     if clamp in options:
         if clamp == 'toggle':
@@ -211,7 +212,7 @@ def mute(mute):
         raise OptionsError(options)
 
 
-## commands that depend on camilladsp config
+# commands that depend on camilladsp config
 
 
 # numerical commands that accept 'add'
@@ -223,8 +224,8 @@ def loudness_ref(loudness_ref):
     """
 
     init.state['loudness_ref'] = (float(loudness_ref)
-                                + init.state['loudness_ref'] * add
-                                )
+                                  + init.state['loudness_ref'] * add)
+
     # clamp loudness_ref value
     if abs(init.state['loudness_ref']) > base.loudness_ref_variation:
         init.state['loudness_ref'] = m.copysign(
@@ -233,7 +234,7 @@ def loudness_ref(loudness_ref):
                                     )
         raise ClampWarning(init.state['loudness_ref'])
     # set loudness reference_level as absolute gain
-    cdsp_config['filters']['f.loudness']['parameters']['reference_level']=(
+    cdsp_config['filters']['f.loudness']['parameters']['reference_level'] = (
         pd.calc_gain(init.state['loudness_ref']))
 
 
@@ -245,10 +246,11 @@ def bass(bass):
     init.state['bass'] = float(bass) + init.state['bass'] * add
     # clamp bass value
     if m.fabs(init.state['bass']) > base.tone_variation:
-        init.state['bass'] = m.copysign(base.tone_variation, init.state['bass'])
+        init.state['bass'] = m.copysign(
+                            base.tone_variation, init.state['bass'])
         raise ClampWarning(init.state['bass'])
     # set bass
-    cdsp_config['filters']['f.bass']['parameters']['gain']=(
+    cdsp_config['filters']['f.bass']['parameters']['gain'] = (
         init.state['bass']
         )
     set_gain(pd.calc_gain(init.state['level']))
@@ -263,10 +265,11 @@ def treble(treble):
                             + init.state['treble'] * add)
     # clamp treble value
     if m.fabs(init.state['treble']) > base.tone_variation:
-        init.state['treble'] = m.copysign(base.tone_variation, init.state['treble'])
+        init.state['treble'] = m.copysign(
+                                base.tone_variation, init.state['treble'])
         raise ClampWarning(init.state['treble'])
     # set treble
-    cdsp_config['filters']['f.treble']['parameters']['gain']=(
+    cdsp_config['filters']['f.treble']['parameters']['gain'] = (
         init.state['treble']
         )
     set_gain(pd.calc_gain(init.state['level']))
@@ -280,7 +283,7 @@ def balance(balance):
     """
 
     init.state['balance'] = (float(balance)
-                            + init.state['balance'] * add)
+                             + init.state['balance'] * add)
     # clamp balance value
     if m.fabs(init.state['balance']) > base.balance_variation:
         init.state['balance'] = m.copysign(
@@ -291,10 +294,10 @@ def balance(balance):
     # add balance dB gains
     atten_dB_r = init.state['balance']
     atten_dB_l = - (init.state['balance'])
-    cdsp_config['filters']['f.balance.L']['parameters']['gain']=(
+    cdsp_config['filters']['f.balance.L']['parameters']['gain'] = (
         atten_dB_l
         )
-    cdsp_config['filters']['f.balance.R']['parameters']['gain']=(
+    cdsp_config['filters']['f.balance.R']['parameters']['gain'] = (
         atten_dB_r
         )
     set_gain(pd.calc_gain(init.state['level']))
@@ -307,9 +310,9 @@ def source(source):
     """
     change source
     """
-    
+
     # reset clamp to 'on' when changing sources
-    init.state['clamp']='on'
+    init.state['clamp'] = 'on'
 
     # additional waiting after muting
     time.sleep(init.config['command_delay'] * 0.2)
@@ -323,7 +326,7 @@ def source(source):
     for ports_group in init.config['audio_ports']:
         # make no more than possible connections,
         # i.e., minimum of input or output ports
-        num_ports=min(len(ports_group), source_ports_len)
+        num_ports = min(len(ports_group), source_ports_len)
         for i in range(num_ports):
             # audio sources
             tmp.connect(source_ports[i], ports_group[i])
@@ -381,14 +384,14 @@ def channels(channels):
     """
     select input channels (mixed to both output channels)
     """
-    
+
     options = {'lr', 'l', 'r'}
     if channels in options:
         init.state['channels'] = channels
         set_mixer()
     else:
         raise OptionsError(options)
-    
+
 
 def solo(solo):
     """
@@ -518,7 +521,7 @@ def channels_flip(channels_flip):
     """
     toggle channels flip
     """
-    
+
     options = {'off', 'on', 'toggle'}
     if channels_flip in options:
         if channels_flip == 'toggle':
@@ -527,13 +530,13 @@ def channels_flip(channels_flip):
         set_mixer()
     else:
         raise OptionsError(options)
-    
+
 
 def polarity(polarity):
     """
     toggle polarity inversion
     """
-    
+
     options = {'off', 'on', 'toggle'}
     if polarity in options:
         if polarity == 'toggle':
@@ -542,13 +545,13 @@ def polarity(polarity):
         set_mixer()
     else:
         raise OptionsError(options)
-    
+
 
 def polarity_flip(polarity_flip):
     """
     toggle polarity flip (change polarity in one channel only)
     """
-    
+
     options = {'off', 'on', 'toggle'}
     if polarity_flip in options:
         if polarity_flip == 'toggle':
@@ -557,9 +560,9 @@ def polarity_flip(polarity_flip):
         set_mixer()
     else:
         raise OptionsError(options)
-    
 
-### funtions that perform actual backend adjustments
+
+# funtions that perform actual backend adjustments
 
 
 def set_pipeline():
@@ -569,13 +572,13 @@ def set_pipeline():
 
     pipeline_common = []
     if init.state['tones'] == 'on':
-        pipeline_common.extend(['f.bass','f.treble'])
+        pipeline_common.extend(['f.bass', 'f.treble'])
     if init.state['phase_eq'] == 'on':
         pipeline_common.append('f.phase_eq')
     if init.state['eq'] == 'on':
         pipeline_common.extend(init.eq[init.state['eq_filter']]['pipeline'])
-    
-    pipeline = [['f.balance.L'],['f.balance.R']]
+
+    pipeline = [['f.balance.L'], ['f.balance.R']]
     for channel in range(2):
         pipeline[channel].extend(pipeline_common)
         if init.state['drc'] == 'on':
@@ -597,27 +600,27 @@ def set_mixer():
     """
 
     mixer = np.identity(2)
-    
+
     if init.state['channels_flip'] == 'on':
-        mixer = np.array([[0,1],[1,0]])
+        mixer = np.array([[0, 1], [1, 0]])
 
     match init.state['channels']:
-        case 'l':       mixer = mixer @ np.array([[1,1],[0,0]])
-        case 'r':       mixer = mixer @ np.array([[0,0],[1,1]])
+        case 'l':       mixer = mixer @ np.array([[1, 1], [0, 0]])
+        case 'r':       mixer = mixer @ np.array([[0, 0], [1, 1]])
 
     match init.state['stereo']:
-        case 'mid':     mixer = mixer @ np.array([[0.5,0.5],[0.5,0.5]])
-        case 'side':    mixer = mixer @ np.array([[0.5,0.5],[-0.5,-0.5]])
+        case 'mid':     mixer = mixer @ np.array([[0.5, 0.5], [0.5, 0.5]])
+        case 'side':    mixer = mixer @ np.array([[0.5, 0.5], [-0.5, -0.5]])
 
     if init.state['polarity'] == 'on':
-        mixer = mixer @ np.array([[-1,0],[0,-1]])
+        mixer = mixer @ np.array([[-1, 0], [0, -1]])
 
     if init.state['polarity_flip'] == 'on':
-        mixer = mixer @ np.array([[1,0],[0,-1]])
+        mixer = mixer @ np.array([[1, 0], [0, -1]])
 
     match init.state['solo']:
-        case 'l':       mixer = mixer * np.array([[1,0],[1,0]])
-        case 'r':       mixer = mixer * np.array([[0,1],[0,1]])
+        case 'l':       mixer = mixer * np.array([[1, 0], [1, 0]])
+        case 'r':       mixer = mixer * np.array([[0, 1], [0, 1]])
 
     # gain
     for sources in range(2):
@@ -632,7 +635,7 @@ def set_mixer():
                     ['sources'][sources]['gain']) = (
                         0
                         )
-    
+
     # inverted
     for sources in range(2):
         for dest in range(2):
@@ -640,11 +643,11 @@ def set_mixer():
                 ['sources'][sources]['inverted']) = (
                     bool(mixer[sources, dest] < 0)
                     )
-    
+
     # mute
     for sources in range(2):
         for dest in range(2):
-            (cdsp_config['mixers']['m.mixer']['mapping'][dest] 
+            (cdsp_config['mixers']['m.mixer']['mapping'][dest]
                 ['sources'][sources]['mute']) = (
                     not bool(mixer[sources, dest])
                     )
@@ -690,7 +693,7 @@ def set_gain(gain):
         cdsp.set_volume(gain)
 
 
-### main command proccessing function
+# main command proccessing function
 
 
 def proccess_commands(full_command):
@@ -705,7 +708,7 @@ def proccess_commands(full_command):
 
     add = False
     do_mute = False
-    
+
     # strips command final characters and split command from arguments
     full_command = full_command.rstrip('\r\n').split()
     if len(full_command) > 0:
@@ -720,47 +723,44 @@ def proccess_commands(full_command):
         if full_command[2] == 'add':
             add = True
 
-    # initializes gain since it is calculated from level
-    gain = pd.calc_gain(init.state['level'])
-
-    ## parse  commands and select corresponding actions
+    # parse  commands and select corresponding actions
 
     try:
         # commands without options
         if command == 'show':
             show()                              #
 
-        ## commands that do not depend on camilladsp config
+        # commands that do not depend on camilladsp config
 
         elif command in {'clamp', 'mute', 'level', 'gain'}:
             do_command(
-            {
-            # numerical commands that accept 'add'
-            'level':            level,          #[level] add
-            # on/off commands
-            'clamp':            clamp,          #['off','on','toggle']
-            'mute':             mute,           #['off','on','toggle']
-            # special utility command
-            'gain':             set_gain        #[gain]
-            }[command], arg)
+             {
+                # numerical commands that accept 'add'
+                'level':            level,          # [level] add
+                # on/off commands
+                'clamp':            clamp,          # ['off','on','toggle']
+                'mute':             mute,           # ['off','on','toggle']
+                # special utility command
+                'gain':             set_gain        # [gain]
+                }[command], arg)
 
-        ## commands that depend on camilladsp config
+        # commands that depend on camilladsp config
 
         elif command == 'source':
-            # source                            #[source]
+            # source                            # [source]
             do_source(arg)
             # dispatch config
             cdsp.set_config(cdsp_config)
 
         elif command in {'loudness_ref', 'bass', 'treble', 'balance'}:
             do_command(
-            {
-            # numerical commands that accept 'add'
-            'loudness_ref':     loudness_ref,   #[loudness_ref] add
-            'bass':             bass,           #[bass] add
-            'treble':           treble,         #[treble] add
-            'balance':          balance,        #[balance] add
-            }[command], arg)
+             {
+                # numerical commands that accept 'add'
+                'loudness_ref':     loudness_ref,   # [loudness_ref] add
+                'bass':             bass,           # [bass] add
+                'treble':           treble,         # [treble] add
+                'balance':          balance,        # [balance] add
+                }[command], arg)
             # dispatch config
             cdsp.set_config(cdsp_config)
 
@@ -768,25 +768,25 @@ def proccess_commands(full_command):
             # these commands benefit for silencing switching noise
             do_mute = True
             do_command(
-            {
-            # non numerical commands
-            'drc_set':          drc_set,        #[drc_set]
-            'eq_filter':        eq_filter,      #[eq_filter]
-            'stereo':           stereo,         #['off','mid','side']
-            'channels':         channels,       #['lr','l','r']
-            'solo':             solo,           #['lr','l','r']
+             {
+                # non numerical commands
+                'drc_set':          drc_set,        # [drc_set]
+                'eq_filter':        eq_filter,      # [eq_filter]
+                'stereo':           stereo,         # ['off','mid','side']
+                'channels':         channels,       # ['lr','l','r']
+                'solo':             solo,           # ['lr','l','r']
 
-            # on/off commands
-            'drc':              drc,            #['off','on','toggle']
-            'phase_eq':         phase_eq,       #['off','on','toggle']
-            'loudness':         loudness,       #['off','on','toggle']
-            'tones':            tones,          #['off','on','toggle']
-            'eq':               eq,             #['off','on','toggle']
-            'sources':          sources,        #['off','on','toggle']
-            'channels_flip':    channels_flip,  #['off','on','toggle']
-            'polarity':         polarity,       #['off','on','toggle']
-            'polarity_flip':    polarity_flip   #['off','on','toggle']
-            }[command], arg)
+                # on/off commands
+                'drc':              drc,            # ['off','on','toggle']
+                'phase_eq':         phase_eq,       # ['off','on','toggle']
+                'loudness':         loudness,       # ['off','on','toggle']
+                'tones':            tones,          # ['off','on','toggle']
+                'eq':               eq,             # ['off','on','toggle']
+                'sources':          sources,        # ['off','on','toggle']
+                'channels_flip':    channels_flip,  # ['off','on','toggle']
+                'polarity':         polarity,       # ['off','on','toggle']
+                'polarity_flip':    polarity_flip   # ['off','on','toggle']
+                }[command], arg)
             # dispatch config
             cdsp.set_config(cdsp_config)
 

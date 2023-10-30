@@ -16,7 +16,6 @@ all: all of the above
 
 import sys
 import os
-import time
 from subprocess import Popen
 
 import init
@@ -38,17 +37,18 @@ def main(run_level):
             try:
                 Popen(f'{init.clients_folder}/{command}'.split())
             except Exception as e:
-                print(f'\n(stopaudio) problem stopping client "{command}": {e}\n')
+                print('\n(stopaudio) problem stopping client',
+                      f'"{command}": {e}\n')
     if run_level in {'core', 'all'}:
         # controlserver
         print('(stopaudio) stopping server')
-        Popen ('pkill -f server.py'.split())
+        Popen('pkill -f server.py'.split())
         # camilladsp
         print('(stopaudio) stopping camilladsp')
-        Popen ('pkill -f camilladsp'.split())
+        Popen('pkill -f camilladsp'.split())
         # jack
         print('(stopaudio) stopping jackd')
-        Popen ('pkill -f jackd'.split())
+        Popen('pkill -f jackd'.split())
 
 
 if __name__ == '__main__':

@@ -6,7 +6,6 @@ import os
 import sys
 
 import yaml
-import numpy as np
 
 import baseconfig as base
 
@@ -29,9 +28,9 @@ main_folder = os.path.dirname(__file__)
 
 config_folder = f'{main_folder}/{base.config_folder}'
 clients_folder = f'{main_folder}/{base.clients_folder}'
-loudspeakers_folder= f'{main_folder}/{base.loudspeakers_folder}'
+loudspeakers_folder = f'{main_folder}/{base.loudspeakers_folder}'
 
-config_path= f'{config_folder}/{base.config_filename}'
+config_path = f'{config_folder}/{base.config_filename}'
 state_path = f'{config_folder}/{base.state_filename}'
 state_init_path = f'{config_folder}/{base.state_init_filename}'
 sources_path = f'{config_folder}/{base.sources_filename}'
@@ -54,13 +53,13 @@ try:
     eq = get_configs(eq_path)
 
     # after knowing which speaker config to load, load it
-    loudspeaker_path = f'{loudspeakers_folder}/{config["loudspeaker"]}' 
+    loudspeaker_path = f'{loudspeakers_folder}/{config["loudspeaker"]}'
     speaker = get_configs(loudspeaker_path + '/' + base.loudspeaker_filename)
     drc = get_configs(loudspeaker_path + '/' + base.drc_filename)
 
 except Exception as e:
-   print(f'\n(init) Error getting configurations: {e}')
-   sys.exit()
+    print(f'\n(init) Error getting configurations: {e}')
+    sys.exit()
 
 
 # some processing of data for downstream easyer use
@@ -69,10 +68,9 @@ except Exception as e:
 # audio ports
 # turn string space separated enumerations into a lists
 for i in range(len(config['audio_ports'])):
-    config['audio_ports'][i]=config['audio_ports'][i].split()
+    config['audio_ports'][i] = config['audio_ports'][i].split()
 
 # source ports
 # turn string space separated enumerations into a lists
 for source in sources:
-    sources[source]['source_ports']=sources[source]['source_ports'].split()
-
+    sources[source]['source_ports'] = sources[source]['source_ports'].split()

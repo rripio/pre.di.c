@@ -11,11 +11,11 @@ import yaml
 import control
 import init
 
+
 async def handle_commands(reader, writer):
 
     rawdata = await reader.read(100)
     data = rawdata.decode()
-    addr = writer.get_extra_info('peername')
 
     def write_state():
         """
@@ -23,16 +23,15 @@ async def handle_commands(reader, writer):
         """
 
         with open(init.state_path, 'w') as f:
-            if init.state != None:
+            if init.state is not None:
                 yaml.dump(init.state, f, default_flow_style=False)
             else:
                 print('\n(server) corrupted null state')
 
-
     try:
         if data.rstrip('\r\n') == 'status':
             # echo state to client as YAML string
-            writer.write(yaml.dump(init.state, 
+            writer.write(yaml.dump(init.state,
                                    default_flow_style=False).encode())
             writer.write(b'OK\n')
             await writer.drain()

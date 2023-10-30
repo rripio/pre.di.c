@@ -59,11 +59,10 @@ def stop():
 if sys.argv[1:]:
     try:
         option = {
-            'start' : start,
-            'stop'  : stop
+            'start': start,
+            'stop': stop
             }[sys.argv[1]]()
     except KeyError:
         print('\n(DVB_load.py) bad option')
 else:
     print(__doc__)
-

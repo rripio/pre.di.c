@@ -13,7 +13,6 @@ use it with 'start' and 'stop' as options
 import os
 import sys
 import time
-import math as m
 import subprocess as sp
 import multiprocessing as mp
 
@@ -29,7 +28,7 @@ import init
 import pdlib as pd
 
 
-## user config
+# user config
 config_filename = 'config.yml'
 
 
@@ -140,20 +139,20 @@ def start():
         if restore:
             mpd_client.seek(song, elapsed)
         mpd_client.close()
-    except:
+    except Exception:
         print('\n(mpd_load.py) problems with mpd ping routine')
 
     # volume linked to mpd (optional)
     if mpd_conf['volume_linked']:
         try:
-            mpdloop = mp.Process( target = mpd_vol_loop )
+            mpdloop = mp.Process(target=mpd_vol_loop)
             mpdloop.start()
-        except:
+        except Exception:
             print('\n(mpd_load.py) mpd socket loop broke')
         try:
-            predicloop = mp.Process( target = predic_vol_loop )
+            predicloop = mp.Process(target=predic_vol_loop)
             predicloop.start()
-        except:
+        except Exception:
             print('\n(mpd_load.py) predic socket loop broke')
 
 
@@ -163,7 +162,7 @@ def stop():
     """
 
     delay = init.config['command_delay']
-    
+
     sp.Popen(mpd_conf["stop_command"].split())
     sp.Popen((f'pkill -f {dir}/mpd_load.py').split())
     time.sleep(delay)
@@ -174,8 +173,8 @@ if sys.argv[1:]:
     mpd_conf = pd.get_yaml(f'{dir}/{config_filename}')
     try:
         option = {
-            'start' : start,
-            'stop'  : stop
+            'start': start,
+            'stop': stop
             }[sys.argv[1]]()
     except KeyError:
         print('\n(mpd_load.py) bad option')
