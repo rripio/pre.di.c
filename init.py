@@ -66,11 +66,11 @@ except Exception as e:
 # while retaining upstream ease of writing in config files
 
 # audio ports
-# turn string space separated enumerations into a lists
+# turn string space separated enumerations into lists
 for i in range(len(config['audio_ports'])):
     config['audio_ports'][i] = config['audio_ports'][i].split()
 
 # source ports
-# turn string space separated enumerations into a lists
+# turn string space separated enumerations into lists
 for source in sources:
     sources[source]['source_ports'] = sources[source]['source_ports'].split()
