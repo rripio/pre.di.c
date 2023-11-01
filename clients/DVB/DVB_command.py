@@ -26,7 +26,9 @@ import sys
 import os
 
 # add main pre.di.c folder to module search path
+# get script folder
 folder = os.path.dirname(sys.argv[0])
+# goes up two directories to get main predic folder
 predic_dir = os.path.dirname(os.path.dirname(folder))
 sys.path.append(predic_dir)
 
