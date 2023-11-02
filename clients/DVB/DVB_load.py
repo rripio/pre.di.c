@@ -15,19 +15,13 @@ import sys
 import os
 import subprocess as sp
 
-# add main pre.di.c folder to module search path
-# get script folder
-folder = os.path.dirname(sys.argv[0])
-# goes up two directories to get main predic folder
-predic_dir = os.path.dirname(os.path.dirname(folder))
-sys.path.append(predic_dir)
-
 import pdlib as pd
 
 
 # initialize
 
 # get config
+folder = os.path.dirname(sys.argv[0])
 config_filename = 'config.yml'
 config = pd.get_yaml(f'{folder}/{config_filename}')
 dvb_fifo = f'{folder}/{config["fifo_filename"]}'
