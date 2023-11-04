@@ -22,9 +22,6 @@ for use when launching DVB client on pre.di.c start
 """
 
 
-# mute as soon as possible
-import pdlib as pd
-pd.client_socket('mute on', quiet=True)
 
 import sys
 import os
@@ -33,6 +30,7 @@ import time
 import yaml
 
 import init
+import pdlib as pd
 
 
 # get config
@@ -149,9 +147,6 @@ def change_radio(
         state['actual'] = state_old['actual']
         state['previous'] = state_old['previous']
         print('(DVB_command) Something went wrong when changing radio state')
-
-    # restore previous mute state
-    pd.client_socket(f"mute {init.state['mute']}", quiet=True)
 
     # write state
     with open(state_path, 'w') as f:
