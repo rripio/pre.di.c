@@ -73,7 +73,7 @@ async def handle_commands(reader, writer):
             # command received in 'data', \
             # then send command to control.py
             if init.config['verbose'] in [1, 2]:
-                print(f'\n(server) Command: {data}')
+                print(f'\n(server) command: {data}')
 
             control.proccess_commands(data)
 
@@ -85,12 +85,12 @@ async def handle_commands(reader, writer):
                 writer.write(b'OK\n')
                 await writer.drain()
             except Exception as e:
-                print('\n(server) An error occurred when writing state file: ',
+                print('\n(server) an error occurred when writing state file: ',
                       e)
     except ConnectionResetError:
         print('\n(server) still no connection...')
     except Exception as e:
-        print('(server) An exception occurred: ', e)
+        print('(server) an exception occurred: ', e)
     finally:
         writer.close()
 
