@@ -72,10 +72,10 @@ async def handle_commands(reader, writer):
         else:
             # command received in 'data', \
             # then send command to control.py
-            control.proccess_commands(data)
-
             if init.config['verbose'] in [1, 2]:
                 print(f'\n(server) Command: {data}')
+
+            control.proccess_commands(data)
 
             # a try block avoids blocking of state file writing \
             # when the terminal that launched startaudio.py is closed
