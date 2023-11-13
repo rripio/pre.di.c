@@ -320,7 +320,7 @@ def source(source):
 
     source_ports = init.sources[source]['source_ports']
     source_ports_len = len(source_ports)
-    tmp = jack.Client('tmp')
+    tmp = jack.Client('source_client')
 
     disconnect_sources(tmp)
     try:
@@ -515,13 +515,21 @@ def sources(sources):
         if sources == 'toggle':
             sources = toggle('sources')
         init.state['sources'] = sources
+        tmp = jack.Client('sources_client')
         match sources:
             case 'off':
-                tmp = jack.Client('tmp')
                 disconnect_sources(tmp)
                 tmp.close()
             case 'on':
-                source(init.state['source'])
+                # first check for source ports existence
+                source_selected = init.state['source']
+                source_ports = init.sources[source_selected]['source_ports']
+                delay = init.config['command_delay'] * 0.1
+                if pd.wait4ports(source_ports, delay):
+                    source(source_selected)
+                else:
+                    print('\n(control) error: source ports are down')
+                tmp.close()
     else:
         raise OptionsError(options)
 
