@@ -166,10 +166,13 @@ def init_source(state):
             # ports detection for whatever reason
             time.sleep(init.config['command_delay'] * 2)
 
-        pd.client_socket('sources on', quiet=True)
-        # pd.client_socket('source ' + source, quiet=True)
     else:
         print(f"\n(startaudio) could not connect '{source}' ports")
+
+    # disconnect sources from eventual bad behaving clients
+    pd.client_socket('sources off', quiet=True)
+    # actual source connection
+    pd.client_socket('sources on', quiet=True)
 
 
 def main(run_level):
@@ -222,13 +225,12 @@ def main(run_level):
         # restoring sources if config mandates so
         if state['sources'] == 'on':
             init_source(state)
-        else:
-            pd.client_socket('sources off', quiet=True)
 
         # cancel command_unmute mode downstream \
         # restoring config value
         if init.config['do_mute']:
             pd.client_socket('command_mute', quiet=True)
+
         # save changes to file
         pd.client_socket('save', quiet=True)
         print('\n(startaudio): pre.di.c started :-)')
