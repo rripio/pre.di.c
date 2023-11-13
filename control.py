@@ -133,6 +133,7 @@ def do_command(command, arg):
             print(f"\n(control) Command '{command.__name__}' ",
                   f"needs a number: {e}")
         except Exception as e:
+            # restore state as it was before command
             init.state[command.__name__] = state_old[command.__name__]
             print(f"\n(control) Exception in command '{command.__name__}': ",
                   e)
@@ -317,20 +318,28 @@ def source(source):
     # additional waiting after muting
     time.sleep(init.config['command_delay'] * 0.2)
 
-    init.state['source'] = source
-    source_ports = init.sources[init.state['source']]['source_ports']
+    source_ports = init.sources[source]['source_ports']
     source_ports_len = len(source_ports)
     tmp = jack.Client('tmp')
 
     disconnect_sources(tmp)
-    for ports_group in init.config['audio_ports']:
-        # make no more than possible connections,
-        # i.e., minimum of input or output ports
-        num_ports = min(len(ports_group), source_ports_len)
-        for i in range(num_ports):
-            # audio sources
-            tmp.connect(source_ports[i], ports_group[i])
-    tmp.close()
+    try:
+        for ports_group in init.config['audio_ports']:
+            # make no more than possible connections,
+            # i.e., minimum of input or output ports
+            num_ports = min(len(ports_group), source_ports_len)
+            for i in range(num_ports):
+                # audio sources
+                tmp.connect(source_ports[i], ports_group[i])
+    except Exception as e:
+        print('\n(control) Error connecting ports')
+        sources(init.state['sources'])
+        return
+    else:
+        init.state['source'] = source
+    finally:
+        tmp.close()
+
     # source change went OK
     set_gain(pd.calc_gain(init.state['level']))
     # change phase_eq if configured so
