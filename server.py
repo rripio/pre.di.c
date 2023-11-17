@@ -33,41 +33,22 @@ async def handle_commands(reader, writer):
             # echo state to client as YAML string
             writer.write(yaml.dump(init.state,
                                    default_flow_style=False).encode())
-            writer.write(b'OK\n')
-            await writer.drain()
-            if init.config['verbose'] == 2:
-                print('\n(server) closing connection...')
 
         elif data.rstrip('\r\n') == 'save':
             # writes state to state file
             write_state()
-            writer.write(b'OK\n')
-            await writer.drain()
-            if init.config['verbose'] == 2:
-                print('\n(server) closing connection...')
 
         elif data.rstrip('\r\n') == 'ping':
             # just answers OK
-            writer.write(b'OK\n')
-            await writer.drain()
-            if init.config['verbose'] == 2:
-                print('\n(server) closing connection...')
+            pass
 
         elif data.rstrip('\r\n') == 'command_unmute':
             # inhibits mute downstream
             init.config['do_mute'] = False
-            writer.write(b'OK\n')
-            await writer.drain()
-            if init.config['verbose'] == 2:
-                print('\n(server) closing connection...')
 
         elif data.rstrip('\r\n') == 'command_mute':
             # restore mute state downstream
             init.config['do_mute'] = True
-            writer.write(b'OK\n')
-            await writer.drain()
-            if init.config['verbose'] == 2:
-                print('\n(server) closing connection...')
 
         else:
             # command received in 'data', \
@@ -84,15 +65,18 @@ async def handle_commands(reader, writer):
             try:
                 # writes state file
                 write_state()
-                writer.write(b'OK\n')
-                await writer.drain()
             except Exception as e:
                 print('\n(server) an error occurred when writing state file: ',
                       e)
     except ConnectionResetError:
+        writer.write(b'ACK\n')
         print('\n(server) still no connection...')
     except Exception as e:
-        print('(server) an exception occurred: ', e)
+        writer.write(b'ACK\n')
+        print('\n(server) an exception occurred: ', e)
+    else:
+        writer.write(b'OK\n')
+        await writer.drain()
     finally:
         writer.close()
 
