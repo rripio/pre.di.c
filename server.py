@@ -33,6 +33,7 @@ async def handle_commands(reader, writer):
             # echo state to client as YAML string
             writer.write(yaml.dump(init.state,
                                    default_flow_style=False).encode())
+            await writer.drain()
 
         elif data.rstrip('\r\n') == 'save':
             # writes state to state file
@@ -53,11 +54,15 @@ async def handle_commands(reader, writer):
         else:
             # command received in 'data', \
             # then send command to control.py
-            if init.config['verbose'] in [1, 2]:
+            if init.config['verbose'] in {1, 2}:
                 writer.write(b'\ncommand: ' + data.encode())
+                await writer.drain()
 
             control.proccess_commands(data)
 
+            writer.write(control.message.encode() + b'\n')
+            await writer.drain()
+            control.message = ''
             # a try block avoids blocking of state file writing \
             # when the terminal that launched startaudio.py is closed
             try:
@@ -67,16 +72,20 @@ async def handle_commands(reader, writer):
                 writer.write(b'ACK\n')
                 writer.write(b'an error occurred when writing state file: '
                       + str(e).encode() + b'\n')
+                await writer.drain()
+
     except ConnectionResetError:
         writer.write(b'ACK\n')
         writer.write(b'still no connection...\n')
+        await writer.drain()
     except Exception as e:
         writer.write(b'ACK\n')
         writer.write(b'an exception occurred: ' + str(e).encode() + b'\n')
-        # writer.write(b'an exception occurred\n')
+        await writer.drain()
     else:
         writer.write(b'OK\n')
-        await writer.drain()
+        # error not understood. temporaly commented
+        # await writer.drain()
     finally:
         writer.close()
 
@@ -89,7 +98,7 @@ async def main():
                 init.config['control_port']
                 )
     addr = server.sockets[0].getsockname()
-    if init.config['verbose'] in [1, 2]:
+    if init.config['verbose'] in {1, 2}:
         print(f'\n(server) listening on address {addr}')
     await server.serve_forever()
 

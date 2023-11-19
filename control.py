@@ -45,6 +45,7 @@ do_mute = False         # mute during command
 # gets camilladsp setting for volume ramp, and use it for mute waiting
 ramp_time = cdsp_config['filters']['f.volume']['parameters']['ramp_time']/1000
 
+message = ''
 
 # exception definitions
 
@@ -91,6 +92,7 @@ def do_source(source_arg):
     wrapper for source command, avoiding muting already selected sources
     """
 
+    global message
     global do_mute
 
     sources = init.sources
@@ -98,18 +100,20 @@ def do_source(source_arg):
     if source_arg in sources:
         # check for already selected source
         if init.state['source'] == source_arg:
-            print('\n(control) source already selected')
+            message = '\nsource already selected'
         else:
             do_mute = True
             do_command(source, source_arg)
     else:
-        print("\n(control) Source has to be in : ", list(sources))
+        message = "\nsource has to be in : " + str(list(sources))
 
 
 def do_command(command, arg):
     """
     general command wrapper
     """
+
+    global message
 
     # backup state to restore values in case of not enough headroom \
     # or error of any kind
@@ -125,18 +129,17 @@ def do_command(command, arg):
             command(arg)
 
         except ClampWarning as w:
-            print(f"\n(control) '{command.__name__}' value clamped: ",
-                  w.clamp_value)
+            message = (f"\n'{command.__name__}' value clamped: "
+                  + w.clamp_value)
         except OptionsError as e:
-            print("\n(control) Options has to be in : ", list(e.options))
+            message = ("\noptions has to be in : " + str(list(e.options)))
         except ValueError as e:
-            print(f"\n(control) Command '{command.__name__}' ",
-                  f"needs a number: {e}")
+            message = (f"\ncommand '{command.__name__}' needs a number: {e}")
         except Exception as e:
             # restore state as it was before command
             init.state[command.__name__] = state_old[command.__name__]
-            print(f"\n(control) Exception in command '{command.__name__}': ",
-                  e)
+            message = (f"\nexception in command '{command.__name__}': "
+                  + str(e))
         finally:
             if do_mute and init.config['do_mute']:
                 # 0.8x command_delay to give time for command to finish
@@ -145,7 +148,7 @@ def do_command(command, arg):
                 mute(init.state['mute'])
 
     else:
-        print(f"\n(control) Command '{command.__name__}' needs an option")
+        message = f"\ncommand '{command.__name__}' needs an option"
 
 
 # internal functions for commands
@@ -312,6 +315,8 @@ def source(source):
     change source
     """
 
+    global message
+
     # reset clamp to 'on' when changing sources
     init.state['clamp'] = 'on'
 
@@ -332,7 +337,7 @@ def source(source):
                 # audio sources
                 tmp.connect(source_ports[i], ports_group[i])
     except Exception as e:
-        print('\n(control) Error connecting ports')
+        message = '\nerror connecting ports'
         sources(init.state['sources'])
         return
     else:
@@ -510,6 +515,8 @@ def sources(sources):
     toggle connection of sources
     """
 
+    global message
+
     options = {'off', 'on', 'toggle'}
     if sources in options:
         if sources == 'toggle':
@@ -528,7 +535,7 @@ def sources(sources):
                 if pd.wait4ports(source_ports, delay):
                     source(source_selected)
                 else:
-                    print('\n(control) error: source ports are down')
+                    message = '\nerror: source ports are down'
                 tmp.close()
     else:
         raise OptionsError(options)
@@ -616,6 +623,8 @@ def set_mixer():
     set general mixer in camilladsp from state settings
     """
 
+    global message
+    
     mixer = np.identity(2)
 
     if init.state['channels_flip'] == 'on':
@@ -671,7 +680,7 @@ def set_mixer():
 
     # for debug
     if init.config['verbose'] in {1, 2}:
-        print(f'\n(control) mixer matrix : \n{mixer}\n')
+        message = f'\nmixer matrix : \n{mixer}\n'
 
 
 def set_gain(gain):
@@ -681,6 +690,8 @@ def set_gain(gain):
     considering balance, tones and source gain shift
     """
 
+    global message
+    
     # gain command send its str argument directly
     gain = float(gain)
     # clamp gain value
@@ -689,8 +700,8 @@ def set_gain(gain):
     # max gain is clamped downstream when calculating headroom
     if gain < base.gain_min:
         gain = base.gain_min
-        print(f'\n(control) min. gain must be more than {base.gain_min} dB')
-        print('(control) gain clamped')
+        message = (f'\nmin. gain must be more than {base.gain_min}' +
+                   + ' dB\ngain clamped')
     # calculate headroom and clamp gain if clamp_gain allows to do so
     if init.state['clamp'] == 'on':
         headroom = pd.calc_headroom(gain)
@@ -705,7 +716,7 @@ def set_gain(gain):
         # if not enough headroom tries lowering gain
         else:
             set_gain(gain + headroom)
-            print('\n(control) headroom hit, lowering gain...')
+            message = '\nheadroom hit, lowering gain...'
     else:
         cdsp.set_volume(gain)
 
@@ -719,9 +730,9 @@ def proccess_commands(full_command):
     """
 
     global cdsp             # let camilladsp connection be accesible
-
     global add
     global do_mute
+    global message
 
     add = False
     do_mute = False
@@ -808,6 +819,7 @@ def proccess_commands(full_command):
             cdsp.set_config(cdsp_config)
 
     except KeyError:
-        print(f"\n(control) Unknown command '{command}'")
+        message = f"\nunknown command '{command}'"
+        
 
 # end of proccess_commands()
