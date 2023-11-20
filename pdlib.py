@@ -269,9 +269,10 @@ def show():
     Gain                {gain: 10.1f}
     Headroom            {headroom: 10.1f}
     Clamp gain          {init.state['clamp']: >10s}
-
     '''
+
     return show_str
+
 
 help_str = '''
     status                              Display status
@@ -303,5 +304,4 @@ help_str = '''
                                         ('add' for incremental mode)
     level <level> [add]                 Set volume level ('add' for incremental mode)
     gain <gain>                         Set digital gain
-
     '''

@@ -17,6 +17,7 @@ async def handle_commands(reader, writer):
 
     rawdata = await reader.read(100)
     data = rawdata.decode()
+    say_OK = True
 
     def write_state():
         """
@@ -52,9 +53,11 @@ async def handle_commands(reader, writer):
             init.config['do_mute'] = True
 
         elif data.rstrip('\r\n') == 'show':
+            say_OK = False
             writer.write(pd.show().encode())
 
         elif data.rstrip('\r\n') == 'help':
+            say_OK = False
             writer.write(pd.help_str.encode())
         
         else:
@@ -84,7 +87,8 @@ async def handle_commands(reader, writer):
         writer.write(b'ACK\n')
         writer.write(b'an exception occurred: ' + str(e).encode() + b'\n')
     else:
-        writer.write(b'OK\n')
+        if say_OK:
+            writer.write(b'OK\n')
     finally:
         # error not understood. temporaly commented
         # await writer.drain()
