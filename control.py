@@ -94,6 +94,8 @@ def do_source(source_arg):
 
     global message
     global do_mute
+    
+    success = False
 
     sources = init.sources
     # sources check is done here, not in proper function
@@ -103,9 +105,11 @@ def do_source(source_arg):
             message = '\nsource already selected'
         else:
             do_mute = True
-            do_command(source, source_arg)
+            success = do_command(source, source_arg)
     else:
         message = "\nsource has to be in : " + str(list(sources))
+
+    return success
 
 
 def do_command(command, arg):
@@ -115,10 +119,12 @@ def do_command(command, arg):
 
     global message
 
+    success = False
+
     # backup state to restore values in case of not enough headroom \
     # or error of any kind
     state_old = init.state.copy()
-
+    
     if arg:
         try:
             if do_mute and init.config['do_mute']:
@@ -140,6 +146,8 @@ def do_command(command, arg):
             init.state[command.__name__] = state_old[command.__name__]
             message = (f"\nexception in command '{command.__name__}': "
                   + str(e))
+        else:
+            success = True
         finally:
             if do_mute and init.config['do_mute']:
                 # 0.8x command_delay to give time for command to finish
@@ -149,6 +157,8 @@ def do_command(command, arg):
 
     else:
         message = f"\ncommand '{command.__name__}' needs an option"
+
+    return success
 
 
 # internal functions for commands
@@ -725,6 +735,7 @@ def proccess_commands(full_command):
 
     add = False
     do_mute = False
+    success = False
 
     # strips command final characters and split command from arguments
     full_command = full_command.rstrip('\r\n').split()
@@ -746,7 +757,7 @@ def proccess_commands(full_command):
         # commands that do not depend on camilladsp config
 
         if command in {'clamp', 'mute', 'level', 'gain'}:
-            do_command(
+            success = do_command(
              {
                 # numerical commands that accept 'add'
                 'level':            level,          # [level] add
@@ -761,12 +772,12 @@ def proccess_commands(full_command):
 
         elif command == 'source':
             # source                            # [source]
-            do_source(arg)
+            success = do_source(arg)
             # dispatch config
             cdsp.set_config(cdsp_config)
 
         elif command in {'loudness_ref', 'bass', 'treble', 'balance'}:
-            do_command(
+            success = do_command(
              {
                 # numerical commands that accept 'add'
                 'loudness_ref':     loudness_ref,   # [loudness_ref] add
@@ -780,7 +791,7 @@ def proccess_commands(full_command):
         else:
             # these commands benefit for silencing switching noise
             do_mute = True
-            do_command(
+            success = do_command(
              {
                 # non numerical commands
                 'drc_set':          drc_set,        # [drc_set]
@@ -805,6 +816,8 @@ def proccess_commands(full_command):
 
     except KeyError:
         message = f"\nunknown command '{command}'"
-        
+    
+    return success
+
 
 # end of proccess_commands()

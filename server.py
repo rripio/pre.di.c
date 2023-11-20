@@ -28,7 +28,7 @@ async def handle_commands(reader, writer):
             if init.state is not None:
                 yaml.dump(init.state, f, default_flow_style=False)
             else:
-                writer.write(b'\ncorrupted null state file')
+                raise Exception('corrupted null state file\n')
 
     try:
         if data.rstrip('\r\n') == 'status':
@@ -66,32 +66,33 @@ async def handle_commands(reader, writer):
             if init.config['verbose'] in {1, 2}:
                 writer.write(b'\ncommand: ' + data.encode())
 
-            control.proccess_commands(data)
+            if not control.proccess_commands(data):
+                raise Exception(control.message)
 
-            writer.write(control.message.encode() + b'\n')
-            control.message = ''
+            writer.write(control.message.encode())
             # a try block avoids blocking of state file writing \
             # when the terminal that launched startaudio.py is closed
             try:
                 # writes state file
                 write_state()
             except Exception as e:
-                writer.write(b'ACK\n')
+                writer.write(b'ACK')
                 writer.write(b'an error occurred when writing state file: '
                       + str(e).encode() + b'\n')
 
-    except ConnectionResetError:
-        writer.write(b'ACK\n')
-        writer.write(b'still no connection...\n')
     except Exception as e:
-        writer.write(b'ACK\n')
-        writer.write(b'an exception occurred: ' + str(e).encode() + b'\n')
+        writer.write(b'ACK')
+        writer.write(str(e).encode() + b'\n')
     else:
         if say_OK:
             writer.write(b'OK\n')
     finally:
-        # error not understood. temporaly commented
-        # await writer.drain()
+        try:
+            await writer.drain()
+        except ConnectionResetError:
+            writer.write(b'ACK')
+            writer.write(b'still no connection...\n')
+        control.message = ''
         writer.close()
 
 
