@@ -224,7 +224,7 @@ def calc_source_gain(source):
 
 def show():
     """
-    shows a status report
+    compose a status report string
     """
 
     source_gain = calc_source_gain(init.state['source'])
@@ -232,58 +232,76 @@ def show():
     headroom = calc_headroom(gain)
     source_headroom = headroom - source_gain
 
-    print()
-    print(f"Loudspeaker:        {init.config['loudspeaker']: >10s}")
-    print()
-    print(f"fs                  {init.speaker['fs']: 10d}")
-    print(f"Reference level     {init.speaker['ref_level_gain']: 10.1f}")
+    show_str = f'''
+    Loudspeaker:        {init.config['loudspeaker']: >10s}
 
-    print()
-    print(f"Mute                {init.state['mute']: >10s}")
-    print(f"Level               {init.state['level']: 10.1f}")
-    print(f"Balance             {init.state['balance']: 10.1f}")
+    fs                  {init.speaker['fs']: 10d}
+    Reference level     {init.speaker['ref_level_gain']: 10.1f}
 
-    print()
-    print(f"Channels            {init.state['channels']: >10s}")
-    print(f"Channels flip       {init.state['channels_flip']: >10s}")
-    print(f"Polarity            {init.state['polarity']: >10s}")
-    print(f"Polarity flip       {init.state['polarity_flip']: >10s}")
-    print(f"Stereo              {init.state['stereo']: >10s}")
-    print(f"Solo                {init.state['solo']: >10s}")
+    Mute                {init.state['mute']: >10s}
+    Level               {init.state['level']: 10.1f}
+    Balance             {init.state['balance']: 10.1f}
 
-    print()
-    print(f"Tones               {init.state['tones']: >10s}")
-    print(f"Bass                {init.state['bass']: 10.1f}")
-    print(f"Treble              {init.state['treble']: 10.1f}")
-    print(f"Loudness            {init.state['loudness']: >10s}")
-    print(f"Loudness reference  {init.state['loudness_ref']: 10.1f}")
+    Channels            {init.state['channels']: >10s}
+    Channels flip       {init.state['channels_flip']: >10s}
+    Polarity            {init.state['polarity']: >10s}
+    Polarity flip       {init.state['polarity_flip']: >10s}
+    Stereo              {init.state['stereo']: >10s}
+    Solo                {init.state['solo']: >10s}
 
-    print()
-    print(f"DRC                 {init.state['drc']: >10s}")
-    print(f"DRC set             {init.state['drc_set']: >10s}")
-    print(f"Phase equalizer     {init.state['phase_eq']: >10s}")
-    print(f"EQ                  {init.state['eq']: >10s}")
-    print(f"EQ filter           {init.state['eq_filter']: >10s}")
+    Tones               {init.state['tones']: >10s}
+    Bass                {init.state['bass']: 10.1f}
+    Treble              {init.state['treble']: 10.1f}
+    Loudness            {init.state['loudness']: >10s}
+    Loudness reference  {init.state['loudness_ref']: 10.1f}
 
-    print()
-    print(f"Sources             {init.state['sources']: >10s}")
-    print(f"Source              {init.state['source']: >10s}")
-    print(f'Source gain         {source_gain: 10.1f}')
-    print(f'Source headroom     {source_headroom: 10.1f}')
+    DRC                 {init.state['drc']: >10s}
+    DRC set             {init.state['drc_set']: >10s}
+    Phase equalizer     {init.state['phase_eq']: >10s}
+    EQ                  {init.state['eq']: >10s}
+    EQ filter           {init.state['eq_filter']: >10s}
 
-    print()
-    print(f"Gain                {gain: 10.1f}")
-    print(f"Headroom            {headroom: 10.1f}")
-    print(f"Clamp gain          {init.state['clamp']: >10s}")
+    Sources             {init.state['sources']: >10s}
+    Source              {init.state['source']: >10s}
+    Source gain         {source_gain: 10.1f}
+    Source headroom     {source_headroom: 10.1f}
 
-    print('\n')
+    Gain                {gain: 10.1f}
+    Headroom            {headroom: 10.1f}
+    Clamp gain          {init.state['clamp']: >10s}
 
+    '''
+    return show_str
 
-def show_file():
-    """
-    writes a status report to temp file
-    """
+help_str = '''
+    status                              Display status
+    save                                Save status
+    ping                                Request an answer from server
 
-    with open('/tmp/predic', 'w') as f:
-        with cl.redirect_stdout(f):
-            show()
+    show                                Save a human readable status to /tmp/predic
+    clamp <off|on|toggle>               Set or toggle level clamp activation 
+    sources <off|on|toggle>             Set or toggle  sources activation
+    source <input>                      Select source
+    drc <off|on|toggle>                 Set or toggle DRC filters activation
+    drc_set <drc_set>                   Select DRC filters set
+    phase_eq <off|on|toggle>            Set or toggle phase equalizer filter activation
+
+    channels <lr|l|r>                   Set input channels selector mode
+    channels_flip <off|on|toggle>       Set or toggle channels flip activation
+    polarity <off|on|toggle>            Set or toggle polarity inversion activation
+    polarity_flip <off|on|toggle>       Set or toggle polarity flip activation
+    stereo <normal|mid|side>            Set input channels mixer mode
+    solo <lr|l|r>                       Set output channels selector mode
+
+    mute <off|on|toggle>                Set or toggle mute activation
+    loudness <off|on|toggle>            Set or toggle loudness control activation
+    loudness_ref <loudness_ref> [add]   Set loudness reference level ('add' for incremental mode)
+    tones <off|on|toggle>               Set or toggle tone control activation
+    treble <treble> [add]               Set treble level ('add' for incremental mode)
+    bass <bass> [add]                   Set bass level ('add' for incremental mode)
+    balance <balance> [add]             Set balance, negative for left shift, positive for right shifts
+                                        ('add' for incremental mode)
+    level <level> [add]                 Set volume level ('add' for incremental mode)
+    gain <gain>                         Set digital gain
+
+    '''

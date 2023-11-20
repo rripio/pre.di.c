@@ -154,17 +154,6 @@ def do_command(command, arg):
 # internal functions for commands
 
 
-# commands without options
-
-
-def show():
-    """
-    show status in a readable way
-    """
-
-    pd.show_file()
-
-
 # commands that do not depend on camilladsp config
 
 
@@ -754,13 +743,9 @@ def proccess_commands(full_command):
     # parse  commands and select corresponding actions
 
     try:
-        # commands without options
-        if command == 'show':
-            show()                              #
-
         # commands that do not depend on camilladsp config
 
-        elif command in {'clamp', 'mute', 'level', 'gain'}:
+        if command in {'clamp', 'mute', 'level', 'gain'}:
             do_command(
              {
                 # numerical commands that accept 'add'
