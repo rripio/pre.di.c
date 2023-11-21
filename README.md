@@ -20,7 +20,7 @@ FIRtro copyright (C) 2006-2011 Roberto Ripio
 FIRtro copyright (C) 2011-2016 Alberto Miguélez  
 FIRtro copyright (C) 2016-2018 Rafael Sánchez  
 
-Wih the demise of _python 2_ a big rewrite was made by me, and another one came with the advent of a new truly wonderful DSP engine, [CamillaDSP](https://github.com/HEnquist/camilladsp), that is now the machine behind pre.di.c.
+With the demise of _python 2_ a big rewrite was made by me, and another one came with the advent of a new truly wonderful DSP engine, [CamillaDSP](https://github.com/HEnquist/camilladsp), that is now the machine behind pre.di.c.
 
 ## disclaimer
 
