@@ -1,12 +1,28 @@
 # pre.di.c
 A preamp and digital crossover.
 
+## Introduction
+
+### Purpose
+
+This program makes a linux computer equipped with a modern sound card behave as a traditional hi-fi preamp, but able also to make advanced DSP equalization and crossover tasks.
+
+That means that external sources can be used, be them analog or digital, along with digital libraries or streamed sources.
+
+### History
+
+While first experiments began in 2005, the first operative version, using _brutefir_ as DSP engine and coded in _python 2_, was made in 2006, with the name _FIRtro_.
+
+Since then it has slowly evolved with the impulse of dear friends and great hi-fi aficionados, and that lends to this aproximate time sequence credits:
+
 pre.di.c is based on FIRtro https://github.com/AudioHumLab/FIRtro  
 FIRtro copyright (C) 2006-2011 Roberto Ripio  
 FIRtro copyright (C) 2011-2016 Alberto Miguélez  
 FIRtro copyright (C) 2016-2018 Rafael Sánchez  
 
-#### disclaimer
+Wih the demise of _python 2_ a big rewrite was made by me, and another one came with the advent of a new truly wonderful DSP engine, [CamillaDSP](https://github.com/HEnquist/camilladsp), that is now the machine behind pre.di.c.
+
+## disclaimer
 
 This program is given in good faith. I have put my best efforts in having all of it free from mistakes, but the full responsability for its use lies on you.
 
