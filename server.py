@@ -59,7 +59,7 @@ async def handle_commands(reader, writer):
         elif data.rstrip('\r\n') == 'help':
             say_OK = False
             writer.write(pd.help_str.encode())
-        
+
         else:
             # command received in 'data', \
             # then send command to control.py
@@ -78,7 +78,7 @@ async def handle_commands(reader, writer):
             except Exception as e:
                 writer.write(b'ACK')
                 writer.write(b'an error occurred when writing state file: '
-                      + str(e).encode() + b'\n')
+                             + str(e).encode() + b'\n')
 
     except Exception as e:
         writer.write(b'ACK')

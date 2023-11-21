@@ -22,7 +22,6 @@ for use when launching DVB client on pre.di.c start
 """
 
 
-
 import sys
 import os
 import time

@@ -94,7 +94,7 @@ def do_source(source_arg):
 
     global message
     global do_mute
-    
+
     success = False
 
     sources = init.sources
@@ -124,7 +124,7 @@ def do_command(command, arg):
     # backup state to restore values in case of not enough headroom \
     # or error of any kind
     state_old = init.state.copy()
-    
+
     if arg:
         try:
             if do_mute and init.config['do_mute']:
@@ -136,7 +136,7 @@ def do_command(command, arg):
 
         except ClampWarning as w:
             message = (f"\n'{command.__name__}' value clamped: "
-                  + w.clamp_value)
+                       + w.clamp_value)
         except OptionsError as e:
             message = ("\noptions has to be in : " + str(list(e.options)))
         except ValueError as e:
@@ -145,7 +145,7 @@ def do_command(command, arg):
             # restore state as it was before command
             init.state[command.__name__] = state_old[command.__name__]
             message = (f"\nexception in command '{command.__name__}': "
-                  + str(e))
+                       + str(e))
         else:
             success = True
         finally:
@@ -336,7 +336,7 @@ def source(source):
                 # audio sources
                 tmp.connect(source_ports[i], ports_group[i])
     except Exception as e:
-        message = '\nerror connecting ports'
+        message = f'\nerror connecting ports: {e}'
         sources(init.state['sources'])
         return
     else:
@@ -623,7 +623,7 @@ def set_mixer():
     """
 
     global message
-    
+
     mixer = np.identity(2)
 
     if init.state['channels_flip'] == 'on':
@@ -690,7 +690,7 @@ def set_gain(gain):
     """
 
     global message
-    
+
     # gain command send its str argument directly
     gain = float(gain)
     # clamp gain value
@@ -816,7 +816,7 @@ def proccess_commands(full_command):
 
     except KeyError:
         message = f"\nunknown command '{command}'"
-    
+
     return success
 
 

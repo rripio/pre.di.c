@@ -10,7 +10,6 @@ miscellanea of utility functions for use in predic scripts
 import socket
 import sys
 import time
-import contextlib as cl
 import subprocess as sp
 import math as m
 
@@ -279,8 +278,8 @@ help_str = '''
     save                                Save status
     ping                                Request an answer from server
 
-    show                                Save a human readable status to /tmp/predic
-    clamp <off|on|toggle>               Set or toggle level clamp activation 
+    show                                Save a human readable status to/tmp/predic
+    clamp <off|on|toggle>               Set or toggle level clamp activation
     sources <off|on|toggle>             Set or toggle  sources activation
     source <input>                      Select source
     drc <off|on|toggle>                 Set or toggle DRC filters activation

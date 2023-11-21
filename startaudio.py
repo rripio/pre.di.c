@@ -59,9 +59,9 @@ def init_camilladsp():
     # folder in speaker.yml config file
     os.chdir(init.loudspeaker_path)
     print(f'\n(startaudio) starting camilladsp on {os.getcwd()}')
-    sp.Popen((f'{init.config["camilladsp_command"]} -m ' + 
-             f'-p {init.config["websocket_port"]} ' +
-             f'{init.camilladsp_path}').split())
+    sp.Popen((f'{init.config["camilladsp_command"]} -m ' +
+              f'-p {init.config["websocket_port"]} ' +
+              f'{init.camilladsp_path}').split())
 
     # waiting for camilladsp
     # test for input jack ports to be up
