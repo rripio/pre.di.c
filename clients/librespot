@@ -4,6 +4,8 @@ case $1 in
     start)
         echo
         echo -n "(librespot)"
+        echo
+
         librespot --backend "jackaudio" -b 320 --initial-volume 100 --format F32 --name pre.di.c > /dev/null
     ;;
     stop)

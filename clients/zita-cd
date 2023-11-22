@@ -4,8 +4,9 @@ case $1 in
     start)
         echo
         echo "(zita-cd) starting..."
+        echo
+
         zita-a2j -d hw:CARD=U24XL,DEV=0 -p 2048 -r 44100 -j cd > /dev/null
-#        zita-a2j -d hw:CARD=U24XL,DEV=0 -p 1024 -r 48000 -j cd > /dev/null
     ;;
     stop)
         killall zita-a2j
