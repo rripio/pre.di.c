@@ -278,29 +278,30 @@ help_str = '''
     save                                Save status
     ping                                Request an answer from server
 
-    show                                Save a human readable status to/tmp/predic
-    clamp <off|on|toggle>               Set or toggle level clamp activation
-    sources <off|on|toggle>             Set or toggle  sources activation
+    show                                Show a human readable status
+    clamp <off|on|toggle>               Set or toggle level clamp
+    sources <off|on|toggle>             Set or toggle  sources
     source <input>                      Select source
-    drc <off|on|toggle>                 Set or toggle DRC filters activation
+    drc <off|on|toggle>                 Set or toggle DRC filters
     drc_set <drc_set>                   Select DRC filters set
-    phase_eq <off|on|toggle>            Set or toggle phase equalizer filter activation
+    phase_eq <off|on|toggle>            Set or toggle phase equalizer filter
 
     channels <lr|l|r>                   Set input channels selector mode
-    channels_flip <off|on|toggle>       Set or toggle channels flip activation
-    polarity <off|on|toggle>            Set or toggle polarity inversion activation
-    polarity_flip <off|on|toggle>       Set or toggle polarity flip activation
+    channels_flip <off|on|toggle>       Set or toggle channels flip
+    polarity <off|on|toggle>            Set or toggle polarity inversion
+    polarity_flip <off|on|toggle>       Set or toggle polarity flip
     stereo <normal|mid|side>            Set input channels mixer mode
     solo <lr|l|r>                       Set output channels selector mode
 
-    mute <off|on|toggle>                Set or toggle mute activation
-    loudness <off|on|toggle>            Set or toggle loudness control activation
-    loudness_ref <loudness_ref> [add]   Set loudness reference level ('add' for incremental mode)
-    tones <off|on|toggle>               Set or toggle tone control activation
-    treble <treble> [add]               Set treble level ('add' for incremental mode)
-    bass <bass> [add]                   Set bass level ('add' for incremental mode)
-    balance <balance> [add]             Set balance, negative for left shift, positive for right shifts
-                                        ('add' for incremental mode)
-    level <level> [add]                 Set volume level ('add' for incremental mode)
+    mute <off|on|toggle>                Set or toggle mute
+    loudness <off|on|toggle>            Set or toggle loudness control
+    loudness_ref <loudness_ref> [add]   Set loudness reference level
+    tones <off|on|toggle>               Set or toggle tone control
+    treble <treble> [add]               Set treble level
+    bass <bass> [add]                   Set bass level
+    balance <balance> [add]             Set balance (- left , + for right)
+    level <level> [add]                 Set volume level
     gain <gain>                         Set digital gain
+
+    'add' option makes previous number be an increment
     '''
