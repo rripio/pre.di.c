@@ -94,14 +94,14 @@ def start():
     """
 
     # starts MPD
-    print('\n(mpd_load.py) starting mpd')
+    print('\n(mpd_load) starting mpd')
     sp.Popen(mpd_conf["start_command"].split())
     if pd.wait4result(
             f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
             'OK MPD'):
-        print('\n(mpd_load.py) mpd started :-)')
+        print('\n(mpd_load) mpd started :-)')
     else:
-        print('\n(mpd_load.py) mpd loading failed')
+        print('\n(mpd_load) mpd loading failed')
         return
 
     # ping mpd to create jack ports
@@ -134,21 +134,23 @@ def start():
         if restore:
             mpd_client.seek(song, elapsed)
         mpd_client.close()
-    except Exception:
-        print('\n(mpd_load.py) problems with mpd ping routine')
+    except Exception as e:
+        print(f'\n(mpd_load) error in ping routine: {e}')
 
     # volume linked to mpd (optional)
     if mpd_conf['volume_linked']:
         try:
             mpdloop = mp.Process(target=mpd_vol_loop)
             mpdloop.start()
-        except Exception:
-            print('\n(mpd_load.py) mpd socket loop broke')
+        except Exception as e:
+            print('\n(mpd_load) mpd socket loop broke' +
+                  f'with exception {e}')
         try:
             predicloop = mp.Process(target=predic_vol_loop)
             predicloop.start()
-        except Exception:
-            print('\n(mpd_load.py) predic socket loop broke')
+        except Exception as e:
+            print('\n(mpd_load) predic socket loop broke' +
+                  f' with exception {e}')
 
 
 def stop():
@@ -172,6 +174,6 @@ if sys.argv[1:]:
             'stop': stop
             }[sys.argv[1]]()
     except KeyError:
-        print('\n(mpd_load.py) bad option')
+        print('\n(mpd_load) bad option')
 else:
     print(__doc__)
