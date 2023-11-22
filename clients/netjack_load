@@ -1,0 +1,9 @@
+#!/bin/sh
+
+echo
+echo -n "(netjack_load) starting netjack"
+echo
+
+/usr/bin/jack_load netmanager
+
+exit
