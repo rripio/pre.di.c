@@ -102,12 +102,12 @@ def do_source(source_arg):
     if source_arg in sources:
         # check for already selected source
         if init.state['source'] == source_arg:
-            message = '\nsource already selected'
+            message = 'source already selected'
         else:
             do_mute = True
             success = do_command(source, source_arg)
     else:
-        message = "\nsource has to be in : " + str(list(sources))
+        message = f"source has to be in : {str(list(sources))}"
 
     return success
 
@@ -135,17 +135,15 @@ def do_command(command, arg):
             command(arg)
 
         except ClampWarning as w:
-            message = (f"\n'{command.__name__}' value clamped: "
-                       + w.clamp_value)
+            message = (f"'{command.__name__}' value clamped: {w.clamp_value}")
         except OptionsError as e:
-            message = ("\noptions has to be in : " + str(list(e.options)))
+            message = (f"options has to be in : {str(list(e.options))}")
         except ValueError as e:
-            message = (f"\ncommand '{command.__name__}' needs a number: {e}")
+            message = (f"command '{command.__name__}' needs a number: {e}")
         except Exception as e:
             # restore state as it was before command
             init.state[command.__name__] = state_old[command.__name__]
-            message = (f"\nexception in command '{command.__name__}': "
-                       + str(e))
+            message = (f"exception in command '{command.__name__}': {str(e)}")
         else:
             success = True
         finally:
@@ -156,7 +154,7 @@ def do_command(command, arg):
                 mute(init.state['mute'])
 
     else:
-        message = f"\ncommand '{command.__name__}' needs an option"
+        message = f"command '{command.__name__}' needs an option"
 
     return success
 
@@ -336,7 +334,7 @@ def source(source):
                 # audio sources
                 tmp.connect(source_ports[i], ports_group[i])
     except Exception as e:
-        message = f'\nerror connecting ports: {e}'
+        message = f'error connecting ports: {e}'
         sources(init.state['sources'])
         return
     else:
@@ -534,7 +532,7 @@ def sources(sources):
                 if pd.wait4ports(source_ports, delay):
                     source(source_selected)
                 else:
-                    message = '\nerror: source ports are down'
+                    message = 'error: source ports are down'
                 tmp.close()
     else:
         raise OptionsError(options)
@@ -679,7 +677,7 @@ def set_mixer():
 
     # for debug
     if init.config['verbose'] in {1, 2}:
-        message = f'\nmixer matrix : \n{mixer}\n'
+        message = f'mixer matrix : \n{mixer}'
 
 
 def set_gain(gain):
@@ -699,8 +697,8 @@ def set_gain(gain):
     # max gain is clamped downstream when calculating headroom
     if gain < base.gain_min:
         gain = base.gain_min
-        message = (f'\nmin. gain must be more than {base.gain_min}' +
-                   + ' dB\ngain clamped')
+        message = (f'min. gain must be more than {base.gain_min} ' +
+                   + 'dB\ngain clamped')
     # calculate headroom and clamp gain if clamp_gain allows to do so
     if init.state['clamp'] == 'on':
         headroom = pd.calc_headroom(gain)
@@ -715,7 +713,7 @@ def set_gain(gain):
         # if not enough headroom tries lowering gain
         else:
             set_gain(gain + headroom)
-            message = '\nheadroom hit, lowering gain...'
+            message = 'headroom hit, lowering gain...'
     else:
         cdsp.set_volume(gain)
 
@@ -815,7 +813,7 @@ def proccess_commands(full_command):
             cdsp.set_config(cdsp_config)
 
     except KeyError:
-        message = f"\nunknown command '{command}'"
+        message = f"unknown command '{command}'"
 
     return success
 

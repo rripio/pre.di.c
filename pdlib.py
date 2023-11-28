@@ -92,7 +92,7 @@ def read_state():
     retrieve state dictionary from server to be used by clients
     """
 
-    return yaml.safe_load(client_socket('status').decode().replace('OK\n', ''))
+    return yaml.safe_load(client_socket('status').decode().replace('\nOK', ''))
 
 
 def wait4result(command, answer, tmax=5, interval=0.1):

@@ -76,22 +76,22 @@ async def handle_commands(reader, writer):
                 # writes state file
                 write_state()
             except Exception as e:
-                writer.write(b'ACK')
                 writer.write(b'an error occurred when writing state file: '
-                             + str(e).encode() + b'\n')
+                             + str(e).encode())
+                writer.write(b'\nACK')
 
     except Exception as e:
-        writer.write(b'ACK')
-        writer.write(str(e).encode() + b'\n')
+        writer.write(str(e).encode())
+        writer.write(b'\nACK')
     else:
         if say_OK:
-            writer.write(b'OK\n')
+            writer.write(b'\nOK')
     finally:
         try:
             await writer.drain()
         except ConnectionResetError:
-            writer.write(b'ACK')
-            writer.write(b'still no connection...\n')
+            writer.write(b'still no connection...')
+            writer.write(b'\nACK')
         control.message = ''
         writer.close()
 
