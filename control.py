@@ -736,7 +736,7 @@ def proccess_commands(full_command):
     success = False
 
     # strips command final characters and split command from arguments
-    full_command = full_command.rstrip('\r\n').split()
+    full_command = full_command.split()
     if len(full_command) > 0:
         command = full_command[0]
     else:

@@ -16,7 +16,7 @@ import pdlib as pd
 async def handle_commands(reader, writer):
 
     rawdata = await reader.read(100)
-    data = rawdata.decode()
+    data = rawdata.decode().rstrip('\r\n')
     say_OK = True
 
     def write_state():
@@ -31,32 +31,32 @@ async def handle_commands(reader, writer):
                 raise Exception('corrupted null state file\n')
 
     try:
-        if data.rstrip('\r\n') == 'status':
+        if data == 'status':
             # echo state to client as YAML string
             writer.write(yaml.dump(init.state,
                                    default_flow_style=False).encode())
 
-        elif data.rstrip('\r\n') == 'save':
+        elif data == 'save':
             # writes state to state file
             write_state()
 
-        elif data.rstrip('\r\n') == 'ping':
+        elif data == 'ping':
             # just answers OK
             pass
 
-        elif data.rstrip('\r\n') == 'command_unmute':
+        elif data == 'command_unmute':
             # inhibits mute downstream
             init.config['do_mute'] = False
 
-        elif data.rstrip('\r\n') == 'command_mute':
+        elif data == 'command_mute':
             # restore mute state downstream
             init.config['do_mute'] = True
 
-        elif data.rstrip('\r\n') == 'show':
+        elif data == 'show':
             say_OK = False
             writer.write(pd.show().encode())
 
-        elif data.rstrip('\r\n') == 'help':
+        elif data == 'help':
             say_OK = False
             writer.write(pd.help_str.encode())
 
