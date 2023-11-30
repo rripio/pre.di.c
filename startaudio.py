@@ -24,6 +24,9 @@ import stopaudio
 import pdlib as pd
 
 
+port = init.config['control_port']
+
+
 def stop_all():
     """
     stops all audio and the current script
@@ -145,7 +148,7 @@ def init_state_settings(state):
             'treble'
             ):
         print(f'{setting} {state[setting]}')
-        pd.client_socket(f'{setting} {state[setting]}')
+        pd.client_socket(f'{setting} {state[setting]}', port)
 
 
 def init_source(state):
@@ -170,9 +173,9 @@ def init_source(state):
         print(f"\n(startaudio) could not connect '{source}' ports")
 
     # disconnect sources from eventual bad behaving clients
-    pd.client_socket('sources off', quiet=True)
+    pd.client_socket('sources off', port, quiet=True)
     # actual source connection
-    pd.client_socket('sources on', quiet=True)
+    pd.client_socket('sources on', port, quiet=True)
 
 
 def main(run_level):
@@ -195,7 +198,7 @@ def main(run_level):
         state = set_initial_state()
 
         # activate command_unmute mode downstream
-        pd.client_socket('command_unmute', quiet=True)
+        pd.client_socket('command_unmute', port, quiet=True)
 
         # restoring previous state
         # exceptionally we add a line feed at the end \
@@ -207,7 +210,7 @@ def main(run_level):
         if state['sources'] == 'on':
             # just refresh state file
             init.state['source'] = state['source']
-            pd.client_socket('save', quiet=True)
+            pd.client_socket('save', port, quiet=True)
 
         # launch external clients, sources and clients
         # exceptionally we add a line feed at the end \
@@ -229,10 +232,10 @@ def main(run_level):
         # cancel command_unmute mode downstream \
         # restoring config value
         if init.config['do_mute']:
-            pd.client_socket('command_mute', quiet=True)
+            pd.client_socket('command_mute', port, quiet=True)
 
         # save changes to file
-        pd.client_socket('save', quiet=True)
+        pd.client_socket('save', port, quiet=True)
         print('\n(startaudio): pre.di.c started :-)')
 
 

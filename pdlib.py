@@ -52,7 +52,7 @@ def get_yaml(filepath):
     return config_dict
 
 
-def client_socket(data, quiet=True):
+def client_socket(data, port, quiet=True):
     """
     makes a socket for talking to the server
     """
@@ -62,7 +62,7 @@ def client_socket(data, quiet=True):
         return b'ACK\n'
 
     server = 'localhost'
-    port = init.config['control_port']
+    # port = init.config['control_port']
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
@@ -91,8 +91,9 @@ def read_state():
     """
     retrieve state dictionary from server to be used by clients
     """
+    string = client_socket('status', init.config['control_port'])
 
-    return yaml.safe_load(client_socket('status').decode().replace('\nOK', ''))
+    return yaml.safe_load(string.decode().replace('\nOK', '')) 
 
 
 def wait4result(command, answer, tmax=5, interval=0.1):

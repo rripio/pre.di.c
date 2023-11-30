@@ -24,3 +24,8 @@ presets_filename: presets.yml
 # option -input file={dvb_fifo} is added in program
 fifo_filename: DVB_fifo
 
+# address and port
+# 0.0.0.0 listen to all net connections
+# 127.0.0.1 listen only to local connections
+control_address: 0.0.0.0
+control_port: 9998

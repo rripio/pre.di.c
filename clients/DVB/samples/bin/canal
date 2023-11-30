@@ -1,5 +1,22 @@
+<<<<<<< HEAD
 #!/bin/sh
 
 ~/pre.di.c/clients/DVB/DVB_command.py $1
 
 exit
+=======
+#!/bin/bash
+if [ $# -ne 0 ]
+then
+    for ARG in $@
+    do
+        STR="$STR $ARG"
+    done
+    echo $STR | nc 127.0.0.1 9998
+    echo
+else
+    echo
+    echo "Usage: ${0##*/} command [options]"
+    echo
+fi
+>>>>>>> DVB_server
