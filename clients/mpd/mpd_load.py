@@ -26,6 +26,8 @@ import pdlib as pd
 # user config
 config_filename = 'config.yml'
 
+port = init.config['control_port']
+
 
 def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
     """
@@ -55,7 +57,7 @@ def mpd_vol_loop():
             + mpd_gain_min
             - init.speaker['ref_level_gain']
             )
-        pd.client_socket("level " + str(predic_level), quiet=True)
+        pd.client_socket("level " + str(predic_level), port, quiet=True)
     mpd_client.close()
     mpd_client.disconnect()
 
