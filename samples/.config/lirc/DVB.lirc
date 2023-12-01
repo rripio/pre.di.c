@@ -9,67 +9,67 @@ begin dvb
     begin  
         prog = irexec
         button = KEY_STOP
-        config = /bin/echo stop > ~/pre.di.c/clients/DVB/DVB_fifo
+        config = /bin/echo stop > /home/predic/pre.di.c/clients/DVB/DVB_fifo
         flags = quit
     end
     begin
         prog = irexec
         button = KEY_PREVIOUSSONG
-        config = ~/pre.di.c/clients/DVB/DVB_command.py back
+        config = ~/bin/canal back
     end
     begin
         prog = irexec
         button = KEY_NEXTSONG
-        config = ~/pre.di.c/clients/DVB/DVB_command.py forth
+        config = ~/bin/canal forth
     end
     begin
         prog = irexec
         button = KEY_PLAY
-        config = ~/pre.di.c/clients/DVB/DVB_command.py last
+        config = ~/bin/canal last
     end
     begin
         prog = irexec
         button = KEY_NUMERIC_1
-        config = ~/pre.di.c/clients/DVB/DVB_command.py 1
+        config = ~/bin/canal 1
     end
     begin
         prog = irexec
         button = KEY_NUMERIC_2
-        config = ~/pre.di.c/clients/DVB/DVB_command.py 2
+        config = ~/bin/canal 2
     end
     begin
         prog = irexec
         button = KEY_NUMERIC_3
-        config = ~/pre.di.c/clients/DVB/DVB_command.py 3
+        config = ~/bin/canal 3
     end
     begin
         prog = irexec
         button = KEY_NUMERIC_4
-        config = ~/pre.di.c/clients/DVB/DVB_command.py 4
+        config = ~/bin/canal 4
     end
     begin
         prog = irexec
         button = KEY_NUMERIC_5
-        config = ~/pre.di.c/clients/DVB/DVB_command.py 5
+        config = ~/bin/canal 5
     end
     begin
         prog = irexec
         button = KEY_NUMERIC_6
-        config = ~/pre.di.c/clients/DVB/DVB_command.py 6
+        config = ~/bin/canal 6
     end
     begin
         prog = irexec
         button = KEY_NUMERIC_7
-        config = ~/pre.di.c/clients/DVB/DVB_command.py 7
+        config = ~/bin/canal 7
     end
     begin
         prog = irexec
         button = KEY_NUMERIC_8
-        config = ~/pre.di.c/clients/DVB/DVB_command.py 8
+        config = ~/bin/canal 8
     end
     begin
         prog = irexec
         button = KEY_NUMERIC_9
-        config = ~/pre.di.c/clients/DVB/DVB_command.py 9
+        config = ~/bin/canal 9
     end
 end dvb
