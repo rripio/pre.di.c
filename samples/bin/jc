@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# jack connections
+
+jack_lsp -c
+
+exit
