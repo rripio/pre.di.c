@@ -1,9 +1,9 @@
 devices:
 
-    # fs is taken from loudspeaker config and overrides camilladsp.yml, \
-    # and is given in command line
-    # since this setting is mandatory, \
-    # it will be used only as information label
+    # fs is taken from loudspeaker config and overrides camilladsp.yml,
+    # and is given in command line.
+    # since this setting is mandatory,
+    # it will be used only as information label.
     samplerate: 48000
     
     chunksize: 1024
@@ -21,8 +21,8 @@ devices:
 
 mixers:
 
-    # preamp mixer
-    # do not edit
+    # preamp mixer.
+    # do not edit.
 
     m.mixer:
         channels:
@@ -55,8 +55,8 @@ mixers:
 
 filters:
 
-    # preamp filters
-    # do not edit
+    # preamp filters.
+    # do not edit.
 
     f.volume:
         type: Volume
@@ -109,18 +109,18 @@ filters:
             type: Shibata48
             bits: 24
 
-    # optional FIR phase linearizing filter
-    # can be switched by pre.di.c but not changed
-    # this is a dummy container, do not change
-    # speaker config can overwrite this
+    # optional FIR phase linearizing filter.
+    # it can be switched by pre.di.c but not changed.
+    # this is a dummy container, do not change.
+    # speaker config can overwrite this.
     f.phase_eq:
         type: Conv
 
 
 pipeline:
 
-# preamp pipeline
-# do not edit
+# preamp pipeline.
+# do not edit.
 
 # volume section
 -   type: Mixer

@@ -9,11 +9,11 @@
 #   source_ports: source_jack_port_1 source_jack_port_2
 
 ## phase equalizer will be activated automatically when the source is selected \
-## if use_source_phase_eq: false in main config
+## if use_source_phase_eq: false in main config.
 #   phase_eq: true
 
-## wait a bit before switching source on startup, after source ports are up
-## mpd needs this, maybe other clients also
+## wait a bit before switching source on startup, after source ports are up.
+## mpd needs this, maybe other clients also.
 # wait_on_start: [true | false]
 
 

@@ -25,8 +25,8 @@ do_mute: true
 
 ## jack audio ports
 
-# source selector will connect sources ports to this ports in order
-# each group of ports is a space separated string
+# source selector will connect sources ports to this ports in order.
+# each group of ports is a space separated string.
 
 audio_ports:
     - cpal_client_in:in_0 cpal_client_in:in_1
@@ -52,12 +52,12 @@ control_port: 9999
 jack_command: /usr/bin/jackd --silent -R -dalsa -p512 -n 3 -d hw:USB,0
 
 # camilladsp
-# for options see https://github.com/HEnquist/camilladsp#command-line-options
-# omit config file (managed in startaudio.py, taken from loudspeaker config)
-# fs is taken from loudspeaker config and overrides camilladsp.yml
+# for options see https://github.com/HEnquist/camilladsp#command-line-options.
+# omit config file (managed in startaudio.py, taken from loudspeaker config).
+# fs is taken from loudspeaker config and overrides camilladsp.yml.
 
 camilladsp_command: /home/predic/bin/camilladsp --logfile /dev/null
 # use this for warnings to appear on screen:
-# camilladsp_command: /home/predic/bin/camilladsp
+# camilladsp_command: /home/predic/bin/camilladsp.
 websocket_address: 127.0.0.1
 websocket_port: 1234
