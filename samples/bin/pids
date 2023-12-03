@@ -1,0 +1,40 @@
+#!/bin/sh
+
+echo
+echo "jackd:"
+pgrep -a jackd
+
+echo
+echo "camilladsp:"
+pgrep -a camilladsp
+
+echo
+echo "server:"
+pgrep -af /server.py
+
+echo
+echo "clients:"
+pgrep -af "clients.+py"
+
+echo
+echo "mpd:"
+pgrep -a mpd
+
+echo
+echo "mplayer:"
+pgrep -a mplayer
+
+echo
+echo "zita-cd:"
+pgrep -a zita-a2j
+
+echo
+echo "librespot:"
+pgrep -a librespot
+
+echo
+echo "lirc:"
+pgrep -a lircd
+pgrep -a irexec
+
+echo
