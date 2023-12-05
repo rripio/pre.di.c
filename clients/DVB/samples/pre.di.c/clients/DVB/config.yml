@@ -10,7 +10,7 @@ start_command: /usr/bin/mplayer
 stop_command: pkill -f /usr/bin/mplayer
 
 # DVB source name in ~/pre.di.c/sources.yml
-DVB_source: dvb
+DVB_source_name: dvb
 
 # play preset on start
 # set preset as "last" for last played channel

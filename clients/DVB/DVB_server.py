@@ -139,7 +139,7 @@ async def handle_commands(reader, writer):
             if not startflag:
                 # check selected source and reconnect to DVB if selected
                 selected_source = init.state['source']
-                if selected_source == config['DVB_source']:
+                if selected_source == config['DVB_source_name']:
                     tmax = init.config['command_delay'] * 10
                     interval = init.config['command_delay'] * 0.1
                     # wait for disconnection of previous channel
