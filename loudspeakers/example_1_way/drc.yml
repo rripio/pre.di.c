@@ -7,7 +7,7 @@
                 parameters:
                     type: Raw
                     format: FLOAT32LE
-                    filename: "drc.1.L.pcm"
+                    filename: "drc-1-L.pcm"
         pipeline:
         -   f.drc.1.L
     -   filters:
@@ -16,7 +16,7 @@
                 parameters:
                     type: Raw
                     format: FLOAT32LE
-                    filename: "drc.1.R.pcm"
+                    filename: "drc-1-R.pcm"
         pipeline:
         -   f.drc.1.R
 "2":
@@ -28,7 +28,7 @@
                 parameters:
                     type: Raw
                     format: FLOAT32LE
-                    filename: "drc.2.L.pcm"
+                    filename: "drc-2-L.pcm"
         pipeline:
         -   f.drc.2.L
     -   filters:
@@ -37,6 +37,6 @@
                 parameters:
                     type: Raw
                     format: FLOAT32LE
-                    filename: "drc.2.R.pcm"
+                    filename: "drc-2-R.pcm"
         pipeline:
         -   f.drc.2.R
