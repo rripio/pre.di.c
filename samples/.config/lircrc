@@ -3,23 +3,23 @@
 # modes
 
 # mixer
-include ~/.config/lirc/mixer.lirc
+include /home/predic/.config/lirc/mixer.lirc
 
 # EQ and XO
-include ~/.config/lirc/eq.lirc
+include /home/predic/.config/lirc/eq.lirc
 
 # music player daemon
-include ~/.config/lirc/mpd.lirc
+include /home/predic/.config/lirc/mpd.lirc
 
 # mplayer tdt
-include ~/.config/lirc/DVB.lirc
+include /home/predic/.config/lirc/DVB.lirc
 
 begin loudness_ref
 
     begin
         prog = irexec
         button = KEY_UP
-        config = ~/bin/control 'loudness_ref +1 add'
+        config = /home/predic/bin/control 'loudness_ref +1 add'
         repeat = 1
         flags = quit
     end
@@ -27,7 +27,7 @@ begin loudness_ref
     begin
         prog = irexec
         button = KEY_DOWN
-        config = ~/bin/control 'loudness_ref -1 add'
+        config = /home/predic/bin/control 'loudness_ref -1 add'
         repeat = 1
         flags = quit
     end
@@ -55,14 +55,14 @@ end
 begin
 	prog = irexec
 	button = KEY_POWER2
-	config = ~/bin/restartaudio
+	config = /home/predic/bin/restartaudio
 end
 
 begin
 	prog = irexec
     button = KEY_SELECT
-#	config = ~/bin/control 'sources on'
-	config = ~/bin/stopaudio
+#	config = /home/predic/bin/control 'sources on'
+	config = /home/predic/bin/stopaudio
 
 end
 
@@ -72,25 +72,25 @@ end
 begin
      prog = irexec
      button = KEY_OK
-	 config = ~/bin/control 'mute toggle'
+	 config = /home/predic/bin/control 'mute toggle'
 end
 
 begin
     prog = irexec
     button = KEY_PREVIOUS
-	config = ~/bin/control 'loudness toggle'
+	config = /home/predic/bin/control 'loudness toggle'
 end
 
 begin
     prog = irexec
     button = KEY_MUTE
-    config = ~/bin/control 'tones toggle'
+    config = /home/predic/bin/control 'tones toggle'
 end
 
 begin
     prog = irexec
     button = KEY_VOLUMEUP
-    config = ~/bin/control 'bass +1 add'
+    config = /home/predic/bin/control 'bass +1 add'
     repeat = 1
     delay = 1
 end
@@ -98,7 +98,7 @@ end
 begin
     prog = irexec
     button = KEY_VOLUMEDOWN
-    config = ~/bin/control 'bass -1 add'
+    config = /home/predic/bin/control 'bass -1 add'
     repeat = 1
     delay = 1
 end
@@ -106,7 +106,7 @@ end
 begin
     prog = irexec
     button = KEY_CHANNELUP
-    config = ~/bin/control 'treble +1 add'
+    config = /home/predic/bin/control 'treble +1 add'
     repeat = 1
     delay = 1
     flags = quit
@@ -115,7 +115,7 @@ end
 begin
     prog = irexec
     button = KEY_CHANNELDOWN
-    config = ~/bin/control 'treble -1 add'
+    config = /home/predic/bin/control 'treble -1 add'
     repeat = 1
     delay = 1
     flags = quit
@@ -127,28 +127,28 @@ end
 begin
     prog = irexec
     button = KEY_UP
-	config = ~/bin/control 'level +1 add'
+	config = /home/predic/bin/control 'level +1 add'
     repeat = 1
 end
 
 begin
     prog = irexec
     button = KEY_DOWN
-	config = ~/bin/control 'level -1 add'
+	config = /home/predic/bin/control 'level -1 add'
     repeat = 1
 end
 
 begin
     prog = irexec
     button = KEY_RIGHT
-	config = ~/bin/control 'balance +1 add'
+	config = /home/predic/bin/control 'balance +1 add'
     repeat = 1
 end
 
 begin
     prog = irexec
     button = KEY_LEFT
-	config = ~/bin/control 'balance -1 add'
+	config = /home/predic/bin/control 'balance -1 add'
     repeat = 1
 end
 
@@ -163,33 +163,33 @@ end
 begin
     button = KEY_TV
     prog = irexec
-    config = ~/bin/control "source analog"
+    config = /home/predic/bin/control "source analog"
 end
 begin
     button = KEY_VIDEO
     prog = irexec
-    config = ~/bin/control "source net"
+    config = /home/predic/bin/control "source net"
 end
 begin
     mode = mpd
     button = KEY_AUDIO
     prog = irexec
-    config = ~/bin/control "source mpd"
+    config = /home/predic/bin/control "source mpd"
 end
 begin
     mode = dvb
     button = KEY_RADIO
     prog = irexec
-    config = ~/bin/control "source tdt"
+    config = /home/predic/bin/control "source tdt"
 end
 begin
     button = KEY_CAMERA
     prog = irexec
-    config = ~/bin/control "source spotify"
+    config = /home/predic/bin/control "source spotify"
 end
 begin
     button = KEY_EPG
     prog = irexec
-    config = ~/bin/control "source cd"
+    config = /home/predic/bin/control "source cd"
 end
 
