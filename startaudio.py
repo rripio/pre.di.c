@@ -23,6 +23,8 @@ import init
 import stopaudio
 import pdlib as pd
 
+from camilladsp import CamillaConnection
+
 
 port = init.config['control_port']
 
@@ -42,7 +44,8 @@ def init_jack():
     """
 
     print('\n(startaudio) starting jack\n')
-    sp.Popen(f'{init.config["jack_command"]} -r {init.speaker["fs"]}'.split())
+    fs = init.speaker['devices']['samplerate']
+    sp.Popen(f'{init.config["jack_command"]} -r {fs}'.split())
     # waiting for jackd:
     tmax = init.config['command_delay'] * 5
     interval = init.config['command_delay'] * 0.1
@@ -58,25 +61,52 @@ def init_camilladsp():
     loads camilladsp
     """
 
-    # cd to louspeaker folder so filter paths are relative to this \
-    # folder in speaker.yml config file
-    os.chdir(init.loudspeaker_path)
-    print(f'\n(startaudio) starting camilladsp on {os.getcwd()}')
-    sp.Popen((f'{init.config["camilladsp_command"]} -m ' +
-              f'-p {init.config["websocket_port"]} ' +
-              f'{init.camilladsp_path}').split())
+    try:
+        # cd to louspeaker folder so filter paths are relative to this \
+        # folder in speaker.yml config file
+        os.chdir(init.loudspeaker_path)
+        print(f'\n(startaudio) starting camilladsp on {os.getcwd()}')
+        sp.Popen((f'{init.config["camilladsp_command"]} -m -w ' +
+                f'-p {init.config["websocket_port"]}').split())
 
-    # waiting for camilladsp
-    # test for input jack ports to be up
-    tmax = init.config['command_delay'] * 10
-    interval = init.config['command_delay'] * 0.1
-    ports = ['cpal_client_in:in_0', 'cpal_client_in:in_1']
-    if pd.wait4ports(ports, tmax, interval):
-        print('\n(startaudio) camilladsp started :-)')
-    else:
-        print('\n(startaudio) error starting camilladsp')
-        stop_all()
+        # wait a bit
+        time.sleep(init.config['command_delay'] * 1)
+        
+        # connect to camilladsp
+        cdsp = CamillaConnection("localhost", init.config['websocket_port'])
+        cdsp.connect()
 
+        # get general part of camilladsp config
+
+        cdsp_config = init.camilladsp
+        
+        # get loudspeaker specific parts of camilladsp config
+        
+        # merge drc filters in camilladsp config
+        for drc_set in init.drc:
+            drc_channels = init.drc[drc_set]['channels']
+            for channel in range(len(drc_channels)):
+                cdsp_config['filters'].update(drc_channels[channel]['filters'])
+
+        # merge eq filters in camilladsp config
+        for eq_set in init.eq:
+            cdsp_config['filters'].update(init.eq[eq_set]['filters'])
+
+        # merge loudspeaker specific settings in camilladsp config
+        cdsp_config['devices'].update(init.speaker['devices'])
+        cdsp_config['filters'].update(init.speaker['filters'])
+        cdsp_config['mixers'].update(init.speaker['mixers'])
+        cdsp_config['pipeline'].extend(init.speaker['pipeline'])
+        
+        # send full config to camilladsp.
+        # probably we should check for jack ports here...
+        cdsp.set_config(cdsp_config)
+        cdsp.disconnect()
+
+    except Exception as e:
+        print('\n(startaudio) error starting camilladsp: ', e)
+        stop_all()  
+    
 
 def init_server():
     """

@@ -20,21 +20,6 @@ cdsp = CamillaConnection("localhost", init.config['websocket_port'])
 cdsp.connect()
 cdsp_config = cdsp.get_config()
 
-# merge drc filters in camilladsp config
-for drc_set in init.drc:
-    drc_channels = init.drc[drc_set]['channels']
-    for channel in range(len(drc_channels)):
-        cdsp_config['filters'].update(drc_channels[channel]['filters'])
-
-# merge eq filters in camilladsp config
-for eq_set in init.eq:
-    cdsp_config['filters'].update(init.eq[eq_set]['filters'])
-
-# merge loudspeaker specific settings in camilladsp config
-cdsp_config['filters'].update(init.speaker['filters'])
-cdsp_config['mixers'].update(init.speaker['mixers'])
-cdsp_config['pipeline'].extend(init.speaker['pipeline'])
-
 
 # flags
 

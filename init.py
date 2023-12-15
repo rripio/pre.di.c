@@ -51,6 +51,7 @@ try:
     state = get_configs(state_path)
     state_init = get_configs(state_init_path)
     eq = get_configs(eq_path)
+    camilladsp = get_configs(camilladsp_path)
 
     # after knowing which speaker config to load, load it
     loudspeaker_path = f'{loudspeakers_folder}/{config["loudspeaker"]}'

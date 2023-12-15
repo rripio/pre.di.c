@@ -1,21 +1,11 @@
 devices:
 
-    # fs is taken from loudspeaker config and overrides camilladsp.yml,
-    # and is given in command line.
-    # since this setting is mandatory,
-    # it will be used only as information label.
-    samplerate: 48000
-    
     chunksize: 1024
     silence_threshold: -80
     silence_timeout: 10.0
     capture:
         type: Jack
         channels: 5
-        device: "default"
-    playback:
-        type: Jack
-        channels: 2
         device: "default"
 
 

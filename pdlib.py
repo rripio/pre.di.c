@@ -235,7 +235,7 @@ def show():
     show_str = f'''
     Loudspeaker:        {init.config['loudspeaker']: >10s}
 
-    fs                  {init.speaker['fs']: 10d}
+    fs                  {init.speaker['devices']['samplerate']: 10d}
     Reference level     {init.speaker['ref_level_gain']: 10.1f}
 
     Mute                {init.state['mute']: >10s}
