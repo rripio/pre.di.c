@@ -43,16 +43,20 @@ def init_jack():
     loads jack server
     """
 
-    print('\n(startaudio) starting jack\n')
-    fs = init.speaker['devices']['samplerate']
-    sp.Popen(f'{init.config["jack_command"]} -r {fs}'.split())
-    # waiting for jackd:
-    tmax = init.config['command_delay'] * 5
-    interval = init.config['command_delay'] * 0.1
-    if pd.wait4result('jack_lsp', 'system', tmax, interval):
-        print('\n(startaudio) jack started :-)')
-    else:
-        print('\n(startaudio) error starting jack')
+    try:
+        print('\n(startaudio) starting jack\n')
+        fs = init.speaker['devices']['samplerate']
+        sp.Popen(f'{init.config["jack_command"]} -r {fs}'.split())
+        # waiting for jackd:
+        tmax = init.config['command_delay'] * 5
+        interval = init.config['command_delay'] * 0.1
+        if pd.wait4result('jack_lsp', 'system', tmax, interval):
+            print('\n(startaudio) jack started :-)')
+        else:
+            raise Exception('no ports available')
+            stop_all()
+    except Exception as e:
+        print('\n(startaudio) error starting jack: ', e)
         stop_all()
 
 
@@ -105,7 +109,7 @@ def init_camilladsp():
 
     except Exception as e:
         print('\n(startaudio) error starting camilladsp: ', e)
-        stop_all()  
+        stop_all()
     
 
 def init_server():
@@ -114,23 +118,24 @@ def init_server():
     """
 
     print('\n(startaudio) starting server')
+    
     try:
         sp.Popen(f'python3 {init.main_folder}/server.py'.split())
+    
+        # waiting for server
+        tmax = init.config['command_delay'] * 5
+        interval = init.config['command_delay'] * 0.1
+        if pd.wait4result(
+                'echo ping| nc localhost 9999 2>/dev/null',
+                'OK', tmax, interval):
+            print('\n(startaudio) server started :-)')
+        else:
+            print('\n(startaudio) server not accesible Bye :-/')
+            stop_all()
+
     except Exception as e:
         print('\n(startaudio) server didn\'t load: ', e)
-        stopaudio.main('all')
-        sys.exit()
-    # waiting for server
-    tmax = init.config['command_delay'] * 5
-    interval = init.config['command_delay'] * 0.1
-    if pd.wait4result(
-            'echo ping| nc localhost 9999 2>/dev/null',
-            'OK', tmax, interval):
-        print('\n(startaudio) server started :-)')
-    else:
-        print('\n(startaudio) server not accesible Bye :-/')
         stop_all()
-
 
 def set_initial_state():
     """
