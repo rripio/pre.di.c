@@ -42,7 +42,7 @@ def start():
     sp.Popen(command.split())
 
     # starts DVB_server.py
-    
+
     print('\n(DVB_load) starting DVB server')
     sp.Popen(f'{folder}/DVB_server.py')
 

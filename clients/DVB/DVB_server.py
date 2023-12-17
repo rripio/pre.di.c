@@ -49,11 +49,11 @@ presets = pd.get_yaml(presets_path)
 
 port = config['control_port']
 
+
 async def handle_commands(reader, writer):
 
     rawdata = await reader.read(100)
     data = rawdata.decode().rstrip('\r\n').split()
-
 
     def select_channel(channel_name, channel_gain):
         """
@@ -72,7 +72,6 @@ async def handle_commands(reader, writer):
             return True
         except Exception:
             return False
-
 
     def select_preset(preset, preset_dict=presets):
         """
@@ -149,8 +148,9 @@ async def handle_commands(reader, writer):
                         # source ports up and ready :-)
                         # switch on source
                         pd.client_socket('sources on',
-                                          init.config['control_port'],
-                                          quiet=True)
+                                         init.config['control_port'],
+                                         quiet=True)
+
         else:
             state['actual'] = state_old['actual']
             state['previous'] = state_old['previous']
@@ -161,12 +161,11 @@ async def handle_commands(reader, writer):
         with open(state_path, 'w') as f:
             yaml.dump(state, f, default_flow_style=False)
 
-
     if data[0:]:
-        
+
         if data[0] == 'help':
             writer.write(__doc__.encode())
-        
+
         else:
             if data[1:]:
                 if data[1] == 'startaudio':
@@ -175,9 +174,9 @@ async def handle_commands(reader, writer):
                     startflag = False
             else:
                 startflag = False
-            
+
             change_radio(data[0], startflag)
-    
+
     await writer.drain()
     writer.close()
 

@@ -93,7 +93,7 @@ def read_state():
     """
     string = client_socket('status', init.config['control_port'])
 
-    return yaml.safe_load(string.decode().replace('\nOK', '')) 
+    return yaml.safe_load(string.decode().replace('\nOK', ''))
 
 
 def wait4result(command, answer, tmax=5, interval=0.1):
