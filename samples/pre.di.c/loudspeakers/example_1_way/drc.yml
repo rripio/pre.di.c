@@ -1,0 +1,31 @@
+"1":
+    f.drc.L:
+        description: 'main listening position.L'
+        type: Conv
+        parameters:
+            type: Raw
+            format: FLOAT32LE
+            filename: "drc-1-L.pcm"
+    f.drc.R:
+        description: 'main listening position.R'
+        type: Conv
+        parameters:
+            type: Raw
+            format: FLOAT32LE
+            filename: "drc-1-R.pcm"
+
+"2":
+    f.drc.L:
+        description: 'secondary listening position.L'
+        type: Conv
+        parameters:
+            type: Raw
+            format: FLOAT32LE
+            filename: "drc-2-L.pcm"
+    f.drc.R:
+        description: 'secondary listening position.R'
+        type: Conv
+        parameters:
+            type: Raw
+            format: FLOAT32LE
+            filename: "drc-2-R.pcm"

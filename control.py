@@ -12,13 +12,13 @@ import baseconfig as base
 import init
 import pdlib as pd
 
-from camilladsp import CamillaConnection
+from camilladsp import CamillaClient
 
 
 # connect to camilladsp and get camilladsp config once
-cdsp = CamillaConnection("localhost", init.config['websocket_port'])
+cdsp = CamillaClient("localhost", init.config['websocket_port'])
 cdsp.connect()
-cdsp_config = cdsp.get_config()
+cdsp_config = cdsp.config.active()
 
 
 # flags
@@ -28,7 +28,7 @@ add = False             # switch to relative commands
 do_mute = False         # mute during command
 
 # gets camilladsp setting for volume ramp, and use it for mute waiting
-ramp_time = cdsp_config['filters']['f.volume']['parameters']['ramp_time']/1000
+ramp_time = cdsp_config['devices']['volume_ramp_time']/1000
 
 message = ''
 
@@ -72,6 +72,14 @@ def toggle(command):
     return {'off': 'on', 'on': 'off'}[init.state[command]]
 
 
+def bypass_state(state):
+    """
+    sets bypass state for on/off commands
+    """
+    
+    return {'off': True, 'on': False}[state]
+
+
 def do_source(source_arg):
     """
     wrapper for source command, avoiding muting already selected sources
@@ -113,12 +121,12 @@ def do_command(command, arg):
     if arg:
         try:
             if do_mute and init.config['do_mute']:
-                cdsp.set_mute(True)
+                cdsp.mute.set_main(True)
                 # 2x volume ramp_time for security (estimated)
                 time.sleep(ramp_time*2)
-
+    
             command(arg)
-
+    
         except ClampWarning as w:
             message = (f"'{command.__name__}' value clamped: {w.clamp_value}")
         except OptionsError as e:
@@ -193,7 +201,7 @@ def mute(mute):
         if mute == 'toggle':
             mute = toggle('mute')
         init.state['mute'] = mute
-        cdsp.set_mute({'off': False, 'on': True}[mute])
+        cdsp.mute.set_main({'off': False, 'on': True}[mute])
     else:
         raise OptionsError(options)
 
@@ -342,10 +350,11 @@ def drc_set(drc_set):
     change drc filters
     """
 
-    options = init.drc
-    if drc_set in options:
+    if drc_set in init.drc:
         init.state['drc_set'] = drc_set
-        set_pipeline()
+        cdsp_config['filters']['f.drc.L'] = init.drc[drc_set]['f.drc.L']
+        cdsp_config['filters']['f.drc.R'] = init.drc[drc_set]['f.drc.R']
+        cdsp.config.set_active(cdsp_config)
     else:
         raise OptionsError(options)
 
@@ -355,10 +364,10 @@ def eq_filter(eq_filter):
     select general equalizer filter
     """
 
-    options = init.eq
-    if eq_filter in options:
+    if eq_filter in init.eq:
         init.state['eq_filter'] = eq_filter
-        set_pipeline()
+        cdsp_config['filters']['f.eq'] = init.drc[drc_set]['f.eq']
+        cdsp.config.set_active(cdsp_config)
     else:
         raise OptionsError(options)
 
@@ -415,7 +424,11 @@ def drc(drc):
         if drc == 'toggle':
             drc = toggle('drc')
         init.state['drc'] = drc
-        set_pipeline()
+
+        drc = bypass_state(drc)
+        cdsp_config['pipeline'][12]['bypassed'] = drc
+        cdsp_config['pipeline'][13]['bypassed'] = drc
+        cdsp.config.set_active(cdsp_config)
     else:
         raise OptionsError(options)
 
@@ -430,7 +443,11 @@ def phase_eq(phase_eq):
         if phase_eq == 'toggle':
             phase_eq = toggle('phase_eq')
         init.state['phase_eq'] = phase_eq
-        set_pipeline()
+
+        phase_eq = bypass_state(phase_eq)
+        cdsp_config['pipeline'][8]['bypassed'] = phase_eq
+        cdsp_config['pipeline'][9]['bypassed'] = phase_eq
+        cdsp.config.set_active(cdsp_config)
     else:
         raise OptionsError(options)
 
@@ -446,18 +463,10 @@ def loudness(loudness):
             loudness = toggle('loudness')
         init.state['loudness'] = loudness
 
-        # Put volume_filter filters after the mixer m.mixer
-        mixer_index = cdsp_config['pipeline'].index(
-            {'type': 'Mixer', 'name': 'm.mixer'}
-            )
-
-        if init.state['loudness'] == 'off':
-            volume_filter = "f.volume"
-        else:
-            volume_filter = "f.loudness"
-
-        cdsp_config['pipeline'][mixer_index + 1]['names'] = [volume_filter]
-        cdsp_config['pipeline'][mixer_index + 2]['names'] = [volume_filter]
+        loudness = bypass_state(loudness)
+        cdsp_config['pipeline'][4]['bypassed'] = loudness
+        cdsp_config['pipeline'][5]['bypassed'] = loudness
+        cdsp.config.set_active(cdsp_config)
     else:
         raise OptionsError(options)
 
@@ -472,7 +481,11 @@ def tones(tones):
         if tones == 'toggle':
             tones = toggle('tones')
         init.state['tones'] = tones
-        set_pipeline()
+
+        tones = bypass_state(tones)
+        cdsp_config['pipeline'][6]['bypassed'] = tones
+        cdsp_config['pipeline'][7]['bypassed'] = tones
+        cdsp.config.set_active(cdsp_config)
     else:
         raise OptionsError(options)
 
@@ -487,7 +500,11 @@ def eq(eq):
         if eq == 'toggle':
             eq = toggle('eq')
         init.state['eq'] = eq
-        set_pipeline()
+
+        eq = bypass_state(eq)
+        cdsp_config['pipeline'][10]['bypassed'] = eq
+        cdsp_config['pipeline'][11]['bypassed'] = eq
+        cdsp.config.set_active(cdsp_config)
     else:
         raise OptionsError(options)
 
@@ -566,38 +583,6 @@ def polarity_flip(polarity_flip):
         set_mixer()
     else:
         raise OptionsError(options)
-
-
-# funtions that perform actual backend adjustments
-
-
-def set_pipeline():
-    """
-    set camilladsp pipeline from state settings
-    """
-
-    pipeline_common = []
-    if init.state['tones'] == 'on':
-        pipeline_common.extend(['f.bass', 'f.treble'])
-    if init.state['phase_eq'] == 'on':
-        pipeline_common.append('f.phase_eq')
-    if init.state['eq'] == 'on':
-        pipeline_common.extend(init.eq[init.state['eq_filter']]['pipeline'])
-
-    pipeline = [['f.balance.L'], ['f.balance.R']]
-    for channel in range(2):
-        pipeline[channel].extend(pipeline_common)
-        if init.state['drc'] == 'on':
-            drc_channels = (init.drc[init.state['drc_set']]['channels'])
-            pipeline[channel].extend(drc_channels[channel]['pipeline'])
-
-    # Put selected filters after the volume or loudness filters, \
-    # taken their fixed positions after mixer m.mixer
-    mixer_index = cdsp_config['pipeline'].index(
-        {'type': 'Mixer', 'name': 'm.mixer'}
-        )
-    cdsp_config['pipeline'][mixer_index + 3]['names'] = pipeline[0]
-    cdsp_config['pipeline'][mixer_index + 4]['names'] = pipeline[1]
 
 
 def set_mixer():
@@ -693,14 +678,14 @@ def set_gain(gain):
         # if enough headroom commit changes
         # since there is no init.state['gain'] we set init.state['level']
         if headroom >= 0:
-            cdsp.set_volume(real_gain)
+            cdsp.volume.set_main(real_gain)
             init.state['level'] = pd.calc_level(gain)
         # if not enough headroom tries lowering gain
         else:
             set_gain(gain + headroom)
             message = 'headroom hit, lowering gain...'
     else:
-        cdsp.set_volume(gain)
+        cdsp.volume.set_main(gain)
 
 
 # main command proccessing function
@@ -757,7 +742,7 @@ def proccess_commands(full_command):
             # source                            # [source]
             success = do_source(arg)
             # dispatch config
-            cdsp.set_config(cdsp_config)
+            cdsp.config.set_active(cdsp_config)
 
         elif command in {'loudness_ref', 'bass', 'treble', 'balance'}:
             success = do_command(
@@ -769,7 +754,7 @@ def proccess_commands(full_command):
                 'balance':          balance,        # [balance] add
                 }[command], arg)
             # dispatch config
-            cdsp.set_config(cdsp_config)
+            cdsp.config.set_active(cdsp_config)
 
         else:
             # these commands benefit for silencing switching noise
@@ -795,7 +780,7 @@ def proccess_commands(full_command):
                 'polarity_flip':    polarity_flip   # ['off','on','toggle']
                 }[command], arg)
             # dispatch config
-            cdsp.set_config(cdsp_config)
+            cdsp.config.set_active(cdsp_config)
 
     except KeyError:
         message = f"unknown command '{command}'"

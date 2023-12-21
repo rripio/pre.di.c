@@ -23,7 +23,7 @@ import init
 import stopaudio
 import pdlib as pd
 
-from camilladsp import CamillaConnection
+from camilladsp import CamillaClient
 
 
 port = init.config['control_port']
@@ -77,7 +77,7 @@ def init_camilladsp():
         time.sleep(init.config['command_delay'] * 1)
 
         # connect to camilladsp
-        cdsp = CamillaConnection("localhost", init.config['websocket_port'])
+        cdsp = CamillaClient("localhost", init.config['websocket_port'])
         cdsp.connect()
 
         # get general part of camilladsp config
@@ -86,17 +86,9 @@ def init_camilladsp():
 
         # get loudspeaker specific parts of camilladsp config
 
-        # merge drc filters in camilladsp config
-        for drc_set in init.drc:
-            drc_channels = init.drc[drc_set]['channels']
-            for channel in range(len(drc_channels)):
-                cdsp_config['filters'].update(drc_channels[channel]['filters'])
-
-        # merge eq filters in camilladsp config
-        for eq_set in init.eq:
-            cdsp_config['filters'].update(init.eq[eq_set]['filters'])
-
         # merge loudspeaker specific settings in camilladsp config
+        cdsp_config['title'] = init.speaker['title']
+        cdsp_config['description'] = init.speaker['description']
         cdsp_config['devices'].update(init.speaker['devices'])
         cdsp_config['filters'].update(init.speaker['filters'])
         cdsp_config['mixers'].update(init.speaker['mixers'])
@@ -104,7 +96,7 @@ def init_camilladsp():
 
         # send full config to camilladsp.
         # probably we should check for jack ports here...
-        cdsp.set_config(cdsp_config)
+        cdsp.config.set_active(cdsp_config)
         cdsp.disconnect()
 
     except Exception as e:

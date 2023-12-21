@@ -23,3 +23,6 @@
 #     start:  zita-cd start
 #     stop:   zita-cd stop
 
+# librespot:
+#     start:  librespot start
+#     stop:   librespot stop

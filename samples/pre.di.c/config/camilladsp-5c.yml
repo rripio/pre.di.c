@@ -1,8 +1,12 @@
+title: "5 channels base"
+description: "base config for preamp function. 5 channels input"
+
 devices:
 
     chunksize: 1024
     silence_threshold: -80
     silence_timeout: 10.0
+    volume_ramp_time: 100.0
     capture:
         type: Jack
         channels: 5
@@ -10,7 +14,6 @@ devices:
 
 
 mixers:
-
 
     # input mixer.
     # do not edit.
@@ -89,15 +92,9 @@ filters:
     # preamp filters.
     # do not edit.
 
-    f.volume:
-        type: Volume
-        parameters:
-            ramp_time: 100
-
     f.loudness:
         type: Loudness
         parameters:
-            ramp_time: 100.0
             reference_level: 0
             # high_boost: 1.5
             # low_boost: 10.0
@@ -137,7 +134,7 @@ filters:
     f.dither:
         type: Dither
         parameters:
-            type: Shibata48
+            type: Highpass
             bits: 24
 
     # optional FIR phase linearizing filter.
@@ -146,6 +143,27 @@ filters:
     # speaker config can overwrite this.
     f.phase_eq:
         type: Conv
+        parameters:
+            type: Dummy
+            length: 1
+
+    f.eq:
+        type: Conv
+        parameters:
+            type: Dummy
+            length: 1
+
+    f.drc.L:
+        type: Conv
+        parameters:
+            type: Dummy
+            length: 1
+
+    f.drc.R:
+        type: Conv
+        parameters:
+            type: Dummy
+            length: 1
 
 
 pipeline:
@@ -154,6 +172,7 @@ pipeline:
 # do not edit.
 
 # volume section
+
 -   type: Mixer
     name: m.input
 
@@ -163,54 +182,95 @@ pipeline:
 -   type: Filter
     channel: 0
     names:
-    # switchable volume filters
-        -   f.volume
-        # -   f.loudness
-
--   type: Filter
-    channel: 1
-    names:
-    # switchable volume filters
-        -   f.volume
-        # -   f.loudness
-
-# eq section
--   type: Filter
-    channel: 0
-    names:
-    # permanent fixed length filters
     -   f.balance.L
-
-    # switchable fixed length filters
-    # -   f.bass
-    # -   f.treble
-    # -   f.phase
-
-    # switchable variable length filters
-
-    # defined in eq.yml
-    # -   [ eq filter set ]
-
-    # defined in speaker.yml
-    # -   [ drc filter set, L channel ]
-
 -   type: Filter
     channel: 1
     names:
-    # permanent fixed length filters
     -   f.balance.R
 
+# eq section
+
+    # [4]
+-   type: Filter
+    description: 'loudness'
+    channel: 0
+    bypassed: true
+    names:
+        -   f.loudness
+    # [5]
+-   type: Filter
+    description: 'loudness'
+    channel: 1
+    bypassed: true
+    names:
+        -   f.loudness
+
     # switchable fixed length filters
-    # -   f.bass
-    # -   f.treble
-    # -   f.phase
+
+    # [6]
+-   type: Filter
+    description: 'tones'
+    channel: 0
+    bypassed: true
+    names:
+    -   f.bass
+    -   f.treble
+    # [7]
+-   type: Filter
+    description: 'tones'
+    channel: 1
+    bypassed: true
+    names:
+    -   f.bass
+    -   f.treble
+
+    # [8]
+-   type: Filter
+    description: 'phase_eq'
+    channel: 0
+    bypassed: true
+    names:
+    -   f.phase_eq
+    # [9]
+-   type: Filter
+    description: 'phase_eq'
+    channel: 1
+    bypassed: true
+    names:
+    -   f.phase_eq
 
     # switchable variable length filters
 
     # defined in eq.yml
-    # -   [ eq filter set ]
+    # [10]
+-   type: Filter
+    description: 'eq'
+    channel: 0
+    bypassed: true
+    names:
+    -   f.eq
+    # [11]
+-   type: Filter
+    description: 'eq'
+    channel: 1
+    bypassed: true
+    names:
+    -   f.eq
 
-    # defined in speaker.yml
-    # -   [ drc filter set, R channel ]
+    # defined in [loudspeaker]/drc.yml
+    # [12]
+-   type: Filter
+    description: 'drc'
+    channel: 0
+    bypassed: true
+    names:
+    -   f.drc.L
+    # [13]
+-   type: Filter
+    description: 'drc'
+    channel: 1
+    bypassed: true
+    names:
+    -   f.drc.R
 
 

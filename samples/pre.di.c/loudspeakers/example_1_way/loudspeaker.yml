@@ -1,8 +1,18 @@
-comment: example 1 way
-# starting jack needs this although is it redundant with camilladsp config.
-# it serves also as information label.
-fs: 48000
+title: "Example 1 way"
+description: "Sample to be used as template of a full range speaker"
+
 ref_level_gain: -12.0
+
+
+devices:
+
+    samplerate: 48000
+    
+    playback:
+        type: Jack
+        channels: 2
+        device: "default"
+
 
 filters:
 

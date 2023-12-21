@@ -69,19 +69,19 @@ async def handle_commands(reader, writer):
             if not control.proccess_commands(data):
                 raise Exception(control.message)
 
-            writer.write(control.message.encode())
+            writer.write(b'\n' + control.message.encode())
             # a try block avoids blocking of state file writing \
             # when the terminal that launched startaudio.py is closed
             try:
                 # writes state file
                 write_state()
             except Exception as e:
-                writer.write(b'an error occurred when writing state file: '
+                writer.write(b'\nan error occurred when writing state file: '
                              + str(e).encode())
                 writer.write(b'\nACK')
 
     except Exception as e:
-        writer.write(str(e).encode())
+        writer.write(b'\n' + str(e).encode())
         writer.write(b'\nACK')
     else:
         if say_OK:
@@ -90,7 +90,7 @@ async def handle_commands(reader, writer):
         try:
             await writer.drain()
         except ConnectionResetError:
-            writer.write(b'still no connection...')
+            writer.write(b'\nstill no connection...')
             writer.write(b'\nACK')
         control.message = ''
         writer.close()
