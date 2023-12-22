@@ -116,9 +116,9 @@ def do_command(command, arg):
                 cdsp.mute.set_main(True)
                 # 2x volume ramp_time for security (estimated)
                 time.sleep(ramp_time*2)
-    
+
             command(arg)
-    
+
         except ClampWarning as w:
             message = (f"'{command.__name__}' value clamped: {w.clamp_value}")
         except OptionsError as e:
@@ -342,7 +342,8 @@ def drc_set(drc_set):
     change drc filters
     """
 
-    if drc_set in init.drc:
+    options = init.drc
+    if drc_set in options:
         init.state['drc_set'] = drc_set
         cdsp_config['filters']['f.drc.L'] = init.drc[drc_set]['f.drc.L']
         cdsp_config['filters']['f.drc.R'] = init.drc[drc_set]['f.drc.R']
@@ -356,7 +357,8 @@ def eq_filter(eq_filter):
     select general equalizer filter
     """
 
-    if eq_filter in init.eq:
+    options = init.eq
+    if eq_filter in options:
         init.state['eq_filter'] = eq_filter
         cdsp_config['filters']['f.eq'] = init.drc[drc_set]['f.eq']
         cdsp.config.set_active(cdsp_config)
@@ -416,7 +418,7 @@ def drc(drc):
         if drc == 'toggle':
             drc = toggle('drc')
         init.state['drc'] = drc
-        
+
         set_bypass('drc', drc)
 
     else:
