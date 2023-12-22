@@ -72,14 +72,6 @@ def toggle(command):
     return {'off': 'on', 'on': 'off'}[init.state[command]]
 
 
-def bypass_state(state):
-    """
-    sets bypass state for on/off commands
-    """
-    
-    return {'off': True, 'on': False}[state]
-
-
 def do_source(source_arg):
     """
     wrapper for source command, avoiding muting already selected sources
@@ -424,11 +416,9 @@ def drc(drc):
         if drc == 'toggle':
             drc = toggle('drc')
         init.state['drc'] = drc
+        
+        set_bypass('drc', drc)
 
-        drc = bypass_state(drc)
-        cdsp_config['pipeline'][12]['bypassed'] = drc
-        cdsp_config['pipeline'][13]['bypassed'] = drc
-        cdsp.config.set_active(cdsp_config)
     else:
         raise OptionsError(options)
 
@@ -444,10 +434,8 @@ def phase_eq(phase_eq):
             phase_eq = toggle('phase_eq')
         init.state['phase_eq'] = phase_eq
 
-        phase_eq = bypass_state(phase_eq)
-        cdsp_config['pipeline'][8]['bypassed'] = phase_eq
-        cdsp_config['pipeline'][9]['bypassed'] = phase_eq
-        cdsp.config.set_active(cdsp_config)
+        set_bypass('phase_eq', phase_eq)
+
     else:
         raise OptionsError(options)
 
@@ -463,10 +451,8 @@ def loudness(loudness):
             loudness = toggle('loudness')
         init.state['loudness'] = loudness
 
-        loudness = bypass_state(loudness)
-        cdsp_config['pipeline'][4]['bypassed'] = loudness
-        cdsp_config['pipeline'][5]['bypassed'] = loudness
-        cdsp.config.set_active(cdsp_config)
+        set_bypass('loudness', loudness)
+
     else:
         raise OptionsError(options)
 
@@ -482,10 +468,8 @@ def tones(tones):
             tones = toggle('tones')
         init.state['tones'] = tones
 
-        tones = bypass_state(tones)
-        cdsp_config['pipeline'][6]['bypassed'] = tones
-        cdsp_config['pipeline'][7]['bypassed'] = tones
-        cdsp.config.set_active(cdsp_config)
+        set_bypass('tones', tones)
+
     else:
         raise OptionsError(options)
 
@@ -501,10 +485,8 @@ def eq(eq):
             eq = toggle('eq')
         init.state['eq'] = eq
 
-        eq = bypass_state(eq)
-        cdsp_config['pipeline'][10]['bypassed'] = eq
-        cdsp_config['pipeline'][11]['bypassed'] = eq
-        cdsp.config.set_active(cdsp_config)
+        set_bypass('eq', eq)
+
     else:
         raise OptionsError(options)
 
@@ -583,6 +565,18 @@ def polarity_flip(polarity_flip):
         set_mixer()
     else:
         raise OptionsError(options)
+
+
+def set_bypass(step, arg):
+    """
+    set bypass state of certain steps in pipeline
+    """
+
+    state = {'off': True, 'on': False}[arg]
+
+    for index, element in enumerate(cdsp_config['pipeline']):
+        if element['description'] == step:
+            cdsp_config['pipeline'][index]['bypassed'] = state
 
 
 def set_mixer():

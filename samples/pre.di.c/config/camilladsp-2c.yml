@@ -134,6 +134,9 @@ pipeline:
 # volume section
 
 -   type: Mixer
+    name: m.input
+
+-   type: Mixer
     name: m.mixer
 
 -   type: Filter
@@ -147,14 +150,13 @@ pipeline:
 
 # eq section
 
-    # [4]
 -   type: Filter
     description: 'loudness'
     channel: 0
     bypassed: true
     names:
         -   f.loudness
-    # [5]
+
 -   type: Filter
     description: 'loudness'
     channel: 1
@@ -164,7 +166,6 @@ pipeline:
 
     # switchable fixed length filters
 
-    # [6]
 -   type: Filter
     description: 'tones'
     channel: 0
@@ -172,8 +173,8 @@ pipeline:
     names:
     -   f.bass
     -   f.treble
-    # [7]
--   type: Filter
+
+    -   type: Filter
     description: 'tones'
     channel: 1
     bypassed: true
@@ -181,14 +182,14 @@ pipeline:
     -   f.bass
     -   f.treble
 
-    # [8]
+
 -   type: Filter
     description: 'phase_eq'
     channel: 0
     bypassed: true
     names:
     -   f.phase_eq
-    # [9]
+
 -   type: Filter
     description: 'phase_eq'
     channel: 1
@@ -199,14 +200,14 @@ pipeline:
     # switchable variable length filters
 
     # defined in eq.yml
-    # [10]
--   type: Filter
+
+    -   type: Filter
     description: 'eq'
     channel: 0
     bypassed: true
     names:
     -   f.eq
-    # [11]
+
 -   type: Filter
     description: 'eq'
     channel: 1
@@ -215,19 +216,17 @@ pipeline:
     -   f.eq
 
     # defined in [loudspeaker]/drc.yml
-    # [12]
+
 -   type: Filter
     description: 'drc'
     channel: 0
     bypassed: true
     names:
     -   f.drc.L
-    # [13]
+
 -   type: Filter
     description: 'drc'
     channel: 1
     bypassed: true
     names:
     -   f.drc.R
-
-
