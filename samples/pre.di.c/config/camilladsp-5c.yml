@@ -195,14 +195,14 @@ pipeline:
     channel: 0
     bypassed: true
     names:
-        -   f.loudness
+    -   f.loudness
 
 -   type: Filter
     description: 'loudness'
     channel: 1
     bypassed: true
     names:
-        -   f.loudness
+    -   f.loudness
 
     # switchable fixed length filters
 
@@ -214,7 +214,7 @@ pipeline:
     -   f.bass
     -   f.treble
 
-    -   type: Filter
+-   type: Filter
     description: 'tones'
     channel: 1
     bypassed: true
@@ -241,7 +241,7 @@ pipeline:
 
     # defined in eq.yml
 
-    -   type: Filter
+-   type: Filter
     description: 'eq'
     channel: 0
     bypassed: true
