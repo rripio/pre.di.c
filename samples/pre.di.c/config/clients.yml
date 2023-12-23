@@ -1,28 +1,26 @@
 # client start/stop scripts listed in this file are launched on start and stop.
 #
-# names refer to any kind of executable with paths relative to folder
-# 'clients' or its subfolders, and corresponding options, if any.
+# names refer to any kind of executable and corresponding options, if any.
 
 
-# Don't name this mpd.py since it could interfere with mpd module.
-#mpd:
-#    start:  mpd/mpd_load.py start
-#    stop:   mpd/mpd_load.py stop
-
-#DVB:
-#    start:  DVB/DVB_load.py start
-#    stop:   DVB/DVB_load.py stop
-
-#netjack:
-#    start:  netjack_load.py
+# mpd:
+#     start:  python /home/predic/pre.di.c/clients/mpd/mpd_load.py start
+#     stop:   python /home/predic/pre.di.c/clients/mpd/mpd_load.py stop
+# 
+# DVB:
+#     start:  python /home/predic/pre.di.c/clients/DVB/DVB_load.py start
+#     stop:   python /home/predic/pre.di.c/clients/DVB/DVB_load.py stop
+# 
+# netjack:
+#     start:  /home/predic/pre.di.c/clients/netjack_load
 
 #stream_loop:
-#    start:  stream_loop.py start
+#    start:  /home/predic/pre.di.c/clients/stream_loop.py start
 
 # zita-cd:
-#     start:  zita-cd start
-#     stop:   zita-cd stop
-
+#     start:  /home/predic/pre.di.c/clients/zita-cd start
+#     stop:   /home/predic/pre.di.c/clients/zita-cd stop
+# 
 # librespot:
-#     start:  librespot start
-#     stop:   librespot stop
+#     start:  /home/predic/pre.di.c/clients/librespot start
+#     stop:   /home/predic/pre.di.c/clients/librespot stop

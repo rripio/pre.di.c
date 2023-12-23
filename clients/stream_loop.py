@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#! /home/predic/camilladsp/.venv/bin/python
 
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover

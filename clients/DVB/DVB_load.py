@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
@@ -44,7 +42,7 @@ def start():
     # starts DVB_server.py
 
     print('\n(DVB_load) starting DVB server')
-    sp.Popen(f'{folder}/DVB_server.py')
+    sp.Popen(f'{init.config["python_command"]} {folder}/DVB_server.py'.split())
 
     time.sleep(delay)
     if config["play_on_start"]:

@@ -45,9 +45,11 @@ verbose: 0
 control_address: 0.0.0.0
 control_port: 9999
 
+# python virtual environement
+python_command: /home/predic/pre.di.c/.venv/bin/python
+
 # jack
 # omit fs (managed in startaudio.py, taken from loudspeaker config)
-
 # jack_command: /usr/bin/jackd --silent -R -P 95 -dalsa -p4096 -n 3 -d hw:USB,0
 jack_command: /usr/bin/jackd --silent -R -dalsa -p512 -n 3 -d hw:USB,0
 
@@ -55,7 +57,6 @@ jack_command: /usr/bin/jackd --silent -R -dalsa -p512 -n 3 -d hw:USB,0
 # for options see https://github.com/HEnquist/camilladsp#command-line-options.
 # omit config file (managed in startaudio.py, taken from base config).
 # fs is taken from loudspeaker config and overrides camilladsp.yml.
-
 camilladsp_command: /home/predic/bin/camilladsp --logfile /dev/null
 # use this for warnings to appear on screen:
 # camilladsp_command: /home/predic/bin/camilladsp.

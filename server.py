@@ -1,5 +1,3 @@
-#! /usr/bin/env python3
-
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio

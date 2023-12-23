@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-python3 ~/pre.di.c/stopaudio.py $1 &
+source ~/pre.di.c/.venv/bin/activate
+python ~/pre.di.c/stopaudio.py $1 &
 
 exit

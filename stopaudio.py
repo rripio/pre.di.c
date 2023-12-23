@@ -1,5 +1,3 @@
-#! /usr/bin/env python3
-
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
@@ -18,7 +16,6 @@ import sys
 import os
 from subprocess import Popen
 
-import init
 import pdlib as pd
 
 
@@ -33,12 +30,12 @@ def main(run_level):
     if run_level in {'clients', 'all'}:
         # stop external scripts, sources and clients
         print('\n(stopaudio) stopping clients')
-        for command in pd.read_clients('stop'):
+        for client in pd.read_clients('stop'):
             try:
-                Popen(f'{init.clients_folder}/{command}'.split())
+                Popen(f'{client}'.split())
             except Exception as e:
                 print('\n(stopaudio) problem stopping client',
-                      f'"{command}": {e}\n')
+                      f'"{client}": {e}\n')
     if run_level in {'core', 'all'}:
         # controlserver
         print('(stopaudio) stopping server')

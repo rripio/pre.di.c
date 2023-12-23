@@ -1,5 +1,3 @@
-#! /usr/bin/env python3
-
 # This file is part of pre.di.c
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
@@ -112,7 +110,8 @@ def init_server():
     print('\n(startaudio) starting server')
 
     try:
-        sp.Popen(f'python3 {init.main_folder}/server.py'.split())
+        sp.Popen((f'{init.config["python_command"]} ' +
+                  f'{init.main_folder}/server.py').split())
 
         # waiting for server
         tmax = init.config['command_delay'] * 5
@@ -246,8 +245,7 @@ def main(run_level):
         print('\n(startaudio): starting clients...\n')
         for client in pd.read_clients('start'):
             try:
-                command_path = f'{init.clients_folder}/{client}'
-                p = sp.Popen(command_path.split())
+                p = sp.Popen(client.split())
                 print(f'pid {p.pid:4}: {client}')
             except Exception as e:
                 print(f"\n(startaudio) problem launching client '{client}':",
