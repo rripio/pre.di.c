@@ -2,7 +2,7 @@
 
 # starts audio system
 #su -l predic -c "/usr/bin/python3 /home/predic/pre.di.c/startaudio.py"
-runuser -l predic -c "/usr/bin/python3 /home/predic/pre.di.c/startaudio.py"
+runuser -l predic -c "/home/predic/bin/startaudio"
 
 # loads irexec remote command launcher
 #su -l predic -c "/usr/bin/irexec -d"
