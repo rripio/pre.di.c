@@ -96,9 +96,12 @@ def start():
     # starts MPD
     print('\n(mpd_load) starting mpd')
     sp.Popen(mpd_conf["start_command"].split())
+
+    tmax = init.config['command_delay'] * 10
+    interval = init.config['command_delay'] / 10
     if pd.wait4result(
             f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
-            'OK MPD'):
+            'OK MPD',):
         print('\n(mpd_load) mpd started :-)')
     else:
         print('\n(mpd_load) mpd loading failed')
