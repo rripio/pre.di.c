@@ -97,8 +97,7 @@ def start():
     print('\n(mpd_load) starting mpd')
     sp.Popen(mpd_conf["start_command"].split())
 
-    tmax = init.config['command_delay'] * 10
-    interval = init.config['command_delay'] / 10
+    delay = init.config['command_delay'] * 5
     if pd.wait4result(
             f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
             'OK MPD',):
@@ -131,7 +130,7 @@ def start():
         # and restore the play pointer to previous state
         mpd_client.addid(silence_path, 0)
         mpd_client.play(0)
-        time.sleep(init.config['command_delay'])
+        time.sleep(delay)
         mpd_client.delete(0)
         mpd_client.pause()
         if restore:
