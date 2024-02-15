@@ -6,10 +6,17 @@ case $1 in
         echo -n "(librespot)"
         echo
 
-        librespot   --username xxx@xxx.xxx \
-                    --password xxxxxxxxxxx \
-                    --backend "jackaudio" -b 320 \
-                    --initial-volume 100 \
+        librespot   --username "filarete@gmail.com" \
+                    --password "-_bX:4XcijL~:-m" \
+                    --backend jackaudio -b 320 \
+                    # bypass volume
+                        --mixer softvol
+                        --volume-ctrl fixed
+                        --initial-volume 100 \
+                    # replay gain
+                        --enable-volume-normalisation
+                        --normalisation-pregain 0
+                        --normalisation-method basic
                     --format F32 \
                     --name pre.di.c \
             > /dev/null
