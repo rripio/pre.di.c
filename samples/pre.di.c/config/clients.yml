@@ -1,15 +1,16 @@
 # client start/stop scripts listed in this file are launched on start and stop.
 #
 # names refer to any kind of executable and corresponding options, if any.
+# beware of python executable in caso of using a virtual python environement
 
 
 # mpd:
-#     start:  python /home/predic/pre.di.c/clients/mpd/mpd_load.py start
-#     stop:   python /home/predic/pre.di.c/clients/mpd/mpd_load.py stop
+#     start:  /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/mpd/mpd_load.py start
+#     stop:   /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/mpd/mpd_load.py stop
 # 
 # DVB:
-#     start:  python /home/predic/pre.di.c/clients/DVB/DVB_load.py start
-#     stop:   python /home/predic/pre.di.c/clients/DVB/DVB_load.py stop
+#     start:  /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/DVB/DVB_load.py start
+#     stop:   /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/DVB/DVB_load.py stop
 # 
 # netjack:
 #     start:  /home/predic/pre.di.c/clients/netjack_load
