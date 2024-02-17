@@ -229,7 +229,7 @@ def main(run_level):
 
         # restoring previous state
         # exceptionally we add a line feed at the end \
-        # since sttings restoring messages don't
+        # since settings restoring messages don't
         print('\n(startaudio): restoring previous settings:\n')
         init_state_settings(state)
 
