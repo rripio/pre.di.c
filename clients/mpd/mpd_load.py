@@ -3,7 +3,7 @@
 # Copyright (C) Roberto Ripio
 
 """
-start and stop mplayer for DVB tasks
+start and stop mpd
 
 use it with 'start' and 'stop' as options
 """
@@ -97,7 +97,7 @@ def start():
     print('\n(mpd_load) starting mpd')
     sp.Popen(mpd_conf["start_command"].split())
 
-    delay = init.config['command_delay'] * 5
+    delay = init.config['command_delay'] * 10
     if pd.wait4result(
             f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
             'OK MPD',):
