@@ -7,7 +7,7 @@
 
 begin
     mode = mixer
-    button = KEY_BLUE
+    button = KEY_RED
 end
 
 begin mixer

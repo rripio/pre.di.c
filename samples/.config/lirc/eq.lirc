@@ -7,7 +7,7 @@
 
 begin
     mode = drc
-    button = KEY_RED
+    button = KEY_GREEN
 end
 
 begin drc
@@ -61,7 +61,7 @@ end drc
 
 begin
     mode = eq
-    button = KEY_GREEN
+    button = KEY_YELLOW
 end
 
 begin eq
@@ -115,7 +115,7 @@ end eq
 
 begin
     mode = phase
-    button = KEY_YELLOW
+    button = KEY_BLUE
 end
 
 begin phase
