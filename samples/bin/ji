@@ -2,5 +2,6 @@
 
 # jack active input
 
-# jack_lsp -c |egrep -A 1 ^brutefir:input|egrep \ {3}
-jack_lsp -c |egrep -A 1 ^cpal_client_in|egrep \ {3}
+jack_lsp -c |egrep -A 2 ^cpal_client_in:in_0|egrep \ {3}
+jack_lsp -c |egrep -A 2 ^cpal_client_in:in_1|egrep \ {3}
+
