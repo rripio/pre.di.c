@@ -47,6 +47,7 @@ def mpd_vol_loop():
     mpd_client = connect_mpd()
     mpd_gain_min = base.gain_max - mpd_conf['slider_range']
     while True:
+        # wait for changes in mpd mixer
         mpd_client.idle('mixer')
         mpd_vol = int(mpd_client.status()['volume'])
         # update pre.di.c level
@@ -65,7 +66,11 @@ def predic_vol_loop():
     loop: reads predic volume, sets mpd volume
     """
 
-    interval = init.config['command_delay'] / 10
+    #creates a big load if used with short intervals.
+    #since it only updates mpd volume record do not need
+    #very frecuent updates.
+    #server communications are very inefficient
+    interval = init.config['command_delay'] / 2
     predic_level = pd.read_state()['level']
     mpd_gain_min = base.gain_max - mpd_conf['slider_range']
     while True:
