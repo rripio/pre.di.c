@@ -87,7 +87,7 @@ def client_socket(data, port, quiet=True):
             print(f'\n(lib) unexpected error: {sys.exc_info()[0]}')
 
 
-def read_state():
+def get_state():
     """
     retrieve state dictionary from server to be used by clients
     """
