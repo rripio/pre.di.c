@@ -36,17 +36,17 @@ camilladsp_path = f'{config_folder}/{base.camilladsp_filename}'
 
 try:
 
-    config = pd.get_yaml(config_path)
-    sources = pd.get_yaml(sources_path)
-    state = pd.get_yaml(state_path)
-    state_init = pd.get_yaml(state_init_path)
-    eq = pd.get_yaml(eq_path)
-    camilladsp = pd.get_yaml(camilladsp_path)
+    config = pd.read_yaml(config_path)
+    sources = pd.read_yaml(sources_path)
+    state = pd.read_yaml(state_path)
+    state_init = pd.read_yaml(state_init_path)
+    eq = pd.read_yaml(eq_path)
+    camilladsp = pd.read_yaml(camilladsp_path)
 
     # after knowing which speaker config to load, load it
     loudspeaker_path = f'{loudspeakers_folder}/{config["loudspeaker"]}'
-    speaker = pd.get_yaml(loudspeaker_path + '/' + base.loudspeaker_filename)
-    drc = pd.get_yaml(loudspeaker_path + '/' + base.drc_filename)
+    speaker = pd.read_yaml(loudspeaker_path + '/' + base.loudspeaker_filename)
+    drc = pd.read_yaml(loudspeaker_path + '/' + base.drc_filename)
 
 except Exception as e:
     print(f'\n(init) Error getting configurations: {e}')

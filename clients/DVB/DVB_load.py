@@ -23,7 +23,7 @@ import pdlib as pd
 # get config
 folder = os.path.dirname(sys.argv[0])
 config_filename = 'config.yml'
-config = pd.get_yaml(f'{folder}/{config_filename}')
+config = pd.read_yaml(f'{folder}/{config_filename}')
 dvb_fifo = f'{folder}/{config["fifo_filename"]}'
 
 delay = init.config['command_delay'] * 5

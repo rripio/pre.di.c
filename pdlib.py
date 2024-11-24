@@ -41,7 +41,7 @@ def read_clients(phase):
     return clients
 
 
-def get_yaml(filepath):
+def read_yaml(filepath):
     """
     returns dictionary from yaml config file
     """

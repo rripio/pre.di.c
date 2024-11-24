@@ -34,7 +34,7 @@ import pdlib as pd
 # get config
 folder = os.path.dirname(sys.argv[0])
 config_filename = 'config.yml'
-config = pd.get_yaml(f'{folder}/{config_filename}')
+config = pd.read_yaml(f'{folder}/{config_filename}')
 
 # paths
 state_path = f'{folder}/{config["state_filename"]}'
@@ -42,8 +42,8 @@ presets_path = f'{folder}/{config["presets_filename"]}'
 dvb_fifo = f'{folder}/{config["fifo_filename"]}'
 
 # get dictionaries
-state = pd.get_yaml(state_path)
-presets = pd.get_yaml(presets_path)
+state = pd.read_yaml(state_path)
+presets = pd.read_yaml(presets_path)
 
 port = config['control_port']
 
