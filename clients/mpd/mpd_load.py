@@ -67,16 +67,16 @@ def predic_vol_loop():
     """
 
     #creates a big load if used with short intervals.
-    #since it only updates mpd volume record do not need
-    #very frecuent updates.
-    #server communications are very inefficient
+    #since it only updates mpd volume record, it doesn'try
+    #need very frecuent updates.
+
     interval = init.config['command_delay'] / 2
-    predic_level = pd.get_state()['level']
+    predic_level = pd.read_state()['level']
     mpd_gain_min = base.gain_max - mpd_conf['slider_range']
     while True:
         # check level changes in pre.di.c
         predic_level_old = predic_level
-        predic_level = pd.get_state()['level']
+        predic_level = pd.read_state()['level']
         if predic_level != predic_level_old:
             # update mpd "fake volume"
             predic_gain = predic_level + init.speaker['ref_level_gain']

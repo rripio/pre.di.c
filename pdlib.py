@@ -91,9 +91,20 @@ def get_state():
     """
     retrieve state dictionary from server to be used by clients
     """
+
     string = client_socket('status', init.config['control_port'])
 
     return yaml.safe_load(string.decode().replace('\nOK', ''))
+
+
+def read_state():
+    """
+    get state dictionary from state file to be used by clients
+    """
+    
+    state = read_yaml(init.state_path)
+
+    return state
 
 
 def wait4result(command, answer, tmax=5, interval=0.1):
