@@ -3,7 +3,7 @@ bass: 0.0
 channels: lr
 channels_flip: 'off'
 clamp: 'on'
-drc: 'on'
+drc: 'off'
 drc_set: '1'
 eq: 'off'
 eq_filter: '1'
@@ -15,7 +15,7 @@ phase_eq: 'off'
 polarity: 'off'
 polarity_flip: 'off'
 solo: lr
-source: a
+source: analog
 sources: 'on'
 stereo: normal
 tones: 'off'
