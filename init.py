@@ -8,7 +8,17 @@ import sys
 import yaml
 
 import baseconfig as base
-import pdlib as pd
+
+
+def get_configs(filepath):
+    """
+    returns dictionary from yaml config file
+    """
+
+    with open(filepath) as configfile:
+        config_dict = yaml.safe_load(configfile)
+
+    return config_dict
 
 
 # paths
@@ -36,17 +46,17 @@ camilladsp_path = f'{config_folder}/{base.camilladsp_filename}'
 
 try:
 
-    config = pd.read_yaml(config_path)
-    sources = pd.read_yaml(sources_path)
-    state = pd.read_yaml(state_path)
-    state_init = pd.read_yaml(state_init_path)
-    eq = pd.read_yaml(eq_path)
-    camilladsp = pd.read_yaml(camilladsp_path)
+    config = get_configs(config_path)
+    sources = get_configs(sources_path)
+    state = get_configs(state_path)
+    state_init = get_configs(state_init_path)
+    eq = get_configs(eq_path)
+    camilladsp = get_configs(camilladsp_path)
 
     # after knowing which speaker config to load, load it
     loudspeaker_path = f'{loudspeakers_folder}/{config["loudspeaker"]}'
-    speaker = pd.read_yaml(loudspeaker_path + '/' + base.loudspeaker_filename)
-    drc = pd.read_yaml(loudspeaker_path + '/' + base.drc_filename)
+    speaker = get_configs(loudspeaker_path + '/' + base.loudspeaker_filename)
+    drc = get_configs(loudspeaker_path + '/' + base.drc_filename)
 
 except Exception as e:
     print(f'\n(init) Error getting configurations: {e}')
