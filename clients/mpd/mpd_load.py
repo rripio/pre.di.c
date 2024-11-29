@@ -33,10 +33,9 @@ port = init.config['control_port']
 
 class predic_vol_watch(FileSystemEventHandler):
 
+    # initial level for comparison
     predic_level = pd.get_state()['level']
-    print(pd.get_state())
 
-    # def on_modified(self, event, predic_level=predic_level):
     def on_modified(self, event):
         # check level changes in pre.di.c
         predic_level_old = predic_vol_watch.predic_level
@@ -121,7 +120,7 @@ def start():
     print('\n(mpd_load) starting mpd')
     sp.Popen(mpd_conf["start_command"].split())
 
-    delay = init.config['command_delay'] * 10
+    delay = init.config['command_delay']
     if pd.wait4result(
             f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
             'OK MPD', delay):
@@ -148,11 +147,9 @@ def start():
         else:
             restore = False
 
-        # path to silence dummy file relative to base music directory
-        silence_path = "mpd_silence.wav"
         # load silence file, plays it a bit, delete it from playlist, \
         # and restore the play pointer to previous state
-        mpd_client.addid(silence_path, 0)
+        mpd_client.addid(mpd_conf['silence_path'], 0)
         mpd_client.play(0)
         time.sleep(delay)
         mpd_client.delete(0)
