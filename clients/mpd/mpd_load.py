@@ -14,6 +14,9 @@ import time
 import subprocess as sp
 import multiprocessing as mp
 
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
 import mpd
 
 import baseconfig as base
@@ -24,7 +27,34 @@ import pdlib as pd
 # user config
 config_filename = 'config.yml'
 
+# globals
 port = init.config['control_port']
+
+
+class predic_vol_watch(FileSystemEventHandler):
+
+    predic_level = pd.get_state()['level']
+    print(pd.get_state())
+
+    # def on_modified(self, event, predic_level=predic_level):
+    def on_modified(self, event):
+        # check level changes in pre.di.c
+        predic_level_old = predic_vol_watch.predic_level
+        predic_vol_watch.predic_level = pd.get_state()['level']
+        predic_level = predic_vol_watch.predic_level
+        if predic_level != predic_level_old:
+            # update mpd "fake volume"
+            predic_gain = predic_level + init.speaker['ref_level_gain']
+            mpd_vol = round(
+                (predic_gain - mpd_gain_min)
+                * 100 / mpd_conf['slider_range']
+                )
+            # minimal mpd volume
+            if mpd_vol < 0:
+                mpd_vol = 0
+            mpd_client = connect_mpd()
+            mpd_client.setvol(int(mpd_vol))
+            mpd_client.close()
 
 
 def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
@@ -66,31 +96,20 @@ def predic_vol_loop():
     loop: reads predic volume, sets mpd volume
     """
 
-    #creates a big load if used with short intervals.
-    #since it only updates mpd volume record, it doesn'try
-    #need very frecuent updates.
-
     interval = init.config['command_delay'] / 2
-    predic_level = pd.read_state()['level']
-    mpd_gain_min = base.gain_max - mpd_conf['slider_range']
-    while True:
-        # check level changes in pre.di.c
-        predic_level_old = predic_level
-        predic_level = pd.read_state()['level']
-        if predic_level != predic_level_old:
-            # update mpd "fake volume"
-            predic_gain = predic_level + init.speaker['ref_level_gain']
-            mpd_vol = round(
-                (predic_gain - mpd_gain_min)
-                * 100 / mpd_conf['slider_range']
-                )
-            # minimal mpd volume
-            if mpd_vol < 0:
-                mpd_vol = 0
-            mpd_client = connect_mpd()
-            mpd_client.setvol(int(mpd_vol))
-            mpd_client.close()
-        time.sleep(interval)
+
+    event_handler = predic_vol_watch()
+    observer = Observer()
+    observer.schedule(event_handler, init.config_folder, recursive=False)
+    observer.start()
+
+    try:
+        while True:
+            time.sleep(interval)
+
+    finally:
+        observer.stop()
+        observer.join()
 
 
 def start():
@@ -175,6 +194,8 @@ def stop():
 if sys.argv[1:]:
     dir = os.path.dirname(os.path.realpath(__file__))
     mpd_conf = pd.read_yaml(f'{dir}/{config_filename}')
+    mpd_gain_min = base.gain_max - mpd_conf['slider_range']
+
     try:
         option = {
             'start': start,
