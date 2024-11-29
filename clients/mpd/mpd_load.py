@@ -31,7 +31,7 @@ config_filename = 'config.yml'
 port = init.config['control_port']
 
 
-class predic_vol_watch(FileSystemEventHandler):
+class Predic_vol_watch(FileSystemEventHandler):
 
     # initial level for comparison
     predic_level = pd.get_state()['level']
@@ -97,7 +97,7 @@ def predic_vol_loop():
 
     interval = init.config['command_delay'] / 2
 
-    event_handler = predic_vol_watch()
+    event_handler = Predic_vol_watch()
     observer = Observer()
     observer.schedule(event_handler, init.config_folder, recursive=False)
     observer.start()
