@@ -38,9 +38,9 @@ class Predic_vol_watch(FileSystemEventHandler):
 
     def on_modified(self, event):
         # check level changes in pre.di.c
-        predic_level_old = predic_vol_watch.predic_level
-        predic_vol_watch.predic_level = pd.get_state()['level']
-        predic_level = predic_vol_watch.predic_level
+        predic_level_old = Predic_vol_watch.predic_level
+        Predic_vol_watch.predic_level = pd.get_state()['level']
+        predic_level = Predic_vol_watch.predic_level
         if predic_level != predic_level_old:
             # update mpd "fake volume"
             predic_gain = predic_level + init.speaker['ref_level_gain']
