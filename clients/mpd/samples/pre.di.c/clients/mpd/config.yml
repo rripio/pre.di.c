@@ -20,3 +20,5 @@ volume_linked: true
 # must be positive integer
 slider_range: 54
 
+# path to silence dummy file relative to base music directory
+silence_path: 'mpd_silence.wav'
