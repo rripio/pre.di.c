@@ -33,10 +33,9 @@ port = init.config['control_port']
 
 class predic_vol_watch(FileSystemEventHandler):
 
+    # initial level for comparison
     predic_level = pd.get_state()['level']
-    print(pd.get_state())
 
-    # def on_modified(self, event, predic_level=predic_level):
     def on_modified(self, event):
         # check level changes in pre.di.c
         predic_level_old = predic_vol_watch.predic_level
