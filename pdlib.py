@@ -13,7 +13,6 @@ import time
 import subprocess as sp
 import math as m
 
-
 import jack
 import yaml
 import numpy as np
