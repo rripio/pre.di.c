@@ -3,9 +3,7 @@
 # Copyright (C) Roberto Ripio
 
 """
-start and stop mpd
-
-use it with 'start' and 'stop' as options
+start mpd
 """
 
 import os
@@ -111,94 +109,64 @@ def predic_vol_loop():
         observer.join()
 
 
-def start():
-    """
-    loads mpd
-    """
+dir = os.path.dirname(os.path.realpath(__file__))
+mpd_conf = pd.read_yaml(f'{dir}/{config_filename}')
+mpd_gain_min = base.gain_max - mpd_conf['slider_range']
 
-    # starts MPD
-    print('\n(mpd_load) starting mpd')
-    sp.Popen(mpd_conf["start_command"].split())
+print('\n(mpd_load) starting mpd')
+sp.Popen(mpd_conf["mpd_start_command"].split())
 
-    delay = init.config['command_delay']
-    if pd.wait4result(
-            f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
-            'OK MPD', delay):
-        print('\n(mpd_load) mpd started :-)')
-    else:
-        print('\n(mpd_load) mpd loading failed')
-        return
-
-    # ping mpd to create jack ports
-    try:
-        mpd_client = connect_mpd()
-        status = mpd_client.status()
-        # check if there's a playlist loaded and, if any, \
-        # get relevant status data
-        # no 'song' in status if there is no playlist
-        if 'song' in status:
-            song = status['song']
-            # no 'elapsed' in status if song stoppped
-            if 'elapsed' in status:
-                elapsed = status['elapsed']
-            else:
-                elapsed = 0
-            restore = True
-        else:
-            restore = False
-
-        # load silence file, plays it a bit, delete it from playlist, \
-        # and restore the play pointer to previous state
-        mpd_client.addid(mpd_conf['silence_path'], 0)
-        mpd_client.play(0)
-        time.sleep(delay)
-        mpd_client.delete(0)
-        mpd_client.pause()
-        if restore:
-            mpd_client.seek(song, elapsed)
-        mpd_client.close()
-    except Exception as e:
-        print(f'\n(mpd_load) error in ping routine: {e}')
-
-    # volume linked to mpd (optional)
-    if mpd_conf['volume_linked']:
-        try:
-            mpdloop = mp.Process(target=mpd_vol_loop)
-            mpdloop.start()
-        except Exception as e:
-            print('\n(mpd_load) mpd socket loop broke' +
-                  f'with exception {e}')
-        try:
-            predicloop = mp.Process(target=predic_vol_loop)
-            predicloop.start()
-        except Exception as e:
-            print('\n(mpd_load) predic socket loop broke' +
-                  f' with exception {e}')
-
-
-def stop():
-    """
-    kills mpd and this script
-    """
-
-    delay = init.config['command_delay']
-
-    sp.Popen(mpd_conf["stop_command"].split())
-    sp.Popen((f'pkill -f {dir}/mpd_load.py').split())
-    time.sleep(delay)
-
-
-if sys.argv[1:]:
-    dir = os.path.dirname(os.path.realpath(__file__))
-    mpd_conf = pd.read_yaml(f'{dir}/{config_filename}')
-    mpd_gain_min = base.gain_max - mpd_conf['slider_range']
-
-    try:
-        option = {
-            'start': start,
-            'stop': stop
-            }[sys.argv[1]]()
-    except KeyError:
-        print('\n(mpd_load) bad option')
+delay = init.config['command_delay']*10
+if pd.wait4result(
+        f'echo close|nc localhost {mpd_conf["port"]} 2>/dev/null',
+        'OK MPD', delay):
+    print('\n(mpd_load) mpd started :-)')
 else:
-    print(__doc__)
+    print('\n(mpd_load) mpd loading failed')
+    quit()
+
+# ping mpd to create jack ports
+try:
+    mpd_client = connect_mpd()
+    status = mpd_client.status()
+    # check if there's a playlist loaded and, if any, \
+    # get relevant status data
+    # no 'song' in status if there is no playlist
+    if 'song' in status:
+        song = status['song']
+        # no 'elapsed' in status if song stoppped
+        if 'elapsed' in status:
+            elapsed = status['elapsed']
+        else:
+            elapsed = 0
+        restore = True
+    else:
+        restore = False
+
+    # load silence file, plays it a bit, delete it from playlist, \
+    # and restore the play pointer to previous state
+    mpd_client.addid(mpd_conf['silence_path'], 0)
+    mpd_client.play(0)
+    time.sleep(delay)
+    mpd_client.delete(0)
+    mpd_client.pause()
+    if restore:
+        mpd_client.seek(song, elapsed)
+    mpd_client.close()
+except Exception as e:
+    print(f'\n(mpd_load) error in ping routine: {e}')
+
+# volume linked to mpd (optional)
+if mpd_conf['volume_linked']:
+    try:
+        mpdloop = mp.Process(target=mpd_vol_loop)
+        mpdloop.start()
+    except Exception as e:
+        print('\n(mpd_load) mpd socket loop broke' +
+                f'with exception {e}')
+    try:
+        predicloop = mp.Process(target=predic_vol_loop)
+        predicloop.start()
+    except Exception as e:
+        print('\n(mpd_load) predic socket loop broke' +
+                f' with exception {e}')

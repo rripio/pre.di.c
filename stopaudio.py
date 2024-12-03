@@ -31,9 +31,10 @@ def main(run_level):
 
     if run_level in {'clients', 'all'}:
         # stop external scripts, sources and clients
-        print('\n(stopaudio) stopping clients')
+        print('(stopaudio) stopping clients')
         for client in pd.read_clients('stop'):
             try:
+                print('(stopaudio) stopping', client)
                 Popen(f'{client}'.split())
             except Exception as e:
                 print('\n(stopaudio) problem stopping client',

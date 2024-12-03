@@ -76,26 +76,7 @@ def jack_loop(clientname):
             print('\n(lib) Terminated: ', e)
 
 
-def start():
-
-    # create jack loop for connections
-    # The jack_loop module will keep the loop alive, so we need to thread it.
-    jloop = mp.Process(target=jack_loop, args=('stream_loop',))
-    jloop.start()
-
-
-def stop():
-
-    sp.Popen('pkill -f stream_loop.py'.split())
-
-
-if sys.argv[1:]:
-    try:
-        option = {
-            'start': start,
-            'stop': stop
-            }[sys.argv[1]]()
-    except KeyError:
-        print('stream_loop.py: bad option')
-else:
-    print(__doc__)
+# create jack loop for connections
+# The jack_loop module will keep the loop alive, so we need to thread it.
+jloop = mp.Process(target=jack_loop, args=('stream_loop',))
+jloop.start()

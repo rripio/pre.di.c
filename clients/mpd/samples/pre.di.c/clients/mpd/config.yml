@@ -4,10 +4,10 @@
 
 # mpd start command line:
 #command: /usr/bin/chrt 90 /usr/bin/mpd
-start_command: /usr/bin/mpd
+mpd_start_command: /usr/bin/mpd
 
 # mpd kill command line:
-stop_command: pkill -f /usr/bin/mpd
+mpd_stop_command: pkill -f /usr/bin/mpd
 
 # port to connect to
 port: '6600'

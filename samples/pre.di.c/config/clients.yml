@@ -5,22 +5,22 @@
 
 
 # mpd:
-#     start:  /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/mpd/mpd_load.py start
-#     stop:   /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/mpd/mpd_load.py stop
+#     start:  /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/mpd/mpd_start.py
+#     stop:   /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/mpd/mpd_stop.py
 # 
 # DVB:
-#     start:  /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/DVB/DVB_load.py start
-#     stop:   /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/DVB/DVB_load.py stop
+#     start:  /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/DVB/DVB_start.py
+#     stop:   /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/DVB/DVB_stop.py
 # 
 # netjack:
 #     start:  /home/predic/pre.di.c/clients/netjack_load
 
 #stream_loop:
-#    start:  /home/predic/pre.di.c/clients/stream_loop.py start
+#    start:  /home/predic/pre.di.c/clients/stream_loop.py
 
 # zita-cd:
-#     start:  /home/predic/pre.di.c/clients/zita-cd start
-#     stop:   /home/predic/pre.di.c/clients/zita-cd stop
+#     start:  zita-a2j -d hw:CARD=U24XL,DEV=0 -p 2048 -r 44100 -j cd -v
+#     stop:   killall zita-a2j
 # 
 # librespot:
 #     start:  /home/predic/pre.di.c/clients/librespot start
