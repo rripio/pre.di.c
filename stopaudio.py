@@ -3,7 +3,7 @@
 # Copyright (C) Roberto Ripio
 
 """
-Stops pre.di.c audio system
+Stops pre.di.c audio system.
 
 Usage:
 stopaudio.py [ core | clients | all ]   (default 'all')
@@ -14,10 +14,10 @@ all: all of the above
 
 import sys
 import os
-import time
+# import time
 from subprocess import Popen
 
-import init
+# import init
 import pdlib as pd
 
 
@@ -25,13 +25,10 @@ fnull = open(os.devnull, 'w')
 
 
 def main(run_level):
-    """
-    main stop function
-    """
-
+    """Stop pre.di.c."""
     if run_level in {'clients', 'all'}:
         # stop external scripts, sources and clients
-        print('(stopaudio) stopping clients')
+        print('(stopaudio) stopping clients:')
         for client in pd.read_clients('stop'):
             try:
                 print('(stopaudio) stopping', client)
@@ -49,14 +46,6 @@ def main(run_level):
         # jack
         print('(stopaudio) stopping jackd')
         Popen('pkill -fe jackd'.split())
-
-        #dirty hack, rekill camilladsp
-        # wait a bit
-        time.sleep(init.config['command_delay'] * 5)
-        # camilladsp
-        print('(stopaudio) stopping camilladsp')
-        Popen('pkill -fe camilladsp'.split())
-
 
 if __name__ == '__main__':
 
