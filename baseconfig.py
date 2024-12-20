@@ -2,7 +2,7 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-# customizable initial values
+"""Customizable initial values."""
 
 # equalizer
 

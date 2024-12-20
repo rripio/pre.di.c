@@ -2,9 +2,7 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-"""
-miscellanea of utility functions for use in predic scripts
-"""
+"""Miscellanea of utility functions for use in predic scripts."""
 
 
 import socket
@@ -24,10 +22,10 @@ import init
 # used on startaudio.py and stopaudio.py
 def read_clients(phase):
     """
-    reads list of programs to start/stop from config/clients.yml file
+    Read list of programs to start/stop from config/clients.yml file.
+
     phase: <'start'|'stop'> phase of client activation or deactivation
     """
-
     clients_list_path = init.clients_path
 
     with open(clients_list_path) as clients_file:
@@ -41,10 +39,7 @@ def read_clients(phase):
 
 
 def read_yaml(filepath):
-    """
-    returns dictionary from yaml config file
-    """
-
+    """Return dictionary from yaml config file."""
     with open(filepath) as configfile:
         config_dict = yaml.safe_load(configfile)
 
@@ -52,10 +47,7 @@ def read_yaml(filepath):
 
 
 def client_socket(data, port, quiet=True):
-    """
-    makes a socket for talking to the server
-    """
-
+    """Make a socket for talking to the server."""
     # avoid void command to reach server and get processed due to encoding
     if data == '':
         return b'ACK\n'
@@ -87,20 +79,14 @@ def client_socket(data, port, quiet=True):
 
 
 def get_state():
-    """
-    retrieve state dictionary from server to be used by clients
-    """
-
+    """Retrieve state dictionary from server to be used by clients."""
     string = client_socket('status', init.config['control_port'])
 
     return yaml.safe_load(string.decode().replace('\nOK', ''))
 
 
 def wait4result(command, answer, tmax=5, interval=0.1):
-    """
-    looks for chain "answer" in "command" output
-    """
-
+    """Look for chain "answer" in "command" output."""
     time_start = time.time()
 
     def elapsed():
@@ -134,10 +120,7 @@ def wait4result(command, answer, tmax=5, interval=0.1):
 
 
 def wait4source(source, tmax=5, interval=0.1):
-    """
-    wait for source jack ports to be up
-    """
-
+    """Wait for source jack ports to be up."""
     source_ports = init.sources[source]['source_ports']
     if wait4ports(source_ports, tmax, interval):
         return True
@@ -146,10 +129,7 @@ def wait4source(source, tmax=5, interval=0.1):
 
 
 def wait4ports(ports, tmax=5, interval=0.1):
-    """
-    wait for jack ports to be up
-    """
-
+    """Wait for jack ports to be up."""
     time_start = time.time()
     jc = jack.Client('wait_client')
 
@@ -175,35 +155,24 @@ def wait4ports(ports, tmax=5, interval=0.1):
 
 
 def gain_dB(x):
+    """Calculate gain in dB from gain multiplier."""
     return 20 * m.log10(x)
-    """
-    calculates gain in dB from gain multiplier
-    """
 
 
 def calc_gain(level):
-    """
-    calculates gain from level and reference gain
-    """
-
+    """Calculate gain from level and reference gain."""
     gain = level + init.speaker['ref_level_gain']
     return gain
 
 
 def calc_level(gain):
-    """
-    calculates level from gain and reference gain
-    """
-
+    """Calculate level from gain and reference gain."""
     level = gain - init.speaker['ref_level_gain']
     return level
 
 
 def calc_headroom(gain):
-    """
-    calculates headroom from gain and equalizer
-    """
-
+    """Calculate headroom from gain and equalizer."""
     tones = {'off': 0, 'on': 1}[init.state['tones']]
     headroom = (base.gain_max
                 - gain
@@ -215,18 +184,12 @@ def calc_headroom(gain):
 
 
 def calc_source_gain(source):
-    """
-    retrieves source gain shift
-    """
-
+    """Retrieve source gain shift."""
     return init.sources[source]['gain']
 
 
 def show():
-    """
-    compose a status report string
-    """
-
+    """Compose a status report string."""
     source_gain = calc_source_gain(init.state['source'])
     gain = calc_gain(init.state['level']) + source_gain
     headroom = calc_headroom(gain)

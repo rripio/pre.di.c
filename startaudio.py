@@ -3,7 +3,7 @@
 # Copyright (C) Roberto Ripio
 
 """
-Starts pre.di.c audio system
+Starts pre.di.c audio system.
 
     Usage:
     startaudio.py [ core | clients | all ]   (default 'all')
@@ -28,19 +28,13 @@ port = init.config['control_port']
 
 
 def stop_all():
-    """
-    stops all audio and the current script
-    """
-
+    """Stop all audio and the current script."""
     stopaudio.main('all')
     sys.exit()
 
 
 def init_jack():
-    """
-    loads jack server
-    """
-
+    """Load jack server."""
     try:
         print('\n(startaudio) starting jack\n')
         fs = init.speaker['devices']['samplerate']
@@ -59,10 +53,7 @@ def init_jack():
 
 
 def init_camilladsp():
-    """
-    loads camilladsp
-    """
-
+    """Load camilladsp."""
     try:
         # cd to louspeaker folder so filter paths are relative to this \
         # folder in speaker.yml config file
@@ -103,10 +94,7 @@ def init_camilladsp():
 
 
 def init_server():
-    """
-    loads server
-    """
-
+    """Load server."""
     print('\n(startaudio) starting server')
 
     try:
@@ -130,10 +118,7 @@ def init_server():
 
 
 def set_initial_state():
-    """
-    set initial state state as last saved or user determined
-    """
-
+    """Set initial state state as last saved or user determined."""
     state = init.state
     if init.config['use_state_init']:
         for setting in init.state_init:
@@ -142,16 +127,14 @@ def set_initial_state():
 
 
 def init_state_settings(state):
+    """Restore audio settings from state.yaml."""
     """
-    restore audio settings as stored in state.yaml except source,
-    and takes care of options to reset some of them
+    Source is not restored.
+    Take care of options to reset some of them.
+    It is assumed that command name and setting name are the same.
+    Source associated phase_EQ will prevail if use_source_phase_EQ is set
+    because init_source function is executed after this one.
     """
-
-    # it is assumed that command name and setting name are the same
-    #
-    # source associated phase_EQ will prevail if use_source_phase_EQ is set \
-    # because init_source function is executed after this one
-
     for setting in (
             'balance',
             'bass',
@@ -179,10 +162,7 @@ def init_state_settings(state):
 
 
 def init_source(state):
-    """
-    restore selected source as stored in state.yml
-    """
-
+    """Restore selected source as stored in state.yml."""
     source = state['source']
     print(f"\n(startaudio) restoring source '{source}'")
     # wait for source ports to be up
@@ -206,10 +186,7 @@ def init_source(state):
 
 
 def main(run_level):
-    """
-    main loading function
-    """
-
+    """Start loading function."""
     # jack, brutefir, camilladsp, server
     if run_level in {'core', 'all'}:
         # load basic audio kernel

@@ -2,6 +2,8 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
+"""Server to process commands."""
+
 import asyncio
 
 import yaml
@@ -12,16 +14,13 @@ import pdlib as pd
 
 
 async def handle_commands(reader, writer):
-
+    """Async process to handle commands."""
     rawdata = await reader.read(100)
     data = rawdata.decode().rstrip('\r\n')
     say_OK = True
 
     def write_state():
-        """
-        writes state to state file
-        """
-
+        """Write state to state file."""
         with open(init.state_path, 'w') as f:
             if init.state is not None:
                 yaml.dump(init.state, f, default_flow_style=False)
@@ -95,7 +94,7 @@ async def handle_commands(reader, writer):
 
 
 async def main():
-
+    """Start server."""
     server = await asyncio.start_server(
                 handle_commands,
                 init.config['control_address'],

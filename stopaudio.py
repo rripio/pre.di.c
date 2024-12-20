@@ -47,6 +47,7 @@ def main(run_level):
         print('(stopaudio) stopping jackd')
         Popen('pkill -fe jackd'.split())
 
+
 if __name__ == '__main__':
 
     run_level = 'all'

@@ -2,6 +2,8 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
+"""Initial code."""
+
 import os
 import sys
 
@@ -11,10 +13,7 @@ import baseconfig as base
 
 
 def get_configs(filepath):
-    """
-    returns dictionary from yaml config file
-    """
-
+    """Return dictionary from yaml config file."""
     with open(filepath) as configfile:
         config_dict = yaml.safe_load(configfile)
 

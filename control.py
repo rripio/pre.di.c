@@ -2,6 +2,8 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
+"""Process commands."""
+
 import time
 import jack
 import math as m
@@ -36,15 +38,14 @@ message = ''
 
 
 class OptionsError(Exception):
-    """
-    exception for options revealing
-    """
+    """Exception for options revealing."""
 
     def __init__(self, options):
         self.options = options
 
 
 class ClampWarning(Warning):
+    """Exception for volume clamp."""
 
     def __init__(self, clamp_value):
         self.clamp_value = clamp_value
@@ -54,10 +55,7 @@ class ClampWarning(Warning):
 
 
 def disconnect_sources(jack_client):
-    """
-    disconnect sources from predic audio ports
-    """
-
+    """Disconnect sources from predic audio ports."""
     for ports_group in init.config['audio_ports']:
         for in_port in ports_group:
             for out_port in jack_client.get_all_connections(in_port):
@@ -65,18 +63,12 @@ def disconnect_sources(jack_client):
 
 
 def toggle(command):
-    """
-    changes state of on/off commands
-    """
-
+    """Change state of on/off commands."""
     return {'off': 'on', 'on': 'off'}[init.state[command]]
 
 
 def do_source(source_arg):
-    """
-    wrapper for source command, avoiding muting already selected sources
-    """
-
+    """Process source commands, avoiding muting already selected sources."""
     global message
     global do_mute
 
@@ -98,10 +90,7 @@ def do_source(source_arg):
 
 
 def do_command(command, arg):
-    """
-    general command wrapper
-    """
-
+    """General command wrapper."""
     global message
 
     success = False
@@ -154,9 +143,7 @@ def do_command(command, arg):
 
 
 def level(level):
-    """
-    change level (gain relative to reference_level)
-    """
+    """Change level (gain relative to reference_level)."""
     # level clamp is comissioned to set_gain()
     init.state['level'] = (float(level) + init.state['level'] * add)
     gain = pd.calc_gain(init.state['level'])
@@ -167,11 +154,7 @@ def level(level):
 
 
 def clamp(clamp):
-    """
-    frees gain setting from clamping:
-    useful for playing  low level files
-    """
-
+    """Free gain setting from clamping, useful for playing  low level files."""
     options = {'off', 'on', 'toggle'}
     if clamp in options:
         if clamp == 'toggle':
@@ -184,10 +167,7 @@ def clamp(clamp):
 
 
 def mute(mute):
-    """
-    mute output
-    """
-
+    """Mute output."""
     options = {'off', 'on', 'toggle'}
     if mute in options:
         if mute == 'toggle':
@@ -205,10 +185,7 @@ def mute(mute):
 
 
 def loudness_ref(loudness_ref):
-    """
-    select loudness reference level (correction threshold level)
-    """
-
+    """Select loudness reference level (correction threshold level)."""
     init.state['loudness_ref'] = (float(loudness_ref)
                                   + init.state['loudness_ref'] * add)
 
@@ -225,10 +202,7 @@ def loudness_ref(loudness_ref):
 
 
 def bass(bass):
-    """
-    select bass level correction
-    """
-
+    """Select bass level correction."""
     init.state['bass'] = float(bass) + init.state['bass'] * add
     # clamp bass value
     if m.fabs(init.state['bass']) > base.tone_variation:
@@ -243,10 +217,7 @@ def bass(bass):
 
 
 def treble(treble):
-    """
-    select treble level correction
-    """
-
+    """Select treble level correction."""
     init.state['treble'] = (float(treble)
                             + init.state['treble'] * add)
     # clamp treble value
@@ -263,11 +234,11 @@ def treble(treble):
 
 def balance(balance):
     """
-    select balance level
-    'balance' means deviation from 0 in R channel
-    deviation of the L channel then goes symmetrical
-    """
+    Select balance level.
 
+    'Balance' means deviation from 0 in R channel.
+    Seviation of the L channel then goes symmetrical.
+    """
     init.state['balance'] = (float(balance)
                              + init.state['balance'] * add)
     # clamp balance value
@@ -293,10 +264,7 @@ def balance(balance):
 
 
 def source(source):
-    """
-    change source
-    """
-
+    """Change source."""
     global message
 
     # reset clamp to 'on' when changing sources
@@ -338,10 +306,7 @@ def source(source):
 
 
 def drc_set(drc_set):
-    """
-    change drc filters
-    """
-
+    """Change drc filters."""
     options = init.drc
     if drc_set in options:
         init.state['drc_set'] = drc_set
@@ -353,10 +318,7 @@ def drc_set(drc_set):
 
 
 def eq_filter(eq_filter):
-    """
-    select general equalizer filter
-    """
-
+    """Select general equalizer filter."""
     options = init.eq
     if eq_filter in options:
         init.state['eq_filter'] = eq_filter
@@ -367,10 +329,7 @@ def eq_filter(eq_filter):
 
 
 def stereo(stereo):
-    """
-    change mix to normal stereo, mono, or midside side
-    """
-
+    """Change mix to normal stereo, mono, or midside side."""
     options = {'normal', 'mid', 'side'}
     if stereo in options:
         init.state['stereo'] = stereo
@@ -380,10 +339,7 @@ def stereo(stereo):
 
 
 def channels(channels):
-    """
-    select input channels (mixed to both output channels)
-    """
-
+    """Select input channels (mixed to both output channels)."""
     options = {'lr', 'l', 'r'}
     if channels in options:
         init.state['channels'] = channels
@@ -393,10 +349,7 @@ def channels(channels):
 
 
 def solo(solo):
-    """
-    isolate output channels
-    """
-
+    """Isolate output channels."""
     options = {'lr', 'l', 'r'}
     if solo in options:
         init.state['solo'] = solo
@@ -409,10 +362,7 @@ def solo(solo):
 
 
 def drc(drc):
-    """
-    toggle drc
-    """
-
+    """Toggle drc."""
     options = {'off', 'on', 'toggle'}
     if drc in options:
         if drc == 'toggle':
@@ -426,10 +376,7 @@ def drc(drc):
 
 
 def phase_eq(phase_eq):
-    """
-    toggle phase equalizer
-    """
-
+    """Toggle phase equalizer."""
     options = {'off', 'on', 'toggle'}
     if phase_eq in options:
         if phase_eq == 'toggle':
@@ -443,10 +390,7 @@ def phase_eq(phase_eq):
 
 
 def loudness(loudness):
-    """
-    toggle loudness
-    """
-
+    """Toggle loudness."""
     options = {'off', 'on', 'toggle'}
     if loudness in options:
         if loudness == 'toggle':
@@ -460,10 +404,7 @@ def loudness(loudness):
 
 
 def tones(tones):
-    """
-    toggle tone controls
-    """
-
+    """Toggle tone controls."""
     options = {'off', 'on', 'toggle'}
     if tones in options:
         if tones == 'toggle':
@@ -477,10 +418,7 @@ def tones(tones):
 
 
 def eq(eq):
-    """
-    toggle general equalizer (not linked to a particular speaker)
-    """
-
+    """Toggle general equalizer (not linked to a particular speaker)."""
     options = {'off', 'on', 'toggle'}
     if eq in options:
         if eq == 'toggle':
@@ -494,10 +432,7 @@ def eq(eq):
 
 
 def sources(sources):
-    """
-    toggle connection of sources
-    """
-
+    """Toggle connection of sources."""
     global message
 
     options = {'off', 'on', 'toggle'}
@@ -525,10 +460,7 @@ def sources(sources):
 
 
 def channels_flip(channels_flip):
-    """
-    toggle channels flip
-    """
-
+    """Toggle channels flip."""
     options = {'off', 'on', 'toggle'}
     if channels_flip in options:
         if channels_flip == 'toggle':
@@ -540,10 +472,7 @@ def channels_flip(channels_flip):
 
 
 def polarity(polarity):
-    """
-    toggle polarity inversion
-    """
-
+    """Toggle polarity inversion."""
     options = {'off', 'on', 'toggle'}
     if polarity in options:
         if polarity == 'toggle':
@@ -555,10 +484,7 @@ def polarity(polarity):
 
 
 def polarity_flip(polarity_flip):
-    """
-    toggle polarity flip (change polarity in one channel only)
-    """
-
+    """Toggle polarity flip (change polarity in one channel only)."""
     options = {'off', 'on', 'toggle'}
     if polarity_flip in options:
         if polarity_flip == 'toggle':
@@ -570,10 +496,7 @@ def polarity_flip(polarity_flip):
 
 
 def set_bypass(step, arg):
-    """
-    set bypass state of certain steps in pipeline
-    """
-
+    """Set bypass state of certain steps in pipeline."""
     state = {'off': True, 'on': False}[arg]
 
     for index, element in enumerate(cdsp_config['pipeline']):
@@ -582,10 +505,7 @@ def set_bypass(step, arg):
 
 
 def set_mixer():
-    """
-    set general mixer in camilladsp from state settings
-    """
-
+    """Set general mixer in camilladsp from state settings."""
     global message
 
     mixer = np.identity(2)
@@ -648,11 +568,11 @@ def set_mixer():
 
 def set_gain(gain):
     """
-    set_gain, aka 'the volume machine' :-)
-    gain is clamped to avoid positive gain \
-    considering balance, tones and source gain shift
-    """
+    Set_gain, aka 'the volume machine' :-).
 
+    Gain is clamped to avoid positive gain,
+    considering balance, tones and source gain shift.
+    """
     global message
 
     # gain command send its str argument directly
@@ -688,10 +608,7 @@ def set_gain(gain):
 
 
 def proccess_commands(full_command):
-    """
-    procces commands for predic control
-    """
-
+    """Procces commands for predic control."""
     global cdsp             # let camilladsp connection be accesible
     global add
     global do_mute
