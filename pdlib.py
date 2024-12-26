@@ -240,6 +240,7 @@ def show():
 help_str = '''
     status                              Display status
     save                                Save status
+    camillaconfig                       Save actual camilladsp config
     ping                                Request an answer from server
 
     show                                Show a human readable status
@@ -268,4 +269,5 @@ help_str = '''
     gain <gain>                         Set digital gain
 
     'add' option makes previous number be an increment
+    'camillaconfig' command saves actual config in loudspeaker folder
     '''

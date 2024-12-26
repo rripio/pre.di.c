@@ -27,33 +27,45 @@ async def handle_commands(reader, writer):
             else:
                 raise Exception('corrupted null state file\n')
 
+    def write_camillaconfig():
+        """Write camilladsp config to file in loudspeaker folder."""
+        camillaconfig = init.loudspeaker_path + '/actual_config.yaml'
+        with open(camillaconfig, 'w') as f:
+            yaml.dump(control.cdsp_config, f, default_flow_style=False)
+
     try:
         if data == 'status':
-            # echo state to client as YAML string
+            # Echo state to client as YAML string
             writer.write(yaml.dump(init.state,
                                    default_flow_style=False).encode())
 
         elif data == 'save':
-            # writes state to state file
+            # Write state to state file
             write_state()
+
+        elif data == 'camillaconfig':
+            # Write camilladsp config to file
+            write_camillaconfig()
 
         elif data == 'ping':
             # just answers OK
             pass
 
         elif data == 'command_unmute':
-            # inhibits mute downstream
+            # Inhibit mute downstream
             init.config['do_mute'] = False
 
         elif data == 'command_mute':
-            # restore mute state downstream
+            # Restore mute state downstream
             init.config['do_mute'] = True
 
         elif data == 'show':
+            # Print human readable status
             say_OK = False
             writer.write(pd.show().encode())
 
         elif data == 'help':
+            # Print command help
             say_OK = False
             writer.write(pd.help_str.encode())
 
