@@ -8,18 +8,13 @@
 sets up loop ports in jack
 """
 
-import sys
-import subprocess as sp
 import multiprocessing as mp
 
 import jack
 
 
 def jack_loop(clientname):
-    """
-    creates a jack loop with given 'clientname'
-    """
-
+    """Create a jack loop with given 'clientname'."""
     # CREDITS:
     # https://jackclient-python.readthedocs.io/en/0.4.5/examples.html
 
