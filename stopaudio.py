@@ -14,10 +14,10 @@ all: all of the above
 
 import sys
 import os
-# import time
+import time
 from subprocess import Popen
 
-# import init
+import init
 import pdlib as pd
 
 
@@ -46,6 +46,13 @@ def main(run_level):
         # jack
         print('(stopaudio) stopping jackd')
         Popen('pkill -fe jackd'.split())
+
+        # dirty hack, rekill camilladsp
+        # wait a bit
+        time.sleep(init.config['command_delay'] * 5)
+        # camilladsp
+        print('(stopaudio) stopping camilladsp')
+        Popen('pkill -fe camilladsp'.split())
 
 
 if __name__ == '__main__':
