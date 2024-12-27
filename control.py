@@ -17,24 +17,24 @@ import pdlib as pd
 from camilladsp import CamillaClient
 
 
-# connect to camilladsp and get camilladsp config once
+# Connect to camilladsp and get camilladsp config once.
 cdsp = CamillaClient("localhost", init.config['websocket_port'])
 cdsp.connect()
 cdsp_config = cdsp.config.active()
 
 
-# flags
+# Flags
 
 
-add = False             # switch to relative commands
-do_mute = False         # mute during command
+add = False             # Switch to relative commands.
+do_mute = False         # Mute during command.
 
-# gets camilladsp setting for volume ramp, and use it for mute waiting
+# Gets camilladsp setting for volume ramp, and use it for mute waiting.
 ramp_time = cdsp_config['devices']['volume_ramp_time']/1000
 
 message = ''
 
-# exception definitions
+# Exception definitions
 
 
 class OptionsError(Exception):
@@ -51,7 +51,7 @@ class ClampWarning(Warning):
         self.clamp_value = clamp_value
 
 
-# auxiliary functions
+# Auxiliary functions
 
 
 def disconnect_sources(jack_client):
@@ -75,9 +75,9 @@ def do_source(source_arg):
     success = False
 
     sources = init.sources
-    # sources check is done here, not in proper function
+    # Sources check is done here, not in proper function.
     if source_arg in sources:
-        # check for already selected source
+        # Check for already selected source.
         if init.state['source'] == source_arg:
             message = 'source already selected'
         else:
@@ -95,15 +95,15 @@ def do_command(command, arg):
 
     success = False
 
-    # backup state to restore values in case of not enough headroom \
-    # or error of any kind
+    # Backup state to restore values in case of not enough headroom
+    # or error of any kind.
     state_old = init.state.copy()
 
     if arg:
         try:
             if do_mute and init.config['do_mute']:
                 cdsp.mute.set_main(True)
-                # 2x volume ramp_time for security (estimated)
+                # 2x volume ramp_time for security (estimated).
                 time.sleep(ramp_time*2)
 
             command(arg)
@@ -115,7 +115,7 @@ def do_command(command, arg):
         except ValueError as e:
             message = (f"command '{command.__name__}' needs a number: {e}")
         except Exception as e:
-            # restore state as it was before command
+            # Restore state as it was before command.
             init.state[command.__name__] = state_old[command.__name__]
             message = (f"exception in command '{command.__name__}': {str(e)}")
         else:
@@ -123,7 +123,7 @@ def do_command(command, arg):
         finally:
             if do_mute and init.config['do_mute']:
                 # 0.8x command_delay to give time for command to finish
-                # (estimated)
+                # (estimated).
                 time.sleep(init.config['command_delay'] * 0.8)
                 mute(init.state['mute'])
 
@@ -133,14 +133,11 @@ def do_command(command, arg):
     return success
 
 
-# internal functions for commands
+# Internal functions for commands
 
+# Commands that do not depend on camilladsp config.
 
-# commands that do not depend on camilladsp config
-
-
-# numerical commands that accept 'add'
-
+# Numerical commands that accept 'add'.
 
 def level(level):
     """Change level (gain relative to reference_level)."""
@@ -150,8 +147,7 @@ def level(level):
     set_gain(gain)
 
 
-# on/off commands
-
+# on/off commands.
 
 def clamp(clamp):
     """Free gain setting from clamping, useful for playing  low level files."""
@@ -178,25 +174,23 @@ def mute(mute):
         raise OptionsError(options)
 
 
-# commands that depend on camilladsp config
+# Commands that depend on camilladsp config.
 
-
-# numerical commands that accept 'add'
-
+# Numerical commands that accept 'add'.
 
 def loudness_ref(loudness_ref):
     """Select loudness reference level (correction threshold level)."""
     init.state['loudness_ref'] = (float(loudness_ref)
                                   + init.state['loudness_ref'] * add)
 
-    # clamp loudness_ref value
+    # Clamp loudness_ref value.
     if abs(init.state['loudness_ref']) > base.loudness_ref_variation:
         init.state['loudness_ref'] = m.copysign(
                                     base.loudness_ref_variation,
                                     init.state['loudness_ref']
                                     )
         raise ClampWarning(init.state['loudness_ref'])
-    # set loudness reference_level as absolute gain
+    # Set loudness reference_level as absolute gain.
     cdsp_config['filters']['f.loudness']['parameters']['reference_level'] = (
         pd.calc_gain(init.state['loudness_ref']))
 
@@ -204,12 +198,12 @@ def loudness_ref(loudness_ref):
 def bass(bass):
     """Select bass level correction."""
     init.state['bass'] = float(bass) + init.state['bass'] * add
-    # clamp bass value
+    # Clamp bass value.
     if m.fabs(init.state['bass']) > base.tone_variation:
         init.state['bass'] = m.copysign(
                             base.tone_variation, init.state['bass'])
         raise ClampWarning(init.state['bass'])
-    # set bass
+    # Set bass.
     cdsp_config['filters']['f.bass']['parameters']['gain'] = (
         init.state['bass']
         )
@@ -220,12 +214,12 @@ def treble(treble):
     """Select treble level correction."""
     init.state['treble'] = (float(treble)
                             + init.state['treble'] * add)
-    # clamp treble value
+    # Clamp treble value.
     if m.fabs(init.state['treble']) > base.tone_variation:
         init.state['treble'] = m.copysign(
                                 base.tone_variation, init.state['treble'])
         raise ClampWarning(init.state['treble'])
-    # set treble
+    # Set treble.
     cdsp_config['filters']['f.treble']['parameters']['gain'] = (
         init.state['treble']
         )
@@ -241,14 +235,14 @@ def balance(balance):
     """
     init.state['balance'] = (float(balance)
                              + init.state['balance'] * add)
-    # clamp balance value
+    # Clamp balance value.
     if m.fabs(init.state['balance']) > base.balance_variation:
         init.state['balance'] = m.copysign(
                                 base.balance_variation,
                                 init.state['balance']
                                 )
         raise ClampWarning(init.state['balance'])
-    # add balance dB gains
+    # Add balance dB gains.
     atten_dB_r = init.state['balance']
     atten_dB_l = - (init.state['balance'])
     cdsp_config['filters']['f.balance.L']['parameters']['gain'] = (
@@ -260,17 +254,16 @@ def balance(balance):
     set_gain(pd.calc_gain(init.state['level']))
 
 
-# non numerical commands
-
+# Non numerical commands.
 
 def source(source):
     """Change source."""
     global message
 
-    # reset clamp to 'on' when changing sources
+    # Reset clamp to 'on' when changing sources.
     init.state['clamp'] = 'on'
 
-    # additional waiting after muting
+    # Additional waiting after muting.
     time.sleep(init.config['command_delay'] * 0.2)
 
     source_ports = init.sources[source]['source_ports']
@@ -280,11 +273,11 @@ def source(source):
     disconnect_sources(tmp)
     try:
         for ports_group in init.config['audio_ports']:
-            # make no more than possible connections,
-            # i.e., minimum of input or output ports
+            # Make no more than possible connections,
+            # i.e., minimum of input or output ports.
             num_ports = min(len(ports_group), source_ports_len)
             for i in range(num_ports):
-                # audio sources
+                # Audio sources.
                 tmp.connect(source_ports[i], ports_group[i])
     except Exception as e:
         message = f'error connecting ports: {e}'
@@ -295,13 +288,13 @@ def source(source):
     finally:
         tmp.close()
 
-    # source change went OK
+    # Source change went OK.
     set_gain(pd.calc_gain(init.state['level']))
-    # change phase_eq if configured so
+    # Change phase_eq if configured so.
     if init.config['use_source_phase_eq']:
         phase_eq(init.sources[source]['phase_eq'])
 
-    # additional waiting before unmuting
+    # Additional waiting before unmuting.
     time.sleep(init.config['command_delay'] * 0.2)
 
 
@@ -358,8 +351,7 @@ def solo(solo):
         raise OptionsError(options)
 
 
-# on/off commands
-
+# on/off commands.
 
 def drc(drc):
     """Toggle drc."""
@@ -446,7 +438,7 @@ def sources(sources):
                 disconnect_sources(tmp)
                 tmp.close()
             case 'on':
-                # first check for source ports existence
+                # First check for source ports existence.
                 source_selected = init.state['source']
                 source_ports = init.sources[source_selected]['source_ports']
                 delay = init.config['command_delay'] * 0.1
@@ -531,7 +523,7 @@ def set_mixer():
         case 'l':       mixer = mixer * np.array([[1, 0], [1, 0]])
         case 'r':       mixer = mixer * np.array([[0, 1], [0, 1]])
 
-    # gain
+    # Gain
     for sources in range(2):
         for dest in range(2):
             if mixer[sources, dest]:
@@ -545,7 +537,7 @@ def set_mixer():
                         0
                         )
 
-    # inverted
+    # Inverted
     for sources in range(2):
         for dest in range(2):
             (cdsp_config['mixers']['m.mixer']['mapping'][dest]
@@ -553,7 +545,7 @@ def set_mixer():
                     bool(mixer[sources, dest] < 0)
                     )
 
-    # mute
+    # Mute
     for sources in range(2):
         for dest in range(2):
             (cdsp_config['mixers']['m.mixer']['mapping'][dest]
@@ -561,7 +553,7 @@ def set_mixer():
                     not bool(mixer[sources, dest])
                     )
 
-    # for debug
+    # For debug
     if init.config['verbose'] in {1, 2}:
         message = f'mixer matrix : \n{mixer}'
 
@@ -575,28 +567,28 @@ def set_gain(gain):
     """
     global message
 
-    # gain command send its str argument directly
+    # Gain command send its str argument directly.
     gain = float(gain)
-    # clamp gain value
-    # just for information, numerical bounds before math range or \
-    # math domain error are +6165 dB and -6472 dB
-    # max gain is clamped downstream when calculating headroom
+    # Clamp gain value.
+    # Just for information, numerical bounds before math range or
+    # math domain error are +6165 dB and -6472 dB.
+    # Max gain is clamped downstream when calculating headroom.
     if gain < base.gain_min:
         gain = base.gain_min
         message = (f'min. gain must be more than {base.gain_min} ' +
                    + 'dB\ngain clamped')
-    # calculate headroom and clamp gain if clamp_gain allows to do so
+    # Calculate headroom and clamp gain if clamp_gain allows to do so.
     if init.state['clamp'] == 'on':
         headroom = pd.calc_headroom(gain)
-        # adds source gain. It can lead to clipping \
-        # because assumes equal dynamic range between sources
+        # Adds source gain. It can lead to clipping
+        # because assumes equal dynamic range between sources.
         real_gain = gain + pd.calc_source_gain(init.state['source'])
-        # if enough headroom commit changes
-        # since there is no init.state['gain'] we set init.state['level']
+        # If enough headroom commit changes.
+        # Since there is no init.state['gain'] we set init.state['level'].
         if headroom >= 0:
             cdsp.volume.set_main(real_gain)
             init.state['level'] = pd.calc_level(gain)
-        # if not enough headroom tries lowering gain
+        # If not enough headroom tries lowering gain.
         else:
             set_gain(gain + headroom)
             message = 'headroom hit, lowering gain...'
@@ -604,9 +596,7 @@ def set_gain(gain):
         cdsp.volume.set_main(gain)
 
 
-# main command proccessing function
-
-
+# Main command proccessing function.
 def proccess_commands(full_command):
     """Procces commands for predic control."""
     global cdsp             # let camilladsp connection be accesible
@@ -618,7 +608,7 @@ def proccess_commands(full_command):
     do_mute = False
     success = False
 
-    # strips command final characters and split command from arguments
+    # Strips command final characters and split command from arguments.
     full_command = full_command.split()
     if len(full_command) > 0:
         command = full_command[0]
@@ -632,56 +622,54 @@ def proccess_commands(full_command):
         if full_command[2] == 'add':
             add = True
 
-    # parse  commands and select corresponding actions
-
+    # Parse  commands and select corresponding actions.
     try:
-        # commands that do not depend on camilladsp config
+        # Commands that do not depend on camilladsp config.
 
         if command in {'clamp', 'mute', 'level', 'gain'}:
             success = do_command(
              {
-                # numerical commands that accept 'add'
+                # Numerical commands that accept 'add'.
                 'level':            level,          # [level] add
-                # on/off commands
+                # on/off commands.
                 'clamp':            clamp,          # ['off','on','toggle']
                 'mute':             mute,           # ['off','on','toggle']
-                # special utility command
+                # Special utility command.
                 'gain':             set_gain        # [gain]
                 }[command], arg)
 
-        # commands that depend on camilladsp config
+        # Commands that depend on camilladsp config.
 
         elif command == 'source':
-            # source                            # [source]
-            success = do_source(arg)
-            # dispatch config
+            success = do_source(arg)                # [source]
+            # Dispatch config.
             cdsp.config.set_active(cdsp_config)
 
         elif command in {'loudness_ref', 'bass', 'treble', 'balance'}:
             success = do_command(
              {
-                # numerical commands that accept 'add'
+                # Numerical commands that accept 'add'.
                 'loudness_ref':     loudness_ref,   # [loudness_ref] add
                 'bass':             bass,           # [bass] add
                 'treble':           treble,         # [treble] add
                 'balance':          balance,        # [balance] add
                 }[command], arg)
-            # dispatch config
+            # Dispatch config.
             cdsp.config.set_active(cdsp_config)
 
         else:
-            # these commands benefit for silencing switching noise
+            # These commands benefit for silencing switching noise.
             do_mute = True
             success = do_command(
              {
-                # non numerical commands
+                # Non numerical commands.
                 'drc_set':          drc_set,        # [drc_set]
                 'eq_filter':        eq_filter,      # [eq_filter]
                 'stereo':           stereo,         # ['off','mid','side']
                 'channels':         channels,       # ['lr','l','r']
                 'solo':             solo,           # ['lr','l','r']
 
-                # on/off commands
+                # on/off commands.
                 'drc':              drc,            # ['off','on','toggle']
                 'phase_eq':         phase_eq,       # ['off','on','toggle']
                 'loudness':         loudness,       # ['off','on','toggle']
@@ -692,7 +680,7 @@ def proccess_commands(full_command):
                 'polarity':         polarity,       # ['off','on','toggle']
                 'polarity_flip':    polarity_flip   # ['off','on','toggle']
                 }[command], arg)
-            # dispatch config
+            # Dispatch config.
             cdsp.config.set_active(cdsp_config)
 
     except KeyError:
@@ -700,5 +688,4 @@ def proccess_commands(full_command):
 
     return success
 
-
-# end of proccess_commands()
+# End of proccess_commands().

@@ -22,7 +22,7 @@ def get_configs(filepath):
 
 # paths
 
-# main folder is the folder this very module is run from
+# main_folder is the folder this very module is run from.
 main_folder = os.path.dirname(__file__)
 
 config_folder = f'{main_folder}/{base.config_folder}'
@@ -37,8 +37,8 @@ clients_path = f'{config_folder}/{base.clients_filename}'
 eq_path = f'{config_folder}/{base.eq_filename}'
 camilladsp_path = f'{config_folder}/{base.camilladsp_filename}'
 
-# we still don't know the loudspeaker name, so speaker_path \
-# is built downstream
+# We still don't know the loudspeaker name, so speaker_path
+# is built downstream.
 
 
 # dictionaries
@@ -52,7 +52,7 @@ try:
     eq = get_configs(eq_path)
     camilladsp = get_configs(camilladsp_path)
 
-    # after knowing which speaker config to load, load it
+    # After knowing which speaker config to load, load it.
     loudspeaker_path = f'{loudspeakers_folder}/{config["loudspeaker"]}'
     speaker = get_configs(loudspeaker_path + '/' + base.loudspeaker_filename)
     drc = get_configs(loudspeaker_path + '/' + base.drc_filename)
@@ -62,11 +62,11 @@ except Exception as e:
     sys.exit()
 
 
-# some processing of data for downstream easyer use
-# while retaining upstream ease of writing in config files
+# Some processing of data for downstream easyer use
+# while retaining upstream ease of writing in config files.
 
-# audio ports
-# turn string space separated enumerations into lists
+# Audio ports
+# Turn string space separated enumerations into lists.
 for i in range(len(config['audio_ports'])):
     config['audio_ports'][i] = config['audio_ports'][i].split()
 

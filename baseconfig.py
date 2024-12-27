@@ -4,26 +4,26 @@
 
 """Customizable initial values."""
 
-# equalizer
+# Equalizer
 
-# audio controls level clamping
+# Audio controls level clamping.
 loudness_ref_variation = 12
 tone_variation = 6
 balance_variation = 6
-# max allowed digital gain (dB)
+# Max allowed digital gain (dB).
 gain_max = 0
-# min allowed digital gain (dB)
+# Min allowed digital gain (dB).
 gain_min = -100
 
 
-# folder names
-# relatives to main pre.di.c folder
+# Folder names
+# (Relative to main pre.di.c folder).
 
 config_folder = 'config'
 clients_folder = 'clients'
 loudspeakers_folder = 'loudspeakers'
 
-# filenames
+# Filenames
 
 config_filename = 'config.yml'
 state_filename = 'state.yml'

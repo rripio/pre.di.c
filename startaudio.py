@@ -55,27 +55,27 @@ def init_jack():
 def init_camilladsp():
     """Load camilladsp."""
     try:
-        # cd to louspeaker folder so filter paths are relative to this \
-        # folder in speaker.yml config file
+        # 'cd' to louspeaker folder so filter paths are relative to this
+        # folder in speaker.yml config file.
         os.chdir(init.loudspeaker_path)
         print(f'\n(startaudio) starting camilladsp on {os.getcwd()}')
         sp.Popen((f'{init.config["camilladsp_command"]} -m -w ' +
                   f'-p {init.config["websocket_port"]}').split())
 
-        # wait a bit
+        # Wait a bit.
         time.sleep(init.config['command_delay'] * 1)
 
-        # connect to camilladsp
+        # Connect to camilladsp.
         cdsp = CamillaClient("localhost", init.config['websocket_port'])
         cdsp.connect()
 
-        # get general part of camilladsp config
+        # Get general part of camilladsp config.
 
         cdsp_config = init.camilladsp
 
-        # get loudspeaker specific parts of camilladsp config
+        # Get loudspeaker specific parts of camilladsp config.
 
-        # merge loudspeaker specific settings in camilladsp config
+        # Merge loudspeaker specific settings in camilladsp config.
         cdsp_config['title'] = init.speaker['title']
         cdsp_config['description'] = init.speaker['description']
         cdsp_config['devices'].update(init.speaker['devices'])
@@ -83,8 +83,8 @@ def init_camilladsp():
         cdsp_config['mixers'].update(init.speaker['mixers'])
         cdsp_config['pipeline'].extend(init.speaker['pipeline'])
 
-        # send full config to camilladsp.
-        # probably we should check for jack ports here...
+        # Send full config to camilladsp.
+        # Probably we should check for jack ports here...
         cdsp.config.set_active(cdsp_config)
         cdsp.disconnect()
 
@@ -101,7 +101,7 @@ def init_server():
         sp.Popen((f'{init.config["python_command"]} ' +
                   f'{init.main_folder}/server.py').split())
 
-        # waiting for server
+        # Waiting for server.
         tmax = init.config['command_delay'] * 5
         interval = init.config['command_delay'] * 0.1
         if pd.wait4result(
@@ -165,23 +165,23 @@ def init_source(state):
     """Restore selected source as stored in state.yml."""
     source = state['source']
     print(f"\n(startaudio) restoring source '{source}'")
-    # wait for source ports to be up
+    # Wait for source ports to be up.
     tmax = init.config['command_delay'] * 15
     interval = init.config['command_delay'] * 0.5
     if pd.wait4source(source, tmax, interval):
-        # source ports up and ready :-)
-        # switch on source and leave function
+        # Source ports up and ready :-)
+        # Switch on source and leave function.
         if init.sources[source]['wait_on_start']:
-            # some clients (namely mpd) seems to need some extra time after \
-            # ports detection for whatever reason
+            # Some clients (namely mpd) seems to need some extra time after
+            # ports detection for whatever reason.
             time.sleep(init.config['command_delay'] * 2)
 
     else:
         print(f"\n(startaudio) could not connect '{source}' ports")
 
-    # disconnect sources from eventual bad behaving clients
+    # Disconnect sources from eventual bad behaving clients.
     pd.client_socket('sources off', port, quiet=True)
-    # actual source connection
+    # Actual source connection.
     pd.client_socket('sources on', port, quiet=True)
 
 
@@ -189,36 +189,34 @@ def main(run_level):
     """Start loading function."""
     # jack, brutefir, camilladsp, server
     if run_level in {'core', 'all'}:
-        # load basic audio kernel
         init_jack()
         init_camilladsp()
         init_server()
 
-    # inboard players
+    # Inboard players.
     if run_level in {'clients', 'all'}:
-        # getting operating state
-        # do it before launching clients \
-        # so they get the correct setting from state file if needed
+        # Getting operating state. Do it before launching clients
+        # so they get the correct setting from state file if needed.
         state = set_initial_state()
 
-        # activate command_unmute mode downstream
+        # Activate command_unmute mode downstream.
         pd.client_socket('command_unmute', port, quiet=True)
 
-        # restoring previous state
-        # exceptionally we add a line feed at the end \
-        # since settings restoring messages don't
+        # Restoring previous state.
+        # Exceptionally we add a line feed at the end
+        # since settings restoring messages don't.
         print('\n(startaudio): restoring previous settings:\n')
         init_state_settings(state)
 
-        # write source to state file for use of clients if config ask for it
+        # Write source to state file for use of clients if config ask for it.
         if state['sources'] == 'on':
-            # just refresh state file
+            # Just refresh state file.
             init.state['source'] = state['source']
             pd.client_socket('save', port, quiet=True)
 
-        # launch external clients, sources and clients
-        # exceptionally we add a line feed at the end \
-        # since client load messages don't
+        # Launch external clients, sources and clients.
+        # Exceptionally we add a line feed at the end
+        # since client load messages don't.
         print('\n(startaudio): starting clients...\n')
         for client in pd.read_clients('start'):
             try:
@@ -228,23 +226,23 @@ def main(run_level):
                 print(f"\n(startaudio) problem launching client '{client}':",
                       e)
 
-        # restoring sources if config mandates so
+        # Restoring sources if config mandates so.
         if state['sources'] == 'on':
             init_source(state)
 
-        # cancel command_unmute mode downstream \
-        # restoring config value
+        # Cancel command_unmute mode downstream.
+        # Restoring config value.
         if init.config['do_mute']:
             pd.client_socket('command_mute', port, quiet=True)
 
-        # save changes to file
+        # Save changes to file.
         pd.client_socket('save', port, quiet=True)
         print('\n(startaudio): pre.di.c started :-)')
 
 
 if __name__ == '__main__':
 
-    # switch runlevels
+    # Switch runlevels.
     if sys.argv[1:]:
         run_level = sys.argv[1]
     else:

@@ -19,7 +19,7 @@ import baseconfig as base
 import init
 
 
-# used on startaudio.py and stopaudio.py
+# Used on startaudio.py and stopaudio.py.
 def read_clients(phase):
     """
     Read list of programs to start/stop from config/clients.yml file.
@@ -30,7 +30,7 @@ def read_clients(phase):
 
     with open(clients_list_path) as clients_file:
         clients_dict = yaml.safe_load(clients_file)
-        # init a list of client actions
+        # Init a list of client actions.
         clients = [
             clients_dict[i][phase]
             for i in clients_dict if phase in clients_dict[i]
@@ -48,7 +48,7 @@ def read_yaml(filepath):
 
 def client_socket(data, port, quiet=True):
     """Make a socket for talking to the server."""
-    # avoid void command to reach server and get processed due to encoding
+    # Avoid void command to reach server and get processed due to encoding.
     if data == '':
         return b'ACK\n'
 
@@ -70,9 +70,9 @@ def client_socket(data, port, quiet=True):
         if not quiet:
             print('\n(lib) Connected')
         try:
-            # if a parameter is passed it is send to server
+            # If a parameter is passed it is send to server.
             s.send(data.encode())
-            # return raw bytes server answer
+            # Return raw bytes server answer.
             return s.recv(2048)
         except Exception:
             print(f'\n(lib) unexpected error: {sys.exc_info()[0]}')
@@ -135,21 +135,21 @@ def wait4ports(ports, tmax=5, interval=0.1):
 
     ports_name = ports[1].split(':', 1)[0]
     while (time.time() - time_start) < tmax:
-        # names of up input ports at this very moment as a generator
+        # Names of up input ports at this very moment as a generator.
         up_ports = (
             port.name for port in
             jc.get_ports(ports_name, is_output=False)
             )
-        # compare sets and, if wanted ports are among up input ports, \
+        # Compare sets and, if wanted ports are among up input ports,
         # then wanted ports are up and ready :-)
         if set(ports).issubset(set(up_ports)):
-            # go on
+            # Go on.
             jc.close()
             return True
         else:
             time.sleep(interval)
-    # time is exhausted and source ports are down :-(
-    # leave function without any connection made
+    # Time is exhausted and source ports are down :-(
+    # Leave function without any connection made.
     jc.close()
     return False
 

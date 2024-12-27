@@ -35,43 +35,43 @@ async def handle_commands(reader, writer):
 
     try:
         if data == 'status':
-            # Echo state to client as YAML string
+            # Echo state to client as YAML string.
             writer.write(yaml.dump(init.state,
                                    default_flow_style=False).encode())
 
         elif data == 'save':
-            # Write state to state file
+            # Write state to state file.
             write_state()
 
         elif data == 'camillaconfig':
-            # Write camilladsp config to file
+            # Write camilladsp config to file.
             write_camillaconfig()
 
         elif data == 'ping':
-            # just answers OK
+            # Just answers OK.
             pass
 
         elif data == 'command_unmute':
-            # Inhibit mute downstream
+            # Inhibit mute downstream.
             init.config['do_mute'] = False
 
         elif data == 'command_mute':
-            # Restore mute state downstream
+            # Restore mute state downstream.
             init.config['do_mute'] = True
 
         elif data == 'show':
-            # Print human readable status
+            # Print human readable status.
             say_OK = False
             writer.write(pd.show().encode())
 
         elif data == 'help':
-            # Print command help
+            # Print command help.
             say_OK = False
             writer.write(pd.help_str.encode())
 
         else:
-            # command received in 'data', \
-            # then send command to control.py
+            # Command received in 'data',
+            # then send command to control.py.
             if init.config['verbose'] in {1, 2}:
                 writer.write(b'\ncommand: ' + data.encode())
 
@@ -79,10 +79,10 @@ async def handle_commands(reader, writer):
                 raise Exception(control.message)
 
             writer.write(b'\n' + control.message.encode())
-            # a try block avoids blocking of state file writing \
-            # when the terminal that launched startaudio.py is closed
+            # A try block avoids blocking of state file writing
+            # when the terminal that launched startaudio.py is closed.
             try:
-                # writes state file
+                # Writes state file.
                 write_state()
             except Exception as e:
                 writer.write(b'\nan error occurred when writing state file: '

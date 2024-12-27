@@ -27,7 +27,7 @@ fnull = open(os.devnull, 'w')
 def main(run_level):
     """Stop pre.di.c."""
     if run_level in {'clients', 'all'}:
-        # stop external scripts, sources and clients
+        # Stop external scripts, sources and clients.
         print('(stopaudio) stopping clients:')
         for client in pd.read_clients('stop'):
             try:
@@ -47,8 +47,8 @@ def main(run_level):
         print('(stopaudio) stopping jackd')
         Popen('pkill -fe jackd'.split())
 
-        # dirty hack, rekill camilladsp
-        # wait a bit
+        # Dirty hack, rekill camilladsp.
+        # Wait a bit.
         time.sleep(init.config['command_delay'] * 5)
         # camilladsp
         print('(stopaudio) stopping camilladsp')
