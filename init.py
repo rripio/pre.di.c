@@ -67,8 +67,7 @@ except Exception as e:
 
 # Audio ports
 # Turn string space separated enumerations into lists.
-for i in range(len(config['audio_ports'])):
-    config['audio_ports'][i] = config['audio_ports'][i].split()
+config['audio_ports'] = [port.split() for port in config['audio_ports']]
 
 # source ports
 # turn string space separated enumerations into lists
