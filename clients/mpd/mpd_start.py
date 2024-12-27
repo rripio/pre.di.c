@@ -2,12 +2,9 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-"""
-start mpd
-"""
+"""Start mpd."""
 
 import os
-import sys
 import time
 import subprocess as sp
 import multiprocessing as mp
@@ -30,11 +27,13 @@ port = init.config['control_port']
 
 
 class Predic_vol_watch(FileSystemEventHandler):
+    """Watch predic volume level."""
 
     # initial level for comparison
     predic_level = pd.get_state()['level']
 
     def on_modified(self, event):
+        """Process volume changes."""
         # check level changes in pre.di.c
         predic_level_old = Predic_vol_watch.predic_level
         Predic_vol_watch.predic_level = pd.get_state()['level']
@@ -55,10 +54,7 @@ class Predic_vol_watch(FileSystemEventHandler):
 
 
 def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
-    """
-    Connect to mpd
-    """
-
+    """Connect to mpd."""
     client = mpd.MPDClient()
     client.connect(mpd_host, mpd_port)
     if mpd_passwd is not None:
@@ -67,10 +63,7 @@ def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
 
 
 def mpd_vol_loop():
-    """
-    loop: reads mpd volume, sets predic volume
-    """
-
+    """Read mpd volume, sets predic volume, on loop."""
     mpd_client = connect_mpd()
     mpd_gain_min = base.gain_max - mpd_conf['slider_range']
     while True:
@@ -89,10 +82,7 @@ def mpd_vol_loop():
 
 
 def predic_vol_loop():
-    """
-    loop: reads predic volume, sets mpd volume
-    """
-
+    """Read predic volume, sets mpd volume, on loop."""
     interval = init.config['command_delay'] / 2
 
     event_handler = Predic_vol_watch()
@@ -163,10 +153,10 @@ if mpd_conf['volume_linked']:
         mpdloop.start()
     except Exception as e:
         print('\n(mpd_load) mpd socket loop broke' +
-                f'with exception {e}')
+              f'with exception {e}')
     try:
         predicloop = mp.Process(target=predic_vol_loop)
         predicloop.start()
     except Exception as e:
         print('\n(mpd_load) predic socket loop broke' +
-                f' with exception {e}')
+              f' with exception {e}')

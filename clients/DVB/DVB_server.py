@@ -3,7 +3,7 @@
 # Copyright (C) Roberto Ripio
 
 """
-selects DVB channels
+selects DVB channels.
 
 Usage: DVB_command.py [preset [startaudio]]
 
@@ -49,15 +49,12 @@ port = config['control_port']
 
 
 async def handle_commands(reader, writer):
-
+    """Read command data."""
     rawdata = await reader.read(100)
     data = rawdata.decode().rstrip('\r\n').split()
 
     def select_channel(channel_name, channel_gain):
-        """
-        sets channel in mplayer
-        """
-
+        """Set channel in mplayer."""
         try:
             command = (
                 f"stop\n"
@@ -72,10 +69,7 @@ async def handle_commands(reader, writer):
             return False
 
     def select_preset(preset, preset_dict=presets):
-        """
-        selects preset from presets.yml
-        """
-
+        """Select preset from presets.yml."""
         # get channel name from preset number
         if preset.isdigit():
             preset = int(preset)
@@ -92,10 +86,7 @@ async def handle_commands(reader, writer):
 
     def change_radio(
             selected, startflag=False, preset_dict=presets, state=state):
-        """
-        process channel options
-        """
-
+        """Process channel options."""
         # list of presets, discarding those white in presets.yml
         state_old = state
         presets = list(map(str, sorted(
@@ -180,7 +171,7 @@ async def handle_commands(reader, writer):
 
 
 async def main():
-
+    """Start funcion."""
     server = await asyncio.start_server(
                 handle_commands,
                 config['control_address'],

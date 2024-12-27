@@ -2,9 +2,7 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-"""
-loads mplayer and DVB_server.py
-"""
+"""Load mplayer and DVB_server.py."""
 
 
 import os
@@ -41,4 +39,4 @@ time.sleep(delay)
 if config["play_on_start"]:
     print('\n(DVB_load) starting DVB play')
     pd.client_socket(f'{config["preset"]} startaudio',
-                        config["control_port"])
+                     config["control_port"])

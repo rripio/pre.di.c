@@ -2,9 +2,7 @@
 # pre.di.c, a preamp and digital crossover
 # Copyright (C) Roberto Ripio
 
-"""
-kills mplayer, DVB_server.py and start script
-"""
+"""Kill mplayer, DVB_server.py and start script."""
 
 
 import os
@@ -27,4 +25,3 @@ dir = os.path.dirname(os.path.realpath(__file__))
 sp.Popen(f'{config["stop_command"]}'.split())
 sp.Popen(f'pkill -f {dir}/DVB_server.py'.split())
 sp.Popen(f'pkill -f {dir}/DVB_start.py'.split())
-
