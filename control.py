@@ -560,7 +560,7 @@ def set_mixer():
 
 def set_gain(gain):
     """
-    Set_gain, aka 'the volume machine' :-).
+    Set_gain, aka 'the volume machine'.
 
     Gain is clamped to avoid positive gain,
     considering balance, tones and source gain shift.
