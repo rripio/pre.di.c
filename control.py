@@ -264,7 +264,8 @@ def source(source):
     init.state['clamp'] = 'on'
 
     # Additional waiting after muting.
-    time.sleep(init.config['command_delay'] * 0.2)
+    if do_mute and init.config['do_mute']:
+        time.sleep(init.config['command_delay'] * 0.5)
 
     source_ports = init.sources[source]['source_ports']
     source_ports_len = len(source_ports)
@@ -295,7 +296,8 @@ def source(source):
         phase_eq(init.sources[source]['phase_eq'])
 
     # Additional waiting before unmuting.
-    time.sleep(init.config['command_delay'] * 0.2)
+    if do_mute and init.config['do_mute']:
+        time.sleep(init.config['command_delay'] * 0.5)
 
 
 def drc_set(drc_set):
