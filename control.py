@@ -231,7 +231,7 @@ def balance(balance):
     Select balance level.
 
     'Balance' means deviation from 0 in R channel.
-    Seviation of the L channel then goes symmetrical.
+    Deviation of the L channel then goes symmetrical.
     """
     init.state['balance'] = (float(balance)
                              + init.state['balance'] * add)
