@@ -1,0 +1,66 @@
+# Main configuration
+
+# Values cannot be void.
+# Numbers: assign "none" to not set
+# Strings: assign "''" to not set
+
+
+# Hardware
+
+loudspeaker: example_1_way
+
+# Miscelanea
+
+# Delay between commands (seconds).
+command_delay: 1
+# Use fixed initial state, instead of last saved state.
+use_state_init: false
+# When changing sources use associated phase_eq setting.
+use_source_phase_eq: true
+# Mute output before some commands.
+do_mute: true
+
+
+# Jack audio ports
+
+# Source selector will connect sources ports to this ports in order.
+# Each group of ports is a space separated string.
+audio_ports:
+    # 5 input channels:
+    - cpal_client_in:in_0 cpal_client_in:in_1 cpal_client_in:in_2 cpal_client_in:in_3 cpal_client_in:in_4
+    # 2 input channels:
+    # - cpal_client_in:in_0 cpal_client_in:in_1
+
+    # - system:playback_1 system:playback_2
+    # - stream_loop:input_1 stream_loop:input_2
+
+
+# Core
+
+# Server
+
+# verbose: 0 (minimal), 1 (informative), 2 (debug)
+verbose: 1
+# Address and port.
+# 0.0.0.0 listen to all net connections
+# 127.0.0.1 listen only to local connections
+control_address: 0.0.0.0
+control_port: 9999
+
+# Python virtual environement
+
+python_command: /home/predic/pre.di.c/.venv/bin/python
+
+# jack
+# omit fs (managed in startaudio.py, taken from loudspeaker config)
+jack_command: /usr/bin/jackd --silent -r -I netmanager -dalsa -p512 -n 3 -d hw:USB,0
+
+# For options see https://github.com/HEnquist/camilladsp#command-line-options.
+# Omit config file (managed in startaudio.py, taken from base config).
+# fs is taken from loudspeaker config and overrides camilladsp.yml.
+# camilladsp_command: /home/predic/bin/camilladsp-2.0.3 --logfile /dev/null -s /home/predic/camilladsp/statefile.yml
+camilladsp_command: /home/predic/bin/camilladsp --logfile /dev/null
+
+# Use this for warnings to appear on screen:
+websocket_address: 127.0.0.1
+websocket_port: 1234

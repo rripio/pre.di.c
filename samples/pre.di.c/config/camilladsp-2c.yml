@@ -1,9 +1,11 @@
+# General camilladsp config
+
 title: "2 channels base"
 description: "base config for preamp functions. 2 channels input"
 
 devices:
 
-    chunksize: 1024
+    chunksize: 4096
     silence_threshold: -80
     silence_timeout: 10.0
     volume_ramp_time: 100.0
@@ -15,36 +17,23 @@ devices:
 
 mixers:
 
-    # preamp mixer.
     # do not edit.
-
     m.mixer:
+        description: Main. Preamp.
         channels:
             in: 2
             out: 2
         mapping:
         -   dest: 0
-            mute: false
             sources:
             -   channel: 0
-                gain: 0
-                inverted: false
-                mute: false
             -   channel: 1
-                gain: 0
-                inverted: false
                 mute: true
         -   dest: 1
-            mute: false
             sources:
             -   channel: 0
-                gain: 0
-                inverted: false
                 mute: true
             -   channel: 1
-                gain: 0
-                inverted: false
-                mute: false
 
 
 filters:
@@ -54,6 +43,7 @@ filters:
 
     f.loudness:
         type: Loudness
+        description: Main. Loudness control.
         parameters:
             reference_level: 0
             # high_boost: 1.5
@@ -63,20 +53,19 @@ filters:
 
     f.balance.L:
         type: Gain
+        description: Main. Balance control. Left channel.
         parameters:
             gain: 0
-            inverted: false
-            mute: false
 
     f.balance.R:
         type: Gain
+        description: Main. Balance control. Right channel.
         parameters:
             gain: 0
-            inverted: false
-            mute: false
 
     f.bass:
         type: Biquad
+        description: Main. Tone control. Bass.
         parameters:
             type: Lowshelf
             freq: 158
@@ -85,6 +74,7 @@ filters:
 
     f.treble:
         type: Biquad
+        description: Main. Tone control. Treble.
         parameters:
             type: Highshelf
             freq: 2530
@@ -93,34 +83,39 @@ filters:
 
     f.dither:
         type: Dither
+        description: Main. Final render dither.
         parameters:
             type: Highpass
             bits: 24
 
-    # optional FIR phase linearizing filter.
-    # it can be switched by pre.di.c but not changed.
-    # this is a dummy container, do not change.
-    # speaker config can overwrite this.
+    # These are dummy containers, do not change.
+    # Speaker config can overwrite all this.
+
+    # This can be switched by pre.di.c but not changed.
     f.phase_eq:
         type: Conv
+        description: Main. FIR phase linearizing. Dummy container.
         parameters:
             type: Dummy
             length: 1
 
     f.eq:
         type: Conv
+        description: Main. Music equalization. Dummy container.
         parameters:
             type: Dummy
             length: 1
 
     f.drc.L:
         type: Conv
+        description: Main. Room Correction. Left channel. Dummy container.
         parameters:
             type: Dummy
             length: 1
 
     f.drc.R:
         type: Conv
+        description: Main. Room Correction. Right channel. Dummy container.
         parameters:
             type: Dummy
             length: 1
@@ -134,100 +129,100 @@ pipeline:
 # volume section
 
 -   type: Mixer
-    name: m.input
-
--   type: Mixer
     name: m.mixer
+    description: Main. Preamp.
 
 -   type: Filter
     channel: 0
     names:
     -   f.balance.L
+    description: Main. Balance control. Left channel.
 
 -   type: Filter
     channel: 1
     names:
     -   f.balance.R
+    description: Main. Balance control. Right channel.
 
 # eq section
 
 -   type: Filter
-    description: 'loudness'
     channel: 0
     bypassed: true
     names:
     -   f.loudness
+    description: Main. Loudness control. Left channel.
 
 -   type: Filter
-    description: 'loudness'
     channel: 1
     bypassed: true
     names:
     -   f.loudness
+    description: Main. Loudness control. Right channel.
 
     # switchable fixed length filters
 
 -   type: Filter
-    description: 'tones'
     channel: 0
     bypassed: true
     names:
     -   f.bass
     -   f.treble
+    description: Main. Tone controls. Left channel.
 
 -   type: Filter
-    description: 'tones'
     channel: 1
     bypassed: true
     names:
     -   f.bass
     -   f.treble
+    description: Main. Tone controls. Right channel.
 
 
 -   type: Filter
-    description: 'phase_eq'
     channel: 0
     bypassed: true
     names:
     -   f.phase_eq
+    description: Main. FIR phase linearizing. Left channel.
 
 -   type: Filter
-    description: 'phase_eq'
     channel: 1
     bypassed: true
     names:
     -   f.phase_eq
+    description: Main. FIR phase linearizing . Right channel.
 
     # switchable variable length filters
 
     # defined in eq.yml
 
 -   type: Filter
-    description: 'eq'
     channel: 0
     bypassed: true
     names:
     -   f.eq
+    description: Main. Music equalization. Left channel.
 
 -   type: Filter
-    description: 'eq'
     channel: 1
     bypassed: true
     names:
     -   f.eq
+    description: Main. Music equalization. Right channel.
 
     # defined in [loudspeaker]/drc.yml
 
 -   type: Filter
-    description: 'drc'
     channel: 0
     bypassed: true
     names:
     -   f.drc.L
+    description: Main. Room Correction. Left channel.
 
 -   type: Filter
-    description: 'drc'
     channel: 1
     bypassed: true
     names:
     -   f.drc.R
+    description: Main. Room Correction. Left channel.

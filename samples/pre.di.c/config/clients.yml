@@ -1,8 +1,8 @@
-# client start/stop scripts listed in this file are launched on start and stop.
-#
-# names refer to any kind of executable and corresponding options, if any.
-# beware of python executable in caso of using a virtual python environement
+# Clients configuration
 
+# Client start/stop scripts listed in this file are launched on start and stop.
+# Names refer to any kind of executable and corresponding options, if any.
+# Beware of python executable in case of using a virtual python environement
 
 # mpd:
 #     start:  /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/mpd/mpd_start.py

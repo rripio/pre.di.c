@@ -15,7 +15,7 @@ phase_eq: 'off'
 polarity: 'off'
 polarity_flip: 'off'
 solo: lr
-source: analog
+source: tape
 sources: 'on'
 stereo: normal
 tones: 'off'

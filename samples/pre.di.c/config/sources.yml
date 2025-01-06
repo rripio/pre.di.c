@@ -1,23 +1,24 @@
-# sources configuration
+# Sources configuration
 
-# source_name:
+# Source_name:
 
-## gain shift of source
+# Gain shift of source
 #   gain: float(dB)
 
-## jack source ports
+# Jack source ports
 #   source_ports: source_jack_port_1 source_jack_port_2
 
-## phase equalizer will be activated automatically when the source is selected \
-## if use_source_phase_eq: false in main config.
-#   phase_eq: true
+# Phase equalizer will be activated automatically when the source is selected.
+# If "use_source_phase_eq: true" in main config:
+#   phase_eq: ['on' | 'off']
+# Beware of quotes!
 
-## wait a bit before switching source on startup, after source ports are up.
-## mpd needs this, maybe other clients also.
+# Wait a bit before switching source on startup, after source ports are up.
+# mpd needs this, maybe other clients also.
 # wait_on_start: [true | false]
 
 
-analogue:
+tape:
     gain: 0
     source_ports: system:capture_1 system:capture_2
     phase_eq: 'on'

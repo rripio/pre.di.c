@@ -1,4 +1,4 @@
-# EQ filters for recordings
+# Recording equalizer config
 
 "1":
     f.eq:
