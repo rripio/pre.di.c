@@ -111,7 +111,9 @@ def do_command(command, arg):
         except ClampWarning as w:
             message = (f"'{command.__name__}' value clamped: {w.clamp_value}")
         except OptionsError as e:
-            message = (f"options has to be in : {str(list(e.options))}")
+            options = str(list(e.options))
+            message = (
+                f"'{command.__name__}' options have to be in: {options}")
         except ValueError as e:
             message = (f"command '{command.__name__}' needs a number: {e}")
         except Exception as e:
@@ -293,7 +295,12 @@ def source(source):
     set_gain(pd.calc_gain(init.state['level']))
     # Change phase_eq if configured so.
     if init.config['use_source_phase_eq']:
-        phase_eq(init.sources[source]['phase_eq'])
+        # reveal error if 'on'/'off' options lacks quotes in config
+        try:
+            phase_eq(init.sources[source]['phase_eq'])
+        except OptionsError as e:
+            options = str(list(e.options))
+            message = (f"'phase_eq' options have to be in : {options}")
 
     # Additional waiting before unmuting.
     if do_mute and init.config['do_mute']:
