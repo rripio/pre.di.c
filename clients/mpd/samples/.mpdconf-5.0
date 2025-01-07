@@ -1,4 +1,6 @@
-## folders
+# mpd configuration. 5 channels input.
+
+# Folders
 
 music_directory                     "~/music"
 playlist_directory                  "~/playlists"
@@ -9,28 +11,28 @@ state_file_interval                 "1"
 sticker_file                        "~/.mpd/sticker.sqlite"
 
 
-## listen to clients
+# Listen to clients
 
 port                    "6600"
 # listen to tcp/ip socket:
 # bind_to_address                     "any"
 bind_to_address                     "0.0.0.0"       # only local network
 # listen to unix socket:
-# bind_to_address                     "~/.mpd/socket"
+bind_to_address                     "~/.mpd/socket"
 
-## user when run from root
+# User when run from root
 
 # user                                "predic"
 # group                               "audio"
 
 
-## database
+# Database
 
 database {
-  plugin "simple"
-  path "~/.mpd/database"
-  cache_directory "~/.mpd/cache"
-}
+    plugin "simple"
+    path "~/.mpd/database"
+    cache_directory "~/.mpd/cache"
+    }
 
 auto_update                         "yes"
 # auto_update_depth                   "3"
@@ -38,24 +40,27 @@ follow_outside_symlinks             "no"
 follow_inside_symlinks              "no"
 
 
-## neighbor plugins
+# Neighbor plugins
 
 neighbors {
     plugin "udisks"
-}
+    }
+neighbors {
+    plugin "upnp"
+    }
 
 
-## input cache
+# Input cache
 
-# this config breaks mpd
+# This config breaks mpd
 
 # input_cache {
-#     size "1 GB"
-# }
+#   size "1 GB"
+#   }
 
 
-## decoder plugins
-## (see active ones with 'mpd --version')
+# Decoder plugins
+# (see active ones with 'mpd --version')
 
 decoder {
     plugin "mpg123"
@@ -70,7 +75,7 @@ decoder {
     }
 
 
-## input plugins
+# Input plugins
 
 input {
     plugin "tidal"
@@ -84,65 +89,75 @@ input {
 
 input {
     plugin "cdio_paranoia"
-    enabled "no"
+    enabled "yes"
+    mode "disable"
+    skip "yes"
     }
 
+input {
+    plugin      "curl"
+    enabled     "yes"
+    }
 
-## outputs
+## playlist plugins
 
-# jack audio output
+playlist_plugin {
+    name "cue"
+    enabled "false"
+    }
+    
+# Outputs
+
+# Jack audio output
 audio_output {
     type            "jack"
     name            "mpd_jack"
     client_name     "mpd_jack"
     source_ports    "L,R,C,LS,RS"
-    # source_ports    "L,R"
-    # auto_destination_ports "no"
-    auto_destination_ports "yes"
-    destination_ports "cpal_client_in:in_0,cpal_client_in:in_1,cpal_client_in:in_2,cpal_client_in:in_3,cpal_client_in:in_4"
+    auto_destination_ports "no"
     mixer_type      "null"
     enabled         "yes"
     always_on       "yes"
-}
+    }
 
 
-## resampling
+# Resampling
 
 # resampler {
-#     plugin  "soxr"
-#     quality "medium"
-#     threads "0"
-# }
+#    plugin  "soxr"
+#    quality "medium"
+#    threads "0"
+#    }
+
+# resampler {
+#    plugin  "soxr"
+#    quality "high"
+#    }
 
 resampler {
     plugin  "soxr"
-    quality "high"
-}
-
-#resampler {
-#    plugin  "soxr"
-#    quality "very high"
-#}
+    quality "very high"
+    }
 
 # resampler {
 #    plugin  "libsamplerate"
 #    type "Fastest Sinc Interpolator"
-# }
+#    }
 
 # resampler {
 #    plugin  "libsamplerate"
 #    type "Medium Sinc Interpolator"
-# }
+#    }
 
 
-## replay gain
+# Replay gain
 
 replaygain                          "album"
 # replaygain_preamp                   "0"
 # volume_normalization                "no"
 
 
-## misc
+# Miscelanea
 
 filesystem_charset "UTF-8"
 # log_level                           "default"
@@ -154,7 +169,7 @@ metadata_to_use "artist, albumartist, album, title, track, name, genre, date, co
 # save_absolute_paths_in_playlists    "no"
 
 
-## advanced
+# Advanced
 
 # connection_timeout                  "60"        # default
 # max_connections                     "5"         # default
@@ -163,7 +178,7 @@ metadata_to_use "artist, albumartist, album, title, track, name, genre, date, co
 # max_output_buffer_size              "8192"      # default)
 
 
-## zeroconf
+# Zeroconf
 
 # zeroconf_enabled                    "yes"
 # zeroconf_name                       "predic mpd :-)"
