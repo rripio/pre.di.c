@@ -102,7 +102,7 @@ def do_command(command, arg):
     if arg:
         try:
             if do_mute and init.config['do_mute']:
-                cdsp.mute.set_main(True)
+                cdsp.volume.set_main_mute(True)
                 # 2x volume ramp_time for security (estimated).
                 time.sleep(ramp_time*2)
 
@@ -171,7 +171,7 @@ def mute(mute):
         if mute == 'toggle':
             mute = toggle('mute')
         init.state['mute'] = mute
-        cdsp.mute.set_main({'off': False, 'on': True}[mute])
+        cdsp.volume.set_main_mute({'off': False, 'on': True}[mute])
     else:
         raise OptionsError(options)
 
@@ -595,14 +595,14 @@ def set_gain(gain):
         # If enough headroom commit changes.
         # Since there is no init.state['gain'] we set init.state['level'].
         if headroom >= 0:
-            cdsp.volume.set_main(real_gain)
+            cdsp.volume.set_main_volume(real_gain)
             init.state['level'] = pd.calc_level(gain)
         # If not enough headroom tries lowering gain.
         else:
             set_gain(gain + headroom)
             message = 'headroom hit, lowering gain...'
     else:
-        cdsp.volume.set_main(gain)
+        cdsp.volume.set_main_volume(gain)
 
 
 # Main command proccessing function.

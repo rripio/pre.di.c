@@ -58,7 +58,7 @@ jack_command: /usr/bin/jackd --silent -r -I netmanager -dalsa -p512 -n 3 -d hw:U
 # For options see https://github.com/HEnquist/camilladsp#command-line-options.
 # Omit config file (managed in startaudio.py, taken from base config).
 # fs is taken from loudspeaker config and overrides camilladsp.yml.
-# camilladsp_command: /home/predic/bin/camilladsp-2.0.3 --logfile /dev/null -s /home/predic/camilladsp/statefile.yml
+# camilladsp_command: /home/predic/bin/camilladsp --logfile /dev/null -s /home/predic/camilladsp/statefile.yml
 camilladsp_command: /home/predic/bin/camilladsp --logfile /dev/null
 
 # Use this for warnings to appear on screen:
