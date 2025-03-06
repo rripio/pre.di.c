@@ -238,6 +238,7 @@ def show():
 
 
 help_str = '''
+    help                                This help
     status                              Display status
     save                                Save status
     camillaconfig                       Save actual camilladsp config
