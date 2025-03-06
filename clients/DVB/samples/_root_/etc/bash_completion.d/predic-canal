@@ -1,0 +1,12 @@
+_script_canal()
+{
+  _script_commands="forth back last previous"
+
+  local cur
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  COMPREPLY=( $(compgen -W "${_script_commands}" -- ${cur}) )
+
+  return 0
+}
+complete -o nospace -F _script_canal canal
