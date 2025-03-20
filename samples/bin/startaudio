@@ -1,5 +1,7 @@
 #!/bin/bash
 
-/home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/startaudio.py $1 &
+/home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/startaudio.py $1
 
-exit
+sleep 5
+echo
+exit 0
