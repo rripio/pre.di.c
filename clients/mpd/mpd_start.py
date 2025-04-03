@@ -135,13 +135,13 @@ try:
 
     # Load silence file, plays it a bit, delete it from playlist,
     # and restore the play pointer to previous state.
-    mpd_client.addid(mpd_conf['silence_path'], 0)
-    mpd_client.play(0)
-    time.sleep(delay)
-    mpd_client.delete(0)
-    mpd_client.pause()
+    songid = mpd_client.addid(mpd_conf['silence_path'], )
+    mpd_client.playid(songid)
+    mpd_client.stop()
+    mpd_client.deleteid(songid)
     if restore:
         mpd_client.seek(song, elapsed)
+    mpd_client.pause()
     mpd_client.close()
 except Exception as e:
     print(f'\n(mpd_load) error in ping routine: {e}')
