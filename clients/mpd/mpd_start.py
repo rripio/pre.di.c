@@ -19,33 +19,33 @@ import init
 import pdlib as pd
 
 
-# user config
+# User config.
 config_filename = 'config.yml'
 
-# globals
+# Globals.
 port = init.config['control_port']
 
 
 class Predic_vol_watch(FileSystemEventHandler):
     """Watch predic volume level."""
 
-    # initial level for comparison
+    # Initial level for comparison.
     predic_level = pd.get_state()['level']
 
     def on_modified(self, event):
         """Process volume changes."""
-        # check level changes in pre.di.c
+        # Check level changes in pre.di.c.
         predic_level_old = Predic_vol_watch.predic_level
         Predic_vol_watch.predic_level = pd.get_state()['level']
         predic_level = Predic_vol_watch.predic_level
         if predic_level != predic_level_old:
-            # update mpd "fake volume"
+            # Update mpd "fake volume".
             predic_gain = predic_level + init.speaker['ref_level_gain']
             mpd_vol = round(
                 (predic_gain - mpd_gain_min)
                 * 100 / mpd_conf['slider_range']
                 )
-            # minimal mpd volume
+            # Minimal mpd volume.
             if mpd_vol < 0:
                 mpd_vol = 0
             mpd_client = connect_mpd()
@@ -67,10 +67,10 @@ def mpd_vol_loop():
     mpd_client = connect_mpd()
     mpd_gain_min = base.gain_max - mpd_conf['slider_range']
     while True:
-        # wait for changes in mpd mixer
+        # Wait for changes in mpd mixer.
         mpd_client.idle('mixer')
         mpd_vol = int(mpd_client.status()['volume'])
-        # update pre.di.c level
+        # Update pre.di.c level.
         predic_level = round(
             (mpd_vol / 100 * mpd_conf['slider_range'])
             + mpd_gain_min
@@ -115,16 +115,16 @@ else:
     print('\n(mpd_load) mpd loading failed')
     quit()
 
-# ping mpd to create jack ports
+# Ping mpd to create jack ports.
 try:
     mpd_client = connect_mpd()
     status = mpd_client.status()
-    # check if there's a playlist loaded and, if any, \
-    # get relevant status data
-    # no 'song' in status if there is no playlist
+    # Check if there's a playlist loaded and, if any,
+    # get relevant status data.
+    # No 'song' in status if there is no playlist.
     if 'song' in status:
         song = status['song']
-        # no 'elapsed' in status if song stoppped
+        # No 'elapsed' in status if song stoppped.
         if 'elapsed' in status:
             elapsed = status['elapsed']
         else:
@@ -133,8 +133,8 @@ try:
     else:
         restore = False
 
-    # load silence file, plays it a bit, delete it from playlist, \
-    # and restore the play pointer to previous state
+    # Load silence file, plays it a bit, delete it from playlist,
+    # and restore the play pointer to previous state.
     mpd_client.addid(mpd_conf['silence_path'], 0)
     mpd_client.play(0)
     time.sleep(delay)
@@ -146,7 +146,7 @@ try:
 except Exception as e:
     print(f'\n(mpd_load) error in ping routine: {e}')
 
-# volume linked to mpd (optional)
+# Volume linked to mpd (optional).
 if mpd_conf['volume_linked']:
     try:
         mpdloop = mp.Process(target=mpd_vol_loop)
