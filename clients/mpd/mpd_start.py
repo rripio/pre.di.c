@@ -137,6 +137,7 @@ try:
     # and restore the play pointer to previous state.
     songid = mpd_client.addid(mpd_conf['silence_path'], )
     mpd_client.playid(songid)
+    time.sleep(1)
     mpd_client.stop()
     mpd_client.deleteid(songid)
     if restore:
