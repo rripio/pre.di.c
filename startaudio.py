@@ -129,7 +129,7 @@ def set_initial_state():
 def init_state_settings(state):
     """Restore audio settings from state.yaml."""
     """
-    Source is not restored.
+    Source and mute are not restored.
     Take care of options to reset some of them.
     It is assumed that command name and setting name are the same.
     Source associated phase_EQ will prevail if use_source_phase_EQ is set
@@ -148,7 +148,6 @@ def init_state_settings(state):
             'level',
             'loudness',
             'loudness_ref',
-            'mute',
             'phase_eq',
             'polarity',
             'polarity_flip',
@@ -214,7 +213,7 @@ def main(run_level):
             init.state['source'] = state['source']
             pd.client_socket('save', port, quiet=True)
 
-        # Launch external clients, sources and clients.
+        # Launch external clients.
         # Exceptionally we add a line feed at the end
         # since client load messages don't.
         print('\n(startaudio): starting clients...\n')
@@ -229,6 +228,9 @@ def main(run_level):
         # Restoring sources if config mandates so.
         if state['sources'] == 'on':
             init_source(state)
+
+        # Restore mute state.
+        pd.client_socket(f'mute {state["mute"]}', port)
 
         # Cancel command_unmute mode downstream.
         # Restoring config value.
