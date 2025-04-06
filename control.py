@@ -152,7 +152,7 @@ def level(level):
 # on/off commands.
 
 def clamp(clamp):
-    """Free gain setting from clamping, useful for playing  low level files."""
+    """Free gain setting from clamping, useful for playing low level files."""
     options = {'off', 'on', 'toggle'}
     if clamp in options:
         if clamp == 'toggle':
