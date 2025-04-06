@@ -231,6 +231,7 @@ def main(run_level):
 
         # Restore mute state.
         pd.client_socket(f'mute {state["mute"]}', port)
+        print(f'mute {state["mute"]}')
 
         # Cancel command_unmute mode downstream.
         # Restoring config value.
