@@ -135,12 +135,12 @@ def wait4ports(ports, tmax=5, interval=0.1):
 
     ports_name = ports[1].split(':', 1)[0]
     while (time.time() - time_start) < tmax:
-        # Names of up input ports at this very moment as a generator.
+        # Names of up ports at this very moment as a generator.
         up_ports = (
             port.name for port in
-            jc.get_ports(ports_name, is_output=False)
+            jc.get_ports(ports_name)
             )
-        # Compare sets and, if wanted ports are among up input ports,
+        # Compare sets and, if wanted ports are among up ports,
         # then wanted ports are up and ready :-)
         if set(ports).issubset(set(up_ports)):
             # Go on.
