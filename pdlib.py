@@ -133,7 +133,8 @@ def wait4ports(ports, tmax=5, interval=0.1):
     time_start = time.time()
     jc = jack.Client('wait_client')
 
-    ports_name = ports[1].split(':', 1)[0]
+    # take basename of first element of ports list
+    ports_name = ports[0].split(':', 1)[0]
     while (time.time() - time_start) < tmax:
         # Names of up ports at this very moment as a generator.
         up_ports = (
