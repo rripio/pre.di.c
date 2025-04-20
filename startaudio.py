@@ -189,7 +189,21 @@ def main(run_level):
     # jack, brutefir, camilladsp, server
     if run_level in {'core', 'all'}:
         init_jack()
-        init_camilladsp()
+        
+        # camillaDSP:
+        # Hack to care for unconsistent port name creation upstream.
+        # Get camilladsp port names:
+        ports = sum(init.config["audio_ports"], [])
+        count = 0
+        while count < 5:
+            init_camilladsp()
+            if pd.wait4ports(ports):
+                break
+            else:
+                sp.Popen('pkill -fe camilladsp'.split())
+                count += 1
+
+
         init_server()
 
     # Inboard players.
