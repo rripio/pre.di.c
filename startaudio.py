@@ -15,6 +15,7 @@ Starts pre.di.c audio system.
 import sys
 import os
 import time
+import re
 import subprocess as sp
 
 import init
@@ -193,7 +194,10 @@ def main(run_level):
         # camillaDSP:
         # Hack to care for unconsistent port name creation upstream.
         # Get camilladsp port names:
+        # Join all music output ports in a list:
         ports = sum(init.config["audio_ports"], [])
+        # Filter camillaDSP ports:
+        ports = [x for x in ports if re.match("cpal_client_in.*", x)]
         count = 0
         while count < 5:
             init_camilladsp()
