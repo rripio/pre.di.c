@@ -27,31 +27,34 @@ port = init.config['control_port']
 
 
 class Predic_vol_watch(FileSystemEventHandler):
-    """Watch predic volume level."""
+    """Watch predic volume gain."""
 
-    # Initial level for comparison.
-    predic_level = pd.get_state()['level']
+    # Initial gain for comparison.
+    predic_gain = pd.calc_gain(pd.get_state()['level'])
 
     def on_modified(self, event):
         """Process volume changes."""
-        # Check level changes in pre.di.c.
-        predic_level_old = Predic_vol_watch.predic_level
-        Predic_vol_watch.predic_level = pd.get_state()['level']
-        predic_level = Predic_vol_watch.predic_level
-        if predic_level != predic_level_old:
-            # Update mpd "fake volume".
-            predic_gain = predic_level + init.speaker['ref_level_gain']
-            mpd_vol = round(
-                (predic_gain - mpd_gain_min)
-                * 100 / mpd_conf['slider_range']
-                )
-            # Minimal mpd volume.
-            if mpd_vol < 0:
-                mpd_vol = 0
-            mpd_client = connect_mpd()
-            mpd_client.setvol(int(mpd_vol))
-            mpd_client.close()
+        # Check gain changes in pre.di.c.
+        predic_gain_old = Predic_vol_watch.predic_gain
+        Predic_vol_watch.predic_gain = pd.calc_gain(pd.get_state()['level'])
+        predic_gain = Predic_vol_watch.predic_gain
+        if predic_gain != predic_gain_old:
+            update_mpd_vol(predic_gain)
 
+
+def update_mpd_vol(predic_gain):
+    """Update mpd "fake volume"."""
+    mpd_vol = round((predic_gain - base.gain_max)
+        / mpd_conf['gain_precision'] + 100)
+    # Clamp mpd volume.
+    if mpd_vol < 0:
+        mpd_vol = 0
+    if mpd_vol > 100:
+        mpd_vol = 100
+    mpd_client = connect_mpd()
+    mpd_client.setvol(int(mpd_vol))
+    mpd_client.close()
+    
 
 def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
     """Connect to mpd."""
@@ -65,18 +68,14 @@ def connect_mpd(mpd_host='localhost', mpd_port=6600, mpd_passwd=None):
 def mpd_vol_loop():
     """Read mpd volume, sets predic volume, on loop."""
     mpd_client = connect_mpd()
-    mpd_gain_min = base.gain_max - mpd_conf['slider_range']
     while True:
         # Wait for changes in mpd mixer.
         mpd_client.idle('mixer')
         mpd_vol = int(mpd_client.status()['volume'])
-        # Update pre.di.c level.
-        predic_level = round(
-            (mpd_vol / 100 * mpd_conf['slider_range'])
-            + mpd_gain_min
-            - init.speaker['ref_level_gain']
-            )
-        pd.client_socket("level " + str(predic_level), port, quiet=True)
+        # Update pre.di.c gain.
+        predic_gain = ((mpd_vol - 100) * mpd_conf['gain_precision']
+                       + base.gain_max)
+        pd.client_socket("gain " + str(predic_gain), port, quiet=True)
     mpd_client.close()
     mpd_client.disconnect()
 
@@ -101,7 +100,6 @@ def predic_vol_loop():
 
 dir = os.path.dirname(os.path.realpath(__file__))
 mpd_conf = pd.read_yaml(f'{dir}/{config_filename}')
-mpd_gain_min = base.gain_max - mpd_conf['slider_range']
 
 print('\n(mpd_load) starting mpd')
 sp.Popen(mpd_conf["mpd_start_command"].split())
@@ -132,7 +130,6 @@ try:
         restore = True
     else:
         restore = False
-
     # Load silence file, plays it a bit, delete it from playlist,
     # and restore the play pointer to previous state.
     songid = mpd_client.addid(mpd_conf['silence_path'], )
@@ -161,3 +158,5 @@ if mpd_conf['volume_linked']:
     except Exception as e:
         print('\n(mpd_load) predic socket loop broke' +
               f' with exception {e}')
+    # Initialize mpd volume:
+    update_mpd_vol(pd.calc_gain(pd.get_state()['level']))

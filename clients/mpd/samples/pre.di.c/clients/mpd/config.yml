@@ -14,11 +14,11 @@ port: '6600'
 
 # link mpd and predic volumes
 volume_linked: true
-# mpd volume range (dB from 0% to 100%)
-# 100% is then mapped to pre.di.c gain_max
-# gain at 0% is then gain_max - slider_range
-# must be positive integer
-slider_range: 54
+# mpd volume pecision
+# (pre.di.c dB volume increment for 1% mpd volume increment)
+# 100% is mapped to pre.di.c gain_max
+# must be positive float
+gain_precision: 0.5
 
 # path to silence dummy file relative to base music directory
 silence_path: 'mpd_silence.wav'
