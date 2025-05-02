@@ -14,7 +14,6 @@ from watchdog.events import FileSystemEventHandler
 
 import mpd
 
-import baseconfig as base
 import init
 import pdlib as pd
 
@@ -27,25 +26,25 @@ port = init.config['control_port']
 
 
 class Predic_vol_watch(FileSystemEventHandler):
-    """Watch predic volume gain."""
+    """Watch predic volume level."""
 
-    # Initial gain for comparison.
-    predic_gain = pd.calc_gain(pd.get_state()['level'])
+    # Initial level for comparison.
+    predic_level = pd.get_state()['level']
 
     def on_modified(self, event):
         """Process volume changes."""
-        # Check gain changes in pre.di.c.
-        predic_gain_old = Predic_vol_watch.predic_gain
-        Predic_vol_watch.predic_gain = pd.calc_gain(pd.get_state()['level'])
-        predic_gain = Predic_vol_watch.predic_gain
-        if predic_gain != predic_gain_old:
-            update_mpd_vol(predic_gain)
+        # Check level changes in pre.di.c.
+        predic_level_old = Predic_vol_watch.predic_level
+        Predic_vol_watch.predic_level = pd.get_state()['level']
+        predic_level = Predic_vol_watch.predic_level
+        if predic_level != predic_level_old:
+            update_mpd_vol(predic_level)
 
 
-def update_mpd_vol(predic_gain):
+def update_mpd_vol(predic_level):
     """Update mpd "fake volume"."""
-    mpd_vol = round((predic_gain - base.gain_max)
-        / mpd_conf['gain_precision'] + 100)
+    mpd_vol = round(predic_level / mpd_conf['level_precision'] 
+                     + mpd_conf['zerolevel_map'])
     # Clamp mpd volume.
     if mpd_vol < 0:
         mpd_vol = 0
@@ -72,10 +71,10 @@ def mpd_vol_loop():
         # Wait for changes in mpd mixer.
         mpd_client.idle('mixer')
         mpd_vol = int(mpd_client.status()['volume'])
-        # Update pre.di.c gain.
-        predic_gain = ((mpd_vol - 100) * mpd_conf['gain_precision']
-                       + base.gain_max)
-        pd.client_socket("gain " + str(predic_gain), port, quiet=True)
+        # Update pre.di.c level.
+        predic_level = ((mpd_vol - mpd_conf['zerolevel_map']) 
+                        * mpd_conf['level_precision'])
+        pd.client_socket("level " + str(predic_level), port, quiet=True)
     mpd_client.close()
     mpd_client.disconnect()
 
@@ -159,4 +158,4 @@ if mpd_conf['volume_linked']:
         print('\n(mpd_load) predic socket loop broke' +
               f' with exception {e}')
     # Initialize mpd volume:
-    update_mpd_vol(pd.calc_gain(pd.get_state()['level']))
+    update_mpd_vol(pd.get_state()['level'])
