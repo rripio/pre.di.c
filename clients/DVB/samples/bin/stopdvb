@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source ~/pre.di.c/.venv/bin/activate
+python /home/predic/pre.di.c/clients/DVB/DVB_stop.py
+

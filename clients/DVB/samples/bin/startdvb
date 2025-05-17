@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source ~/pre.di.c/.venv/bin/activate
+python /home/predic/pre.di.c/clients/DVB/DVB_start.py
+sleep 10
+echo connecting source
+~/bin/control sources on
+
