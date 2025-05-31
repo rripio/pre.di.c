@@ -41,3 +41,18 @@ tape:
 #     source_ports: mplayer_dvb:out_0 mplayer_dvb:out_1
 #     phase_eq: 'on'
 #     wait_on_start: false
+# 
+# cd:
+#     gain: 0
+#     source_ports: cd:capture_1 cd:capture_2
+#     phase_eq: 'on'
+#     wait_on_start: false
+#     
+# spotify:
+#     gain: 0
+#     source_ports: librespot:out_0 librespot:out_1
+#     # source_ports: cpal_client_out-01:out_0 cpal_client_out-01:out_1
+#     phase_eq:'on'
+#     wait_on_start: false
+
+
