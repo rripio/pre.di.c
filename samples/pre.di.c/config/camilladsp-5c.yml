@@ -118,8 +118,9 @@ filters:
         type: Dither
         description: Main. Final render dither.
         parameters:
-            type: Highpass
+            type: Flat
             bits: 24
+            amplitude: 2
 
     # These are dummy containers, do not change.
     # Speaker config can overwrite all this.
