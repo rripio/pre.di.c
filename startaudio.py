@@ -166,7 +166,7 @@ def init_source(state):
     source = state['source']
     print(f"\n(startaudio) restoring source '{source}'")
     # Wait for source ports to be up.
-    tmax = init.config['command_delay'] * 15
+    tmax = init.config['command_delay'] * 5
     interval = init.config['command_delay'] * 0.5
     if pd.wait4source(source, tmax, interval):
         # Source ports up and ready :-)
@@ -199,9 +199,11 @@ def main(run_level):
         # Filter camillaDSP ports:
         ports = [x for x in ports if re.match("cpal_client_in.*", x)]
         count = 0
+        tmax = init.config['command_delay'] * 2
+        interval = init.config['command_delay'] * 0.5
         while count < 5:
             init_camilladsp()
-            if pd.wait4ports(ports):
+            if pd.wait4ports(ports, tmax, interval):
                 break
             else:
                 sp.Popen('pkill -fe camilladsp'.split())
