@@ -239,7 +239,7 @@ def main(run_level):
         print('\n(startaudio): starting clients...\n')
         for client in pd.read_clients('start'):
             try:
-                p = sp.Popen(client.split())
+                p = sp.Popen(client.split(), stdout=sp.DEVNULL)
                 print(f'pid {p.pid:4}: {client}')
             except Exception as e:
                 print(f"\n(startaudio) problem launching client '{client}':",
