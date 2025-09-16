@@ -7,28 +7,20 @@
 # mpd:
 #     start:  /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/mpd/mpd_start.py
 #     stop:   /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/mpd/mpd_stop.py
-# 
+
 # DVB:
 #     start:  /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/DVB/DVB_start.py
 #     stop:   /home/predic/pre.di.c/.venv/bin/python /home/predic/pre.di.c/clients/DVB/DVB_stop.py
-# 
-# netjack:
-#     start:  /home/predic/pre.di.c/clients/netjack_load
+ 
+# net:
+#     start: /home/predic/pre.di.c/clients/netsource
 
-#stream_loop:
-#    start:  /home/predic/pre.di.c/clients/stream_loop.py
+# jack_loop:
+#     start:  /home/predic/pre.di.c/clients/jackloop
 
 # zita-cd:
-#     start:  zita-a2j -d hw:CARD=U24XL,DEV=0 -p 2048 -r 44100 -j cd -v
+#     start:  zita-a2j -d hw:CARD=U24XL,DEV=0 -r 44100 -j cd
 #     stop:   killall zita-a2j
-
-# zita-cd:
-#     start:  alsa_in -d hw:CARD=U24XL,DEV=0 -p 2048 -r 44100 -j cd -n 3 -q 3
-#     stop:   killall alsa_in
-
-# zita-cd:
-#     start:  jack_load cd zalsa_in -i "-d hw:CARD=U24XL,DEV=0 -r 44100 -v -L"
-#     stop:   jack_unload cd
 
 # 
 # librespot:

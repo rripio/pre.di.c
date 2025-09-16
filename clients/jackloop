@@ -1,0 +1,8 @@
+#!/bin/sh
+
+jack_thru_client &
+
+sleep 1
+
+jack_connect jack_thru_client:output_1 netjack:playback_1
+jack_connect jack_thru_client:output_2 netjack:playback_2

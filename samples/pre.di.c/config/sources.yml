@@ -32,7 +32,7 @@ tape:
 # 
 # net:
 #     gain: 0
-#     source_ports: net:from_slave_1 net:from_slave_2
+#     source_ports: netjack:capture_1 netjack:capture_2
 #     phase_eq: 'on'
 #     wait_on_start: false
 # 

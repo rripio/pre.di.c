@@ -31,8 +31,9 @@ audio_ports:
     # 2 input channels:
     # - cpal_client_in:in_0 cpal_client_in:in_1
 
+    # Aditional ports:
     # - system:playback_1 system:playback_2
-    # - stream_loop:input_1 stream_loop:input_2
+    # - jack_thru_client:input_1 jack_thru_client:input_2
 
 
 # Core
@@ -44,16 +45,19 @@ verbose: 1
 # Address and port.
 # 0.0.0.0 listen to all net connections
 # 127.0.0.1 listen only to local connections
-control_address: 0.0.0.0
+control_address: 127.0.0.1
 control_port: 9999
 
 # Python virtual environement
 
 python_command: /home/predic/pre.di.c/.venv/bin/python
 
-# jack
-# omit fs (managed in startaudio.py, taken from loudspeaker config)
-jack_command: /usr/bin/jackd --silent -r -I netmanager -dalsa -p512 -n 3 -d hw:USB,0
+# Jack
+
+# Omit fs (managed in startaudio.py, taken from loudspeaker config)
+jack_command: /usr/bin/jackd --silent -R -P 80 -d alsa -p1024 -n 3 -d hw:USB,0
+
+# Camilladsp
 
 # For options see https://github.com/HEnquist/camilladsp#command-line-options.
 # Omit config file (managed in startaudio.py, taken from base config).

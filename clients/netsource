@@ -1,0 +1,8 @@
+#!/bin/sh
+
+jack_netsource -H workstation -o 2 -i 2 -O 0 -I 0 &
+
+sleep 1
+
+jack_disconnect jack_thru_client:output_1 system:playback_1
+jack_disconnect jack_thru_client:output_2 system:playback_2
