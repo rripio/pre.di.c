@@ -1,3 +1,6 @@
+This repository has been archived.
+Development follows at [https://codeberg.org/rripio/pre.di.c](https://codeberg.org/rripio/pre.di.c).
+
 # pre.di.c
 A preamp and digital crossover.
 
